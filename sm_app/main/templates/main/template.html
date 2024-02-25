@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<style>
+
+.heading{
+    display: flex;
+     margin: auto;
+ }
+
+     .topbar{
+     width: 100%;
+     height: 85px;
+     background-color: rgb(186, 186, 186);
+ }
+ .logo-button{
+     background-color: rgb(186, 186, 186);
+     border: none;
+     size: 60px;
+     padding-left: 30px;
+     padding-top: 15px;
+ }
+ 
+ .contents{
+     padding: 30px;
+         width: 70%;
+         height: 70%;
+         margin: auto;
+         position: absolute;
+         top: 50%;
+         margin-top: 20px;
+         text-align: center;
+ }
+ .post{
+     padding: 30px;
+         width: 85%;
+         height: 85%;
+         margin: auto;
+         position: absolute;
+         top: 50%;
+         margin-top: 20px;
+         text-align: left;
+ }
+ .add{
+     width: 10%;
+     margin: auto;
+     position: absolute;
+ }
+ .profile{
+     text-align: center;
+     padding: 10px;
+     margin: auto;
+     position: absolute;
+     width: 85%;
+     height: 85%;
+     margin-top: 25px;
+ }
+ .like {
+     width: 10%;
+     height: 10%;
+     margin-left: 90%;
+ }
+ .pfp_image{
+     width: 30px;
+     height: 30px;
+     border-radius:15px;
+ }
+ .pfp_button{
+     height: 35px;
+     width: 35px;
+     background-color: #fff;
+     border-radius: 17.5px;
+     border-color: green;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+ .follow{
+     width: 100px;
+     left: 50%;
+     
+ }
+ .profile-row-one{
+     text-align: center;
+ }
+ .profile-pfp{
+     height: 100px;
+     width: 100px;
+ }
+.sideopener{
+    position: absolute;
+    right: 10px;
+    top: 20px;
+}
+.user-profile{
+    position: absolute;
+    height: 54px;
+    width: 54px;
+    right: 80px;
+    top: 15px;
+    border-radius: 25px;
+    border-color: green;
+}
+.user-image{
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
+}
+.minipost{
+    width: 300px;
+    height: 100px;                          
+}
+.invis{
+    border: none;
+    background-color: #fff;
+
+}
+</style>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} | Arabali</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
+    
+</head>
+<body>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasnav" aria-labelledby="offcanvasnav">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasExampleLabel">More</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <button type="button" class="btn btn-success col-sm" onclick='location.href = "/page/"'><h2>Feed</h2></button>
+            <button type="button" class="btn btn-success col-sm" onclick='location.href = ""'><h2>DM's</h2></button>
+            <button type="button" class="btn btn-success col-sm" onclick='location.href = "/logout/"'><h2>Logout</h2></button>
+
+          </div>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+    <div class="topbar">
+        <button type="button" class="logo-button" onclick='location.href = ""'><h2>Arabali</h2></button>
+        <button class="btn btn-success sideopener" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav">
+            More
+        </button>
+          {% block topbar %}{% endblock %}
+            </div>
+    {% block body %}{% endblock %}
+</body>
+</html>

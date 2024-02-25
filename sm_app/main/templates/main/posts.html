@@ -1,0 +1,55 @@
+{% extends 'main/template.html' %} 
+{% block title %} 
+{{post.title}}
+{% endblock %} 
+{% block body %}
+    <div class="card post">
+        <div>
+            <button class="pfp_button"> <img src={{post.user_pfp.url}} class="pfp_image", onclick='location.href = "/profile/{{post.user}}"'/> </button>
+            <h6 class="display4">{{post.user}}</h6>
+        </div>
+        <img src="{{post.media_mp3.url}}" alt="image">
+        <br>
+        <h3 class="display4">{{post.title}}</h3>
+        <p>{{post.contents}}</p>
+        <button type="submit" id="like{{post.id}}" class="btn btn-outline-success like " data-post-id="{{post.id}}">Like | {{post.likes}}</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.like').click(function() {
+            console.log('clicked')
+            var postId = $(this).data('post-id');
+            console.log('Post ID:', postId);
+            var button = $(this);
+            console.log('defined')
+            $.ajax({
+                type: 'POST',
+                url: '/page/liked/',
+                data: {
+                    'post_id': postId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                
+                success: function(response) {
+                    console.log('success')
+                    button.text('Like | ' + response.likes);
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log('Error:', xhr.ststus, xhr.statusText);
+                },
+                beforeSend: function(xhr, settings) {
+                    console.log('Before send:', settings);
+                    console.log('i.hasContent:', settings.hasContent);
+                    console.log('i.data:', settings.data);
+                }
+            });
+        });
+        $(document).on('submit', '#post-form', function(e) {
+            e.preventDefault()
+            console.log('prevented');
+        });
+    });
+</script>
+{% endblock %}
