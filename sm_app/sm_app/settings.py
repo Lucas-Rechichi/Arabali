@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'validate.apps.ValidateConfig',
     'crispy_forms',
-    'crispy_bootstrap4',
+    'crispy_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -126,9 +126,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+# crispy forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-CRISPY_TEMPLATE_PACK = "bootstrap4"
+# url configuration
+LOGIN_REDIRECT_URL =  "/page/"
+LOGOUT_REDIRECT_URL =  "/logout/"
 
-LOGIN_REDIRECT_URL =  "/"
-LOGOUT_REDIRECT_URL =  "/"
+# images
+MEDIA_ROOT = os.path.join(BASE_DIR, 'arabali_users')
+MEDIA_URL = '/arabali_users/'
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
