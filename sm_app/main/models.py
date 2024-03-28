@@ -46,4 +46,3 @@ class UserStats(models.Model):
     pfp = models.ImageField(null=True, upload_to=get_image_upload_path_profile)
     banner = models.ImageField(null=True, upload_to=get_image_upload_path_profile)
     following = models.ManyToManyField(Following)
-

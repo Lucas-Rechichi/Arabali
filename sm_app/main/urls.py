@@ -9,4 +9,3 @@ urlpatterns = [
     path('posts/<int:post_id>', main_v.post_view, name="post_view"),
 ]
 
-
