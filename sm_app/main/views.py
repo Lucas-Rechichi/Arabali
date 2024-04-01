@@ -108,10 +108,18 @@ def profile(request, name):
         'post': posts,
         'followed_user': followed_userstats, 
     }
-    for x in followed_userstats:
-        print(x[0].pfp) 
     return render(request, 'main/profile.html', profile_vars)
 
 def post_view(request, post_id):
     post = Post.objects.get(id=post_id)
     return render(request, 'main/posts.html', {"post": post})
+
+def edit_profile(request, name):
+    username = request.user.username
+    if name != username:
+        return HttpResponseRedirect('/edit_error/')
+    
+    return render(request, 'main/edit_profile.html')
+
+def edit_error(request):
+    return render(request, 'main/unsafe_editing.html')

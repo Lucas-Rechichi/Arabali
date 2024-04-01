@@ -49,8 +49,15 @@
 </div>
 </div>
 <br>
+
 <form action="" method="post">
-  {% csrf_token %} {% if self_profile %} {% else %} {% if is_following %}
+  {% csrf_token %} 
+  {% if self_profile %}
+  <div class="container">
+    <button class="btn btn-success col-1" , onclick='location.href = "/edit/{{user.username}}"'>Edit</button>
+    </div> 
+  {% else %} 
+  {% if is_following %}
   <button
     type="submit"
     name="follow"

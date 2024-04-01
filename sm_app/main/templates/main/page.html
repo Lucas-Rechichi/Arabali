@@ -5,7 +5,9 @@
 
 {% block title %}For You{% endblock %}
 {% block topbar %}
-        <button class="user-profile" onclick='location.href = "/profile/{{username}}"'><img src="{{user.pfp.url}}" alt="pfp" class="user-image"></button>
+        <div class="container">
+            <button class="user-profile" onclick='location.href = "/profile/{{username}}"'><img src="{{user.pfp.url}}" alt="pfp" class="user-image"></button>
+        </div>
 {% endblock %} 
 {% block body %}
 
