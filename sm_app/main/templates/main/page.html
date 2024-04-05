@@ -22,7 +22,12 @@
     {% for posts in post %}
     <div class="card post">
         <div>
-            <button class="pfp_button"> <img src={{posts.user_pfp.url}} class="pfp_image", onclick='location.href = "/profile/{{posts.user}}"'/> </button>
+            {% for key, value in post_users.items %}
+                {% if key|stringformat:"%s%s" == posts.user|stringformat:"%s%s" %}
+                    <button class="pfp_button"> <img src="{{ value }}" class="pfp_image", onclick='location.href = "/profile/{{posts.user}}"'/> </button>
+                {% else %}
+                {% endif %}
+            {% endfor %}
             <h6 class="display4">{{posts.user}}</h6>
         </div>
         <img src="{{posts.media_mp3.url}}" alt="image">
@@ -40,6 +45,7 @@
         </div>
     </div>
     {% endfor %}
+    
     </form>
     
 </div>
