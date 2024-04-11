@@ -1,3 +1,4 @@
+
 import os
 
 from django.shortcuts import render, HttpResponseRedirect
@@ -13,14 +14,15 @@ from main.models import UserStats
 from django.http import HttpResponse
 from django.conf import settings
 from validate.views import create_user_directory
+
 from main.errors import UsernameError
 from main.configure import Configure
 from datetime import datetime
+from django.shortcuts import render
 
 # Create your views here.
 def home(request):
     return render(request, "main/home.html")
-
 
 @login_required
 def page(request):
