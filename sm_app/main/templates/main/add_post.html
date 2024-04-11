@@ -1,12 +1,17 @@
 {% extends 'main/template.html' %}
 {% load crispy_forms_tags %}
-{% block title %}For You{% endblock %}
+{% block title %}Add Post{% endblock %}
+{% block sidebar %}
+<div class="col-12 p-2">
+    <button type="button" class="btn btn-light border border-success" , onclick='location.href = "/edit/{{username}}"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.37.14 am.png" alt="" style="height: 30px; width: 30px;"> Settings</button>
+</div>
+{% endblock %}
 {% block body %}
 <div class="card contents">
     <form method="post", enctype="multipart/form-data">
         {% csrf_token %}
         {{ input_fields | crispy }}
-        <button type="submit", class="btn btn-success">Add Post</button>
+        <button type="submit", class="btn btn-success">Post</button>
     </form>
 </div>
 {% endblock %}

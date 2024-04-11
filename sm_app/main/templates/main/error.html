@@ -1,0 +1,16 @@
+{% extends 'main/template.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Error{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <h2 class="display4">
+                    {{issue}}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

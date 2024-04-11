@@ -1,0 +1,2 @@
+class UsernameError(Exception):
+    pass

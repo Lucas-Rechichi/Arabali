@@ -5,10 +5,10 @@
 {% block body %}
     <div class="card post">
         <div>
-            <button class="pfp_button"> <img src={{post.user_pfp.url}} class="pfp_image", onclick='location.href = "/profile/{{post.user}}"'/> </button>
+            <button class="pfp_button"> <img src={{user_stats.pfp.url}} class="pfp_image", onclick='location.href = "/profile/{{post.user}}"'/> </button>
             <h6 class="display4">{{post.user}}</h6>
         </div>
-        <img src="{{post.media_mp3.url}}" alt="image">
+        <img src="{{post.media.url}}" alt="image">
         <br>
         <h3 class="display4">{{post.title}}</h3>
         <p>{{post.contents}}</p>
