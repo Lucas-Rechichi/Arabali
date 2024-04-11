@@ -1,6 +1,11 @@
 {% extends 'main/template.html' %} 
 {% block title %} 
 {{ user.username }} 
+{% endblock %}
+{% block sidebar %}
+<div class="col-12 p-2">
+  <button type="button" class="btn btn-light border border-success" , onclick='location.href = "/edit/{{user.username}}"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.37.14 am.png" alt="" style="height: 30px; width: 30px;"> Settings</button>
+</div>
 {% endblock %} 
 {% block body %}
 <div class="card profile">
@@ -12,7 +17,7 @@
   <h2>Followers: {{ userstats.followers }}</h2>
 </div>
 <div class="col-3 pt-4">
-  <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#followers">Followers</button>
+  <button class="btn btn-light border border-success" data-bs-toggle="modal" data-bs-target="#followers"><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.39.51 am.png" alt="" style="height: 30px; width: 30px;"> Followers</button>
   <div class="modal fade" id="followers">
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
@@ -50,9 +55,6 @@
 </div>
 <br>
 {% if self_profile %}
-  <div class="container">
-    <button class="btn btn-success col-1" , onclick='location.href = "/edit/{{user.username}}"'>Settings</button>
-    </div>
 {% else %}
 <form action="" method="post">
   {% csrf_token %} 
@@ -61,8 +63,8 @@
     type="submit"
     name="follow"
     value="unfollow"
-    class="btn btn-outline-success follow"
-  >
+    class="btn btn-light follow border border-success"
+  ><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.42.09 am.png" alt="" style="height: 30px; width: 30px;">
     Unfollow
   </button>
   {% else %}
@@ -70,8 +72,8 @@
     type="submit"
     name="follow"
     value="follow"
-    class="btn btn-success follow"
-  >
+    class="btn btn-light follow border border-success"
+  ><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.41.46 am.png" alt="" style="height: 30px; width: 30px;">
     Follow
   </button>
   {% endif %}

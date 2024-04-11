@@ -6,8 +6,13 @@
 {% block title %}For You{% endblock %}
 {% block topbar %}
         <div class="container">
-            <button class="user-profile" onclick='location.href = "/profile/{{username}}"'><img src="{{user.pfp.url}}" alt="pfp" class="user-image"></button>
+            <button class="user-profile border border-success rounded-circle border-2" onclick='location.href = "/profile/{{username}}"'><img src="{{user.pfp.url}}" alt="pfp" class="user-image"></button>
         </div>
+{% endblock %}
+{% block sidebar %}
+<div class="col-12 p-2">
+    <button type="button" class="btn btn-light border border-success" , onclick='location.href = "/edit/{{username}}"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.37.14 am.png" alt="" style="height: 30px; width: 30px;"> Settings</button>
+</div>
 {% endblock %} 
 {% block body %}
 
@@ -16,7 +21,7 @@
 <div class="card contents">
     <h2 class="display4"> Hello {{username}}. </h2>
     <br>
-    <button class="btn btn-success add" onclick='location.href = "/add/"'>+</button>
+    <button class="btn btn-light add border border-success" onclick='location.href = "/add/"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.38.03 am.png" alt="" style="height: 30px; width: 30px;"></button>
     <form method="post", id="post-form">
         {% csrf_token %}
     {% for posts in post %}
@@ -30,7 +35,7 @@
             {% endfor %}
             <h6 class="display4">{{posts.user}}</h6>
         </div>
-        <img src="{{posts.media_mp3.url}}" alt="image">
+        <img src="{{posts.media.url}}" alt="image">
         <br>
         <h3 class="display4">{{posts.title}}</h3>
         <p>{{posts.contents}}</p>

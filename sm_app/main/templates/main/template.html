@@ -96,8 +96,6 @@
     width: 54px;
     right: 80px;
     top: 15px;
-    border-radius: 25px;
-    border-color: green;
 }
 .user-image{
     position: absolute;
@@ -139,20 +137,30 @@
         </div>
         <div class="offcanvas-body">
           <div>
-            <button type="button" class="btn btn-success col-sm" onclick='location.href = "/page/"'><h2>Feed</h2></button>
-            <button type="button" class="btn btn-success col-sm" onclick='location.href = ""'><h2>DM's</h2></button>
-            <button type="button" class="btn btn-success col-sm" onclick='location.href = "/logout/"'><h2>Logout</h2></button>
-
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = "/page/"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.35.46 am.png" alt="" style="height: 30px; width: 30px;"> Feed</button>
+                    </div>
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = ""'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.36.09 am.png" alt="" style="height: 30px; width: 30px;"> DM's</button>
+                    </div>
+                    {% block sidebar %}{% endblock %}
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = "/logout/"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.35.22 am.png" alt="" style="height: 30px; width: 30px;"> Logout</button>
+                    </div>
+                </div>
+            </div>
           </div>
           </div>
         </div>
       </div>
         </div>
       </div>
-    <div class="topbar">
-        <button type="button" class="logo-button" onclick='location.href = ""'><h2>Arabali</h2></button>
-        <button class="btn btn-success sideopener" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav">
-            More
+      <div class="topbar">
+        <button type="button" class="logo-button" onclick='location.href = "/home/"'><h2 class="display-6" style="color: green;">Arabali</h2></button>
+        <button class="btn btn-light sideopener border border-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav" style="">
+            <img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.33.31 am.png" alt="" style="height: 30px; width: 30px;">
         </button>
           {% block topbar %}{% endblock %}
             </div>

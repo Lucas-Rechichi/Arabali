@@ -30,12 +30,13 @@ class Following(models.Model):
 # models
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    user_pfp = models.ImageField(null=True, upload_to=get_image_upload_path_posts)
     title = models.CharField(max_length=150)
     contents = models.TextField()
     likes = models.IntegerField()
-    media_mp3 = models.ImageField(null=True, upload_to=get_image_upload_path_posts)
+    media = models.ImageField(null=True, upload_to=get_image_upload_path_posts)
     liked_by = models.ManyToManyField(LikedBy)
+    created_at = models.DateTimeField()
+    date_modified = models.DateTimeField(null=True, default=None)
 
     def __str__(self):
         return self.title 
