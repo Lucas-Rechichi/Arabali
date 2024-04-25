@@ -1,10 +1,11 @@
 {% extends 'main/template.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Add Post{% endblock %}
-{% block sidebar %}
-<div class="col-12 p-2">
-    <button type="button" class="btn btn-light border border-success" , onclick='location.href = "/edit/{{username}}"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.37.14 am.png" alt="" style="height: 30px; width: 30px;"> Settings</button>
-</div>
+{% block topsidebar %}
+<li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
+{% endblock %}
+{% block middlesidebar %}
+<li class="custom-icon"><div class="fs-4"><i class="bi bi-gear-wide-connected" style="color: #787878;"></i></div> <a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
 {% endblock %}
 {% block body %}
 <div class="card contents">

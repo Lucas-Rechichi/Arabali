@@ -1,47 +1,116 @@
-
+from collections import defaultdict
 import os
 
 from django.shortcuts import render, HttpResponseRedirect
 from django.http import JsonResponse
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F
 from validate.forms import User
 from django.contrib.auth.decorators import login_required
 from main.models import Post
-from main.forms import AddPost, EditProfile, EditPost
+from main.forms import AddPost, EditProfile, EditPost, AddComment
 from main.models import LikedBy, Following
-from main.models import UserStats
+from main.models import UserStats, Comment, NestedComment
 from django.http import HttpResponse
 from django.conf import settings
 from validate.views import create_user_directory
-
 from main.errors import UsernameError
 from main.configure import Configure
 from datetime import datetime
-from django.shortcuts import render
 
 # Create your views here.
 def home(request):
     return render(request, "main/home.html")
 
+
 @login_required
 def page(request):
+    # Getting relevent variables
     name = request.user.username
     u = User.objects.get(username=name)
     us = UserStats.objects.get(user=u)
     p = Post.objects.all()
     s = UserStats.objects.all()
+    user_liked_by = LikedBy.objects.get(name=name)
+    
+    # Forms
+    if request.method == 'POST':
+
+        comment_form = AddComment(request.POST)
+        sub_comment_form = AddComment(request.POST)
+
+        if request.POST.get('comment'):
+            print(request.POST)
+            text = request.POST.get('text')
+            post_id = request.POST.get('post_id')
+            post_for_comment = Post.objects.get(id=post_id)
+            comm = Comment(post=post_for_comment, user=u, text=text, likes=0)
+            comm.save()
+            return HttpResponseRedirect('/page/')
+        else:
+            print(request.POST) 
+            return HttpResponseRedirect('/page/')
+    else:
+        print(request.POST)
+        comment_form = AddComment()
+        sub_comment_form = AddComment()
+
+    # Comment and pfp processing
+    liked_by = {}
+    post_comments = {}
+    post_replies = {}
+    for post in p:
+        liked_by[f'{post.pk}'] = list(post.liked_by.all())
+        comments_for_post = Comment.objects.filter(post=post)
+        for comment in comments_for_post:
+            print(comment)
+            sub_comments = NestedComment.objects.filter(comment=comment)
+            for sub_comment in sub_comments:
+                print(sub_comment)
+                print(comment.pk, sub_comment.comment.pk)
+                post_replies[f'{sub_comment.pk}'] = {
+                    'id':sub_comment.pk,
+                    'comment':sub_comment.comment,
+                    'comment_id':sub_comment.comment.pk,
+                    'user':sub_comment.user,
+                    'text':sub_comment.text,
+                    'liked__by':sub_comment.liked_by,
+                    'likes':sub_comment.likes,
+                    'created_at':sub_comment.created_at
+                }
+            post_comments[f'{comment.pk}'] = {
+                'id':comment.pk,
+                'post':comment.post,
+                'post_id':comment.post.pk,
+                'user':comment.user,
+                'text':comment.text,
+                'liked__by':comment.liked_by,
+                'likes':comment.likes,
+                'created_at':comment.created_at               
+            }
+            
+
+    # Convert defaultdict to regular dictionary
+    post_comments = dict(post_comments)
+    print (post_comments)
+    print (post_replies)
+
     post_users = {}
     for user_stat in s:
         post_users[str(user_stat.user.username)] = user_stat.pfp.url
 
-    print (post_users)
+    # Variables
     variables = {
         "username":name, 
         "post":p, 
         'user_stats':s, 
         'user':us,
-        'post_users': post_users
+        'post_users': post_users,
+        'liked_by': liked_by,
+        'user_liked_by': user_liked_by,
+        'post_comments': post_comments,
+        'post_replies':post_replies, 
+        'comment_form': comment_form,
+        'sub_comment_form': sub_comment_form
     }
     
 
@@ -71,26 +140,6 @@ def add_post(request):
         f = AddPost()
     return render(request, 'main/add_post.html', {"input_fields": f, 'username': username})
 
-def liked(request):
-    if request.method == 'POST':
-        user = request.user.username
-        post_id = request.POST.get('post_id')
-        try:
-            post = Post.objects.get(id=post_id)
-            
-        except ObjectDoesNotExist:
-            return JsonResponse({'error': 'Post not found'}, status=404)
-        if post.liked_by.filter(name=user).exists():
-            liked_by = LikedBy.objects.get(name=user)
-            post.likes -= 1
-            post.liked_by.remove(liked_by)
-        else:
-            liked_by = LikedBy.objects.get(name=user)
-            post.likes += 1
-            post.liked_by.add(liked_by)
-        post.save()
-        return JsonResponse({'likes': post.likes})
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 @login_required
 def profile(request, name):
@@ -129,6 +178,7 @@ def profile(request, name):
         'post': posts,
         'followed_user': followed_userstats, 
     }
+
     return render(request, 'main/profile.html', profile_vars)
 
 
@@ -191,7 +241,7 @@ def config(request, name):
         # Forms
         edit_profile_form = EditProfile()
         edit_post_form = EditPost()
-          
+        
 
     # LikedBy Preperation
     user_posts = Post.objects.filter(user=user)
@@ -208,4 +258,3 @@ def config(request, name):
 
 def error(request, error):
     return render(request, 'main/error.html', {'issue':error})
-    

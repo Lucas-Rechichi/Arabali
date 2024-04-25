@@ -2,6 +2,9 @@
 {% load crispy_forms_tags %}
 {% block title %}Error{% endblock %}
 {% block body %}
+{% block sidebar %}
+<li class="custom-icon"><i class="fa-solid fa-gear fa-lg" style="color: #787878;"></i> <a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
+{% endblock %}
 <div class="container">
     <div class="row">
         <div class="col">
