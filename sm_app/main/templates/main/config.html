@@ -147,17 +147,17 @@ ul{
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <div>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12 p-2">
-                            <ul>
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-rss-fill" style="color: #787878;"></i></div> <a href="/page/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Feed</p></a></li>
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-chat-text" style="color: #787878;"></i></div> <a href="" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Messages</p></a></li>
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-gear-wide-connected" style="color: #787878;"></i></div><a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-box-arrow-right" style="color: #787878;" ></i></div> <a href="/logout/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Logout</p></a></li>                       
-                            </ul>
+          <div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = "/page/"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.35.46 am.png" alt="" style="height: 30px; width: 30px;"> Feed</button>
+                    </div>
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = ""'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.36.09 am.png" alt="" style="height: 30px; width: 30px;"> DM's</button>
+                    </div>
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" , onclick='location.href = "/edit/{{username}}"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.37.14 am.png" alt="" style="height: 30px; width: 30px;"> Settings</button>
                         </div>
                     </div>
                 </div>
@@ -295,107 +295,113 @@ ul{
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    <div class="modal fade" id="ConfirmDelete">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <Strong>Warning</Strong>
                                 </div>
-                                <div class="modal fade" id="ConfirmDelete-{{posts.id}}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <Strong>Warning</Strong>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col">
+                                                <p>Are you sure you want to delete this post?</p>
                                             </div>
-                                            <div class="modal-body">
-                                                <div class="container">
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p>Are you sure you want to delete this post?</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-6 d-inline-flex justify-content-center">
-                                                            <form id="DeleteForm" method="post">
-                                                                {% csrf_token %}
-                                                                <input type="hidden" id="delete" name="delete" value="">
-                                                                <input type="hidden" id="posts_id" name="posts_id" value="">
-                                                                <button type="button" id="DeletePost" class="btn btn-danger">Delete Post</button>
-                                                            </form>
-                                                            <script>
-                                                                document.addEventListener('DOMContentLoaded', function() {
-                                                                    document.getElementById('DeletePost').addEventListener('click', function() {
-                                                                        document.getElementById('delete').value = 'delete';
-                                                                        document.getElementById('posts_id').value = '{{posts.id}}';
-                                                                        document.getElementById('DeleteForm').submit();
-                                                                    });
-                                                                });
-                                                            </script>
-                                                        </div>
-                                                        <div class="col-6 d-inline-flex justify-content-center">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 d-inline-flex justify-content-center">
+                                                <form id="DeleteForm" method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" id="delete" name="delete" value="">
+                                                    <input type="hidden" id="posts_id" name="posts_id" value="">
+                                                    <button type="button" id="DeletePost" class="btn btn-danger">Delete Post</button>
+                                                </form>
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        document.getElementById('DeletePost').addEventListener('click', function() {
+                                                            document.getElementById('delete').value = 'delete';
+                                                            document.getElementById('posts_id').value = '{{posts.id}}';
+                                                            document.getElementById('DeleteForm').submit();
+                                                        });
+                                                    });
+                                                </script>
+                                            </div>
+                                            <div class="col-6 d-inline-flex justify-content-center">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal fade" id="EditPost-{{posts.id}}" aria-hidden="true">
-                                    <div class="modal-dialog" style="max-width: auto;">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                Edit Post
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="container">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <form action="" method="post" enctype="multipart/form-data" id="EditPostForm">
-                                                                {% csrf_token %}
-                                                                {{edit_post_form | crispy}}
-                                                                <input type="hidden" id="confirm" name="confirm" value="">
-                                                                <input type="hidden" id="post-id" name="post-id" value="">
-                                                                <button type="submit" class="btn btn-success" id="EditPostButton" name="EditPostButton" value="">Confirm</button>
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                            </form>
-                                                            <script>
-                                                                document.addEventListener('DOMContentLoaded', function() {
-                                                                    document.getElementById('EditPostButton').addEventListener('click', function() {
-                                                                        document.getElementById('confirm').value = 'confirm';
-                                                                        document.getElementById('post-id').value = '{{posts.id}}';
-                                                                        document.getElementById('EditPostForm').submit();
-                                                                    });
-                                                                });
-                                                            </script>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p class="lead">Current Titie: {{posts.title}}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p class="lead">Current Content:</p> {{posts.contents}}
-                                                        </div>
-                                                    </div>
-                                                    <br>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <p class="lead">Current Media:</p><img src="{{posts.media.url}}" alt="Media for {{posts.title}} Post" style="width: 400px; height: 100px">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#post-{{posts.id}}">{{ posts.title }}</button>
-                                </div>
-                            {% endfor %}
+                            </div>
                         </div>
                     </div>
+                    <div class="modal fade" id="EditPost">
+                        <div class="modal-dialog" style="max-width: auto;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    Edit Post
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <form action="" method="post" enctype="multipart/form-data" id="EditPostForm">
+                                                    {% csrf_token %}
+                                                    {{edit_post_form | crispy}}
+                                                    <input type="hidden" id="confirm" name="confirm" value="">
+                                                    <input type="hidden" id="post-id" name="post-id" value="">
+                                                    <button type="submit" class="btn btn-success" id="EditPostButton" name="EditPostButton" value="">Confirm</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                </form>
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        document.getElementById('EditPostButton').addEventListener('click', function() {
+                                                            document.getElementById('confirm').value = 'confirm';
+                                                            document.getElementById('post-id').value = '{{posts.id}}';
+                                                            document.getElementById('EditPostForm').submit();
+                                                        });
+                                                    });
+                                                </script>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <p class="lead">Current Titie: {{posts.title}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <p class="lead">Current Content:</p> {{posts.contents}}
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p class="lead">Current Media:</p><img src="{{posts.media.url}}" alt="Media for {{posts.title}} Post" style="width: 400px; height: 100px">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-light" data-bs-target="#post-{{posts.id}}" data-bs-toggle="modal">{{ posts.title }}</button>
+                    </div>
+                    {% endfor %}
+                </div>
                 </div>
             </div>
-        </div>  
+        </div>
     </div>
+    
+</div>
+<!---->
+</div>
+</div>
+</div>
 </div>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>

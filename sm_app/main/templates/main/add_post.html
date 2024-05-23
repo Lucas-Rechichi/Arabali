@@ -9,10 +9,18 @@
 {% endblock %}
 {% block body %}
 <div class="card contents">
-    <form method="post", enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ input_fields | crispy }}
-        <button type="submit", class="btn btn-success">Post</button>
-    </form>
+    <div class="container">
+        <form method="post", enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ input_fields | crispy }}
+            <div class="row">
+                <label for=""><p class="lead" style="color: #787878;">Tags cannot include the vertical line symbol ( | ).</p></label>
+            </div>
+            <br>
+            <div class="row">
+                <button type="submit", class="btn btn-success">Post</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

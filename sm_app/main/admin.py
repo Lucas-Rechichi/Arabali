@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import Post, UserStats, LikedBy, Following, Comment, NestedComment
+from main.models import Post, UserStats, LikedBy, Following, Comment, NestedComment, PostTag, Interest, ICF, PCF, InterestInteraction, PostInteraction, DateAndOrTimeSave
 # Register your models here.
 
 
@@ -17,3 +17,10 @@ admin.site.register(LikedBy, ExtraShow)
 admin.site.register(Following, ExtraShow)
 admin.site.register(Comment, ExtraShow)
 admin.site.register(NestedComment, ExtraShow)
+admin.site.register(PostTag, ExtraShow)
+admin.site.register(Interest, ExtraShow)
+admin.site.register(ICF, ExtraShow)
+admin.site.register(PCF, ExtraShow)
+admin.site.register(InterestInteraction, ExtraShow)
+admin.site.register(PostInteraction, ExtraShow)
+admin.site.register(DateAndOrTimeSave, ExtraShow)

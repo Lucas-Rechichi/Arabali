@@ -139,3 +139,21 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'arabali_users')
 MEDIA_URL = '/arabali_users/'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}

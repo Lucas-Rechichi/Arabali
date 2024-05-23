@@ -81,15 +81,15 @@
   {% endif %}
 </form>
   <br>
-  <h2>Posts:</h2>
+  <h2>post:</h2>
   <br>
   <div class="container text-center">
     <div class="row row-cols-2 gy-3">
-      {% for posts in post %}
+      {% for post in post %}
       <div class="col-3">
           <div class="card minipost pt-4">
-            <button class="invis", onclick='location.href = "/posts/{{posts.id}}"'>
-              <h5>{{posts.title}}</h5>
+            <button class="invis", onclick='location.href = "/post/{{post.id}}"'>
+              <h5>{{post.title}}</h5>
             </button>
         </div>
       </div>

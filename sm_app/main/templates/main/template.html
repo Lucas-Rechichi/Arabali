@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+{% load crispy_forms_tags %}
 <style>
 
 .heading{
     display: flex;
-     margin: auto;
+    margin: auto;
  }
     ul{
         list-style-type: none;
@@ -140,35 +141,40 @@
 
 </head>
 <body>
-    <div class="topbar">
-        <button type="button" class="logo-button" onclick='location.href = "/home/"'><h2 class="display-6" style="color: green;">Arabali</h2></button>
-        <button class="btn sideopener mt-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav">
-            <div class="fs-2"><i class="bi bi-list" style="color: #198754;"></i></div>
-        </button>
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasnav" aria-labelledby="offcanvasnav">
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasExampleLabel"><p class="lead">More</p></h5>
-              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-              <div>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12 p-2">
-                            <ul>
-                                {% block topsidebar %}{% endblock %}
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-rss-fill" style="color: #787878;"></i></div> <a href="/page/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Feed</p></a></li>
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-chat-text" style="color: #787878;"></i></div> <a href="" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Messages</p></a></li>
-                                {% block middlesidebar %}{% endblock %}
-                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-box-arrow-right" style="color: #787878;" ></i></div> <a href="/logout/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Logout</p></a></li>                       
-                            </ul>
-                        </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasnav" aria-labelledby="offcanvasnav">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasExampleLabel">More</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = "/page/"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.35.46 am.png" alt="" style="height: 30px; width: 30px;"> Feed</button>
+                    </div>
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = ""'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.36.09 am.png" alt="" style="height: 30px; width: 30px;"> DM's</button>
+                    </div>
+                    {% block sidebar %}{% endblock %}
+                    <div class="col-12 p-2">
+                        <button type="button" class="btn btn-light border border-success" onclick='location.href = "/logout/"'><img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.35.22 am.png" alt="" style="height: 30px; width: 30px;"> Logout</button>
                     </div>
                 </div>
-              </div>
-              </div>
             </div>
           </div>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+      <div class="topbar">
+        <button type="button" class="logo-button" onclick='location.href = "/home/"'><h2 class="display-6" style="color: green;">Arabali</h2></button>
+        <button class="btn btn-light sideopener border border-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav" style="">
+            <img src="/arabali_users/Images/App_Icons/Screenshot 2024-04-07 at 8.33.31 am.png" alt="" style="height: 30px; width: 30px;">
+        </button>
+          {% block topbar %}{% endblock %}
+            </div>
     {% block body %}{% endblock %}
 </body>
 </html>
