@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from django.http import JsonResponse
+from django.shortcuts import render
 from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction
 from django.core.exceptions import ObjectDoesNotExist
 from main.algorithum import Algorithum
@@ -324,3 +325,7 @@ def scrolled_by(request):
     Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
     Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
     return JsonResponse({'post_id': post_id})
+
+def ajax_error(request):
+    issue = request.POST.get('issue')
+    return render(request, 'main/error.html', {'issue': issue})

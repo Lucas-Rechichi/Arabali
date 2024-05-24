@@ -157,6 +157,20 @@ def page(request, catagory, increment):
     }
     return render(request, "main/page.html", variables)
 
+def catch_up_page(request, increment):
+    init = initialize_page(request)
+
+    if request.POST.get('allowed-location'): # if the user has allowed location permissions
+        pass
+    else:
+        pass
+
+    variables = {
+        'username':init['username'],
+        'search_bar':init['search_bar']
+    }
+    return render(request, "main/catch_up.html", variables)
+
 
 @login_required
 def add_post(request):
