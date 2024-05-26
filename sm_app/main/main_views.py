@@ -312,7 +312,7 @@ def post_view(request, post_id):
 
 @login_required
 def config(request, name):
-
+    init = initialize_page(request)
     # Checking that the right user is acessing this page.
     username = request.user.username
     if name != username:
@@ -324,7 +324,7 @@ def config(request, name):
 
     # LikedBy Preperation
     user_posts = Post.objects.filter(user=user)
-    post_list = list(user_posts)
+    post_list = user_posts
 
     # Form init
     if request.method == 'POST':
@@ -368,21 +368,22 @@ def config(request, name):
     # LikedBy Preperation
     user_posts = Post.objects.filter(user=user)
     post_list = list(user_posts)
-
     variables = {
         'edit_profile_form': edit_profile_form,
         'edit_post_form': edit_post_form, 
         'user_stats': user_stats, 
         'username': username,
         'post': post_list,
+        'search_bar': init['search_bar'],
     }        
     return render(request, 'main/config.html', variables)
 
 def error(request, error):
     return render(request, 'main/error.html', {'issue':error})
 
+@login_required
 def search_results(request, q, post_increment, user_increment, catergory_increment):
-    init = initialize_page(request) # initialize for topbar
+    init = initialize_page(request=request) # initialize for topbar
     try:
         query = request.POST.get('query') # getting query
         if not query:
@@ -446,11 +447,11 @@ def search_results(request, q, post_increment, user_increment, catergory_increme
         c += 1
         if c > ((10 * catergory_increment) + 1):
             break
-
+    print(init['username'])
     variables = {
         'feed':filtered_results, 
-        'search_bar':init['search_bar'], 
-        'username':init['username'],
+        'search_bar': init['search_bar'], 
+        'username': init['username'],
         'query': query,
         "post_increment" : {
             "previous" : post_increment - 1,

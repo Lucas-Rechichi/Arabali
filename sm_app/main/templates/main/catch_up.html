@@ -11,19 +11,40 @@
 {{search_bar|crispy}}
 {% endblock %}
 {% block body %}
-<div class="modal fade show" id="LPModal" tabindex="-1" aria-hidden="false" aria-modal="true">
+<!-- Modal for getting user's location access -->
+<div class="modal fade" id="LPModal" tabindex="-1" aria-hidden="true" aria-modal="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="LPModalTitle">Note</h5>
+                <h5 class="modal-title">Location Premissions</h5>
             </div>
             <div class="modal-body">
                 <p class="lead text-center"> To be able to optimise the algorithum to show you the best of your the people that you follow, location permissions must be allowed. </p>
-                <p class="text-center"><strong> If you deside not to allow permisssions, this page is still accessible.</strong></p>
+                <p class="text-center"><strong> If you deside not to allow permisssions, this page is still accessible, and your last recorded location will be used instead.</strong></p>
+                <div class="d-flex justify-content-center">
+                    <button id="allowedLP" type="button" class="btn btn-success m-1">Allow</button>
+                    <button id="deniedLP" type="button" class="btn btn-outline-success m-1" data-bs-dismiss="modal">Deny</button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button id="allowedLP" type="button" class="btn btn-success">Allow</button>
-                <button id="deniedLP" type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Deny</button>
+        </div>
+    </div>
+</div>
+<!-- LP allowed modal -->
+<div class="modal fade" id="LPModalAllow" tabindex="-1" aria-hidden="true" aria-modal="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" >Success</h5>
+            </div>
+            <div class="modal-body">
+                <p class="lead text-center"> Location Permissions Accessed. </p>
+                <div class="d-flex justify-content-center">
+                    <div class="fs-2"><i class="bi bi-patch-check-fill" style="color: #198754;"></i></div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-center">
+                    <button type="button" class="btn btn-success m-1" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -33,9 +54,20 @@
         var LPModal = new bootstrap.Modal(document.getElementById('LPModal'), {
             keyboard: false
         });
+        var LPModalAllowed = new bootstrap.Modal(document.getElementById('LPModalAllow'), {
+            keyboard: false
+        });
         LPModal.show();
     
         $('#allowedLP').click(function () {
+            $('#allowedLP').remove()
+            $('#deniedLP').before(
+                '<button class="btn btn-success" type="button" disabled>' +
+                    '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>' +
+                    '<span role="status">Loading...</span>' +
+                    '</button>'
+                )
+
             // Check if Geolocation is supported
             if (navigator.geolocation) {
                 // Get the current position
@@ -56,6 +88,9 @@
         function successCallback(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
+            LPModal.hide();
+
+            LPModalAllowed.show();
             
         }
 

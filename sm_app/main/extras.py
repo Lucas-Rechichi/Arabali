@@ -1,7 +1,7 @@
 import math
 
 from main.forms import Search
-from main.models import ICF, PCF, PostTag, Interest
+from main.models import ICF, PCF, PostTag, Interest, User
 
 def capitalize_plus(string):
     # Dictionary of all 26 English letters and their uppercase counterparts
@@ -49,14 +49,12 @@ def capitalize_plus(string):
     return new_string
 
 def initialize_page(request):
-    # Gets the relevent data for the top navbar of our views
-    username = request.user.username
     if request.method == 'POST':
         search_bar = Search(request.POST)
     else:
         search_bar = Search()
     data = {
-        'username' : username,
+        'username' : request.user.username,
         'search_bar' : search_bar
     }
     return data
