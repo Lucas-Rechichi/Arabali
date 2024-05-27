@@ -5,6 +5,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.http import JsonResponse
 from django.db.models import F
 from django.db.models import Count, Sum
+from django.utils import timezone
 from validate.forms import User
 from django.contrib.auth.decorators import login_required
 from main.models import Post
@@ -14,7 +15,7 @@ from main.models import UserStats, Comment, NestedComment, PostTag, PCF
 from validate.views import create_user_directory
 from main.errors import UsernameError
 from main.configure import Configure
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 # For removing string
 def remove_until_character(string, target_char):
@@ -167,6 +168,21 @@ def catch_up_page(request, increment):
     user_liked_by = LikedBy.objects.get(name=request.user.username)
     feed = []
 
+    # Code to prevent the spaming of the location permissions popup
+    current_time = timezone.now()
+    last_recorded_location_time = us.last_recorded_location
+
+    # Check to see if the timezone is nieve 
+    if timezone.is_naive(last_recorded_location_time):
+        last_recorded_location_time = timezone.make_aware(last_recorded_location_time)
+
+    # Process the time difference
+    time_difference = last_recorded_location_time - current_time
+    location_pop_up = 'allow'
+    print(time_difference)
+    if time_difference >= timedelta(hours=2):
+        location_pop_up = 'deny'
+
     # Algorithum
     posts = Algorithum.Sorting.catch_up_sort(user=request.user)
     feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=posts)
@@ -234,7 +250,8 @@ def catch_up_page(request, increment):
         'post_replies':post_replies, 
         'comment_form': comment_form,
         'sub_comment_form': sub_comment_form,
-        'search_bar': init['search_bar']
+        'search_bar': init['search_bar'],
+        'location_pop_up': location_pop_up
     }
     return render(request, "main/catch_up.html", variables)
 

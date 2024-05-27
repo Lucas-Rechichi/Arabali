@@ -172,6 +172,7 @@
         </div> 
         <br>
         <br>
+        <input type="hidden" id="locationModalActivation" data-location="{{location_pop_up}}">
         <!-- Modal for getting user's location access -->
         <div class="modal fade" id="LPModal" tabindex="-1" aria-hidden="true" aria-modal="true">
             <div class="modal-dialog">
@@ -218,7 +219,31 @@
                 var LPModalAllowed = new bootstrap.Modal(document.getElementById('LPModalAllow'), {
                     keyboard: false
                 });
-                LPModal.show();
+                if (document.getElementById('locationModalActivation').dataset.location == 'allow') {
+                    LPModal.show();
+                }
+                else {
+                    // Check if Geolocation is supported
+                    if (navigator.geolocation) {
+                        // Get the current position
+                        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        })
+                    }
+                    else {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/page/error/',
+                            date: {
+                                'issue': 'Geolocation API Not Supported On Your Browser',
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                        })
+                    }
+                }
+                
             
                 $('#allowedLP').click(function () {
                     $('#allowedLP').remove()

@@ -336,5 +336,6 @@ def save_location(request):
     longitude = request.POST.get('longitude')
     user_stats.last_recorded_latitude = latitude
     user_stats.last_recorded_longitude = longitude
+    user_stats.last_recorded_location = datetime.now()
     user_stats.save()
     return JsonResponse({'username': user_stats.user.username})

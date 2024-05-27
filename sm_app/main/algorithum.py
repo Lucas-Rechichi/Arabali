@@ -465,7 +465,6 @@ class Algorithum:
                 i = 1
             for value in relevent_posts.values():
                 feed.append(value['post'])
-            
             return feed
 
 

@@ -51,6 +51,7 @@ class UserStats(models.Model):
     following = models.ManyToManyField(Following)
     last_recorded_latitude = models.FloatField()
     last_recorded_longitude = models.FloatField()
+    last_recorded_location = models.DateTimeField(null=False, auto_now_add=True)
 
 # Comment Models   
 class Comment(models.Model):
