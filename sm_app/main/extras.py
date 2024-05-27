@@ -132,3 +132,10 @@ def algorithm_function(x, tag, interest, type):
     print(f"Updated and saved k value: {parameters.k}")
 
     return result
+
+def harvinsine_distance(lat1, lat2, lon1, lon2):
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+    R = 6371000 # 6.371x10^6 m, radius of earth
+    distance = 2 * R * math.asin(math.sqrt((math.sin((delta_lat) / (2)) ** 2) + math.cos(lat1) * math.cos(lat2) *(math.sin((delta_lon) / (2)) ** 2)))
+    return distance

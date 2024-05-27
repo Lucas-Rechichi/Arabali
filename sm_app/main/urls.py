@@ -17,11 +17,12 @@ urlpatterns = [
     path('posts/<int:post_id>', main_v.post_view, name="post_view"),
 
     # AJAX views
-    path('page/liked', ajax_v.liked, name="liked"),
-    path('page/new_comment', ajax_v.new_comment, name="new_comment"),
-    path('page/new_reply', ajax_v.new_reply, name="new_reply"),
-    path('page/comment_liked', ajax_v.comment_liked, name="comment_liked"),
-    path('page/scrolled_by', ajax_v.scrolled_by, name="scrolled_by"),
-    path('page/error', ajax_v.ajax_error, name="ajax_error"),
+    path('page/liked/', ajax_v.liked, name="liked"),
+    path('page/new_comment/', ajax_v.new_comment, name="new_comment"),
+    path('page/new_reply/', ajax_v.new_reply, name="new_reply"),
+    path('page/comment_liked/', ajax_v.comment_liked, name="comment_liked"),
+    path('page/scrolled_by/', ajax_v.scrolled_by, name="scrolled_by"),
+    path('page/error/', ajax_v.ajax_error, name="ajax_error"),
+    path('page/save_location/', ajax_v.save_location, name='save_location'),
 ]
 

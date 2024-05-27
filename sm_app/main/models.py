@@ -49,6 +49,8 @@ class UserStats(models.Model):
     pfp = models.ImageField(null=True, upload_to=get_image_upload_path_profile)
     banner = models.ImageField(null=True, upload_to=get_image_upload_path_profile)
     following = models.ManyToManyField(Following)
+    last_recorded_latitude = models.FloatField()
+    last_recorded_longitude = models.FloatField()
 
 # Comment Models   
 class Comment(models.Model):
@@ -96,8 +98,8 @@ class PostTag(models.Model):
 class ICF(models.Model):
     interest = models.OneToOneField(Interest, on_delete=models.CASCADE, null=False)
     form = models.CharField(max_length=100, null=False)
-    a = models.FloatField()
-    k = models.FloatField()
+    a = models.FloatField(null=True)
+    k = models.FloatField(null=True)
 
     def __str__(self):
         return f'Function for {self.interest.name} for user {self.interest.user.username}'

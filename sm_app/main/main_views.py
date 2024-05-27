@@ -157,17 +157,84 @@ def page(request, catagory, increment):
     }
     return render(request, "main/page.html", variables)
 
+@login_required
 def catch_up_page(request, increment):
+    # Setup
+    us = UserStats.objects.get(user=request.user)
+    s = UserStats.objects.all()
+    p = Post.objects.all()
     init = initialize_page(request)
+    user_liked_by = LikedBy.objects.get(name=request.user.username)
+    feed = []
 
-    if request.POST.get('allowed-location'): # if the user has allowed location permissions
-        pass
+    # Algorithum
+    posts = Algorithum.Sorting.catch_up_sort(user=request.user)
+    feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=posts)
+    
+    # Getting Relelvent Profile Pictures
+    post_users = {}
+    for user_stat in s:
+        post_users[str(user_stat.user.username)] = user_stat.pfp.url
+    
+    # Forms
+    if request.method == 'POST':
+        comment_form = AddComment(request.POST)
+        sub_comment_form = AddComment(request.POST)
     else:
-        pass
+        comment_form = AddComment()
+        sub_comment_form = AddComment()
+    
+    # Comment and Reply Processing
+    liked_by = {}
+    post_comments = {}
+    post_replies = {}
+    for post in p:
+        liked_by[f'{post.pk}'] = list(post.liked_by.all())
+        comments_for_post = Comment.objects.filter(post=post)
+        for comment in comments_for_post:
+            sub_comments = NestedComment.objects.filter(comment=comment)
+            for sub_comment in sub_comments:
+                post_replies[f'{sub_comment.pk}'] = {
+                    'id':sub_comment.pk,
+                    'comment':sub_comment.comment,
+                    'comment_id':sub_comment.comment.pk,
+                    'user':sub_comment.user,
+                    'text':sub_comment.text,
+                    'liked__by':sub_comment.liked_by,
+                    'likes':sub_comment.likes,
+                    'created_at':sub_comment.created_at
+                }
+            post_comments[f'{comment.pk}'] = {
+                'id':comment.pk,
+                'post':comment.post,
+                'post_id':comment.post.pk,
+                'user':comment.user,
+                'text':comment.text,
+                'liked__by':comment.liked_by,
+                'likes':comment.likes,
+                'created_at':comment.created_at               
+            }
+    post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
 
+    # Variables
     variables = {
-        'username':init['username'],
-        'search_bar':init['search_bar']
+        "username":init['username'], 
+        "post":feed,
+        "increment": {
+            "previous": increment - 1,
+            "current": increment,
+            "next": increment + 1 
+        },
+        'user_stats':s, 
+        'user':us,
+        'post_users': post_users,
+        'liked_by': liked_by,
+        'user_liked_by': user_liked_by,
+        'post_comments': post_comments,
+        'post_replies':post_replies, 
+        'comment_form': comment_form,
+        'sub_comment_form': sub_comment_form,
+        'search_bar': init['search_bar']
     }
     return render(request, "main/catch_up.html", variables)
 

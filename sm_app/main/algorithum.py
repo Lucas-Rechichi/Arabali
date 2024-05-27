@@ -1,10 +1,10 @@
 import logging
-from main.models import Post, PostTag, UserStats, Interest, ICF, PCF, InterestInteraction, PostInteraction, DateAndOrTimeSave
+from main.models import Post, PostTag, UserStats, Interest, ICF, PCF, InterestInteraction, PostInteraction, DateAndOrTimeSave, User, Following
 from django.db.models import Count, Sum
 from datetime import date
 import math
 from main.extras import capitalize_plus, algorithm_function
-from main.extras import remove_until_character, remove_last_character, modified_reciprocal, difference, exact_display, approx_display
+from main.extras import remove_until_character, remove_last_character, modified_reciprocal, difference, exact_display, approx_display, harvinsine_distance
 
 class Algorithum:
     
@@ -434,6 +434,43 @@ class Algorithum:
                     post = Post.objects.get(posttag=tag)
                     order.append(post)
             return order
+        
+        def catch_up_sort(user):
+
+            # Setup
+            user_stats = UserStats.objects.get(user=user.pk)
+            user_follower_object = Following.objects.get(subscribers=user_stats.user.username)
+            followers = UserStats.objects.filter(user=User.objects.get(username=user_follower_object))
+            distances = {}
+
+            # Calculate harvinsine distance between every follower that user follows and the user
+            for follower in followers:
+                distance_between_users = harvinsine_distance(lat1=user_stats.last_recorded_latitude, lat2=follower.last_recorded_latitude, lon1=user_stats.last_recorded_longitude, lon2=follower.last_recorded_longitude)
+                distances[f'{follower.user.username}'] = distance_between_users
+
+            # Sorts them baced on the one that is the closest to the user in distance
+            distances = dict(sorted(distances.items(), key=lambda item: item[1]))
+
+            feed = []
+            relevent_posts = {}
+            i = 1
+            for key in distances.keys():
+                posts = Post.objects.filter(user=User.objects.get(username=key)).annotate(Count('created_at')).order_by('created_at')
+                for post in posts:
+                    relevent_posts[i] = {
+                        'user': key,
+                        'post': post,
+                    }
+                    i += 1
+                i = 1
+            for value in relevent_posts.values():
+                feed.append(value['post'])
+            
+            return feed
+
+
+
+            
 
 
 

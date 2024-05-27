@@ -329,3 +329,12 @@ def scrolled_by(request):
 def ajax_error(request):
     issue = request.POST.get('issue')
     return render(request, 'main/error.html', {'issue': issue})
+
+def save_location(request):
+    user_stats = UserStats.objects.get(user=request.user)
+    latitude = request.POST.get('latitude')
+    longitude = request.POST.get('longitude')
+    user_stats.last_recorded_latitude = latitude
+    user_stats.last_recorded_longitude = longitude
+    user_stats.save()
+    return JsonResponse({'username': user_stats.user.username})
