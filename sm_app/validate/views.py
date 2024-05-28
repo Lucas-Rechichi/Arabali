@@ -39,7 +39,7 @@ def sign_up_page(request):
                 # creating directory for the user
                 u = User.objects.get(username=name)
                 create_user_directory(user=u, sub_directory='profile')
-                us = UserStats(user=u, followers=0, pfp='Images/Default_User_Images/Screenshot 2024-04-06 at 8.59.45am.png', banner='Images/Default_User_Images/Screenshot_2024-03-03_at_7.37.14pm_d2VufHD.png')
+                us = UserStats(user=u, followers=0, pfp='Images/Default_User_Images/Default_Profile_Picture.png', banner='Images/Default_User_Images/Default_Banner_Image.png')
                 us.save()
                 b = Following(subscribers=u.username)
                 b.save()

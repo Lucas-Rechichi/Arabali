@@ -98,7 +98,7 @@ class Configure():
             print(f'New pfp: {new_pfp} \nNew banner: {new_banner}')
 
             # if the old images are not the default ones (cannot delete default paths).
-            if old_pfp_path != 'arabali_users/Images/Default_User_Images/Screenshot_2024-03-03_at_7.30.10pm.png' and old_banner_path != 'arabali_users/Images/Default_User_Images/Screenshot_2024-03-03_at_7.37.14pm_d2VufHD.png':
+            if old_pfp_path != 'arabali_users/Images/Default_User_Images/Default_Profile_Picture.png' and old_banner_path != 'arabali_users/Images/Default_User_Images/Default_Banner_Image.png':
                 # delete old image paths
                 os.remove(old_pfp_path)
                 print(f'Deleted file at {old_pfp_path}')
@@ -146,7 +146,7 @@ class Configure():
             print('-------------')
 
             # if the old images are not the default ones (cannot delete default paths).
-            if old_pfp_path != 'arabali_users/Images/Default_User_Images/Screenshot_2024-03-03_at_7.30.10pm.png':
+            if old_pfp_path != 'arabali_users/Images/Default_User_Images/Default_Profile_Picture.png':
                 # delete old image paths
                 os.remove(old_pfp_path)
                 print(f'Deleted file at {old_pfp_path}')
@@ -187,7 +187,7 @@ class Configure():
 
             print('-------------')
 
-            if old_banner_path != 'arabali_users/Images/Default_User_Images/Screenshot_2024-03-03_at_7.37.14pm_d2VufHD.png':
+            if old_banner_path != 'arabali_users/Images/Default_User_Images/Default_Banner_Image.png':
 
                 # delete old image paths
                 os.remove(old_banner_path)
