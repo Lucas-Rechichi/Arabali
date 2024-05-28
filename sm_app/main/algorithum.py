@@ -428,7 +428,7 @@ class Algorithum:
                     i += 1
 
             else:
-                interest = Interest.objects.get(name=sub_catagory, user=user)
+                interest = Interest.objects.get(name=sub_catagory.removeprefix('|'), user=user)
                 tags = PostTag.objects.filter(name=interest.name)
                 for tag in tags:
                     post = Post.objects.get(posttag=tag)
@@ -440,7 +440,7 @@ class Algorithum:
             # Setup
             user_stats = UserStats.objects.get(user=user.pk)
             user_follower_object = Following.objects.get(subscribers=user_stats.user.username)
-            followers = UserStats.objects.filter(user=User.objects.get(username=user_follower_object))
+            followers = UserStats.objects.filter(following=user_follower_object)
             distances = {}
 
             # Calculate harvinsine distance between every follower that user follows and the user
@@ -448,6 +448,7 @@ class Algorithum:
                 distance_between_users = harvinsine_distance(lat1=user_stats.last_recorded_latitude, lat2=follower.last_recorded_latitude, lon1=user_stats.last_recorded_longitude, lon2=follower.last_recorded_longitude)
                 distances[f'{follower.user.username}'] = distance_between_users
 
+            print(followers)
             # Sorts them baced on the one that is the closest to the user in distance
             distances = dict(sorted(distances.items(), key=lambda item: item[1]))
 

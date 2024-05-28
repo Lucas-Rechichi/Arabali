@@ -177,10 +177,10 @@ def catch_up_page(request, increment):
         last_recorded_location_time = timezone.make_aware(last_recorded_location_time)
 
     # Process the time difference
-    time_difference = last_recorded_location_time - current_time
+    hour_difference = last_recorded_location_time.hour - current_time.hour
     location_pop_up = 'allow'
-    print(time_difference)
-    if time_difference >= timedelta(hours=2):
+    print(hour_difference)
+    if hour_difference <= 2:
         location_pop_up = 'deny'
 
     # Algorithum
@@ -300,6 +300,7 @@ def add_post(request):
 
 @login_required
 def profile(request, name):
+    init = initialize_page(request)
     u = User.objects.get(username=name)
     us = UserStats.objects.get(user=u)
     follow = Following.objects
@@ -333,7 +334,8 @@ def profile(request, name):
         'is_following': is_following, 
         'self_profile': self_profile, 
         'post': posts,
-        'followed_user': followed_userstats, 
+        'followed_user': followed_userstats,
+        'search_bar': init['search_bar'],
     }
 
     return render(request, 'main/profile.html', profile_vars)

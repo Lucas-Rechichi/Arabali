@@ -242,8 +242,31 @@
                             },
                         })
                     }
+                    // Success callback for geolocation
+                    function successCallback(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        $.ajax({
+                                type: 'POST',
+                                url: '/page/save_location/',
+                                data: {
+                                    'latitude': latitude,
+                                    'longitude': longitude,
+                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                },
+                                success: function (response) {
+                                    console.log('Location Accessed')
+                                }
+                            })
+                    }
+                    // Error callback for geolocation
+                    function errorCallback(error) {
+                        console.error('Error getting geolocation:', error);
+                        
+                    }
                 }
-                
+                    });
+            
             
                 $('#allowedLP').click(function () {
                     $('#allowedLP').remove()
@@ -301,9 +324,7 @@
                     console.error('Error getting geolocation:', error);
                     
                 }
-                });
-
-            })
+            });
         </script>
         <!-- Feed: top navigation -->
         <div class="container">
