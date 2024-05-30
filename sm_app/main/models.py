@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os
 
+# To direct the images from user imput into their respective folders.
 def get_image_upload_path_posts(instance, filename):
     
     # Return the full upload path
@@ -29,7 +29,7 @@ class Following(models.Model):
         return self.subscribers
 
 
-# models
+# Main models
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     title = models.CharField(max_length=150)
@@ -144,4 +144,3 @@ class DateAndOrTimeSave(models.Model):
     day_time = models.DateTimeField(null=True)
 
 
-    

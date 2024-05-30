@@ -449,23 +449,19 @@ class Algorithum:
                 distances[f'{follower.user.username}'] = distance_between_users
 
             print(followers)
+
             # Sorts them baced on the one that is the closest to the user in distance
             distances = dict(sorted(distances.items(), key=lambda item: item[1]))
 
+            # Filters posts that were created today and also are followers of the user acessing the page. 
+            # The followers come from the distance dictionary and therefore is ordered baced on the distances as well.
             feed = []
-            relevent_posts = {}
-            i = 1
-            for key in distances.keys():
-                posts = Post.objects.filter(user=User.objects.get(username=key)).annotate(Count('created_at')).order_by('created_at')
-                for post in posts:
-                    relevent_posts[i] = {
-                        'user': key,
-                        'post': post,
-                    }
-                    i += 1
-                i = 1
-            for value in relevent_posts.values():
-                feed.append(value['post'])
+            relevent_posts = []
+            todays_posts = Post.objects.filter(created_at=date.today())
+            for post in todays_posts:
+                if post.user.username in distances.keys():
+                    relevent_posts.append(post)
+            print(relevent_posts)
             return feed
 
 
