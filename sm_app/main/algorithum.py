@@ -457,12 +457,13 @@ class Algorithum:
             # The followers come from the distance dictionary and therefore is ordered baced on the distances as well.
             daily_feed = []
             remaining_feed = []
-            todays_posts = Post.objects.filter(day_of_creation=date.today())
+            todays_posts = Post.objects.filter(created_at__date=date.today())
             for post in todays_posts:
                 if post.user.username in distances.keys():
                     daily_feed.append(post)
-            remaining_posts = Post.objects.exclude(day_of_creation=date.today())
+            remaining_posts = Post.objects.exclude(created_at__date=date.today())
             for post in remaining_posts:
                 if post.user.username in distances.keys():
                     remaining_feed.append(post)
+            print(daily_feed, remaining_feed)
             return daily_feed, remaining_feed

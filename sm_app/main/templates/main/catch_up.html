@@ -357,15 +357,15 @@
                         </div>
                     </div>
                 </div>
-                {% for posts in daily_posts %}
+                {% for dailyPost in daily_posts %}
                     <div class="row">
                         <div class="col-12">
                                 <div class="card m-5">
                                     <div class="row">
                                         <div class="col m-2">
                                             {% for key, value in post_users.items %}
-                                                {% if key|stringformat:"%s%s" == posts.user|stringformat:"%s%s" %}
-                                                    <button class="btn btn-light"><img src="{{ value }}", onclick='location.href = "/profile/{{posts.user}}"' style="width: 30px; height: 30px;"></button>
+                                                {% if key|stringformat:"%s%s" == dailyPost.user|stringformat:"%s%s" %}
+                                                    <button class="btn btn-light"><img src="{{ value }}", onclick='location.href = "/profile/{{dailyPost.user}}"' style="width: 30px; height: 30px;"></button>
                                                 {% else %}
                                                 {% endif %}
                                             {% endfor %}
@@ -373,63 +373,63 @@
                                     </div>
                                     <div class="row">
                                         <div class="col m-2">
-                                            <h6 class="display-6">{{posts.user}}</h6>
+                                            <h6 class="display-6">{{dailyPost.user}}</h6>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col m-2">
-                                            <img src="{{posts.media.url}}" alt="{{posts.id}}'s Media" class="post-no-{{posts.id}}" style="height: 248px; width: 100%;" id="post-{{posts.id}}" data-post-id="{{posts.id}}">
+                                            <img src="{{dailyPost.media.url}}" alt="{{dailyPost.id}}'s Media" class="post-no-{{dailyPost.id}}" style="height: 248px; width: 100%;" id="post-{{dailyPost.id}}" data-post-id="{{dailyPost.id}}">
                                         </div>
                                     </div>
                                     <div class="row m-2">
                                         <div class="col">
-                                            <h3 class="display-6">{{posts.title}}</h3>
+                                            <h3 class="display-6">{{dailyPost.title}}</h3>
                                         </div>
                                     </div>
                                     <div class="row m-1">
                                         <div class="col">
-                                            <p class="lead">{{posts.contents}}</p>
+                                            <p class="lead">{{dailyPost.contents}}</p>
                                         </div>
                                     </div>
                                     <div class="row m-1">
                                         <div class="col-6 d-flex justify-content-start">
-                                            <button type="button" class="btn" data-bs-target="#expand-{{posts.id}}", data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
+                                            <button type="button" class="btn" data-bs-target="#expand-{{dailyPost.id}}", data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
                                         </div>
                                         <div class="col-6 d-flex justify-content-end">
                                             <form action="" id="post-form" method="post">
-                                                {% if user_liked_by in posts.liked_by.all %}
-                                                <button type="submit" id="like{{posts.id}}" class="btn btn-success border border-success page-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                {% if user_liked_by in dailyPost.liked_by.all %}
+                                                <button type="submit" id="like{{dailyPost.id}}" class="btn btn-success border border-success page-like-button-{{dailyPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{dailyPost.id}}" style="height: 25px;">
                                                     <div class="row align-items-center">
                                                         <div class="col mt-1 d-flex justify-content-end">
-                                                            <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{posts.id}}" style="color: #ffffff;"></i>
+                                                            <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{dailyPost.id}}" style="color: #ffffff;"></i>
                                                         </div>
                                                         <div class="col mt-4">
-                                                            <p class="text-white" id="page-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                            <p class="text-white" id="page-like-text-{{dailyPost.id}}">{{dailyPost.likes}}</p>
                                                         </div>
                                                     </div>
                                                 </button>
                                                 {% else %}
-                                                <button type="submit" id="like{{posts.id}}" class="btn border border-success page-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                <button type="submit" id="like{{dailyPost.id}}" class="btn border border-success page-like-button-{{dailyPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{dailyPost.id}}" style="height: 25px;">
                                                     <div class="row align-items-center">
                                                         <div class="col mt-1 d-flex justify-content-end">
-                                                            <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{posts.id}}" style="color: #198754;"></i>
+                                                            <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{dailyPost.id}}" style="color: #198754;"></i>
                                                         </div>
                                                         <div class="col mt-4">
-                                                            <p class="text-success" id="page-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                            <p class="text-success" id="page-like-text-{{dailyPost.id}}">{{dailyPost.likes}}</p>
                                                         </div>
                                                     </div>
                                                 </button>
                                                 {% endif %}
                                                 <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
-                                                        $('.page-like-button-{{posts.id}}').click(function() { // When the button is pressed
+                                                        $('.page-like-button-{{dailyPost.id}}').click(function() { // When the button is pressed
                                                             console.log('clicked');
                                                             var postId = $(this).data('post-id'); // Get Post ID
                                                             console.log('Post ID:', postId);
                                                         
                                                             // Defining variables
-                                                            var modalClickedButton = $('.modal-like-button-{{posts.id}}'); 
-                                                            var pageClickedButton = $('.page-like-button-{{posts.id}}');
+                                                            var modalClickedButton = $('.modal-like-button-{{dailyPost.id}}'); 
+                                                            var pageClickedButton = $('.page-like-button-{{dailyPost.id}}');
                                                             var isLiked
                                                             var modalLikeCounter
                                                             var pageLikeCounter
@@ -452,10 +452,10 @@
                                                                     console.log('success');
 
                                                                     // Getting relevent elements
-                                                                    modalLikeCounter = $('#modal-like-text-{{posts.id}}');
-                                                                    pageLikeCounter = $('#page-like-text-{{posts.id}}')
-                                                                    modalLikeIcon = $('#modal-like-icon-{{posts.id}}');
-                                                                    pageLikeIcon = $('#page-like-icon-{{posts.id}}')
+                                                                    modalLikeCounter = $('#modal-like-text-{{dailyPost.id}}');
+                                                                    pageLikeCounter = $('#page-like-text-{{dailyPost.id}}')
+                                                                    modalLikeIcon = $('#modal-like-icon-{{dailyPost.id}}');
+                                                                    pageLikeIcon = $('#page-like-icon-{{dailyPost.id}}')
 
                                                                     // Changing text
                                                                     modalLikeCounter.text(response.likes);
@@ -476,10 +476,10 @@
                                                                         pageClickedButton.removeClass('liked-button').addClass('btn-success');
 
                                                                         // Color change
-                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{dailyPost.id}}')
                                                                         modalLikeIcon.style.color = '#ffffff'
                                                                         
-                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{dailyPost.id}}')
                                                                         pageLikeIcon.style.color = '#ffffff'
 
                                                                     } else {
@@ -496,9 +496,9 @@
 
 
                                                                         // Color change
-                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{dailyPost.id}}')
                                                                         modalLikeIcon.style.color = '#198754'
-                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{dailyPost.id}}')
                                                                         pageLikeIcon.style.color = '#198754'
                                                                     }
                                                                 },
@@ -524,7 +524,7 @@
                                 </div>
                             </div>
                             <!-- modal -->
-                            <div id="expand-{{posts.id}}" class="modal fade">
+                            <div id="expand-{{dailyPost.id}}" class="modal fade">
                                 <div class="modal-dialog" style="max-width: 56%;">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -535,8 +535,8 @@
                                             <div class="row">
                                                 <div class="col m-2">
                                                     {% for key, value in post_users.items %}
-                                                        {% if key|stringformat:"%s%s" == posts.user|stringformat:"%s%s" %}
-                                                            <button class="btn btn-light" style="border-radius: 15px; width: fit-content; height: fit-content;"><img src="{{ value }}", onclick='location.href = "/profile/{{posts.user}}"' style="width: 30px; height: 30px;"></button>
+                                                        {% if key|stringformat:"%s%s" == dailyPost.user|stringformat:"%s%s" %}
+                                                            <button class="btn btn-light" style="border-radius: 15px; width: fit-content; height: fit-content;"><img src="{{ value }}", onclick='location.href = "/profile/{{dailyPost.user}}"' style="width: 30px; height: 30px;"></button>
                                                         {% else %}
                                                         {% endif %}
                                                     {% endfor %}
@@ -544,63 +544,63 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col m-2">
-                                                    <h6 class="display-6">{{posts.user}}</h6>
+                                                    <h6 class="display-6">{{dailyPost.user}}</h6>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col m-2">
-                                                    <img src="{{posts.media.url}}" alt="{{posts.id}}'s Media" style="height: 248px; width: 100%;">
+                                                    <img src="{{dailyPost.media.url}}" alt="{{dailyPost.id}}'s Media" style="height: 248px; width: 100%;">
                                                 </div>
                                             </div>
                                             <div class="row m-2">
                                                 <div class="col">
-                                                    <h3 class="display-6">{{posts.title}}</h3>
+                                                    <h3 class="display-6">{{dailyPost.title}}</h3>
                                                 </div>
                                             </div>
                                             <div class="row m-1">
                                                 <div class="col">
-                                                    <p class="lead">{{posts.contents}}</p>
+                                                    <p class="lead">{{dailyPost.contents}}</p>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-4">
-                                                    <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-{{posts.id}}" role="button" aria-expanded="false" aria-controls="liked-by-{{posts.id}}">Liked By</a> 
+                                                    <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-{{dailyPost.id}}" role="button" aria-expanded="false" aria-controls="liked-by-{{dailyPost.id}}">Liked By</a> 
                                                 </div>
                                                 <div class="col-8 d-flex justify-content-end">
                                                     <form action="" id="post-form" method="post">
-                                                        {% if user_liked_by in posts.liked_by.all %}
-                                                            <button type="submit" id="like{{posts.id}}" class="btn btn-success border border-success modal-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                        {% if user_liked_by in dailyPost.liked_by.all %}
+                                                            <button type="submit" id="like{{dailyPost.id}}" class="btn btn-success border border-success modal-like-button-{{dailyPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{dailyPost.id}}" style="height: 25px;">
                                                                 <div class="row align-items-center">
                                                                     <div class="col mt-1 d-flex justify-content-end">
-                                                                        <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{posts.id}}" style="color: #ffffff;"></i>
+                                                                        <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{dailyPost.id}}" style="color: #ffffff;"></i>
                                                                     </div>
                                                                     <div class="col mt-4">
-                                                                        <p class="text-white" id="modal-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                                        <p class="text-white" id="modal-like-text-{{dailyPost.id}}">{{dailyPost.likes}}</p>
                                                                     </div>
                                                                 </div>
                                                             </button>
                                                             {% else %}
-                                                            <button type="submit" id="like{{posts.id}}" class="btn border border-success modal-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                            <button type="submit" id="like{{dailyPost.id}}" class="btn border border-success modal-like-button-{{dailyPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{dailyPost.id}}" style="height: 25px;">
                                                                 <div class="row align-items-center">
                                                                     <div class="col mt-1 d-flex justify-content-end">
-                                                                        <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{posts.id}}" style="color: #198754;"></i>
+                                                                        <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{dailyPost.id}}" style="color: #198754;"></i>
                                                                     </div>
                                                                     <div class="col mt-4">
-                                                                        <p class="text-success" id="modal-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                                        <p class="text-success" id="modal-like-text-{{dailyPost.id}}">{{dailyPost.likes}}</p>
                                                                     </div>
                                                                 </div>
                                                             </button>
                                                             {% endif %}
                                                             <script>
                                                                 document.addEventListener('DOMContentLoaded', function() {
-                                                                    $('.modal-like-button-{{posts.id}}').click(function() { // When the button is pressed
+                                                                    $('.modal-like-button-{{dailyPost.id}}').click(function() { // When the button is pressed
                                                                         console.log('clicked');
                                                                         var postId = $(this).data('post-id'); // Get Post ID
                                                                         console.log('Post ID:', postId);
                                                                         
                                                                         // Defining variables
-                                                                        var modalClickedButton = $('.modal-like-button-{{posts.id}}'); 
-                                                                        var pageClickedButton = $('.page-like-button-{{posts.id}}');
+                                                                        var modalClickedButton = $('.modal-like-button-{{dailyPost.id}}'); 
+                                                                        var pageClickedButton = $('.page-like-button-{{dailyPost.id}}');
                                                                         var isLiked
                                                                         var modalLikeCounter
                                                                         var pageLikeCounter
@@ -622,10 +622,10 @@
                                                                                 console.log('success');
                                     
                                                                                 // Getting relevent elements
-                                                                                modalLikeCounter = $('#modal-like-text-{{posts.id}}');
-                                                                                pageLikeCounter = $('#page-like-text-{{posts.id}}')
-                                                                                modalLikeIcon = $('#modal-like-icon-{{posts.id}}');
-                                                                                pageLikeIcon = $('#page-like-icon-{{posts.id}}')
+                                                                                modalLikeCounter = $('#modal-like-text-{{dailyPost.id}}');
+                                                                                pageLikeCounter = $('#page-like-text-{{dailyPost.id}}')
+                                                                                modalLikeIcon = $('#modal-like-icon-{{dailyPost.id}}');
+                                                                                pageLikeIcon = $('#page-like-icon-{{dailyPost.id}}')
                                     
                                                                                 // Changing text
                                                                                 modalLikeCounter.text(response.likes);
@@ -646,10 +646,10 @@
                                                                                     pageClickedButton.removeClass('liked-button').addClass('btn-success');
                                     
                                                                                     // Color change
-                                                                                    modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                                    modalLikeIcon = document.getElementById('modal-like-icon-{{dailyPost.id}}')
                                                                                     modalLikeIcon.style.color = '#ffffff'
                                                                                     
-                                                                                    pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                                    pageLikeIcon = document.getElementById('page-like-icon-{{dailyPost.id}}')
                                                                                     pageLikeIcon.style.color = '#ffffff'
                                     
                                                                                 } else {
@@ -666,9 +666,9 @@
                                     
                                     
                                                                                     // Color change
-                                                                                    modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                                    modalLikeIcon = document.getElementById('modal-like-icon-{{dailyPost.id}}')
                                                                                     modalLikeIcon.style.color = '#198754'
-                                                                                    pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                                    pageLikeIcon = document.getElementById('page-like-icon-{{dailyPost.id}}')
                                                                                     pageLikeIcon.style.color = '#198754'
                                                                                 }
                                                                             },
@@ -693,9 +693,9 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col">
-                                                        <div class="collapse card m-1" id="liked-by-{{posts.id}}">
+                                                        <div class="collapse card m-1" id="liked-by-{{dailyPost.id}}">
                                                             <ul class="list-group list-group-flush">
-                                                                {% for likedby in posts.liked_by.all %}
+                                                                {% for likedby in dailyPost.liked_by.all %}
                                                                     <li class="list-group-item"> > {{ likedby }}</li>
                                                                 {% endfor %}
                                                             </ul>
@@ -704,7 +704,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col text-center">
-                                                        <p class="lead">Date Created: {{posts.created_at}}</p>
+                                                        <p class="lead">Date Created: {{dailyPost.created_at}}</p>
                                                     </div>
                                                 </div>
                                                 <br>
@@ -716,17 +716,17 @@
                                                 <div class="row">
                                                     <div class="col d-flex justify-content-center">
                                                         <!-- Comments form -->
-                                                        <form method="post" id="comment-form-{{posts.id}}">
+                                                        <form method="post" id="comment-form-{{dailyPost.id}}">
                                                             {% csrf_token %}
                                                             {{comment_form | crispy}}
-                                                            <button type="button" id="add-comment-{{posts.id}}" class="btn btn-success" data-post-id="{{posts.id}}">Add</button>
+                                                            <button type="button" id="add-comment-{{dailyPost.id}}" class="btn btn-success" data-post-id="{{dailyPost.id}}">Add</button>
                                                         </form>
                                                         <!-- Script gets items from form, creates the comment, then displays it inside of the relevent post. -->
                                                         <script>
                                                             document.addEventListener('DOMContentLoaded', function() {
-                                                                document.getElementById('add-comment-{{posts.id}}').addEventListener('click', function() {
+                                                                document.getElementById('add-comment-{{dailyPost.id}}').addEventListener('click', function() {
                                                                     var postId = $(this).data('post-id');
-                                                                    var text = $('#comment-form-{{posts.id}} #comment_text').val();
+                                                                    var text = $('#comment-form-{{dailyPost.id}} #comment_text').val();
                                                                     console.log(postId, text)
                                                                     $.ajax({
                                                                         type: 'POST',
@@ -739,7 +739,7 @@
 
                                                                         success: function(response) {
                                                                             console.log('success')
-                                                                            $('#comments-container-{{posts.id}}').prepend(
+                                                                            $('#comments-container-{{dailyPost.id}}').prepend(
                                                                                 '<div class="row">' +
                                                                                     '<div class="col">' +
                                                                                         '<div class="card p-3 m-2">' +
@@ -837,9 +837,9 @@
                                                 </div>
                                             </div>
                                             <!-- comments -->
-                                            <div id="comments-container-{{posts.id}}">
+                                            <div id="comments-container-{{dailyPost.id}}">
                                                 {% for commentPk, commentData  in post_comments.items %}
-                                                    {% if commentData.post_id|stringformat:"%s%s" == posts.id|stringformat:"%s%s" %}
+                                                    {% if commentData.post_id|stringformat:"%s%s" == dailyPost.id|stringformat:"%s%s" %}
                                                         <div class="row">
                                                             <div class="col">
                                                                 <div class="card p-3 m-2">
@@ -1200,7 +1200,7 @@
                                 </div>
                                 <script>
                                     $(document).ready(function() {
-                                        var triggerPoints = $('.post-no-{{posts.id}}'); // Assuming all posts have a class 'post'
+                                        var triggerPoints = $('.post-no-{{dailyPost.id}}'); // Assuming all dailyPost have a class 'post'
                                         var hasTriggered = {};
 
                                         triggerPoints.each(function() {
@@ -1269,15 +1269,15 @@
                                 </div>
                             </div>
                         </div>
-                        {% for posts in remaining_posts %}
+                        {% for remainingPost in remaining_posts %}
                         <div class="row">
                             <div class="col-12">
                                     <div class="card m-5">
                                         <div class="row">
                                             <div class="col m-2">
                                                 {% for key, value in post_users.items %}
-                                                    {% if key|stringformat:"%s%s" == posts.user|stringformat:"%s%s" %}
-                                                        <button class="btn btn-light"><img src="{{ value }}", onclick='location.href = "/profile/{{posts.user}}"' style="width: 30px; height: 30px;"></button>
+                                                    {% if key|stringformat:"%s%s" == remainingPost.user|stringformat:"%s%s" %}
+                                                        <button class="btn btn-light"><img src="{{ value }}", onclick='location.href = "/profile/{{remainingPost.user}}"' style="width: 30px; height: 30px;"></button>
                                                     {% else %}
                                                     {% endif %}
                                                 {% endfor %}
@@ -1285,63 +1285,63 @@
                                         </div>
                                         <div class="row">
                                             <div class="col m-2">
-                                                <h6 class="display-6">{{posts.user}}</h6>
+                                                <h6 class="display-6">{{remainingPost.user}}</h6>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col m-2">
-                                                <img src="{{posts.media.url}}" alt="{{posts.id}}'s Media" class="post-no-{{posts.id}}" style="height: 248px; width: 100%;" id="post-{{posts.id}}" data-post-id="{{posts.id}}">
+                                                <img src="{{remainingPost.media.url}}" alt="{{remainingPost.id}}'s Media" class="post-no-{{remainingPost.id}}" style="height: 248px; width: 100%;" id="post-{{remainingPost.id}}" data-post-id="{{remainingPost.id}}">
                                             </div>
                                         </div>
                                         <div class="row m-2">
                                             <div class="col">
-                                                <h3 class="display-6">{{posts.title}}</h3>
+                                                <h3 class="display-6">{{remainingPost.title}}</h3>
                                             </div>
                                         </div>
                                         <div class="row m-1">
                                             <div class="col">
-                                                <p class="lead">{{posts.contents}}</p>
+                                                <p class="lead">{{remainingPost.contents}}</p>
                                             </div>
                                         </div>
                                         <div class="row m-1">
                                             <div class="col-6 d-flex justify-content-start">
-                                                <button type="button" class="btn" data-bs-target="#expand-{{posts.id}}", data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
+                                                <button type="button" class="btn" data-bs-target="#expand-{{remainingPost.id}}", data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
                                             </div>
                                             <div class="col-6 d-flex justify-content-end">
                                                 <form action="" id="post-form" method="post">
-                                                    {% if user_liked_by in posts.liked_by.all %}
-                                                    <button type="submit" id="like{{posts.id}}" class="btn btn-success border border-success page-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                    {% if user_liked_by in remainingPost.liked_by.all %}
+                                                    <button type="submit" id="like{{remainingPost.id}}" class="btn btn-success border border-success page-like-button-{{remainingPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{remainingPost.id}}" style="height: 25px;">
                                                         <div class="row align-items-center">
                                                             <div class="col mt-1 d-flex justify-content-end">
-                                                                <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{posts.id}}" style="color: #ffffff;"></i>
+                                                                <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{remainingPost.id}}" style="color: #ffffff;"></i>
                                                             </div>
                                                             <div class="col mt-4">
-                                                                <p class="text-white" id="page-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                                <p class="text-white" id="page-like-text-{{remainingPost.id}}">{{remainingPost.likes}}</p>
                                                             </div>
                                                         </div>
                                                     </button>
                                                     {% else %}
-                                                    <button type="submit" id="like{{posts.id}}" class="btn border border-success page-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                    <button type="submit" id="like{{remainingPost.id}}" class="btn border border-success page-like-button-{{remainingPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{remainingPost.id}}" style="height: 25px;">
                                                         <div class="row align-items-center">
                                                             <div class="col mt-1 d-flex justify-content-end">
-                                                                <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{posts.id}}" style="color: #198754;"></i>
+                                                                <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{remainingPost.id}}" style="color: #198754;"></i>
                                                             </div>
                                                             <div class="col mt-4">
-                                                                <p class="text-success" id="page-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                                <p class="text-success" id="page-like-text-{{remainingPost.id}}">{{remainingPost.likes}}</p>
                                                             </div>
                                                         </div>
                                                     </button>
                                                     {% endif %}
                                                     <script>
                                                         document.addEventListener('DOMContentLoaded', function() {
-                                                            $('.page-like-button-{{posts.id}}').click(function() { // When the button is pressed
+                                                            $('.page-like-button-{{remainingPost.id}}').click(function() { // When the button is pressed
                                                                 console.log('clicked');
                                                                 var postId = $(this).data('post-id'); // Get Post ID
                                                                 console.log('Post ID:', postId);
                                                             
                                                                 // Defining variables
-                                                                var modalClickedButton = $('.modal-like-button-{{posts.id}}'); 
-                                                                var pageClickedButton = $('.page-like-button-{{posts.id}}');
+                                                                var modalClickedButton = $('.modal-like-button-{{remainingPost.id}}'); 
+                                                                var pageClickedButton = $('.page-like-button-{{remainingPost.id}}');
                                                                 var isLiked
                                                                 var modalLikeCounter
                                                                 var pageLikeCounter
@@ -1364,10 +1364,10 @@
                                                                         console.log('success');
 
                                                                         // Getting relevent elements
-                                                                        modalLikeCounter = $('#modal-like-text-{{posts.id}}');
-                                                                        pageLikeCounter = $('#page-like-text-{{posts.id}}')
-                                                                        modalLikeIcon = $('#modal-like-icon-{{posts.id}}');
-                                                                        pageLikeIcon = $('#page-like-icon-{{posts.id}}')
+                                                                        modalLikeCounter = $('#modal-like-text-{{remainingPost.id}}');
+                                                                        pageLikeCounter = $('#page-like-text-{{remainingPost.id}}')
+                                                                        modalLikeIcon = $('#modal-like-icon-{{remainingPost.id}}');
+                                                                        pageLikeIcon = $('#page-like-icon-{{remainingPost.id}}')
 
                                                                         // Changing text
                                                                         modalLikeCounter.text(response.likes);
@@ -1388,10 +1388,10 @@
                                                                             pageClickedButton.removeClass('liked-button').addClass('btn-success');
 
                                                                             // Color change
-                                                                            modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                            modalLikeIcon = document.getElementById('modal-like-icon-{{remainingPost.id}}')
                                                                             modalLikeIcon.style.color = '#ffffff'
                                                                             
-                                                                            pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                            pageLikeIcon = document.getElementById('page-like-icon-{{remainingPost.id}}')
                                                                             pageLikeIcon.style.color = '#ffffff'
 
                                                                         } else {
@@ -1408,9 +1408,9 @@
 
 
                                                                             // Color change
-                                                                            modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                            modalLikeIcon = document.getElementById('modal-like-icon-{{remainingPost.id}}')
                                                                             modalLikeIcon.style.color = '#198754'
-                                                                            pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                            pageLikeIcon = document.getElementById('page-like-icon-{{remainingPost.id}}')
                                                                             pageLikeIcon.style.color = '#198754'
                                                                         }
                                                                     },
@@ -1436,7 +1436,7 @@
                                     </div>
                                 </div>
                                 <!-- modal -->
-                                <div id="expand-{{posts.id}}" class="modal fade">
+                                <div id="expand-{{remainingPost.id}}" class="modal fade">
                                     <div class="modal-dialog" style="max-width: 56%;">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -1447,8 +1447,8 @@
                                                 <div class="row">
                                                     <div class="col m-2">
                                                         {% for key, value in post_users.items %}
-                                                            {% if key|stringformat:"%s%s" == posts.user|stringformat:"%s%s" %}
-                                                                <button class="btn btn-light" style="border-radius: 15px; width: fit-content; height: fit-content;"><img src="{{ value }}", onclick='location.href = "/profile/{{posts.user}}"' style="width: 30px; height: 30px;"></button>
+                                                            {% if key|stringformat:"%s%s" == remainingPost.user|stringformat:"%s%s" %}
+                                                                <button class="btn btn-light" style="border-radius: 15px; width: fit-content; height: fit-content;"><img src="{{ value }}", onclick='location.href = "/profile/{{remainingPost.user}}"' style="width: 30px; height: 30px;"></button>
                                                             {% else %}
                                                             {% endif %}
                                                         {% endfor %}
@@ -1456,63 +1456,63 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col m-2">
-                                                        <h6 class="display-6">{{posts.user}}</h6>
+                                                        <h6 class="display-6">{{remainingPost.user}}</h6>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col m-2">
-                                                        <img src="{{posts.media.url}}" alt="{{posts.id}}'s Media" style="height: 248px; width: 100%;">
+                                                        <img src="{{remainingPost.media.url}}" alt="{{remainingPost.id}}'s Media" style="height: 248px; width: 100%;">
                                                     </div>
                                                 </div>
                                                 <div class="row m-2">
                                                     <div class="col">
-                                                        <h3 class="display-6">{{posts.title}}</h3>
+                                                        <h3 class="display-6">{{remainingPost.title}}</h3>
                                                     </div>
                                                 </div>
                                                 <div class="row m-1">
                                                     <div class="col">
-                                                        <p class="lead">{{posts.contents}}</p>
+                                                        <p class="lead">{{remainingPost.contents}}</p>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-4">
-                                                        <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-{{posts.id}}" role="button" aria-expanded="false" aria-controls="liked-by-{{posts.id}}">Liked By</a> 
+                                                        <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-{{remainingPost.id}}" role="button" aria-expanded="false" aria-controls="liked-by-{{remainingPost.id}}">Liked By</a> 
                                                     </div>
                                                     <div class="col-8 d-flex justify-content-end">
                                                         <form action="" id="post-form" method="post">
-                                                            {% if user_liked_by in posts.liked_by.all %}
-                                                                <button type="submit" id="like{{posts.id}}" class="btn btn-success border border-success modal-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                            {% if user_liked_by in remainingPost.liked_by.all %}
+                                                                <button type="submit" id="like{{remainingPost.id}}" class="btn btn-success border border-success modal-like-button-{{remainingPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{remainingPost.id}}" style="height: 25px;">
                                                                     <div class="row align-items-center">
                                                                         <div class="col mt-1 d-flex justify-content-end">
-                                                                            <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{posts.id}}" style="color: #ffffff;"></i>
+                                                                            <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{remainingPost.id}}" style="color: #ffffff;"></i>
                                                                         </div>
                                                                         <div class="col mt-4">
-                                                                            <p class="text-white" id="modal-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                                            <p class="text-white" id="modal-like-text-{{remainingPost.id}}">{{remainingPost.likes}}</p>
                                                                         </div>
                                                                     </div>
                                                                 </button>
                                                                 {% else %}
-                                                                <button type="submit" id="like{{posts.id}}" class="btn border border-success modal-like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                                <button type="submit" id="like{{remainingPost.id}}" class="btn border border-success modal-like-button-{{remainingPost.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{remainingPost.id}}" style="height: 25px;">
                                                                     <div class="row align-items-center">
                                                                         <div class="col mt-1 d-flex justify-content-end">
-                                                                            <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{posts.id}}" style="color: #198754;"></i>
+                                                                            <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{remainingPost.id}}" style="color: #198754;"></i>
                                                                         </div>
                                                                         <div class="col mt-4">
-                                                                            <p class="text-success" id="modal-like-text-{{posts.id}}">{{posts.likes}}</p>
+                                                                            <p class="text-success" id="modal-like-text-{{remainingPost.id}}">{{remainingPost.likes}}</p>
                                                                         </div>
                                                                     </div>
                                                                 </button>
                                                                 {% endif %}
                                                                 <script>
                                                                     document.addEventListener('DOMContentLoaded', function() {
-                                                                        $('.modal-like-button-{{posts.id}}').click(function() { // When the button is pressed
+                                                                        $('.modal-like-button-{{remainingPost.id}}').click(function() { // When the button is pressed
                                                                             console.log('clicked');
                                                                             var postId = $(this).data('post-id'); // Get Post ID
                                                                             console.log('Post ID:', postId);
                                                                             
                                                                             // Defining variables
-                                                                            var modalClickedButton = $('.modal-like-button-{{posts.id}}'); 
-                                                                            var pageClickedButton = $('.page-like-button-{{posts.id}}');
+                                                                            var modalClickedButton = $('.modal-like-button-{{remainingPost.id}}'); 
+                                                                            var pageClickedButton = $('.page-like-button-{{remainingPost.id}}');
                                                                             var isLiked
                                                                             var modalLikeCounter
                                                                             var pageLikeCounter
@@ -1534,10 +1534,10 @@
                                                                                     console.log('success');
                                         
                                                                                     // Getting relevent elements
-                                                                                    modalLikeCounter = $('#modal-like-text-{{posts.id}}');
-                                                                                    pageLikeCounter = $('#page-like-text-{{posts.id}}')
-                                                                                    modalLikeIcon = $('#modal-like-icon-{{posts.id}}');
-                                                                                    pageLikeIcon = $('#page-like-icon-{{posts.id}}')
+                                                                                    modalLikeCounter = $('#modal-like-text-{{remainingPost.id}}');
+                                                                                    pageLikeCounter = $('#page-like-text-{{remainingPost.id}}')
+                                                                                    modalLikeIcon = $('#modal-like-icon-{{remainingPost.id}}');
+                                                                                    pageLikeIcon = $('#page-like-icon-{{remainingPost.id}}')
                                         
                                                                                     // Changing text
                                                                                     modalLikeCounter.text(response.likes);
@@ -1558,10 +1558,10 @@
                                                                                         pageClickedButton.removeClass('liked-button').addClass('btn-success');
                                         
                                                                                         // Color change
-                                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{remainingPost.id}}')
                                                                                         modalLikeIcon.style.color = '#ffffff'
                                                                                         
-                                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{remainingPost.id}}')
                                                                                         pageLikeIcon.style.color = '#ffffff'
                                         
                                                                                     } else {
@@ -1578,9 +1578,9 @@
                                         
                                         
                                                                                         // Color change
-                                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{posts.id}}')
+                                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{remainingPost.id}}')
                                                                                         modalLikeIcon.style.color = '#198754'
-                                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{posts.id}}')
+                                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{remainingPost.id}}')
                                                                                         pageLikeIcon.style.color = '#198754'
                                                                                     }
                                                                                 },
@@ -1605,9 +1605,9 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col">
-                                                            <div class="collapse card m-1" id="liked-by-{{posts.id}}">
+                                                            <div class="collapse card m-1" id="liked-by-{{remainingPost.id}}">
                                                                 <ul class="list-group list-group-flush">
-                                                                    {% for likedby in posts.liked_by.all %}
+                                                                    {% for likedby in remainingPost.liked_by.all %}
                                                                         <li class="list-group-item"> > {{ likedby }}</li>
                                                                     {% endfor %}
                                                                 </ul>
@@ -1616,7 +1616,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col text-center">
-                                                            <p class="lead">Date Created: {{posts.created_at}}</p>
+                                                            <p class="lead">Date Created: {{remainingPost.created_at}}</p>
                                                         </div>
                                                     </div>
                                                     <br>
@@ -1628,17 +1628,17 @@
                                                     <div class="row">
                                                         <div class="col d-flex justify-content-center">
                                                             <!-- Comments form -->
-                                                            <form method="post" id="comment-form-{{posts.id}}">
+                                                            <form method="post" id="comment-form-{{remainingPost.id}}">
                                                                 {% csrf_token %}
                                                                 {{comment_form | crispy}}
-                                                                <button type="button" id="add-comment-{{posts.id}}" class="btn btn-success" data-post-id="{{posts.id}}">Add</button>
+                                                                <button type="button" id="add-comment-{{remainingPost.id}}" class="btn btn-success" data-post-id="{{remainingPost.id}}">Add</button>
                                                             </form>
                                                             <!-- Script gets items from form, creates the comment, then displays it inside of the relevent post. -->
                                                             <script>
                                                                 document.addEventListener('DOMContentLoaded', function() {
-                                                                    document.getElementById('add-comment-{{posts.id}}').addEventListener('click', function() {
+                                                                    document.getElementById('add-comment-{{remainingPost.id}}').addEventListener('click', function() {
                                                                         var postId = $(this).data('post-id');
-                                                                        var text = $('#comment-form-{{posts.id}} #comment_text').val();
+                                                                        var text = $('#comment-form-{{remainingPost.id}} #comment_text').val();
                                                                         console.log(postId, text)
                                                                         $.ajax({
                                                                             type: 'POST',
@@ -1651,7 +1651,7 @@
 
                                                                             success: function(response) {
                                                                                 console.log('success')
-                                                                                $('#comments-container-{{posts.id}}').prepend(
+                                                                                $('#comments-container-{{remainingPost.id}}').prepend(
                                                                                     '<div class="row">' +
                                                                                         '<div class="col">' +
                                                                                             '<div class="card p-3 m-2">' +
@@ -1749,9 +1749,9 @@
                                                     </div>
                                                 </div>
                                                 <!-- comments -->
-                                                <div id="comments-container-{{posts.id}}">
+                                                <div id="comments-container-{{remainingPost.id}}">
                                                     {% for commentPk, commentData  in post_comments.items %}
-                                                        {% if commentData.post_id|stringformat:"%s%s" == posts.id|stringformat:"%s%s" %}
+                                                        {% if commentData.post_id|stringformat:"%s%s" == remainingPost.id|stringformat:"%s%s" %}
                                                             <div class="row">
                                                                 <div class="col">
                                                                     <div class="card p-3 m-2">
@@ -2112,7 +2112,7 @@
                                     </div>
                                     <script>
                                         $(document).ready(function() {
-                                            var triggerPoints = $('.post-no-{{posts.id}}'); // Assuming all posts have a class 'post'
+                                            var triggerPoints = $('.post-no-{{remainingPost.id}}'); // Assuming all remainingPost have a class 'post'
                                             var hasTriggered = {};
 
                                             triggerPoints.each(function() {

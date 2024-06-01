@@ -97,20 +97,20 @@ def approx_display(value, highest_q_value):
     value = round(value)
     return value
     
-def algorithm_function(x, tag, interest, type):
+def algorithm_function(x, tag, interest, type): # Commented print methods are used for debugging and seeing the algorithum in use.
     # Params
     if type == 'posttag':
         parameters = PCF.objects.get(tag=tag)
-        print('Using PCF')
+        # print('Using PCF')
     else:
         parameters = ICF.objects.get(interest=interest)
-        print('Using ICF')
+        # print('Using ICF')
 
     a = parameters.a
     k = parameters.k
 
     # Log retrieved parameters
-    print(f"Retrieved function parameters: a={a}, k={k}")
+    # print(f"Retrieved function parameters: a={a}, k={k}")
 
     # Function
     if -((((math.sqrt(50-(a*k))) + (math.sqrt((a*k) + 50)))*(math.sqrt(2)))/(2*(math.sqrt(a*k)))) <= x <= ((((math.sqrt(50-(a*k))) + (math.sqrt((a*k) + 50)))*(math.sqrt(2)))/(2*(math.sqrt(a*k)))):
@@ -123,13 +123,13 @@ def algorithm_function(x, tag, interest, type):
     new_k = float(1 / abs(result)) if float(1 / abs(result)) <= 50.0 else 50.0
 
     # Log new k value
-    print(f"Calculated new k value: {new_k}")
+    # print(f"Calculated new k value: {new_k}")
 
     parameters.k = new_k
     parameters.save()
 
     # Log saved k value
-    print(f"Updated and saved k value: {parameters.k}")
+    # print(f"Updated and saved k value: {parameters.k}")
 
     return result
 

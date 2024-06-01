@@ -149,8 +149,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col">
-                                                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#morePostModal{{ post.id }}">More</button>
+                                                    <div class="col d-flex justify-content-center mb-2">
+                                                        <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#morePostModal{{ post.id }}" style="width: 100%; "><i class="bi bi-card-text"></i> More</button>
                                                         <div class="modal fade" id="morePostModal{{ post.id }}" tabindex="-1" aria-labelledby="morePostModalLabel{{ post.id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
@@ -173,29 +173,43 @@
                                                                             </div>
                                                                             <div class="row">
                                                                                 <div class="col">
-                                                                                    <p class="lead text-center">Preformance</p>
-                                                                                    <br>
-                                                                                    <p class="lead text-center">Likes: {{post.likes}}</p>
-                                                                                    <p class="lead text-center">Algorithum Score: {{post.posttag.value}}</p>
-                                                                                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                                                    <p class="lead">Preformance</p>
+                                                                                    <hr>
+                                                                                    <p class="lead">Likes: {{post.likes}}</p>
+                                                                                    <p class="lead">Algorithum Score: {{post.posttag.value}}</p>
+                                                                                    <button class="btn btn-outline-success mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                                                                                         Liked By
                                                                                     </button>
                                                                                     <div class="collapse" id="collapseExample">
                                                                                         <div class="card card-body">
-                                                                                            {% for key, value in liked_by_users.items %}
-                                                                                                <div class="row">
-                                                                                                    <div class="col">
-                                                                                                        <button class="invis" style="width: 300px;" onclick='location.href = "/profile/{{x.user}}"'>
-                                                                                                            <img src="{{value.pfp.url}}" alt="{{x.user}}'s pfp" style="height: 50px; width: 50px;" class="border border-success rounded-circle border-2">
-                                                                                                        </button>
-                                                                                                    </div>
-                                                                                                    <div class="col">
-                                                                                                        {{key}}
-                                                                                                    </div>
-                                                                                                </div>
+                                                                                            {% for likedby in post.liked_by.all %}
+                                                                                                {% for liked_by_user in liked_by_users %}
+                                                                                                    {% if liked_by_user.user.username|stringformat:"%s%s" == likedby.name|stringformat:"%s%s" %}
+                                                                                                        <div class="row">
+                                                                                                            <div class="col-5 d-flex justify-content-end">
+                                                                                                                <button class="invis" style="width: 50px;" onclick='location.href = "/profile/{{liked_by_user.user.username}}"'>
+                                                                                                                    <img src="{{liked_by_user.pfp.url}}" alt="{{liked_by}}'s pfp" style="height: 50px; width: 50px;" class="border border-success rounded-circle border-2">
+                                                                                                                </button>
+                                                                                                            </div>
+                                                                                                            <div class="col-7 d-flex justify-content-start">
+                                                                                                                <button class="invis" style="width: fit-content;" onclick='location.href = "/profile/{{liked_by_user.user.username}}"'>
+                                                                                                                    <p class="lead text-center mt-2">{{liked_by_user.user}}</p>
+                                                                                                                </button>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    {% endif %}
+                                                                                                {% endfor %}
                                                                                             {% endfor %}
                                                                                         </div>
                                                                                     </div>
+                                                                                </div>
+                                                                                <div class="col">
+                                                                                    <p class="lead">Info</p>
+                                                                                    <hr>
+                                                                                    <p class="lead">Date Created:</p>
+                                                                                    <p class="lead">{{post.created_at}}</p>
+                                                                                    <p class="lead">Date Modified:</p>
+                                                                                    <p class="lead">{{post.date_modified}}</p>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -206,8 +220,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="row">
-                                                    <div class="col">
-                                                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#editPostModal{{ post.id }}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                    <div class="col-6">
+                                                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#editPostModal{{ post.id }}" style="width:100%; "><i class="bi bi-pencil-fill"></i> Edit</button>
                                                         <div class="modal fade" id="editPostModal{{ post.id }}" tabindex="-1" aria-labelledby="editPostModalLabel{{ post.id }}" aria-hidden="true">
                                                             <div class="modal-dialog modal-lg">
                                                                 <div class="modal-content">
@@ -246,8 +260,8 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col">
-                                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                                    <div class="col-6">
+                                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}" style="width:100%; "><i class="bi bi-trash3-fill"></i> Delete</button>
                                                         <div class="modal fade" id="deletePostModal{{ post.id }}">
                                                             <div class="modal-dialog">
                                                                 <div class="modal-content">

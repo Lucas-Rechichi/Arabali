@@ -1,0 +1,10 @@
+# Filter posts created today and the users are in the distances dictionary
+    daily_posts = Post.objects.filter(day_of_creation=date.today(), user__username__in=distances.keys()).distinct()
+    
+    # Filter posts not created today and the users are in the distances dictionary
+    remaining_posts = Post.objects.exclude(day_of_creation=date.today()).filter(user__username__in=distances.keys()).distinct()
+
+    return list(daily_posts), list(remaining_posts)
+
+
+            

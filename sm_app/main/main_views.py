@@ -179,14 +179,15 @@ def catch_up_page(request, increment):
     # Process the time difference
     hour_difference = last_recorded_location_time.hour - current_time.hour
     location_pop_up = 'allow'
-    print(hour_difference)
     if hour_difference <= 2:
         location_pop_up = 'deny'
 
     # Algorithum
     daily_posts, remaining_posts = Algorithum.Sorting.catch_up_sort(user=request.user)
-    daily_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=daily_posts)
-    remaining_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=remaining_posts)
+    if daily_posts:
+        daily_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=daily_posts)
+    if remaining_posts:
+        remaining_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=remaining_posts)
     
     # Getting Relelvent Profile Pictures
     post_users = {}
@@ -236,8 +237,8 @@ def catch_up_page(request, increment):
     # Variables
     variables = {
         "username":init['username'], 
-        "daily_posts":daily_feed,
-        "remaining_posts":remaining_feed,
+        "daily_posts":daily_feed if daily_posts else None,
+        "remaining_posts":remaining_feed if remaining_posts else None,
         "increment": {
             "previous": increment - 1,
             "current": increment,
@@ -413,14 +414,17 @@ def config(request, name):
     
 
     # LikedBy Preperation
-    liked_by_users = {}
+    liked_by_users = []
+    liked_by_user_set = set()
     user_posts = Post.objects.filter(user=user)
     post_list = user_posts
     for user_liked_by_obj in liked_bys:
         for post in post_list:
-            if user_liked_by_obj.name in post.liked_by.all():
-                liked_by_users[user_liked_by_obj.name] = UserStats.objects.get(user=User.objects.get(username=user_liked_by_obj.name))
-
+            if user_liked_by_obj in post.liked_by.all():
+                if user_liked_by_obj not in liked_by_user_set:
+                    liked_by_users.append(UserStats.objects.get(user=User.objects.get(username=user_liked_by_obj.name)))
+                    liked_by_user_set.add(user_liked_by_obj)
+    print(post.liked_by.all(), liked_by_users)
 
     # Form init
     if request.method == 'POST':
