@@ -38,6 +38,7 @@ class Post(models.Model):
     media = models.ImageField(null=True, upload_to=get_image_upload_path_posts)
     liked_by = models.ManyToManyField(LikedBy)
     created_at = models.DateTimeField()
+    day_of_creation = models.DateField()
     date_modified = models.DateTimeField(null=True, default=None)
 
     def __str__(self):

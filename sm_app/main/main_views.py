@@ -184,8 +184,9 @@ def catch_up_page(request, increment):
         location_pop_up = 'deny'
 
     # Algorithum
-    posts = Algorithum.Sorting.catch_up_sort(user=request.user)
-    feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=posts)
+    daily_posts, remaining_posts = Algorithum.Sorting.catch_up_sort(user=request.user)
+    daily_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=daily_posts)
+    remaining_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=remaining_posts)
     
     # Getting Relelvent Profile Pictures
     post_users = {}
@@ -235,7 +236,8 @@ def catch_up_page(request, increment):
     # Variables
     variables = {
         "username":init['username'], 
-        "post":feed,
+        "daily_posts":daily_feed,
+        "remaining_posts":remaining_feed,
         "increment": {
             "previous": increment - 1,
             "current": increment,
@@ -407,10 +409,18 @@ def config(request, name):
     # Getting needed databace values
     user = User.objects.get(username=username)
     user_stats = UserStats.objects.get(user=user)
+    liked_bys = LikedBy.objects.all()
+    
 
     # LikedBy Preperation
+    liked_by_users = {}
     user_posts = Post.objects.filter(user=user)
     post_list = user_posts
+    for user_liked_by_obj in liked_bys:
+        for post in post_list:
+            if user_liked_by_obj.name in post.liked_by.all():
+                liked_by_users[user_liked_by_obj.name] = UserStats.objects.get(user=User.objects.get(username=user_liked_by_obj.name))
+
 
     # Form init
     if request.method == 'POST':
@@ -432,10 +442,10 @@ def config(request, name):
         
         elif request.POST.get('delete'):
             for p in post_list:
-                if int(request.POST.get('posts_id')) == int(p.pk):
+                if int(request.POST.get('post-id')) == int(p.pk):
                     Configure.delete_post(request=request, post=p)
                 
-        elif request.POST.get('confirm'):
+        elif request.POST.get('edit'):
             for p in post_list:
                 if int(request.POST.get('post-id')) == int(p.pk):
                     Configure.edit_post(request=request, post=p)
@@ -450,8 +460,6 @@ def config(request, name):
         edit_profile_form = EditProfile()
         edit_post_form = EditPost()
         
-
-    # LikedBy Preperation
     user_posts = Post.objects.filter(user=user)
     post_list = list(user_posts)
     variables = {
@@ -459,8 +467,9 @@ def config(request, name):
         'edit_post_form': edit_post_form, 
         'user_stats': user_stats, 
         'username': username,
-        'post': post_list,
+        'posts': post_list,
         'search_bar': init['search_bar'],
+        'liked_by_users': liked_by_users
     }        
     return render(request, 'main/config.html', variables)
 

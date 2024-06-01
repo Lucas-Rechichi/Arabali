@@ -1,7 +1,7 @@
 import os
 
 from datetime import datetime
-from main.models import User, UserStats, LikedBy, Following, Post
+from main.models import User, UserStats, LikedBy, Following, Post, PostTag
 from django.shortcuts import render, HttpResponseRedirect
 class Configure():
 
@@ -12,7 +12,6 @@ class Configure():
         user_stats = UserStats.objects.get(user=user)
         user_liked_by = LikedBy.objects.get(name=current_username)
         user_following = Following.objects.get(subscribers=current_username)
-        user_posts = Post.objects.filter(user=user)
         users = User.objects.all()
         print(users)
 
@@ -257,17 +256,22 @@ class Configure():
         print('Post Deleted Successfully')
         
     def edit_post(request, post):
+        tag = PostTag.objects.get(post=post)
         if request.POST.get('title'): # If the title was changed
             post.title = request.POST.get('title')
             post.save()
             post.date_modified = datetime.now()
             post.save()
+            tag.value = tag.value * (1 - 0.1)
+            tag.save()
         
         if request.POST.get('content'): # If the content inside of the post was changed
             post.contents = request.POST.get('content')
             post.save()
             post.date_modified = datetime.now()
             post.save()
+            tag.value = tag.value * (1 - 0.1)
+            tag.save()
 
         if request.FILES.get('image'): # If the media was changed
             # Path Management
@@ -298,7 +302,9 @@ class Configure():
             new_post.save()
             for liked_by in preserved_liked_by:
                 new_post.liked_by.add(liked_by)
-            new_post.save() 
+            new_post.save()
+            tag.value = tag.value * (1 - 0.35)
+            tag.save() 
 
 
 

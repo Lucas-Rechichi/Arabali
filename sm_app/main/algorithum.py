@@ -455,18 +455,14 @@ class Algorithum:
 
             # Filters posts that were created today and also are followers of the user acessing the page. 
             # The followers come from the distance dictionary and therefore is ordered baced on the distances as well.
-            feed = []
-            relevent_posts = []
-            todays_posts = Post.objects.filter(created_at=date.today())
+            daily_feed = []
+            remaining_feed = []
+            todays_posts = Post.objects.filter(day_of_creation=date.today())
             for post in todays_posts:
                 if post.user.username in distances.keys():
-                    relevent_posts.append(post)
-            print(relevent_posts)
-            return feed
-
-
-
-            
-
-
-
+                    daily_feed.append(post)
+            remaining_posts = Post.objects.exclude(day_of_creation=date.today())
+            for post in remaining_posts:
+                if post.user.username in distances.keys():
+                    remaining_feed.append(post)
+            return daily_feed, remaining_feed
