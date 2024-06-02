@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
     'validate.apps.ValidateConfig',
+    'messaging.apps.MessagingConfig',
     'crispy_forms',
     'crispy_bootstrap5',
 ]
