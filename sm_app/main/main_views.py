@@ -168,15 +168,13 @@ def catch_up_page(request, increment):
     user_liked_by = LikedBy.objects.get(name=request.user.username)
     feed = []
 
-    # Code to prevent the spaming of the location permissions popup
+    # Code to prevent the constant pop up of the location permissions modal
     current_time = timezone.now()
     last_recorded_location_time = us.last_recorded_location
 
-    # Check to see if the timezone is nieve 
     if timezone.is_naive(last_recorded_location_time):
         last_recorded_location_time = timezone.make_aware(last_recorded_location_time)
 
-    # Process the time difference
     hour_difference = abs(last_recorded_location_time.hour - current_time.hour)
     print(hour_difference)
     location_pop_up = 'allow'

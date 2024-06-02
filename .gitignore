@@ -59,7 +59,7 @@ cover/
 *.log
 local_settings.py
 db.sqlite3
-db.sqbpro
+sm_app/db.sqbpro
 db.sqlite3-journal
 
 # Flask stuff:
@@ -166,4 +166,5 @@ sm_app/clipboard.txt
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
 
