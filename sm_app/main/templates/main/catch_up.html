@@ -251,6 +251,7 @@
                             type: 'POST',
                             url: '/page/save_location/',
                             data: {
+                                'auto-request': 'true', // So that the modal will pop up every 2 hours and not reset every acessing of the location.
                                 'latitude': latitude,
                                 'longitude': longitude,
                                 'csrfmiddlewaretoken': '{{ csrf_token }}'
@@ -259,16 +260,14 @@
                                 console.log('Location Accessed')
                             }
                         })
+                    }
+                    // Error callback for geolocation
+                    function errorCallback(error) {
+                        console.error('Error getting geolocation:', error);
+                        
+                    }
                 }
-                // Error callback for geolocation
-                function errorCallback(error) {
-                    console.error('Error getting geolocation:', error);
-                    
-                }
-            }
-            
-        
-        
+
             $('#allowedLP').click(function () {
                 $('#allowedLP').remove()
                 $('#deniedLP').before(
@@ -306,6 +305,8 @@
                             type: 'POST',
                             url: '/page/save_location/',
                             data: {
+                                'auto-request': 'false',
+                                'accessing-location': 'true',
                                 'latitude': latitude,
                                 'longitude': longitude,
                                 'csrfmiddlewaretoken': '{{ csrf_token }}'
@@ -321,6 +322,19 @@
                         console.error('Error getting geolocation:', error);
                     }
                 });
+            $('#deniedLP').click(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/page/save_location/',
+                    data: {
+                        'accessing-location': 'false',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function (response) {
+                        console.log('location permission denied');
+                    }
+                })
+            })
             });
         </script>
         <!-- Feed: top navigation -->
@@ -1246,29 +1260,10 @@
                         </div>
                         {% endfor %}
                         <!-- you are all caught up "post" -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card m-5">
-                                    <div class="row">
-                                        <div class="col">
-                                            <h4 class="display-4 text-center">You Are All Caught Up!</4>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col d-flex justify-content-center">
-                                            <div class="fs-1">
-                                                <i class="bi bi-person-fill-check" style="font-size: 15rem; color: #198754;"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <p class="lead text-center">Below are older posts from the people that you follow.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {% if all_caught_up %}
+                            {{ all_caught_up|safe }}
+                        {% else %}
+                        {% endif %}
                         {% for remainingPost in remaining_posts %}
                         <div class="row">
                             <div class="col-12">

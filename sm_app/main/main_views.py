@@ -177,18 +177,72 @@ def catch_up_page(request, increment):
         last_recorded_location_time = timezone.make_aware(last_recorded_location_time)
 
     # Process the time difference
-    hour_difference = last_recorded_location_time.hour - current_time.hour
+    hour_difference = abs(last_recorded_location_time.hour - current_time.hour)
+    print(hour_difference)
     location_pop_up = 'allow'
     if hour_difference <= 2:
         location_pop_up = 'deny'
 
     # Algorithum
     daily_posts, remaining_posts = Algorithum.Sorting.catch_up_sort(user=request.user)
-    if daily_posts:
-        daily_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=daily_posts)
-    if remaining_posts:
-        remaining_feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=remaining_posts)
+
+    # Special Sorting for this specific page.
+    all_posts = {}
+    daily_feed = []
+    remaining_feed = []
+    all_caught_up = None
+    i = 0
+    for post in daily_posts:
+        i += 1
+        print(post, i)
+        all_posts['daily'] = {
+            'no': i, 
+            'post': post
+        }
+        
     
+    all_posts['all caught up'] = {
+        'no': 1 + 1,
+        'post':  '''<div class="row">
+                        <div class="col-12">
+                            <div class="card m-5">
+                                <div class="row">
+                                    <div class="col">
+                                        <h4 class="display-4 text-center">You Are All Caught Up!</4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col d-flex justify-content-center">
+                                        <div class="fs-1">
+                                            <i class="bi bi-person-fill-check" style="font-size: 15rem; color: #198754;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="lead text-center">Below are older posts from the people that you follow.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>'''
+    }
+    x = i + 1
+    for post in remaining_posts:
+        x += 1
+        all_posts['remaining'] = {
+            'no': x, 
+            'post': post
+        }
+    for key, value in all_posts.items():
+        if (10 * (increment - 1)) < value['no'] < ((10 * increment) + 1):
+            if key == 'daily':
+                daily_feed.append(value['post'])
+            elif key == 'remaining':
+                remaining_feed.append(value['post'])
+            elif key == 'all caught up':
+                all_caught_up = value['post']
+
     # Getting Relelvent Profile Pictures
     post_users = {}
     for user_stat in s:
@@ -239,6 +293,7 @@ def catch_up_page(request, increment):
         "username":init['username'], 
         "daily_posts":daily_feed if daily_posts else None,
         "remaining_posts":remaining_feed if remaining_posts else None,
+        "all_caught_up": all_caught_up,
         "increment": {
             "previous": increment - 1,
             "current": increment,

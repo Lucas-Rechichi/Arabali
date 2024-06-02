@@ -332,10 +332,16 @@ def ajax_error(request):
 
 def save_location(request):
     user_stats = UserStats.objects.get(user=request.user)
-    latitude = request.POST.get('latitude')
-    longitude = request.POST.get('longitude')
-    user_stats.last_recorded_latitude = latitude
-    user_stats.last_recorded_longitude = longitude
-    user_stats.last_recorded_location = datetime.now()
-    user_stats.save()
+    if request.POST.get('accessing-location') == 'true':
+        user_stats = UserStats.objects.get(user=request.user)
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+        user_stats.last_recorded_latitude = latitude
+        user_stats.last_recorded_longitude = longitude
+        if request.POST.get('auto-request') == 'false': # so that auto acessing of location dosent reset the 2 hour delay on acessing modals
+            user_stats.last_recorded_location = datetime.now()
+        user_stats.save()
+    else:
+        user_stats.last_recorded_location = datetime.now()
+        user_stats.save()
     return JsonResponse({'username': user_stats.user.username})
