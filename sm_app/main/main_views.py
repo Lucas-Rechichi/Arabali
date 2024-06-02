@@ -200,7 +200,7 @@ def catch_up_page(request, increment):
         
     
     all_posts['all caught up'] = {
-        'no': 1 + 1,
+        'no': i + 1,
         'post':  '''<div class="row">
                         <div class="col-12">
                             <div class="card m-5">
@@ -225,7 +225,7 @@ def catch_up_page(request, increment):
                         </div>
                     </div>'''
     }
-    x = i + 1
+    x = i + 2
     for post in remaining_posts:
         x += 1
         all_posts['remaining'] = {

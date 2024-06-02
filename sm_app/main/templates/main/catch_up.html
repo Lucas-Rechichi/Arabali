@@ -226,11 +226,22 @@
                     // Check if Geolocation is supported
                     if (navigator.geolocation) {
                         // Get the current position
-                        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
-                            enableHighAccuracy: true,
-                            timeout: 10000,
-                            maximumAge: 0
-                        })
+                        navigator.geolocation.getCurrentPosition(position => {
+                            const {latitude, longitude} = position.coords;
+                            $.ajax({
+                                type: 'POST',
+                                url: '/page/save_location/',
+                                data: {
+                                    'auto-request': 'true', // So that the modal will pop up every 2 hours and not reset every acessing of the location.
+                                    'latitude': latitude,
+                                    'longitude': longitude,
+                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                },
+                                success: function (response) {
+                                    console.log('Location Accessed')
+                                }
+                            })
+                        });
                         
                     }
                     else {
@@ -243,98 +254,63 @@
                             },
                         })
                     }
-                    // Success callback for geolocation
-                    function successCallback(position) {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-                        $.ajax({
-                            type: 'POST',
-                            url: '/page/save_location/',
-                            data: {
-                                'auto-request': 'true', // So that the modal will pop up every 2 hours and not reset every acessing of the location.
-                                'latitude': latitude,
-                                'longitude': longitude,
-                                'csrfmiddlewaretoken': '{{ csrf_token }}'
-                            },
-                            success: function (response) {
-                                console.log('Location Accessed')
-                            }
-                        })
-                    }
-                    // Error callback for geolocation
-                    function errorCallback(error) {
-                        console.error('Error getting geolocation:', error);
+                }
+                $('#allowedLP').click(function () {
+                    $('#allowedLP').remove()
+                    $('#deniedLP').before(
+                        '<button class="btn btn-success" type="button" disabled>' +
+                            '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>' +
+                            '<span role="status"> Loading...</span>' +
+                            '</button>'
+                        )
+                    // Check if Geolocation is supported
+                    if (navigator.geolocation) {
+                        // Get the current position
+                        navigator.geolocation.getCurrentPosition(position => {
+                            const {latitude, longitude} = position.coords;
+                            $.ajax({
+                                type: 'POST',
+                                url: '/page/save_location/',
+                                data: {
+                                    'auto-request': 'false',
+                                    'acessing-location': 'true',
+                                    'latitude': latitude,
+                                    'longitude': longitude,
+                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                },
+                                success: function (response) {
+                                    console.log('Location Accessed')
+                                    LPModal.hide();
+                                    LPModalAllowed.show();
+                                }
+                            })
+                        });
                         
                     }
-                }
-
-            $('#allowedLP').click(function () {
-                $('#allowedLP').remove()
-                $('#deniedLP').before(
-                    '<button class="btn btn-success" type="button" disabled>' +
-                        '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>' +
-                        '<span role="status">Loading...</span>' +
-                        '</button>'
-                    )
-
-                // Check if Geolocation is supported
-                if (navigator.geolocation) {
-                    // Get the current position
-                    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    })
-                }
-                else {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/page/error/',
-                        date: {
-                            'issue': 'Geolocation API Not Supported On Your Browser',
-                            'csrfmiddlewaretoken': '{{ csrf_token }}'
-                        },
-                    })
-                }
-                // Success callback for geolocation
-                function successCallback(position) {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-                    LPModal.hide();
-                    $.ajax({
+                    else {
+                        $.ajax({
                             type: 'POST',
-                            url: '/page/save_location/',
-                            data: {
-                                'auto-request': 'false',
-                                'accessing-location': 'true',
-                                'latitude': latitude,
-                                'longitude': longitude,
+                            url: '/page/error/',
+                            date: {
+                                'issue': 'Geolocation API Not Supported On Your Browser',
                                 'csrfmiddlewaretoken': '{{ csrf_token }}'
                             },
-                            success: function (response) {
-                                LPModalAllowed.show();
-                            }
                         })
                     }
-
-                    // Error callback for geolocation
-                    function errorCallback(error) {
-                        console.error('Error getting geolocation:', error);
-                    }
                 });
-            $('#deniedLP').click(function () {
-                $.ajax({
-                    type: 'POST',
-                    url: '/page/save_location/',
-                    data: {
-                        'accessing-location': 'false',
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function (response) {
-                        console.log('location permission denied');
-                    }
+                $('#deniedLP').click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/page/save_location/',
+                        data: {
+                            'accessing-location': 'false',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function (response) {
+                            console.log('location permission denied');
+                        }
+                    })
                 })
-            })
             });
         </script>
         <!-- Feed: top navigation -->
