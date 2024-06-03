@@ -54,6 +54,9 @@ class UserStats(models.Model):
     last_recorded_longitude = models.FloatField()
     last_recorded_location = models.DateTimeField(null=False, auto_now_add=True)
 
+    def __str__(self):
+        return self.user.username
+
 # Comment Models   
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
