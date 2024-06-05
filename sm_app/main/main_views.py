@@ -40,6 +40,9 @@ def page(request, catagory, increment):
     s = UserStats.objects.all()
     user_liked_by = LikedBy.objects.get(name=name)
 
+    if us.is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+    
     # Creating the day save for the interaction check function
     if not DateAndOrTimeSave.objects.filter(abstract='Interaction Check').exists():
         interaction_stamp = DateAndOrTimeSave(abstract='Interaction Check', day=date.today())
@@ -167,6 +170,9 @@ def catch_up_page(request, increment):
     init = initialize_page(request)
     user_liked_by = LikedBy.objects.get(name=request.user.username)
     feed = []
+
+    if us.is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
 
     # Code to prevent the constant pop up of the location permissions modal
     current_time = timezone.now()
@@ -314,43 +320,48 @@ def catch_up_page(request, increment):
 
 @login_required
 def add_post(request):
-    username = request.user.username
-    if request.method == "POST": # POST requests are encrypted, safer
-        f = AddPost(request.POST, request.FILES) # enables the form for POST request
-        print(request.POST, request.FILES)
-        print("valid")
+    user = request.user
+    user_stats = UserStats.objects.get(user=user)
+    if user_stats.is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+    if user_stats.can_post:
+        if request.method == "POST": # POST requests are encrypted, safer
+            f = AddPost(request.POST, request.FILES) # enables the form for POST request
+            print(request.POST, request.FILES)
+            print("valid")
 
 
-        # Getting relevant data
-        username = request.user.username
-        a = request.POST.get("title")
-        c = request.POST.get("content")
-        user = User.objects.get(username=username)
-        user_stats = UserStats.objects.get(user=user)
-        d = request.FILES.get("image")
-        create_user_directory(user=user, sub_directory='posts')
-        tag = request.POST.get("tag")
+            # Getting relevant data
+            username = request.user.username
+            a = request.POST.get("title")
+            c = request.POST.get("content")
+            user = User.objects.get(username=username)
+            d = request.FILES.get("image")
+            create_user_directory(user=user, sub_directory='posts')
+            tag = request.POST.get("tag")
+            
+            # Checking to make sure that the tag is valid
+            if '|' in tag:
+                return render(request, 'main/error.html', {'issue': 'Tag cannot contain the vertical line symbol ( | )'})
+            
+            # Capitalization for consistancy and search functionality
+            tag = capitalize_plus(tag)
+
+            # Database Things
+            b = Post(user=user, title=a, contents=c, likes=0, media=d, created_at=datetime.now())
+            b.save()
+            base_value = Algorithum.AutoAlterations.base_value(catergory=tag)
+            t = PostTag(post=b, name=tag, value=base_value, current_increace=0, previous_increace=0, date_of_change=date.today())
+            t.save()
+            func = PCF(form='Parabolic Truncus', a=1, k=1, tag=t)
+            func.save()
+
         
-        # Checking to make sure that the tag is valid
-        if '|' in tag:
-            return render(request, 'main/error.html', {'issue': 'Tag cannot contain the vertical line symbol ( | )'})
-        
-        # Capitalization for consistancy and search functionality
-        tag = capitalize_plus(tag)
-
-        # Database Things
-        b = Post(user=user, title=a, contents=c, likes=0, media=d, created_at=datetime.now())
-        b.save()
-        base_value = Algorithum.AutoAlterations.base_value(catergory=tag)
-        t = PostTag(post=b, name=tag, value=base_value, current_increace=0, previous_increace=0, date_of_change=date.today())
-        t.save()
-        func = PCF(form='Parabolic Truncus', a=1, k=1, tag=t)
-        func.save()
-
-        
-        return HttpResponseRedirect("/page/popular|All/1")
+            return HttpResponseRedirect("/page/popular|All/1")
+        else:
+            f = AddPost()
     else:
-        f = AddPost()
+        return render(request, 'main/error.html', {'issue': 'Cannot Post.'})
     return render(request, 'main/add_post.html', {"input_fields": f, 'username': username})
 
 
@@ -359,6 +370,10 @@ def profile(request, name):
     init = initialize_page(request)
     u = User.objects.get(username=name)
     us = UserStats.objects.get(user=u)
+
+    if us.is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+    
     follow = Following.objects
     posts = Post.objects.filter(user=u)
     followed_userstats = []
@@ -404,6 +419,9 @@ def post_view(request, post_id):
     user_stats = UserStats.objects.get(user=user)
     user_liked_by = LikedBy.objects.get(name=request.user.username)
     s = UserStats.objects.all()
+
+    if UserStats.objects.get(user=request.user).is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
 
     # Profile pictures
     post_users = {}
@@ -456,6 +474,10 @@ def post_view(request, post_id):
 def config(request, name):
     init = initialize_page(request)
     # Checking that the right user is acessing this page.
+
+    if UserStats.objects.get(user=request.user).is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+    
     username = request.user.username
     if name != username:
         return render(request, 'main/error.html', {'issue': 'Cannot access this users profile'})
@@ -536,6 +558,10 @@ def error(request, error):
 @login_required
 def search_results(request, q, post_increment, user_increment, catergory_increment):
     init = initialize_page(request=request) # initialize for topbar
+
+    if UserStats.objects.get(user=request.user).is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+    
     try:
         query = request.POST.get('query') # getting query
         if not query:

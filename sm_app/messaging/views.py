@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def chat_base(request):
+    if UserStats.objects.get(user=request.user).is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     chat_rooms = get_chat_rooms(request.user)
     init = initialize_page(request)
     variables = {
@@ -20,6 +22,8 @@ def chat_base(request):
 
 @login_required
 def chat_room_view(request, room, room_id):
+    if UserStats.objects.get(user=request.user).is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     # Initialize for HTML
     chat_rooms = get_chat_rooms(request.user)
     init = initialize_page(request)

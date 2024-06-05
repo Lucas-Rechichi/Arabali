@@ -212,14 +212,68 @@ def comment_liked(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def new_comment(request):
-    if request.method == 'POST':
-        # If the user has actually added text into their comment
-        if request.POST.get('text'):
-            post_id = request.POST.get('post_id')
-            post = Post.objects.get(id=post_id)
-            text = request.POST.get('text')
-            user_stats = UserStats.objects.get(user=request.user)
-            tag = PostTag.objects.get(post=post)
+    if UserStats.objects.get(user=request.user).can_comment:
+        if request.method == 'POST':
+            # If the user has actually added text into their comment
+            if request.POST.get('text'):
+                post_id = request.POST.get('post_id')
+                post = Post.objects.get(id=post_id)
+                text = request.POST.get('text')
+                user_stats = UserStats.objects.get(user=request.user)
+                tag = PostTag.objects.get(post=post)
+
+                # If the user has this interest already
+                if Interest.objects.filter(user=request.user, name=tag.name).exists():
+                    interest = Interest.objects.get(user=request.user, name=tag.name)
+                else:
+                    new_interest = Interest(user=request.user, name=tag.name, value=0)
+                    new_interest.save()
+                    interest = new_interest
+
+
+                # Making the comment
+                comment = Comment(post=post, text=text, likes=0, user=request.user, created_at = datetime.now())
+                comment.save()
+
+                # Adding points for the comment and the user's interest.
+                tag.value += 5
+                interest.value += 5
+                tag.save()
+                interest.save()
+
+                # Keeping a record of the interactions
+                post_interaction = PostInteraction(tag=tag, value=5, type='current')
+                post_interaction.save()
+                interest_interaction = InterestInteraction(interest=interest, value=5, type='current')
+                interest_interaction.save()
+                
+                # Altering of the algorithum
+                Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
+                Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
+
+                # Sending the comments data over to the HTML document so that it can be displayed inside of the post
+                responce = {
+                    'user':comment.user.username,
+                    'post':comment.post.pk,
+                    'text':comment.text,
+                    'likes':comment.likes,
+                    'created_at':comment.created_at,
+                    'liked__by': list(comment.liked_by.all()),
+                    'pfp':user_stats.pfp.url,
+                    'id':comment.pk
+                }
+                return JsonResponse(responce)
+            else:
+                return JsonResponse({'error': 'Invalid request method'}, status=405)
+        else:
+            return JsonResponse({'Error': 'Invalid form submision.'})
+    else:
+        return render(request, 'main/error.html', {'issue': 'You cannot comment or reply to comments.'})
+    
+def new_reply(request):
+    if UserStats.objects.get(user=request.user).can_comment:
+        if request.method == 'POST':
+            tag = PostTag.objects.get(post=Comment.objects.get(id=request.POST.get('comment_id')).post)
 
             # If the user has this interest already
             if Interest.objects.filter(user=request.user, name=tag.name).exists():
@@ -229,86 +283,38 @@ def new_comment(request):
                 new_interest.save()
                 interest = new_interest
 
+            # If the user has actually added text into their comment
+            if request.POST.get('text'):
+                user = request.user
+                comment_id = request.POST.get('comment_id')
+                user_pfp = UserStats.objects.get(user=user).pfp.url
 
-            # Making the comment
-            comment = Comment(post=post, text=text, likes=0, user=request.user, created_at = datetime.now())
-            comment.save()
+                # Making the comment
+                comment = Comment.objects.get(id=comment_id)
+                reply = NestedComment(user=user, comment=comment, likes=0, created_at=datetime.now(), text=request.POST.get('text'))
+                tag.value += 4
+                tag.current_increace += 4
+                interest.value += 1
+                interest.current_increace += 1
+                tag.save()
+                interest.save()
+                reply.save()
 
-            # Adding points for the comment and the user's interest.
-            tag.value += 5
-            interest.value += 5
-            tag.save()
-            interest.save()
-
-            # Keeping a record of the interactions
-            post_interaction = PostInteraction(tag=tag, value=5, type='current')
-            post_interaction.save()
-            interest_interaction = InterestInteraction(interest=interest, value=5, type='current')
-            interest_interaction.save()
-            
-            # Altering of the algorithum
-            Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
-            Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
-
-            # Sending the comments data over to the HTML document so that it can be displayed inside of the post
-            responce = {
-                'user':comment.user.username,
-                'post':comment.post.pk,
-                'text':comment.text,
-                'likes':comment.likes,
-                'created_at':comment.created_at,
-                'liked__by': list(comment.liked_by.all()),
-                'pfp':user_stats.pfp.url,
-                'id':comment.pk
-            }
-            return JsonResponse(responce)
+                # Sending the comments data over to the HTML document so that it can be displayed inside of the comment
+                responce = {
+                    'reply_id':reply.pk,
+                    'user':reply.user.username,
+                    'comment_id':reply.comment.pk,
+                    'pfp':user_pfp,
+                    'created_at':reply.created_at,
+                    'text':reply.text,
+                    'likes':reply.likes
+                }
+                return JsonResponse(responce)
+            else:
+                return JsonResponse({'error': 'Invalid request method'}, status=405)
         else:
-            return JsonResponse({'error': 'Invalid request method'}, status=405)
-    else:
-        return JsonResponse({'Error': 'Invalid form submision.'})
-    
-def new_reply(request):
-    if request.method == 'POST':
-        tag = PostTag.objects.get(post=Comment.objects.get(id=request.POST.get('comment_id')).post)
-
-        # If the user has this interest already
-        if Interest.objects.filter(user=request.user, name=tag.name).exists():
-            interest = Interest.objects.get(user=request.user, name=tag.name)
-        else:
-            new_interest = Interest(user=request.user, name=tag.name, value=0)
-            new_interest.save()
-            interest = new_interest
-
-        # If the user has actually added text into their comment
-        if request.POST.get('text'):
-            user = request.user
-            comment_id = request.POST.get('comment_id')
-            user_pfp = UserStats.objects.get(user=user).pfp.url
-
-            # Making the comment
-            comment = Comment.objects.get(id=comment_id)
-            reply = NestedComment(user=user, comment=comment, likes=0, created_at=datetime.now(), text=request.POST.get('text'))
-            tag.value += 4
-            tag.current_increace += 4
-            interest.value += 1
-            interest.current_increace += 1
-            tag.save()
-            interest.save()
-            reply.save()
-
-            # Sending the comments data over to the HTML document so that it can be displayed inside of the comment
-            responce = {
-                'reply_id':reply.pk,
-                'user':reply.user.username,
-                'comment_id':reply.comment.pk,
-                'pfp':user_pfp,
-                'created_at':reply.created_at,
-                'text':reply.text,
-                'likes':reply.likes
-            }
-            return JsonResponse(responce)
-        else:
-            return JsonResponse({'error': 'Invalid request method'}, status=405)
+            return render(request, 'main/error.html', {'issue': 'You cannot comment or reply to comments.'})
 
 # If the user scrolls by a post.     
 def scrolled_by(request):

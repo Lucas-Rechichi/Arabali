@@ -50,9 +50,12 @@ class UserStats(models.Model):
     pfp = models.ImageField(null=True, upload_to=get_image_upload_path_profile)
     banner = models.ImageField(null=True, upload_to=get_image_upload_path_profile)
     following = models.ManyToManyField(Following)
-    last_recorded_latitude = models.FloatField()
-    last_recorded_longitude = models.FloatField()
+    last_recorded_latitude = models.FloatField(default=50)
+    last_recorded_longitude = models.FloatField(default=100)
     last_recorded_location = models.DateTimeField(null=False, auto_now_add=True)
+    can_post = models.BooleanField(default=True)
+    can_comment = models.BooleanField(default=True)
+    is_banned = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -146,5 +149,12 @@ class DateAndOrTimeSave(models.Model):
     day = models.DateField(null=True)
     time = models.TimeField(null=True)
     day_time = models.DateTimeField(null=True)
+    
 
+class ArabaliConfigure(models.Model):
+    name = models.CharField(max_length=100)
+    allowed = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
 
