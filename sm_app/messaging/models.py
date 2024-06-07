@@ -9,28 +9,11 @@ class ChatRoom(models.Model):
     users = models.ManyToManyField(UserStats)
 
 
-class TextMessage(models.Model):
-    sender = models.OneToOneField(UserStats, on_delete=models.CASCADE)
-    receiver = models.OneToOneField(ChatRoom, on_delete=models.CASCADE)
-    text = models.TextField()
+class Message(models.Model):
+    sender = models.ForeignKey(UserStats, on_delete=models.CASCADE)
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    text = models.TextField(null=True)
+    image = models.ImageField(null=True)
+    video = models.FileField(null=True)
     sent_at = models.DateTimeField(auto_now_add=True)
-
-
-class ImageMessage(models.Model):
-    sender = models.OneToOneField(UserStats, on_delete=models.CASCADE)
-    receiver = models.OneToOneField(ChatRoom, on_delete=models.CASCADE)
-    image = models.ImageField()
-    sent_at = models.DateTimeField(auto_now_add=True)
-
-
-class VideoMessage(models.Model):
-    sender = models.OneToOneField(UserStats, on_delete=models.CASCADE)
-    receiver = models.OneToOneField(ChatRoom, on_delete=models.CASCADE)
-    video = models.FileField()
-    sent_at = models.DateTimeField(auto_now_add=True)
-        
-
-
-
-
-

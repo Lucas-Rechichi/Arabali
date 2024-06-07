@@ -1,5 +1,5 @@
 from django.contrib import admin
-from messaging.models import ChatRoom, TextMessage, ImageMessage, VideoMessage
+from messaging.models import ChatRoom, Message
 # Register your models here.
 class ExtraShow(admin.ModelAdmin):
     readonly_fields =('id', 'created_at_formatted')
@@ -10,6 +10,4 @@ class ExtraShow(admin.ModelAdmin):
     created_at_formatted.short_description = 'Created At'
 
 admin.site.register(ChatRoom, ExtraShow)
-admin.site.register(TextMessage, ExtraShow)
-admin.site.register(ImageMessage, ExtraShow)
-admin.site.register(VideoMessage, ExtraShow)
+admin.site.register(Message, ExtraShow)

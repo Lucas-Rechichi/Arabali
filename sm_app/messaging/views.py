@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from main.models import UserStats
-from messaging.models import ChatRoom
+from messaging.models import ChatRoom, Message
 from messaging.extras import get_chat_rooms
 from main.extras import initialize_page
 from django.contrib.auth.decorators import login_required
@@ -35,12 +35,17 @@ def chat_room_view(request, room, room_id):
     user_stats = UserStats.objects.get(user=user)
 
     # Checking to see if the user has been invited to this chat room.
-    if user_stats not in chat_room.users:
+    if user_stats not in chat_room.users.all():
         return render(request, 'main/error.html', {'issue': 'Cannot access this chatroom.'})
+    
+    # Getting the messages associated with this chatroom
+    messages = Message.objects.filter(room=chat_room)
 
     # Passing data over to HTML document
     variables = {
         'chat_rooms': chat_rooms,
+        'room': chat_room,
+        'messages': messages,
         'username': init['username'],
         'search_bar': init['search_bar'],
     }
