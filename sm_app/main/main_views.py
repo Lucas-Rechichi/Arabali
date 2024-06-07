@@ -497,8 +497,11 @@ def config(request, name):
         for post in post_list:
             if user_liked_by_obj in post.liked_by.all():
                 if user_liked_by_obj not in liked_by_user_set:
-                    liked_by_users.append(UserStats.objects.get(user=User.objects.get(username=user_liked_by_obj.name)))
-                    liked_by_user_set.add(user_liked_by_obj)
+                    try:
+                        liked_by_users.append(UserStats.objects.get(user=User.objects.get(username=user_liked_by_obj.name)))
+                        liked_by_user_set.add(user_liked_by_obj)
+                    except User.DoesNotExist:
+                        break
     print(post.liked_by.all(), liked_by_users)
 
     # Form init

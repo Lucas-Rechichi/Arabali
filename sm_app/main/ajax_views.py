@@ -324,6 +324,10 @@ def scrolled_by(request):
     post = Post.objects.get(id=post_id)
     tag = PostTag.objects.get(post=post)
     interest = Interest.objects.get(user=user, name=tag.name)
+    tag.value += 1
+    interest.value += 1
+    tag.save()
+    interest.save()
     interest_interaction = InterestInteraction(interest=interest, value=1, type='current')
     post_interaction = PostInteraction(tag=tag, value=1, type='current')
     interest_interaction.save()

@@ -42,30 +42,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logout | Arabail</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <button type="button" class="btn" onclick='location.href = ""'><h2 class="display-6" style="color: green;">Arabali</h2></button>
-            <button type="button" class="btn btn-outline-success left" onclick='location.href = "/login/"'><h2>Login</h2></button>
-            <button type="button" class="btn btn-success" onclick='location.href = "/sign-up/"'><h2>Sign Up</h2></button>
+            <div class="container">
+                <div class="row">
+                    <div class="col-4 d-flex justify-content-start">
+                        <a href="/home/" role="button" class="display-6 link-success link-offset-2 link-underline-opacity-0">Arabali</a>
+                    </div>
+                    <div class="col-8 d-flex justify-content-end">
+                        <button type="button" class="btn btn-outline-success pb-0 me-2" onclick='location.href = "/login/"'><p class="lead mt-2">Login</p></button>
+                        <button type="button" class="btn btn-success pb-0" onclick='location.href = "/sign-up/"'><p class="lead mt-2">Sign Up</p></button>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
     <div class="card sign-up">
         <div class="center-form">
             <div class="prompt">
-                <h1 class="display4 heading">You Have Beed Sucessfully Logged Out</h1>
+                <h1 class="display4 heading">You Have Been Sucessfully Logged Out</h1>
                 <br>
                 <p>See You Soon!</p>
             </div>
         </div>
     </div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 </body>
 </html>
