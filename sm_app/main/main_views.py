@@ -130,8 +130,7 @@ def page(request, catagory, increment):
         return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
 
     # Only allows 10 posts to be displayed per page, as the increment increases, the post range will change to acompany the next 10 posts..
-    feed = []
-    feed = Algorithum.Core.posts_per_page(list=feed, incrementing_factor=increment, posts=posts)
+    feed = Algorithum.Core.posts_per_page(incrementing_factor=increment, posts=posts)
     
     # Variables
     variables = {

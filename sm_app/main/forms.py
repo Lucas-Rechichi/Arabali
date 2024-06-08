@@ -1,5 +1,4 @@
 from django import forms
-from .models import Post
 
 class AddPost(forms.Form):
     title = forms.CharField(label="Title of your post:", max_length=150)

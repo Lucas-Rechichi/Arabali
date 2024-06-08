@@ -14,10 +14,14 @@
     {% for chat_room in chat_rooms %}
     <div class="row">
         <div class="col-3 ms-5 d-flex justify-content-end">
-            <img src="{{chat_room.icon.url}}" style="max-width: 70%; max-height: 70%; border-radius: 35%;">
+            <button class="btn" onclick='location.href="/chat/{{chat_room.name}}/{{chat_room.id}}"'>
+                <img src="{{chat_room.icon.url}}" style="max-width: 2.5rem; max-height: 2.5rem; border-radius: 35%;">
+            </button>
         </div>
-        <div class="col-7 mt-1">
-            <p class="lead">{{chat_room.name}}</p>
+        <div class="col-7 mt-3">
+            <button class="btn" onclick='location.href="/chat/{{chat_room.name}}/{{chat_room.id}}"'>
+                <p class="lead">{{chat_room.name}}</p>
+            </button>
         </div>
         <hr>
     </div>

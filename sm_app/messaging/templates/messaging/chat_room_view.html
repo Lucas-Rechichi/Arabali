@@ -14,10 +14,14 @@
     {% for chat_room in chat_rooms %}
     <div class="row">
         <div class="col-3 ms-5 d-flex justify-content-end">
-            <img src="{{chat_room.icon.url}}" style="max-width: 70%; max-height: 70%; border-radius: 35%;">
+            <button class="btn" onclick='location.href="/chat/{{chat_room.name}}/{{chat_room.id}}"'>
+                <img src="{{chat_room.icon.url}}" style="max-width: 2.5rem; max-height: 2.5rem; border-radius: 35%;">
+            </button>
         </div>
-        <div class="col-7 mt-1">
-            <p class="lead">{{chat_room.name}}</p>
+        <div class="col-7 mt-3">
+            <button class="btn" onclick='location.href="/chat/{{chat_room.name}}/{{chat_room.id}}"'>
+                <p class="lead">{{chat_room.name}}</p>
+            </button>
         </div>
         <hr>
     </div>
@@ -26,7 +30,7 @@
 {% block conversation %}
 <div class="container">
     <div class="row">
-        <div class="card" style="min-height: 650px;">
+        <div class="card" style="height: 630px;">
             <div class="row">
                 <div class="col-1">
                     <img src="{{room.icon.url}}" alt="" class="p-2" style="max-height: 4rem; max-width: 4rem;">
@@ -36,46 +40,29 @@
                 </div>
             </div>
             <hr>
-            <div class="card-body">
-                    {% for message in messages %}
-                        <div class="row">
-                            <div class="col">
-                                {{message.sent_at}}
-                            </div>
+            <div class="card-body" id="conversation-contents" style="overflow-y: auto;">
+                {% for message in messages %}
+                    <div class="row">
+                        <div class="col">
+                            <p class="text-center"><em>{{message.sent_at}}</em></p>
                         </div>
-                        <div class="row">
-                            {% if message.sender.username == username %}
-                                <div class="col-6">
-                                </div>
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-11">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    {% if message.text %}
-                                                        <p>{{message.text}}</p>
-                                                    {% elif message.image %}
-                                                        <img src="{{message.image.url}}" alt="">
-                                                    {% else %} 
-                                                        <video src="{{message.video.url}}" controls></video>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-1">
-                                            <img src="{{message.sender.pfp.url}}" alt="" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                    </div>
-                                </div>
-                            {% else %}
+                    </div>
+                    <div class="row">
+                        {% if message.sender.user.username == username %}
+                            <div class="col-6">
+                            </div>
                             <div class="col-6">
                                 <div class="row">
-                                    <div class="col-1">
-                                        <img src="{{message.sender.pfp.url}}" alt="" style="max-width: 2rem; max-height: 2rem;">
-                                    </div>
                                     <div class="col-11">
-                                        <div class="card">
-                                            <div class="card-body">
+                                        <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                    </div>
+                                    <div class="col-1">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-11 d-flex justify-content-end">
+                                        <div class="card pb-0" style="width: fit-content;">
+                                            <div class="p-1">
                                                 {% if message.text %}
                                                     <p>{{message.text}}</p>
                                                 {% elif message.image %}
@@ -86,22 +73,133 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-1">
+                                        <img src="{{message.sender.pfp.url}}" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                        {% else %}
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-11">
+                                    <p class="d-flex justify-content-start"><strong>You</strong></p>
+                                </div>
+                                <div class="col-1">
+                                </div>
                             </div>
-                            {% endif %}
+                            <div class="row">
+                                <div class="col-1">
+                                    <img src="{{message.sender.pfp.url}}" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                </div>
+                                <div class="col-11">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            {% if message.text %}
+                                                <p>{{message.text}}</p>
+                                            {% elif message.image %}
+                                                <img src="{{message.image.url}}" alt="">
+                                            {% else %} 
+                                                <video src="{{message.video.url}}" controls></video>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    {% endfor %}
-                </div>
+                        <div class="col-6">
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
             </div>
         </div>
     </div>
     <br>
-    <div class="row">
-        <form action="" method="post">
-            <input type="text" class="form-control p-3 " id="exampleInputEmail1" aria-describedby="emailHelp">
-        </form>
-    </div>
+    <form action="" method="post">
+        <div class="row">
+            <div class="col-1">
+                <div class="btn-group dropup">
+                    <button type="button" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-square" style="font-size: 2.5rem;"></i></button>
+                    <ul class="dropdown-menu p-2 mb-1">
+                        <li class="custom-icon"><div class="fs-4"><i class="bi bi-images"></i></div> <p class="lead">Image</p></li>
+                        <li class="custom-icon"><div class="fs-4"><i class="bi bi-play-btn"></i></i></div> <p class="lead">Video</p></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-10">
+                <input type="text" id="message" class="form-control p-3 " id="exampleInputEmail1" aria-describedby="emailHelp">
+            </div>
+            <div class="col-1">
+                <div class="card">
+                    <button type="button" id="send" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-send-fill" style="font-size: 2.5rem;"></i></button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        $(document).ready(function () {
+            $('#send').click(function () {
+                message = $('#message').val()
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat/message-sent-text/',
+                    data: {
+                        'chat-room-name': '{{room.name}}',
+                        'chat-room-id': '{{room.id}}',
+                        'text-message': message,
+                        'is-reply': false,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                success: function(response) {
+                    console.log('text sent and saved.')
+                    var newMessageInHtml = `
+                        <div class="message">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="text-center"><em>`+ response.creationDate + `</em></p>
+                                </div>
+                            </div>
+                        <div class="row">
+                            <div class="col-6">
+                            </div>
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-11">
+                                        <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                    </div>
+                                    <div class="col-1">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-11 d-flex justify-content-end">
+                                        <div class="card pb-0" style="width: fit-content;">
+                                            <div class="p-1">
+                                                <p>` + response.message + `</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-1">
+                                        <img src="`+ response.message_user_pfp_url +`" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                    $('#conversation-contents').append(newMessageInHtml);
+                    var scrollableContent = document.getElementById("conversation-contents");
+                    scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                    $('#message').val('')
+                }
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var scrollableContent = document.getElementById("conversation-contents");
+            scrollableContent.scrollTop = scrollableContent.scrollHeight;
+        });
+    </script>
 </div>
 {% endblock %}

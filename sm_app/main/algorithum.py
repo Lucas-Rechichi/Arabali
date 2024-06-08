@@ -128,7 +128,8 @@ class Algorithum:
     class Core:
         
         # Uses the incrementing system to display only a number of posts at a time.
-        def posts_per_page(list, incrementing_factor, posts):
+        def posts_per_page(incrementing_factor, posts):
+            list = []
             for i, post in enumerate(posts):
                 i += 1
                 print(post, i)
