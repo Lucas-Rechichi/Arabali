@@ -66,22 +66,60 @@ def create_chat_room(request, increment):
     followers = Following.objects.all()
     followed_userstats = []
     user_set = set()
+    user_set.add(user_stats.user) # To eliminate the possiblilty of inviting yourself into a chatroom twice
+
+    # Loops though every user that you follow
     for x in followers:
         if user_stats.following.filter(subscribers=x).exists():
             followed_userstats.append(UserStats.objects.get(user=User.objects.get(username=followers.get(subscribers=x))))
             user_set.add(UserStats.objects.get(user=User.objects.get(username=followers.get(subscribers=x))).user)
+
+    # For non-following users
     non_followed_userstats = []
-    other_users = UserStats.objects.exclude(user__in=user_set)
+    other_users = UserStats.objects.exclude(user__in=user_set,)
     for other_user in other_users:
         non_followed_userstats.append(other_user)
+
+    # Adding the two lists, with priority towards the users that you follow
     chooseable_users = followed_userstats + non_followed_userstats
 
-    # Same sorting system, but to insted to limit users per page insted of posts per page
-    limited_chooseable_users = Algorithum.Core.posts_per_page(incrementing_factor=increment, posts=chooseable_users)
+    # Limits the page to 9 users per increment
+    limited_chooseable_users = []
+    for i, user in enumerate(chooseable_users):
+        i += 1
+        if 0 < i < 10 and increment == 1:
+            limited_chooseable_users.append(user)
+        elif (10 * (increment - 1)) <= i <= (9 + (10 * (increment - 1))) and increment > 1:
+            limited_chooseable_users.append(user)
 
     # Forms
     if request.method == "POST":
         chat_room_form = CreateChatRoom(request.POST, request.FILES)
+        if chat_room_form.is_valid():
+
+            # Getting Values for the creation of the chat room 
+            room_name = request.POST.get('name')
+            room_icon = request.FILES.get('icon')
+            try:
+                room_bg_image = request.FILES.get('room_bg_image')
+            except:
+                room_bg_image = None
+                print('No Custom Backround Image Incerted')
+            
+            # Getting the invited users
+            invited_users = []
+            possible_ids = list(UserStats.objects.values_list('id', flat=True))
+            for id in possible_ids:
+                if request.POST.get(f'chosen_user{id}') == f"chosen{id}":
+                    relevant_user = UserStats.objects.get(id=id)
+                    invited_users.append(relevant_user)
+
+            # Create the chat room
+            new_chatroom = ChatRoom(name=room_name, icon=room_icon, room_bg_image=room_bg_image)
+            new_chatroom.save()
+            invited_users.append(user_stats)
+            new_chatroom.users.set(invited_users)
+            new_chatroom.save()
     else:
         chat_room_form = CreateChatRoom()
 
@@ -89,6 +127,11 @@ def create_chat_room(request, increment):
         'username': init['username'],
         'search_bar': init['search_bar'],
         'chat_room_form': chat_room_form,
-        'chooseable_users': limited_chooseable_users
+        'chooseable_users': limited_chooseable_users,
+        'increment': {
+            'previous': increment - 1,
+            'current': increment,
+            'next': increment + 1
+        },
     }
     return render(request, 'messaging/create_chat_room.html', variables)

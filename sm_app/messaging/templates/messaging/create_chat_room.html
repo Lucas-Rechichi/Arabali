@@ -19,7 +19,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <form action="" method="post">
+                        <form action="" method="post" id="createChatRoomForm" enctype="multipart/form-data">
+                            {% csrf_token %}
                             <p class="lead text-center">Create Chat Room</p>
                             {{chat_room_form|crispy}}
                             <p>Invite Users*</p>
@@ -31,7 +32,7 @@
                                             <div class="card-body">
                                                 <div class="input-group mb-3 text-center">
                                                     <div class="input-group-text" style=" border-top-left-radius: 25px; border-top-right-radius: 25px; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
-                                                        <input class="form-check-input mt-0" type="checkbox" value="" id="" aria-label="Checkbox for following text input">
+                                                        <input class="form-check-input mt-0" type="checkbox" name="chosen_user{{chooseable_user.id}}" id="ChosenUser{{chooseable_user.id}}" value="chosen{{chooseable_user.id}}" value aria-label="Checkbox for selecting the user: {{chooseable_user.user.username}}">
                                                     </div>
                                                     <p class="lead mt-3" style="padding-left: 100px;">{{chooseable_user.user.username}}</p>
                                                     <img src="{{chooseable_user.pfp.url}}" alt="" style="margin-left: 15%; max-width: 70%; max-height: 70%;">
@@ -42,6 +43,15 @@
                                 {% endfor %}
                             </div>
                             <br>
+                            <div class="col d-flex justify-content-center">
+                                {% if increment.previous == 0 %}
+                                    <button class="btn btn-outline-success" disabled><i class="bi bi-arrow-left-circle"></i> Previous</button>
+                                {% else %}
+                                    <button class="btn btn-outline-success" onclick='location.href = "/create_chat_room/{{increment.previous}}"'><i class="bi bi-arrow-left-circle"></i> Previous</button>
+                                {% endif %}
+                                <p class="lead ps-2 pe-2 mt-2">User List no. {{increment.current}} </p>
+                                <button class="btn btn-outline-success" onclick='location.href = "/create_chat_room/{{increment.next}}"'>Next <i class="bi bi-arrow-right-circle"></i></button>
+                            </div>
                             <button type="submit" class="btn btn-success"><i class="bi bi-chat-right-text-fill"></i> Create</button>
                         </form>
                     </div>
