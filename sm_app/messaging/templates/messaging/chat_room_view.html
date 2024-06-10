@@ -28,18 +28,20 @@
 {% endblock %}
 {% block conversation %}
 <div class="container">
-    <div class="row">
-        <div class="card" style="height: 630px;">
+    <div class="card p-0" style="height: 630px;" >
+        <div class="card-header">
             <div class="row">
                 <div class="col-1">
-                    <img src="{{room.icon.url}}" alt="" class="p-2" style="max-height: 4rem; max-width: 4rem;">
+                    <img src="{{room.icon.url}}" alt="" class="p-2 rounded-circle" style="max-height: 4rem; max-width: 4rem;">
                 </div>
                 <div class="col-11">
                     <p class="lead text-start mt-3">{{room.name}}</p>
                 </div>
             </div>
-            <hr>
-            <div class="card-body" id="conversation-contents" style="overflow-y: auto;">
+        </div>
+        <img src="{{room.room_bg_image.url}}" alt="" style="height: 547px; opacity: 30%; border-bottom-left-radius: 5px;">
+        <div class="card-img-overlay" style="overflow-y: auto; margin-top: 80px;" id="conversationFrame">
+            <div class="card-body" id="conversation-contents">
                 {% for message in messages %}
                     <div class="row">
                         <div class="col">
@@ -59,9 +61,9 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-11 d-flex justify-content-end">
+                                    <div class="col-10 d-flex justify-content-end">
                                         <div class="card pb-0" style="width: fit-content;">
-                                            <div class="p-1">
+                                            <div class="card-body">
                                                 {% if message.text %}
                                                     <p>{{message.text}}</p>
                                                 {% elif message.image %}
@@ -73,7 +75,7 @@
                                         </div>
                                     </div>
                                     <div class="col-1">
-                                        <img src="{{message.sender.pfp.url}}" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                        <img src="{{message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
                                     </div>
                                 </div>
                             </div>
@@ -81,17 +83,17 @@
                         <div class="col-6">
                             <div class="row">
                                 <div class="col-11">
-                                    <p class="d-flex justify-content-start"><strong>You</strong></p>
+                                    <p class="d-flex justify-content-start"><strong>{{message.sender.user.username}}</strong></p>
                                 </div>
                                 <div class="col-1">
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-1">
-                                    <img src="{{message.sender.pfp.url}}" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                    <img src="{{message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                 </div>
                                 <div class="col-11">
-                                    <div class="card">
+                                    <div class="card" style="width: fit-content;">
                                         <div class="card-body">
                                             {% if message.text %}
                                                 <p>{{message.text}}</p>
@@ -110,7 +112,6 @@
                         {% endif %}
                     </div>
                 {% endfor %}
-            </div>
             </div>
         </div>
     </div>
@@ -138,6 +139,62 @@
     </form>
     <script>
         $(document).ready(function () {
+            $('#message').keydown(function(event) {
+                if (event.key == 'Enter') {
+                    event.preventDefault(); // Prevent form submission
+                    message = $('#message').val()
+                    $.ajax({
+                        type: 'POST',
+                        url: '/chat/message-sent-text/',
+                        data: {
+                            'chat-room-name': '{{room.name}}',
+                            'chat-room-id': '{{room.id}}',
+                            'text-message': message,
+                            'is-reply': false,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                    success: function(response) {
+                        console.log('text sent and saved.')
+                        var newMessageInHtml = `
+                            <div class="row">
+                                <div class="col">
+                                    <p class="text-center"><em>`+ response.creationDate + `</em></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-11">
+                                            <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                        </div>
+                                        <div class="col-1">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-10 d-flex justify-content-end">
+                                            <div class="card pb-0" style="width: fit-content;">
+                                                <div class="card-body">
+                                                    <p>` + response.message + `</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <img src="`+ response.message_user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        $('#conversation-contents').append(newMessageInHtml);
+                        var scrollableContent = document.getElementById("conversationFrame");
+                        scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                        $('#message').val('')
+                    }
+                });
+                }
+            })
             $('#send').click(function () {
                 message = $('#message').val()
                 $.ajax({
@@ -171,22 +228,22 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-11 d-flex justify-content-end">
+                                    <div class="col-10 d-flex justify-content-end">
                                         <div class="card pb-0" style="width: fit-content;">
-                                            <div class="p-1">
+                                            <div class="card-body">
                                                 <p>` + response.message + `</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-1">
-                                        <img src="`+ response.message_user_pfp_url +`" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                        <img src="`+ response.message_user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>`;
                     $('#conversation-contents').append(newMessageInHtml);
-                    var scrollableContent = document.getElementById("conversation-contents");
+                    var scrollableContent = document.getElementById("conversationFrame");
                     scrollableContent.scrollTop = scrollableContent.scrollHeight;
                     $('#message').val('')
                 }
@@ -196,7 +253,7 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var scrollableContent = document.getElementById("conversation-contents");
+            var scrollableContent = document.getElementById("conversationFrame");
             scrollableContent.scrollTop = scrollableContent.scrollHeight;
         });
     </script>
