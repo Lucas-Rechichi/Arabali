@@ -6,7 +6,9 @@ django.setup()
 
 # Class for all of the methods associated with this connection
 import json
+import pytz
 from main.models import UserStats
+from messaging.extras import replace_spaces_with_underscores
 from messaging.models import ChatRoom, Message
 from django.contrib.auth.models import User
 
@@ -18,14 +20,14 @@ class MessageConsumer(WebsocketConsumer):
     def connect(self):
         # Collects relevant information about the chatroom.
         self.room_id = self.scope['url_route']['kwargs']['room_id']
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f'chat_room_{self.room_id}_{self.room_name}'
         user = self.scope["user"]
 
         # Getting relevant database objects
-        rooms = ChatRoom.objects.filter(name=self.room_name)
-        chat_room = rooms.get(id=self.room_id)
+        chat_room = ChatRoom.objects.get(id=self.room_id)
         user_stats = UserStats.objects.get(user=user)
+
+        # Defining the room name
+        self.room_group_name = f'chat_room_{self.room_id}_{replace_spaces_with_underscores(chat_room.name)}'
 
         # Checking to see if this user has been invited to the chatroom.
         if chat_room.users.filter(user=user_stats.user).exists():
@@ -74,7 +76,12 @@ class MessageConsumer(WebsocketConsumer):
         user = User.objects.get(username=username)
         user_stats = UserStats.objects.get(user=user)
         if message_type == 'text':
-            sent_at = Message.objects.get(sender=user, text=message).sent_at
+            # Assuming you want to convert the datetime to a specific timezone
+            local_timezone = pytz.timezone("Australia/Sydney")
+            local_datetime = Message.objects.latest('sent_at').sent_at.astimezone(local_timezone)
+    
+            formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
+            formatted_datetime_capitalized = formatted_datetime.capitalize()
         else:
             sent_at = None
         user_pfp_url = user_stats.pfp.url
@@ -85,6 +92,6 @@ class MessageConsumer(WebsocketConsumer):
             'message_type': message_type,
             'message': message,
             'username': user.username,
-            'sent_at': sent_at,
+            'sent_at': formatted_datetime_capitalized,
             'user_pfp_url': user_pfp_url
         }))

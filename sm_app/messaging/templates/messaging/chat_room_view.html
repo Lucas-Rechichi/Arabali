@@ -194,43 +194,81 @@
         const roomId = "{{ room.id }}";  // Django template variable for chatroom ID
         const roomName = "{{ room.name }}";  // Django template variable for chatroom name
         const messageSocket = new WebSocket(
-            `ws://${window.location.host}/ws/chat/${roomId}/${roomName}/`
+            'ws://' + window.location.host + '/ws/brordcast-message/' + roomId
         );
         messageSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            var newMessageInHtml = `
-                <div class="message">
+            if (data.username === '{{username}}') {
+                var newMessageInHtml = `
+                    <div class="message">
+                        <div class="row">
+                            <div class="col">
+                                <p class="text-center"><em>` + data.sent_at + `</em></p>
+                            </div>
+                        </div>
                     <div class="row">
-                        <div class="col">
-                            <p class="text-center"><em>`+ response.creationDate + `</em></p>
+                        <div class="col-6">
+                            
                         </div>
-                    </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="row">
-                            <div class="col-11">
-                                <p class="d-flex justify-content-end"><strong>` + data.username + `</strong></p>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-11">
+                                    <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                </div>
+                                <div class="col-1">
+                                </div>
                             </div>
-                            <div class="col-1">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-1">
-                                <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                            </div>
-                            <div class="col-10 d-flex justify-content-start">
-                                <div class="card pb-0" style="width: fit-content;">
-                                    <div class="card-body">
-                                        <p>` + data.message + `</p>
+                            <div class="row">
+                                <div class="col-10 d-flex justify-content-end">
+                                    <div class="card pb-0" style="width: fit-content;">
+                                        <div class="card-body">
+                                            <p>` + data.message + `</p>
+                                        </div>
                                     </div>
+                                </div>
+                                <div class="col-1">
+                                    <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6">
+                </div>`;
+            } 
+            else {
+                var newMessageInHtml = `
+                    <div class="message">
+                        <div class="row">
+                            <div class="col">
+                                <p class="text-center"><em>` + data.sent_at + `</em></p>
+                            </div>
+                        </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-1">
+                                </div>
+                                <div class="col-11">
+                                    <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-1">
+                                    <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                </div>
+                                <div class="col-10 d-flex justify-content-start">
+                                    <div class="card pb-0" style="width: fit-content;">
+                                        <div class="card-body">
+                                            <p>` + data.message + `</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                        </div>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
+            }
             $('#conversation-contents').append(newMessageInHtml);
         };
         messageSocket.onclose = function (e) {

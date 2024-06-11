@@ -319,6 +319,7 @@ def catch_up_page(request, increment):
 
 @login_required
 def add_post(request):
+    init = initialize_page(request)
     user = request.user
     user_stats = UserStats.objects.get(user=user)
     if user_stats.is_banned:
@@ -361,7 +362,7 @@ def add_post(request):
             f = AddPost()
     else:
         return render(request, 'main/error.html', {'issue': 'Cannot Post.'})
-    return render(request, 'main/add_post.html', {"input_fields": f, 'username': username})
+    return render(request, 'main/add_post.html', {"input_fields": f, 'username': init['username'], 'search_bar': init['search_bar']})
 
 
 @login_required

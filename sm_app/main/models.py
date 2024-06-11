@@ -60,6 +60,21 @@ class UserStats(models.Model):
     def __str__(self):
         return self.user.username
 
+# Notifications
+class Notification(models.Model):
+    user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
+    contents = models.TextField()
+    time_stamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Notification for user: {self.user}'
+
+# To let users choose what messages/posts give them a notifitation
+class NotificationSettingObject(models.Model):
+    user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
+    source = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    allowed = models.BooleanField()
+
 # Comment Models   
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -151,6 +166,7 @@ class DateAndOrTimeSave(models.Model):
     day_time = models.DateTimeField(null=True)
     
 
+# System related
 class ArabaliConfigure(models.Model):
     name = models.CharField(max_length=100)
     allowed = models.BooleanField(default=True)

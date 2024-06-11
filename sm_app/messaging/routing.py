@@ -3,5 +3,5 @@ from messaging import consumers
 
 # Connects the websocet to it's respective consumer class
 websocket_urlpatterns = [
-    re_path(r'ws/brordcast-message/(?P<room_id>\d+)/(?P<room_name>[-\w]+)/$', consumers.MessageConsumer.as_asgi()),
+    re_path(r'ws/brordcast-message/(?P<room_id>\d+)', consumers.MessageConsumer.as_asgi()),
 ]
