@@ -155,39 +155,6 @@
                         },
                     success: function(response) {
                         console.log('text sent and saved.')
-                        var newMessageInHtml = `
-                            <div class="row">
-                                <div class="col">
-                                    <p class="text-center"><em>`+ response.creationDate + `</em></p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                </div>
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-11">
-                                            <p class="d-flex justify-content-end"><strong>You</strong></p>
-                                        </div>
-                                        <div class="col-1">
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-10 d-flex justify-content-end">
-                                            <div class="card pb-0" style="width: fit-content;">
-                                                <div class="card-body">
-                                                    <p>` + response.message + `</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-1">
-                                            <img src="`+ response.message_user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
-                        $('#conversation-contents').append(newMessageInHtml);
                         var scrollableContent = document.getElementById("conversationFrame");
                         scrollableContent.scrollTop = scrollableContent.scrollHeight;
                         $('#message').val('')
@@ -209,40 +176,6 @@
                     },
                 success: function(response) {
                     console.log('text sent and saved.')
-                    var newMessageInHtml = `
-                        <div class="message">
-                            <div class="row">
-                                <div class="col">
-                                    <p class="text-center"><em>`+ response.creationDate + `</em></p>
-                                </div>
-                            </div>
-                        <div class="row">
-                            <div class="col-6">
-                            </div>
-                            <div class="col-6">
-                                <div class="row">
-                                    <div class="col-11">
-                                        <p class="d-flex justify-content-end"><strong>You</strong></p>
-                                    </div>
-                                    <div class="col-1">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-10 d-flex justify-content-end">
-                                        <div class="card pb-0" style="width: fit-content;">
-                                            <div class="card-body">
-                                                <p>` + response.message + `</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-1">
-                                        <img src="`+ response.message_user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-                    $('#conversation-contents').append(newMessageInHtml);
                     var scrollableContent = document.getElementById("conversationFrame");
                     scrollableContent.scrollTop = scrollableContent.scrollHeight;
                     $('#message').val('')
@@ -256,6 +189,65 @@
             var scrollableContent = document.getElementById("conversationFrame");
             scrollableContent.scrollTop = scrollableContent.scrollHeight;
         });
+    </script>
+    <script type="text/javascript">
+        const roomId = "{{ room.id }}";  // Django template variable for chatroom ID
+        const roomName = "{{ room.name }}";  // Django template variable for chatroom name
+        const messageSocket = new WebSocket(
+            `ws://${window.location.host}/ws/chat/${roomId}/${roomName}/`
+        );
+        messageSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            var newMessageInHtml = `
+                <div class="message">
+                    <div class="row">
+                        <div class="col">
+                            <p class="text-center"><em>`+ response.creationDate + `</em></p>
+                        </div>
+                    </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-11">
+                                <p class="d-flex justify-content-end"><strong>` + data.username + `</strong></p>
+                            </div>
+                            <div class="col-1">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-1">
+                                <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                            </div>
+                            <div class="col-10 d-flex justify-content-start">
+                                <div class="card pb-0" style="width: fit-content;">
+                                    <div class="card-body">
+                                        <p>` + data.message + `</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                    </div>
+                </div>
+            </div>`;
+            $('#conversation-contents').append(newMessageInHtml);
+        };
+        messageSocket.onclose = function (e) {
+            console.error('WebSocket closed unexpectedly:', e);
+        }
+
+        messageSocket.onerror = function (e) {
+            console.error('WebSocket encountered error:', e);
+        }
+        document.querySelector('#send').onclick = function(e) {
+            const messageInput = document.querySelector('#message');
+            const message = messageInput.value;
+            messageSocket.send(JSON.stringify({
+                'text': message,
+                'message_type': 'text' 
+            }));
+        };
     </script>
 </div>
 {% endblock %}
