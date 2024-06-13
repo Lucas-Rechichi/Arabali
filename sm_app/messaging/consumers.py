@@ -7,8 +7,10 @@ django.setup()
 # Class for all of the methods associated with this connection
 import json
 import pytz
+from datetime import datetime
+from urllib.parse import unquote
 from main.models import UserStats
-from messaging.extras import replace_spaces_with_underscores
+from messaging.extras import replace_spaces
 from messaging.models import ChatRoom, Message
 from django.contrib.auth.models import User
 
@@ -27,12 +29,16 @@ class MessageConsumer(WebsocketConsumer):
         user_stats = UserStats.objects.get(user=user)
 
         # Defining the room name
-        self.room_group_name = f'chat_room_{self.room_id}_{replace_spaces_with_underscores(chat_room.name)}'
+        self.room_group_name = f'chat_room_{self.room_id}_{replace_spaces(string=chat_room.name, replacement='_')}'
 
         # Checking to see if this user has been invited to the chatroom.
         if chat_room.users.filter(user=user_stats.user).exists():
             # Accept the WebSocket connection
             self.accept()
+        else:
+            # Take action if the user is not on the specific page or is not allowed in the chatroom
+            self.close(code=4001)  # Close the connection with a custom error code
+
         
         # Add the WebSocket to the group
         async_to_sync(self.channel_layer.group_add)(
@@ -51,20 +57,40 @@ class MessageConsumer(WebsocketConsumer):
         # Accessing sent data
         text_data_json = json.loads(text_data)
         message = text_data_json['text']
+        chat_room_id = text_data_json['chat_room_id']
         message_type = text_data_json['message_type']
-        user = self.scope.get("user")  # Use get to safely get the user object
-
-        if user and user.is_authenticated:
-            # Send the message to the group
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message_type': message_type,
-                    'message': message,
-                    'username': user.username,
-                }
-            )
+        url = unquote(text_data_json['current_url'])
+        sender = text_data_json['sender'] # The user who sent the message
+        user = self.scope.get("user")  # Use get to safely get the user who is on the page
+        
+        chat_room = ChatRoom.objects.get(id=chat_room_id)
+        print(url)
+        if url == f'http://127.0.0.1:8000/chat/{chat_room.name}/{chat_room.pk}': # change domain name in production
+            if user and user.is_authenticated:
+                # Send the message to the group
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message_type': message_type,
+                        'message': message,
+                        'username': user.username,
+                    }
+                )
+                # More discrete notification
+        else:
+            if user and user.is_authenticated:
+                # Send the message to the group
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_notification',
+                        'message_type': message_type,
+                        'message': message,
+                        'user_on_page': user.username,
+                        'sender': sender,
+                    }
+                )
     
     def chat_message(self, event):
         # Accessing sent data
@@ -95,3 +121,10 @@ class MessageConsumer(WebsocketConsumer):
             'sent_at': formatted_datetime_capitalized,
             'user_pfp_url': user_pfp_url
         }))
+
+    def chat_notification(self, event):
+        # getting relevant data from the recieve function
+        message = event['message']
+        sender = event['sender']
+        message_type = event['message_type']
+        timestamp = datetime.now()

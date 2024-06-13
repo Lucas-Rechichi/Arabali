@@ -1,4 +1,5 @@
 from django.db import models
+
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save
@@ -60,6 +61,8 @@ class UserStats(models.Model):
     def __str__(self):
         return self.user.username
 
+from messaging.models import ChatRoom
+
 # Notifications
 class Notification(models.Model):
     user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
@@ -70,10 +73,16 @@ class Notification(models.Model):
         return f'Notification for user: {self.user}'
 
 # To let users choose what messages/posts give them a notifitation
-class NotificationSettingObject(models.Model):
+class MessageNotificationSetting(models.Model):
     user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
-    source = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    allowed = models.BooleanField()
+    source = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    messages = models.BooleanField()
+    replies = models.BooleanField()
+
+    def __str__(self):
+        return f'Settings for user: {self.user} in group: {self.source}'
+
+
 
 # Comment Models   
 class Comment(models.Model):

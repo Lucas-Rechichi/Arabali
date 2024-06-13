@@ -5,11 +5,12 @@ def get_chat_rooms(user):
     chat_rooms = ChatRoom.objects.filter(users=user_stats)
     return chat_rooms
 
-def replace_spaces_with_underscores(string):
+
+def replace_spaces(string, replacement):
     string_list = [char for char in string]
     for index, char in enumerate(string_list):
         if char == ' ':
-            string_list[index] = '_'
+            string_list[index] = str(replacement)
     new_string = ''
     for chars in string_list:
         new_string = new_string + chars

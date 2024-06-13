@@ -283,8 +283,24 @@
             const message = messageInput.value;
             messageSocket.send(JSON.stringify({
                 'text': message,
-                'message_type': 'text' 
+                'message_type': 'text',
+                'chat_room_id': '{{ room.id }}',
+                'current_url': encodeURIComponent(window.location.href),
+                'sender': '{{username}}',
             }));
+        };
+        document.querySelector('#message').keydown = function(e) {
+            if (e.keyCode === 13 ) {
+                const messageInput = document.querySelector('#message');
+                const message = messageInput.value;
+                messageSocket.send(JSON.stringify({
+                    'text': message,
+                    'message_type': 'text',
+                    'chat_room_id': '{{ room.id }}',
+                    'current_url': encodeURIComponent(window.location.href),
+                    'sender': '{{username}}',
+                }));
+            }
         };
     </script>
 </div>

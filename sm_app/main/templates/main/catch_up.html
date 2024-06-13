@@ -151,9 +151,18 @@
                             </form>
                         </div>
                         <div class="col-4 d-flex justify-content-end">
-                            <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav" style="height: 40px; width: fit-content;">
-                                <div class="fs-2"><i class="bi bi-list" style="color: #198754;"></i></div>
-                            </button>
+                            <div class="row">
+                                <div class="col-6">
+                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav" style="height: 40px; width: fit-content;">
+                                        <div class="fs-2"><i class="bi bi-list" style="color: #198754;"></i></div>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnotify" aria-controls="staticBackdrop">
+                                        <div class="fs-2"><i class="bi bi-bell-fill" style="color: #198754;"></i></div>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -177,6 +186,17 @@
                             </ul>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="offcanvasnotify" aria-labelledby="staticBackdropLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title">Notifications</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div>
+                    Your notifications will pop up here.
                 </div>
             </div>
         </div> 
