@@ -65,7 +65,7 @@ class MessageConsumer(WebsocketConsumer):
         
         chat_room = ChatRoom.objects.get(id=chat_room_id)
         print(url)
-        if url == f'http://127.0.0.1:8000/chat/{chat_room.name}/{chat_room.pk}': # change domain name in production
+        if url == f'http://127.0.0.1:8000/chat/{chat_room.name}/{chat_room.pk}': # Change domain name in production
             if user and user.is_authenticated:
                 # Send the message to the group
                 async_to_sync(self.channel_layer.group_send)(
