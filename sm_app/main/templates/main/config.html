@@ -348,5 +348,40 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Websockets for recieving notifications -->
+    <script type="text/javascript">
+        const notificationSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/brordcast-message/'
+        );
+        notificationSocket.onopen = function() {
+            
+        };
+
+        notificationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data)
+            $('#inbox').append(data.html_notification);
+            var inbox = document.getElementById('inbox');
+            inbox.insertAdjacentHTML('afterbegin', data.html_notification);
+
+            var notificationElement = document.getElementById('notification-' + data.notification_id);
+            var notification = new bootstrap.Toast(notificationElement);
+
+            // Show the toast
+            notification.show();
+        };
+
+        notificationSocket.onerror = function(e) {
+            console.error('WebSocket encountered an error:', e);
+        };
+
+        notificationSocket.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly:', e);
+        };
+    </script>
+    <!-- To store notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+
+    </div>
 </body>
 </html>

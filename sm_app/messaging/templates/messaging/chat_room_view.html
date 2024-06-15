@@ -10,6 +10,53 @@
 {% block searchBar %}
     {{search_bar| crispy}}
 {% endblock %}
+{% block notifications %}
+    <div class="toast-container position-fixed end-0 p-3" style="overflow-y: auto;">
+        {% for notification in notifications.values %}
+            <div class="row">
+                <div class="col p-2">
+                    <div id="notification-{{notification.notification_object.pk}}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                        <div class="toast-header">
+                            <button class="btn p-0" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.id}}'">
+                                <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="..." style="height: 2.5rem; width: 2.5rem">
+                            </button>
+                            <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.source.name}}/{{notification.source.id}}'">
+                                <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
+                            </button>
+                            <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
+                            <button type="button ms-2" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            <div class="row">
+                                <div class="col">
+                                    <img src="{{notification.sender_pfp_url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                                    <em>{{notification.notification_object.sender}}</em>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mt-2">
+                                    <p class="text-truncate ">{{notification.notification_object.contents}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                })
+                toastList.forEach(toast => toast.show())
+            });
+        </script>
+    </div>
+{% endblock %}
+{% block notification_count %}
+    <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ notification_count }}
+{% endblock %}
 {% block chatrooms %}
     {% for chat_room in chat_rooms %}
     <div class="row">
@@ -184,90 +231,95 @@
             });
         });
     </script>
+    <!-- For conviniance when messaging -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var scrollableContent = document.getElementById("conversationFrame");
             scrollableContent.scrollTop = scrollableContent.scrollHeight;
         });
     </script>
+    <!-- Websocket for sending messages -->
     <script type="text/javascript">
-        const roomId = "{{ room.id }}";  // Django template variable for chatroom ID
-        const roomName = "{{ room.name }}";  // Django template variable for chatroom name
+        var roomId = "{{ room.id }}";  // Django template variable for chatroom ID
+        var roomName = "{{ room.name }}";  // Django template variable for chatroom name
         const messageSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/brordcast-message/' + roomId
+            'ws://' + window.location.host + '/ws/realtime-message-manager/' + roomId
         );
         messageSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            if (data.username === '{{username}}') {
-                var newMessageInHtml = `
-                    <div class="message">
+            console.log(data);
+            if (data.type === 'incoming_message') {
+                if (data.username === '{{username}}') {
+                    var newMessageInHtml = `
+                        <div class="message">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="text-center"><em>` + data.sent_at + `</em></p>
+                                </div>
+                            </div>
                         <div class="row">
-                            <div class="col">
-                                <p class="text-center"><em>` + data.sent_at + `</em></p>
+                            <div class="col-6">
+                                
                             </div>
-                        </div>
-                    <div class="row">
-                        <div class="col-6">
-                            
-                        </div>
-                        <div class="col-6">
-                            <div class="row">
-                                <div class="col-11">
-                                    <p class="d-flex justify-content-end"><strong>You</strong></p>
-                                </div>
-                                <div class="col-1">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-10 d-flex justify-content-end">
-                                    <div class="card pb-0" style="width: fit-content;">
-                                        <div class="card-body">
-                                            <p>` + data.message + `</p>
-                                        </div>
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-11">
+                                        <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                    </div>
+                                    <div class="col-1">
                                     </div>
                                 </div>
-                                <div class="col-1">
-                                    <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            } 
-            else {
-                var newMessageInHtml = `
-                    <div class="message">
-                        <div class="row">
-                            <div class="col">
-                                <p class="text-center"><em>` + data.sent_at + `</em></p>
-                            </div>
-                        </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="row">
-                                <div class="col-1">
-                                </div>
-                                <div class="col-11">
-                                    <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-1">
-                                    <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                </div>
-                                <div class="col-10 d-flex justify-content-start">
-                                    <div class="card pb-0" style="width: fit-content;">
-                                        <div class="card-body">
-                                            <p>` + data.message + `</p>
+                                <div class="row">
+                                    <div class="col-10 d-flex justify-content-end">
+                                        <div class="card pb-0" style="width: fit-content;">
+                                            <div class="card-body">
+                                                <p>` + data.message + `</p>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div class="col-1">
+                                        <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6">
+                    </div>`;
+                } 
+                else {
+                    var newMessageInHtml = `
+                        <div class="message">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="text-center"><em>` + data.sent_at + `</em></p>
+                                </div>
+                            </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-1">
+                                    </div>
+                                    <div class="col-11">
+                                        <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-1">
+                                        <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                    </div>
+                                    <div class="col-10 d-flex justify-content-start">
+                                        <div class="card pb-0" style="width: fit-content;">
+                                            <div class="card-body">
+                                                <p>` + data.message + `</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                            </div>
                         </div>
-                    </div>
-                </div>`;
+                    </div>`;
+                }
             }
             $('#conversation-contents').append(newMessageInHtml);
         };
@@ -278,6 +330,34 @@
         messageSocket.onerror = function (e) {
             console.error('WebSocket encountered error:', e);
         }
+
+        const notificationSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/brordcast-message/'
+        );
+        notificationSocket.onopen = function() {
+        
+        };
+
+        notificationSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data)
+            // var inbox = document.getElementById('inbox');
+            // inbox.insertAdjacentHTML('afterbegin', data.html_notification);
+
+            // var notificationElement = document.getElementById('notification-' + data.notification_id);
+            // var notification = new bootstrap.Toast(notificationElement);
+
+            // // Show the toast
+            // notification.show();
+        };
+
+        notificationSocket.onerror = function(e) {
+            console.error('WebSocket encountered an error:', e);
+        };
+
+        notificationSocket.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly:', e);
+        };
         document.querySelector('#send').onclick = function(e) {
             const messageInput = document.querySelector('#message');
             const message = messageInput.value;
@@ -288,9 +368,16 @@
                 'current_url': encodeURIComponent(window.location.href),
                 'sender': '{{username}}',
             }));
+            notificationSocket.send(JSON.stringify({
+                    'text': message,
+                    'message_type': 'text',
+                    'chat_room_id': '{{ room.id }}',
+                    'current_url': encodeURIComponent(window.location.href),
+                    'sender': '{{username}}',
+                }));
         };
         document.querySelector('#message').keydown = function(e) {
-            if (e.keyCode === 13 ) {
+            if (e.key === 'Enter' ) {
                 const messageInput = document.querySelector('#message');
                 const message = messageInput.value;
                 messageSocket.send(JSON.stringify({
@@ -300,8 +387,19 @@
                     'current_url': encodeURIComponent(window.location.href),
                     'sender': '{{username}}',
                 }));
+                notificationSocket.send(JSON.stringify({
+                    'text': message,
+                    'message_type': 'text',
+                    'chat_room_id': '{{ room.id }}',
+                    'current_url': encodeURIComponent(window.location.href),
+                    'sender': '{{username}}',
+                }));
             }
         };
     </script>
+</div>
+<!-- To store notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+
 </div>
 {% endblock %}

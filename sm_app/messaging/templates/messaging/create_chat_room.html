@@ -60,4 +60,39 @@
         </div>
     </div>
 </div>
+<!-- Websockets for recieving notifications -->
+<script type="text/javascript">
+    const notificationSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/brordcast-message/'
+    );
+    notificationSocket.onopen = function() {
+        
+    };
+
+    notificationSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log(data)
+        $('#inbox').append(data.html_notification);
+        var inbox = document.getElementById('inbox');
+        inbox.insertAdjacentHTML('afterbegin', data.html_notification);
+
+        var notificationElement = document.getElementById('notification-' + data.notification_id);
+        var notification = new bootstrap.Toast(notificationElement);
+
+        // Show the toast
+        notification.show();
+    };
+
+    notificationSocket.onerror = function(e) {
+        console.error('WebSocket encountered an error:', e);
+    };
+
+    notificationSocket.onclose = function(e) {
+        console.error('WebSocket closed unexpectedly:', e);
+    };
+</script>
+<!-- To store notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+
+</div>
 {% endblock %}

@@ -52,6 +52,8 @@ def chat_room_view(request, room, room_id):
         'messages': messages,
         'username': init['username'],
         'search_bar': init['search_bar'],
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }
     return render(request, 'messaging/chat_room_view.html', variables)
 

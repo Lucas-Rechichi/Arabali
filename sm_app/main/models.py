@@ -65,7 +65,9 @@ from messaging.models import ChatRoom
 
 # Notifications
 class Notification(models.Model):
-    user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)
+    source = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, null=False)
+    sender = models.CharField(max_length=300)
     contents = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)
 

@@ -1,7 +1,7 @@
 import math
-
+from django.db.models import Sum
 from main.forms import Search
-from main.models import ICF, PCF, PostTag, Interest, User
+from main.models import ICF, PCF, PostTag, Interest, User, Notification, UserStats
 
 def capitalize_plus(string):
     # Dictionary of all 26 English letters and their uppercase counterparts
@@ -53,9 +53,20 @@ def initialize_page(request):
         search_bar = Search(request.POST)
     else:
         search_bar = Search()
+    notifications = Notification.objects.filter(user=UserStats.objects.get(user=request.user)).annotate(Sum('id')).order_by('-id')
+    list_of_notifications = {}
+    o = 1
+    for notification in notifications:
+        list_of_notifications[o] = {
+            'notification_object': notification,
+            'sender_pfp_url': UserStats.objects.get(user=User.objects.get(username=notification.sender)).pfp.url
+        }
+        o += 1
     data = {
         'username' : request.user.username,
-        'search_bar' : search_bar
+        'search_bar' : search_bar,
+        'notification_list': list_of_notifications,
+        'notification_count': o
     }
     return data
 

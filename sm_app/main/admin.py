@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import Post, UserStats, LikedBy, Following, Comment, NestedComment, PostTag, Interest, ICF, PCF, InterestInteraction, PostInteraction, DateAndOrTimeSave, ArabaliConfigure
+from main.models import Post, UserStats, LikedBy, Following, Comment, NestedComment, PostTag, Interest, ICF, PCF, InterestInteraction, PostInteraction, DateAndOrTimeSave, ArabaliConfigure, Notification, MessageNotificationSetting
 # Register your models here.
 
 
@@ -25,3 +25,5 @@ admin.site.register(InterestInteraction, ExtraShow)
 admin.site.register(PostInteraction, ExtraShow)
 admin.site.register(DateAndOrTimeSave, ExtraShow)
 admin.site.register(ArabaliConfigure, ExtraShow)
+admin.site.register(Notification, ExtraShow)
+admin.site.register(MessageNotificationSetting, ExtraShow)
