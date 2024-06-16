@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from django.http import JsonResponse
 from django.shortcuts import render
-from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction
+from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Notification
 from django.core.exceptions import ObjectDoesNotExist
 from main.algorithum import Algorithum
 
@@ -355,3 +355,11 @@ def save_location(request):
         user_stats.last_recorded_location = datetime.now()
         user_stats.save()
     return JsonResponse({'username': user_stats.user.username})
+
+def remove_notification(request):
+    notification_id = request.POST.get('notification_id')
+    notification = Notification.objects.get(id=notification_id)
+    notification.delete()
+    notification_count = Notification.objects.all().count()
+    print(notification_count)
+    return JsonResponse({'message': f'Notification; {notification} has been removed', 'notification_count': notification_count})

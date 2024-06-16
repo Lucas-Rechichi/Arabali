@@ -24,5 +24,6 @@ urlpatterns = [
     path('page/scrolled-by/', ajax_v.scrolled_by, name="scrolled_by"),
     path('page/error/', ajax_v.ajax_error, name="ajax_error"),
     path('page/save-location/', ajax_v.save_location, name='save_location'),
+    path('universal/remove-notification/', ajax_v.remove_notification, name='remove_notification'),
 ]
 

@@ -11,51 +11,90 @@
     {{search_bar| crispy}}
 {% endblock %}
 {% block notifications %}
-    <div class="toast-container position-fixed end-0 p-3" style="overflow-y: auto;">
+    <div class="p-3" style="overflow-y: auto;">
         {% for notification in notifications.values %}
-            <div class="row">
-                <div class="col p-2">
-                    <div id="notification-{{notification.notification_object.pk}}" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-                        <div class="toast-header">
-                            <button class="btn p-0" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.id}}'">
-                                <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="..." style="height: 2.5rem; width: 2.5rem">
-                            </button>
-                            <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.source.name}}/{{notification.source.id}}'">
-                                <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
-                            </button>
-                            <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
-                            <button type="button ms-2" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                <div class="card-header">
+                    <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification-{{notification.notification_object.pk}}">
+                        <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                    </button>
+                    <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification-{{notification.notification_object.pk}}">
+                        <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
+                    </button>
+                    <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
+                    <button type="button ms-2" class="btn-close" id="close-notification-{{notification.notification_object.pk}}" aria-label="Close"></button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <img src="{{notification.sender_pfp_url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                            <em>{{notification.notification_object.sender}}</em>
                         </div>
-                        <div class="toast-body">
-                            <div class="row">
-                                <div class="col">
-                                    <img src="{{notification.sender_pfp_url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
-                                    <em>{{notification.notification_object.sender}}</em>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col mt-2">
-                                    <p class="text-truncate ">{{notification.notification_object.contents}}</p>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mt-2">
+                            <p class="text-truncate ">{{notification.notification_object.contents}}</p>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-        <script>
-            document.addEventListener('DOMContentLoaded', (event) => {
-                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-                var toastList = toastElList.map(function (toastEl) {
-                    return new bootstrap.Toast(toastEl)
+            <script>
+                $(document).ready(function () {
+                    $('#close-notification-{{notification.notification_object.pk}}').click(function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/universal/remove-notification/',
+                            data: {
+                                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                                'notification_id': '{{notification.notification_object.pk}}'
+                            },
+                            success: function(response) {
+                                console.log(response.message)
+                                var notification = $("#notification-{{notification.notification_object.pk}}")
+                                notification.remove();
+                                $('#notification-counter').text(response.notification_counter);
+                                if (response.notification_count == 0) {
+                                    $('#notification-counter').remove();
+                                    $('#bell-icon').removeClass('bi-bell-fill');
+                                    $('#bell-icon').addClass('bi-bell');
+                                }
+                            }
+                        })
+                    })
+                    $('#read-notification-{{notification.notification_object.pk}}').click(function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/universal/remove-notification/',
+                            data: {
+                                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                                'notification_id': '{{notification.notification_object.pk}}'
+                            },
+                            success: function(response) {
+                                console.log(response.message)
+                            }
+                        })
+                    })
                 })
-                toastList.forEach(toast => toast.show())
-            });
-        </script>
+                
+            </script>
+        {% endfor %}
     </div>
 {% endblock %}
 {% block notification_count %}
-    <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ notification_count }}
+    <div id="notification-indicatior">
+        {% if notification_count == 0 %}
+            <script>
+                $(document).ready(function () {
+                    var notification_count = '{{notification_count}}';
+                    var notification_bell = $('#bell-icon');
+                    notification_bell.removeClass('bi-bell-fill');
+                    notification_bell.addClass('bi-bell');
+                })
+            </script>
+        {% else %}
+            <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">{{ notification_count }}
+        {% endif %}
+    </div>
 {% endblock %}
 {% block chatrooms %}
     {% for chat_room in chat_rooms %}
@@ -167,7 +206,7 @@
         <div class="row">
             <div class="col-1">
                 <div class="btn-group dropup">
-                    <button type="button" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-square" style="font-size: 2.5rem;"></i></button>
+                    <button type="button" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-square" style="font-size:  3vw;"></i></button>
                     <ul class="dropdown-menu p-2 mb-1">
                         <li class="custom-icon"><div class="fs-4"><i class="bi bi-images"></i></div> <p class="lead">Image</p></li>
                         <li class="custom-icon"><div class="fs-4"><i class="bi bi-play-btn"></i></i></div> <p class="lead">Video</p></li>
@@ -179,7 +218,7 @@
             </div>
             <div class="col-1">
                 <div class="card">
-                    <button type="button" id="send" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-send-fill" style="font-size: 2.5rem;"></i></button>
+                    <button type="button" id="send" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-send-fill" style="font-size: 3vw;"></i></button>
                 </div>
             </div>
         </div>
@@ -221,12 +260,12 @@
                         'is-reply': false,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
-                success: function(response) {
-                    console.log('text sent and saved.')
-                    var scrollableContent = document.getElementById("conversationFrame");
-                    scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                    $('#message').val('')
-                }
+                    success: function(response) {
+                        console.log('text sent and saved.')
+                        var scrollableContent = document.getElementById("conversationFrame");
+                        scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                        $('#message').val('')
+                    }
                 });
             });
         });
@@ -322,6 +361,7 @@
                 }
             }
             $('#conversation-contents').append(newMessageInHtml);
+
         };
         messageSocket.onclose = function (e) {
             console.error('WebSocket closed unexpectedly:', e);
@@ -374,6 +414,7 @@
                     'chat_room_id': '{{ room.id }}',
                     'current_url': encodeURIComponent(window.location.href),
                     'sender': '{{username}}',
+                    'csrf_token': '{{csrf_token}}',
                 }));
         };
         document.querySelector('#message').keydown = function(e) {

@@ -11,6 +11,7 @@ from main.models import UserStats, Notification
 from messaging.extras import replace_spaces
 from messaging.models import ChatRoom, Message
 from django.contrib.auth.models import User
+from django.middleware.csrf import get_token
 
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
@@ -128,6 +129,7 @@ class NotificationConsumer(WebsocketConsumer):
         chat_room_id = text_data_json['chat_room_id']
         message_type = text_data_json['message_type']
         sender = text_data_json['sender']
+        csrf_token = text_data_json['csrf_token']
         user = self.scope.get("user")
         
         user_on_page_stats = UserStats.objects.get(user=user)
@@ -141,7 +143,8 @@ class NotificationConsumer(WebsocketConsumer):
                         'message': message,
                         'receiver': user.username,
                         'sender': sender,
-                        'chat_room_id': chat_room_id
+                        'chat_room_id': chat_room_id,
+                        'csrf_token': csrf_token
                     }
                 )
 
@@ -151,25 +154,31 @@ class NotificationConsumer(WebsocketConsumer):
         receiver = event['receiver']
         message_type = event['message_type']
         chat_room_id = event['chat_room_id']
+        csrf_token = event['csrf_token']
 
         chat_room = ChatRoom.objects.get(id=chat_room_id)
         user_to_send_to = UserStats.objects.get(user=User.objects.get(username=receiver))
         sender_pfp_url = UserStats.objects.get(user=User.objects.get(username=sender)).pfp.url
-        if message_type == 'text':
+        if message_type == 'text' and sender != receiver:
             new_notification = Notification(user=user_to_send_to, source=chat_room, sender=sender, contents=message)
             new_notification.save()
+        else:
+            display_notification = False
 
-        html_notification = f'''
-        <div id="notification-{new_notification.pk}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        # For the notification icon
+        notification_count = Notification.objects.filter(user=user_to_send_to).count()
+
+        html_notification_popup = f'''
+        <div id="popup-notification-{new_notification.pk}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <button class="btn p-0" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'">
+                <button class="btn p-0" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
                     <img src="{chat_room.icon.url}" class="rounded me-2" alt="..." style="height: 2.5rem; width: 2.5rem">
                 </button>
-                <button class="btn p-0 pe-2" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'">
+                <button class="btn p-0 pe-2" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
                     <strong class="me-auto">{chat_room.name}</strong>
                 </button>
                 <small class="text-muted pe-2">just now</small>
-                <button type="button ms-2" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button ms-2" class="btn-close" id="close-notification-{new_notification.pk}" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
                 <div class="row">
@@ -186,9 +195,83 @@ class NotificationConsumer(WebsocketConsumer):
             </div>
         </div>
         '''
+        script = '''
+        <script>
+            $(document).ready(function () {
+                $("#close-notification-''' + new_notification.pk + '''").click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'csrfmiddlewaretoken': "''' + csrf_token + '''",
+                            'notification_id': "''' + new_notification.pk + '''",
+                        },
+                        success: function(response) {
+                            console.log(response.message);
+                            var notification = $("#''' + new_notification.pk + '''");
+                            notification.remove();
+                            $('#notification-counter').text(response.notification_counter);
+                            if (response.notification_count == 0) {
+                                $('#notification-counter').remove();
+                                $('#bell-icon').removeClass('bi-bell-fill');
+                                $('#bell-icon').addClass('bi-bell');
+                            }
+                        }
+                    });
+                });
+
+                $("#read-notification-''' + new_notification.pk + '''").click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'csrfmiddlewaretoken': "''' + csrf_token + '''",
+                            'notification_id': "''' + new_notification.pk + '''"
+                        },
+                        success: function(response) {
+                            console.log(response.message);
+                        }
+                    });
+                });
+            });
+        </script>
+        '''
+
+        stored_html_notification = f'''
+        <div id="stored-notification-{new_notification.pk}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="card-header">
+                <button class="btn p-0" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
+                    <img src="{chat_room.icon.url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                </button>
+                <button class="btn p-0 pe-2"  onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
+                    <strong class="me-auto">{chat_room.name}</strong>
+                </button>
+                <small class="text-muted pe-2">{new_notification.time_stamp}</small>
+                <button type="button ms-2" class="btn-close" id="close-notification-{new_notification.pk}" aria-label="Close"></button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <img src="{sender_pfp_url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                        <em>{sender}</em>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mt-2">
+                        <p class="text-truncate ">{message}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        '''
+
 
         self.send(text_data=json.dumps({
             'type': 'incoming_notification',
-            'html_notification': html_notification,
-            'notification_id': new_notification.pk
+            'html_notification_popup': html_notification_popup,
+            'stored_notification_popup': stored_html_notification,
+            'html_script':script,
+            'notification_id': new_notification.pk,
+            'notification_count': notification_count,
+            'display_notification': display_notification,
         }))

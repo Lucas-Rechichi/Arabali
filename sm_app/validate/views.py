@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import CreateNewUser
 from main.models import UserStats
 from django.contrib.auth.models import User
-from main.models import Following, LikedBy, ArabaliConfigure
+from main.models import Following, LikedBy, ArabaliConfigure, MessageNotificationSetting
 import os
 import shutil
 from django.conf import settings

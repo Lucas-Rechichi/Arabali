@@ -66,7 +66,7 @@ def initialize_page(request):
         'username' : request.user.username,
         'search_bar' : search_bar,
         'notification_list': list_of_notifications,
-        'notification_count': o
+        'notification_count': o - 1
     }
     return data
 

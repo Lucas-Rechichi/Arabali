@@ -21,6 +21,8 @@ def chat_base(request):
         'chat_rooms': chat_rooms,
         'username': init['username'],
         'search_bar': init['search_bar'],
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }
     return render(request, 'messaging/chat_base.html', variables)
 
