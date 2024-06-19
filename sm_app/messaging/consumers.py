@@ -130,23 +130,24 @@ class NotificationConsumer(WebsocketConsumer):
         message_type = text_data_json['message_type']
         sender = text_data_json['sender']
         csrf_token = text_data_json['csrf_token']
-        user = self.scope.get("user")
-        
-        user_on_page_stats = UserStats.objects.get(user=user)
-        if ChatRoom.objects.filter(id=chat_room_id, users=user_on_page_stats).exists():
-            if user and user.is_authenticated:
-                async_to_sync(self.channel_layer.group_send)(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_notification',
-                        'message_type': message_type,
-                        'message': message,
-                        'receiver': user.username,
-                        'sender': sender,
-                        'chat_room_id': chat_room_id,
-                        'csrf_token': csrf_token
-                    }
-                )
+        users = ChatRoom.objects.get(id=chat_room_id).users.all()
+        for user in users:
+            print(f'Sent to:{user}, From user: {sender}')
+            user_on_page_stats = UserStats.objects.get(user=user.user)
+            if ChatRoom.objects.filter(id=chat_room_id, users=user_on_page_stats).exists():
+                if user.user and user.user.is_authenticated:
+                    async_to_sync(self.channel_layer.group_send)(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_notification',
+                            'message_type': message_type,
+                            'message': message,
+                            'receiver': user.user.username,
+                            'sender': sender,
+                            'chat_room_id': chat_room_id,
+                            'csrf_token': csrf_token
+                        }
+                    )
 
     def chat_notification(self, event):
         message = event['message']
@@ -264,14 +265,16 @@ class NotificationConsumer(WebsocketConsumer):
             </div>
         </div>
         '''
+        notification_id = new_notification.pk
+
         if sender == receiver:
             new_notification.delete()
-
+            
         self.send(text_data=json.dumps({
             'type': 'incoming_notification',
             'html_notification_popup': html_notification_popup,
-            'stored_notification_popup': stored_html_notification,
+            'stored_html_notification': stored_html_notification,
             'html_script':script,
-            'notification_id': new_notification.pk,
+            'notification_id': notification_id,
             'notification_count': notification_count,
         }))

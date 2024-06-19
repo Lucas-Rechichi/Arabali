@@ -137,5 +137,7 @@ def create_chat_room(request, increment):
             'current': increment,
             'next': increment + 1
         },
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }
     return render(request, 'messaging/create_chat_room.html', variables)

@@ -13,7 +13,6 @@
 {{ search_bar|crispy }}
 {% endblock %}
 {% block notifications %}
-    <div class="p-3" style="overflow-y: auto;">
         {% for notification in notifications.values %}
             <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="card-header">
@@ -79,7 +78,6 @@
                 })
             </script>
         {% endfor %}
-    </div>
 {% endblock %}
 {% block notification_count %}
     <div id="notification-indicatior">
@@ -207,11 +205,15 @@
           $('#bell-icon').addClass('bi-bell-fill')
       }
       $('#notification-indicatior').append(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + ``)
-      var notificationElement = document.getElementById('notification-' + data.notification_id);
-      var notification = new bootstrap.Toast(notificationElement);
-
-      // Show the toast
-      notification.show();
+      var notificationElement = document.getElementById('popup-notification-' + data.notification_id);
+    
+      if (notificationElement) {
+          var notification = new bootstrap.Toast(notificationElement);
+          // Show the toast
+          notification.show();
+      } else {
+          console.error('Notification element not found:', 'notification-' + data.notification_id);
+      }
 
 
   };

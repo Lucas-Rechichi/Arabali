@@ -39,6 +39,7 @@ def page(request, catagory, increment):
     p = Post.objects.all()
     s = UserStats.objects.all()
     user_liked_by = LikedBy.objects.get(name=name)
+    init = initialize_page(request)
 
     if us.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
@@ -156,7 +157,9 @@ def page(request, catagory, increment):
         'post_replies':post_replies, 
         'comment_form': comment_form,
         'sub_comment_form': sub_comment_form,
-        'search_bar': search_bar
+        'search_bar': search_bar,
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }
     return render(request, "main/page.html", variables)
 
@@ -312,7 +315,9 @@ def catch_up_page(request, increment):
         'comment_form': comment_form,
         'sub_comment_form': sub_comment_form,
         'search_bar': init['search_bar'],
-        'location_pop_up': location_pop_up
+        'location_pop_up': location_pop_up,
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }
     return render(request, "main/catch_up.html", variables)
 
@@ -362,7 +367,7 @@ def add_post(request):
             f = AddPost()
     else:
         return render(request, 'main/error.html', {'issue': 'Cannot Post.'})
-    return render(request, 'main/add_post.html', {"input_fields": f, 'username': init['username'], 'search_bar': init['search_bar']})
+    return render(request, 'main/add_post.html', {"input_fields": f, 'username': init['username'], 'search_bar': init['search_bar'],'notifications': init['notification_list'],'notification_count': init['notification_count']})
 
 
 @login_required
@@ -370,7 +375,6 @@ def profile(request, name):
     init = initialize_page(request)
     u = User.objects.get(username=name)
     us = UserStats.objects.get(user=u)
-
     if us.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     
@@ -407,6 +411,8 @@ def profile(request, name):
         'post': posts,
         'followed_user': followed_userstats,
         'search_bar': init['search_bar'],
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }
 
     return render(request, 'main/profile.html', profile_vars)
@@ -466,7 +472,9 @@ def post_view(request, post_id):
         "post_replies" : post_replies,
         "search_bar" : init['search_bar'],
         "username": init['username'],
-        "post_users": post_users
+        "post_users": post_users,
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }
     return render(request, 'main/posts.html', variables)
 
@@ -551,12 +559,15 @@ def config(request, name):
         'username': username,
         'posts': post_list,
         'search_bar': init['search_bar'],
-        'liked_by_users': liked_by_users
+        'liked_by_users': liked_by_users,
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
     }        
     return render(request, 'main/config.html', variables)
 
 def error(request, error):
-    return render(request, 'main/error.html', {'issue':error})
+    init = initialize_page(request)
+    return render(request, 'main/error.html', {'issue':error, 'notifications': init['notification_list'], 'notification_count': init['notification_count']})
 
 @login_required
 def search_results(request, q, post_increment, user_increment, catergory_increment):
@@ -649,5 +660,7 @@ def search_results(request, q, post_increment, user_increment, catergory_increme
             "current": catergory_increment,
             "next": catergory_increment + 1
         },
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
         }
     return render(request, 'main/search.html', variables)

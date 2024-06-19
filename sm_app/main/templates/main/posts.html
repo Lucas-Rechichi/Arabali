@@ -220,8 +220,7 @@
             </div>
             <div class="offcanvas-body">
                 <!-- potential issue when adding notifications -->
-                <div id="notification-inbox">
-                    <div class="p-3" style="overflow-y: auto;">
+                <div id="notification-inbox p-3" style="overflow-y: auto;">
                         {% for notification in notifications.values %}
                             <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                                 <div class="card-header">
@@ -287,7 +286,6 @@
                                 })
                             </script>
                         {% endfor %}
-                    </div>
                 </div>
             </div>
         </div>
