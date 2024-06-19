@@ -1,10 +1,90 @@
 {% extends 'main/template.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Error{% endblock %}
-{% block body %}
-{% block sidebar %}
-<li class="custom-icon"><i class="fa-solid fa-gear fa-lg" style="color: #787878;"></i> <a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
+{% block notifications %}
+        {% for notification in notifications.values %}
+            <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                <div class="card-header">
+                    <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification-{{notification.notification_object.pk}}">
+                        <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                    </button>
+                    <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification-{{notification.notification_object.pk}}">
+                        <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
+                    </button>
+                    <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
+                    <button type="button ms-2" class="btn-close" id="close-notification-{{notification.notification_object.pk}}" aria-label="Close"></button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <img src="{{notification.sender_pfp_url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                            <em>{{notification.notification_object.sender}}</em>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mt-2">
+                            <p class="text-truncate ">{{notification.notification_object.contents}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $('#close-notification-{{notification.notification_object.pk}}').click(function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/universal/remove-notification/',
+                            data: {
+                                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                                'notification_id': '{{notification.notification_object.pk}}'
+                            },
+                            success: function(response) {
+                                console.log(response.message)
+                                var notification = $("#notification-{{notification.notification_object.pk}}")
+                                notification.remove();
+                                $('#notification-counter').text(response.notification_counter);
+                                if (response.notification_count == 0) {
+                                    $('#notification-counter').remove();
+                                    $('#bell-icon').removeClass('bi-bell-fill');
+                                    $('#bell-icon').addClass('bi-bell');
+                                }
+                            }
+                        })
+                    })
+                    $('#read-notification-{{notification.notification_object.pk}}').click(function () {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/universal/remove-notification/',
+                            data: {
+                                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                                'notification_id': '{{notification.notification_object.pk}}'
+                            },
+                            success: function(response) {
+                                console.log(response.message)
+                            }
+                        })
+                    })
+                })
+            </script>
+        {% endfor %}
 {% endblock %}
+{% block notification_count %}
+    <div id="notification-indicatior">
+        {% if notification_count == 0 %}
+            <script>
+                $(document).ready(function () {
+                    var notification_count = '{{notification_count}}';
+                    var notification_bell = $('#bell-icon');
+                    notification_bell.removeClass('bi-bell-fill');
+                    notification_bell.addClass('bi-bell');
+                })
+            </script>
+        {% else %}
+            <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">{{ notification_count }}
+        {% endif %}
+    </div>
+{% endblock %}
+{% block body %}
 <div class="container">
     <div class="row">
         <div class="col">
@@ -28,15 +108,21 @@
     notificationSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         console.log(data)
-        $('#inbox').append(data.html_notification);
-        var inbox = document.getElementById('inbox');
-        inbox.insertAdjacentHTML('afterbegin', data.html_notification);
-
+        $('#inbox').append(data.html_notification_popup);
+        $('#notification-inbox').append(data.stored_html_notification);
+        $('#inbox').append(data.script)
+        if ($('#bell-icon').hasClass('bi-bell')) {
+            $('#bell-icon').removeClass('bi-bell')
+            $('#bell-icon').addClass('bi-bell-fill')
+        }
+        $('#notification-indicatior').append(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + ``)
         var notificationElement = document.getElementById('notification-' + data.notification_id);
         var notification = new bootstrap.Toast(notificationElement);
 
         // Show the toast
         notification.show();
+
+
     };
 
     notificationSocket.onerror = function(e) {

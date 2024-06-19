@@ -159,11 +159,11 @@ class NotificationConsumer(WebsocketConsumer):
         chat_room = ChatRoom.objects.get(id=chat_room_id)
         user_to_send_to = UserStats.objects.get(user=User.objects.get(username=receiver))
         sender_pfp_url = UserStats.objects.get(user=User.objects.get(username=sender)).pfp.url
-        if message_type == 'text' and sender != receiver:
+        if message_type == 'text':
             new_notification = Notification(user=user_to_send_to, source=chat_room, sender=sender, contents=message)
             new_notification.save()
         else:
-            display_notification = False
+            pass
 
         # For the notification icon
         notification_count = Notification.objects.filter(user=user_to_send_to).count()
@@ -198,17 +198,17 @@ class NotificationConsumer(WebsocketConsumer):
         script = '''
         <script>
             $(document).ready(function () {
-                $("#close-notification-''' + new_notification.pk + '''").click(function () {
+                $("#close-notification-''' + f'{new_notification.pk}' + '''").click(function () {
                     $.ajax({
                         type: 'POST',
                         url: '/universal/remove-notification/',
                         data: {
                             'csrfmiddlewaretoken': "''' + csrf_token + '''",
-                            'notification_id': "''' + new_notification.pk + '''",
+                            'notification_id': "''' + f'{new_notification.pk}' + '''",
                         },
                         success: function(response) {
                             console.log(response.message);
-                            var notification = $("#''' + new_notification.pk + '''");
+                            var notification = $("#''' + f'{new_notification.pk}' + '''");
                             notification.remove();
                             $('#notification-counter').text(response.notification_counter);
                             if (response.notification_count == 0) {
@@ -220,13 +220,13 @@ class NotificationConsumer(WebsocketConsumer):
                     });
                 });
 
-                $("#read-notification-''' + new_notification.pk + '''").click(function () {
+                $("#read-notification-''' + f'{new_notification.pk}' + '''").click(function () {
                     $.ajax({
                         type: 'POST',
                         url: '/universal/remove-notification/',
                         data: {
                             'csrfmiddlewaretoken': "''' + csrf_token + '''",
-                            'notification_id': "''' + new_notification.pk + '''"
+                            'notification_id': "''' + f'{new_notification.pk}' + '''"
                         },
                         success: function(response) {
                             console.log(response.message);
@@ -264,7 +264,8 @@ class NotificationConsumer(WebsocketConsumer):
             </div>
         </div>
         '''
-
+        if sender == receiver:
+            new_notification.delete()
 
         self.send(text_data=json.dumps({
             'type': 'incoming_notification',
@@ -273,5 +274,4 @@ class NotificationConsumer(WebsocketConsumer):
             'html_script':script,
             'notification_id': new_notification.pk,
             'notification_count': notification_count,
-            'display_notification': display_notification,
         }))
