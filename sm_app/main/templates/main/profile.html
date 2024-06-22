@@ -195,34 +195,36 @@
   };
 
   notificationSocket.onmessage = function(e) {
-      const data = JSON.parse(e.data); // parse data over to the consumer view for this socket
-      if (data.receiver === '{{user.username}}' ) {
-        console.log(data)
-        $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
-        $('#notification-inbox').append(data.stored_html_notification); // adds html to the notification div that houses the notifications in the offcanvas
-        $('#inbox').append(data.html_script) // script for removing notificaions after dismissing them
-        if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
-            $('#bell-icon').removeClass('bi-bell')
-            $('#bell-icon').addClass('bi-bell-fill') 
-        }
+    console.log('Message coming though!')
+    const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
+    if (data.receiver === '{{user.username}}' ) {
+      console.log(data)
+      $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
+      $('#notification-inbox').append(data.stored_html_notification); // adds html to the notification div that houses the notifications in the offcanvas
+      $('#inbox').append(data.html_script) // script for removing notificaions after dismissing them
+      if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
+        $('#bell-icon').removeClass('bi-bell')
+        $('#bell-icon').addClass('bi-bell-fill')
         if ($('#notification-counter')) { // if the notification counter already exists
           $('#notification-counter').text('')
           $('#notification-counter').text(data.notification_count) // changes the counter to the current number of notifications
         } else {
-          $('#notification-indicatior').append(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + ``) // creates the relevant html alongside with the current ammount of notifications inside as well.
-        }
-          var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
-      
-        if (notificationElement) {
-            var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
-            // Show the toast
-            notification.show();
-        } else {
-            console.error('Notification element not found:', 'notification-' + data.notification_id);
-        }
-      } else {
-        console.log('incorrect user')
+          $('#notification-indicatior').append(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count) // creates the relevant html alongside with the current ammount of notifications inside as well.
+        } 
       }
+      
+        var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
+    
+      if (notificationElement) {
+          var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
+          // Show the toast
+          notification.show();
+      } else {
+          console.error('Notification element not found:', 'notification-' + data.notification_id);
+      }
+    } else {
+      console.log('incorrect user')
+    }
 
   };
 
