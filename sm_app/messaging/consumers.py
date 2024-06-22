@@ -127,62 +127,43 @@ class NotificationConsumer(WebsocketConsumer):
             )
 
     def receive(self, text_data):
+
+        # getting relevant data over to the consumer class
         text_data_json = json.loads(text_data)
-        message = text_data_json['text']
-        chat_room_id = text_data_json['chat_room_id']
-        message_type = text_data_json['message_type']
-        sender = text_data_json['sender']
+        notification_ids = text_data_json['notification_ids']
         csrf_token = text_data_json['csrf_token']
-        receivers = list(self.connected_users.values())
-        print(receivers)
+
         # user_on_page_stats = UserStats.objects.get(user=self.scope['user'])
         # if ChatRoom.objects.filter(id=chat_room_id, users=user_on_page_stats).exists():
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type': 'chat_notification',
-                'message_type': message_type,
-                'message': message,
-                'receivers':receivers , # whoever is accessing this websocket
-                'sender': sender,
-                'chat_room_id': chat_room_id,
+                'notification_ids': notification_ids,
                 'csrf_token': csrf_token
             }
         )
 
     def chat_notification(self, event):
-        message = event['message']
-        sender = event['sender']
-        receivers = event['receivers']
-        message_type = event['message_type']
-        chat_room_id = event['chat_room_id']
+        notification_ids = event['notification_ids']
         csrf_token = event['csrf_token']
-
-        
-
-        chat_room = ChatRoom.objects.get(id=chat_room_id)
-        sender_pfp_url = UserStats.objects.get(user=User.objects.get(username=sender)).pfp.url
-        for receiver in receivers:
-            print(f'Receiver: {receiver}')
-            receiver_userstats = UserStats.objects.get(user=receiver)
-            if message_type == 'text':
-                new_notification = Notification(user=receiver_userstats, source=chat_room, sender=sender, contents=message)
-                new_notification.save()
-            else:
-                pass
-
-            if self.connected_users[self.channel_name] == receiver:
+        for notification_id in notification_ids:
+            notification = Notification.objects.get(id=notification_id)
+            if notification.user.user.username == self.connected_users[self.channel_name].username:
+                new_notification = notification
+                
+                sender_userstats = UserStats.objects.get(user=User.objects.get(username=new_notification.sender))
                 # For the notification icon
-                notification_count = Notification.objects.filter(user=receiver_userstats).count()
+                notification_count = Notification.objects.filter(user=new_notification.user).count()
 
                 html_notification_popup = f'''
                 <div id="popup-notification-{new_notification.pk}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
-                        <button class="btn p-0" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
-                            <img src="{chat_room.icon.url}" class="rounded me-2" alt="..." style="height: 2.5rem; width: 2.5rem">
+                        <button class="btn p-0" onclick="location.href='/chat/{new_notification.source.name}/{new_notification.source.pk}'" id="read-notification-{new_notification.pk}">
+                            <img src="{new_notification.source.icon.url}" class="rounded me-2" alt="..." style="height: 2.5rem; width: 2.5rem">
                         </button>
-                        <button class="btn p-0 pe-2" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
-                            <strong class="me-auto">{chat_room.name}</strong>
+                        <button class="btn p-0 pe-2" onclick="location.href='/chat/{new_notification.source.name}/{new_notification.source.pk}'" id="read-notification-{new_notification.pk}">
+                            <strong class="me-auto">{new_notification.source.name}</strong>
                         </button>
                         <small class="text-muted pe-2">just now</small>
                         <button type="button ms-2" class="btn-close" id="close-notification-{new_notification.pk}" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -190,13 +171,13 @@ class NotificationConsumer(WebsocketConsumer):
                     <div class="toast-body">
                         <div class="row">
                             <div class="col">
-                                <img src="{sender_pfp_url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
-                                <em>{sender}</em>
+                                <img src="{sender_userstats.pfp.url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                                <em>{sender_userstats.user.username}</em>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mt-2">
-                                <p class="text-truncate ">{message}</p>
+                                <p class="text-truncate ">{new_notification.contents}</p>
                             </div>
                         </div>
                     </div>
@@ -247,11 +228,11 @@ class NotificationConsumer(WebsocketConsumer):
                 stored_html_notification = f'''
                 <div id="stored-notification-{new_notification.pk}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                     <div class="card-header">
-                        <button class="btn p-0" onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
-                            <img src="{chat_room.icon.url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                        <button class="btn p-0" onclick="location.href='/chat/{new_notification.source.name}/{new_notification.source.pk}'" id="read-notification-{new_notification.pk}">
+                            <img src="{new_notification.source.icon.url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
                         </button>
-                        <button class="btn p-0 pe-2"  onclick="location.href='/chat/{chat_room.name}/{chat_room.pk}'" id="read-notification-{new_notification.pk}">
-                            <strong class="me-auto">{chat_room.name}</strong>
+                        <button class="btn p-0 pe-2"  onclick="location.href='/chat/{new_notification.source.name}/{new_notification.source.pk}'" id="read-notification-{new_notification.pk}">
+                            <strong class="me-auto">{new_notification.source.name}</strong>
                         </button>
                         <small class="text-muted pe-2">{new_notification.time_stamp}</small>
                         <button type="button ms-2" class="btn-close" id="close-notification-{new_notification.pk}" aria-label="Close"></button>
@@ -259,22 +240,19 @@ class NotificationConsumer(WebsocketConsumer):
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
-                                <img src="{sender_pfp_url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
-                                <em>{sender}</em>
+                                <img src="{sender_userstats.pfp.url}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                                <em>{sender_userstats.user.username}</em>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col mt-2">
-                                <p class="text-truncate ">{message}</p>
+                                <p class="text-truncate ">{new_notification.contents}</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 '''
                 notification_id = new_notification.pk
-
-                # if sender == receiver:
-                #     new_notification.delete()
 
                 self.send(text_data=json.dumps({
                     'type': 'incoming_notification',
@@ -283,5 +261,5 @@ class NotificationConsumer(WebsocketConsumer):
                     'html_script':script,
                     'notification_id': notification_id,
                     'notification_count': notification_count,
-                    'receiver': receiver.username
+                    'receiver': new_notification.user.user.username
                 }))

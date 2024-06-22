@@ -1,7 +1,7 @@
 import pytz
 from django.http import JsonResponse
 from django.shortcuts import render
-from main.models import UserStats
+from main.models import UserStats, Notification
 from messaging.models import ChatRoom, Message
 def message_sent_text(request):
     # Get Relevant User
@@ -25,6 +25,13 @@ def message_sent_text(request):
     else:
         new_message = Message()
 
+    receivers = chat_room.users.exclude(user=user_stats.user)
+    notification_ids = []
+    for receiver in receivers:
+        new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text)
+        new_notification.save()
+        notification_ids.append(new_notification.id)
+
     # Assuming you want to convert the datetime to a specific timezone
     local_timezone = pytz.timezone("Australia/Sydney")
     local_datetime = new_message.sent_at.astimezone(local_timezone)
@@ -37,6 +44,7 @@ def message_sent_text(request):
         'message': new_message.text,
         'message_user_pfp_url': new_message.sender.pfp.url,
         'creationDate': formatted_datetime_capitalized,
+        'notification_ids': notification_ids,
     }
     return JsonResponse(responce)
 

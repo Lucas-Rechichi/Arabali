@@ -242,6 +242,10 @@
                         var scrollableContent = document.getElementById("conversationFrame");
                         scrollableContent.scrollTop = scrollableContent.scrollHeight;
                         $('#message').val('')
+                        notificationSocket.send(JSON.stringify({
+                            'notification_ids': response.notification_ids,
+                            'csrf_token': '{{csrf_token}}',
+                        }));
                     }
                 });
                 }
@@ -263,6 +267,11 @@
                         var scrollableContent = document.getElementById("conversationFrame");
                         scrollableContent.scrollTop = scrollableContent.scrollHeight;
                         $('#message').val('')
+                        console.log(response.notification_ids)
+                        notificationSocket.send(JSON.stringify({
+                            'notification_ids': response.notification_ids,
+                            'csrf_token': '{{csrf_token}}',
+                        }));
                     }
                 });
             });
@@ -281,6 +290,9 @@
         var roomName = "{{ room.name }}";  // Django template variable for chatroom name
         const messageSocket = new WebSocket(
             'ws://' + window.location.host + '/ws/realtime-message-manager/' + roomId
+        );
+        const notificationSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/brordcast-message/'
         );
         messageSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
@@ -359,6 +371,7 @@
                 }
             }
             $('#conversation-contents').append(newMessageInHtml);
+            
 
         };
         messageSocket.onclose = function (e) {
@@ -369,9 +382,7 @@
             console.error('WebSocket encountered error:', e);
         }
 
-        const notificationSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/brordcast-message/'
-        );
+        
         notificationSocket.onopen = function() {
         
         };
@@ -406,28 +417,12 @@
                 'sender': '{{username}}',
                 'csrf_token': '{{csrf_token}}',
             }));
-            notificationSocket.send(JSON.stringify({
-                    'text': message,
-                    'message_type': 'text',
-                    'chat_room_id': '{{ room.id }}',
-                    'current_url': encodeURIComponent(window.location.href),
-                    'sender': '{{username}}',
-                    'csrf_token': '{{csrf_token}}',
-                }));
         };
         document.querySelector('#message').keydown = function(e) {
             if (e.key === 'Enter' ) {
                 const messageInput = document.querySelector('#message');
                 const message = messageInput.value;
                 messageSocket.send(JSON.stringify({
-                    'text': message,
-                    'message_type': 'text',
-                    'chat_room_id': '{{ room.id }}',
-                    'current_url': encodeURIComponent(window.location.href),
-                    'sender': '{{username}}',
-                    'csrf_token': '{{csrf_token}}',
-                }));
-                notificationSocket.send(JSON.stringify({ // have this inside of the onmessage functon for the messageConsumer.
                     'text': message,
                     'message_type': 'text',
                     'chat_room_id': '{{ room.id }}',
