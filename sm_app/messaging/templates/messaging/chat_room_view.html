@@ -427,7 +427,7 @@
                     'sender': '{{username}}',
                     'csrf_token': '{{csrf_token}}',
                 }));
-                notificationSocket.send(JSON.stringify({
+                notificationSocket.send(JSON.stringify({ // have this inside of the onmessage functon for the messageConsumer.
                     'text': message,
                     'message_type': 'text',
                     'chat_room_id': '{{ room.id }}',
