@@ -170,9 +170,9 @@
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnotify" aria-controls="staticBackdrop">
+                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnotify" aria-controls="staticBackdrop" id="notification-button">
                                         <div class="fs-2"><i class="bi bi-bell-fill" id="bell-icon" style="color: #198754;"></i></div>
-                                        {% block notification_count %}{% endblock %}
+                                        <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">{% block notification_count %}{% endblock %}</span>
                                     </button>
                                 </div>
                             </div>
@@ -208,7 +208,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-                <div id="notification-inbox p-3" style="overflow-y: auto;">
+                <div id="notification-inbox" style="overflow-y: auto;">
                     {% block notifications %}{% endblock %}
                 </div>
             </div>

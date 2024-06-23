@@ -224,9 +224,40 @@
     <script>
         $(document).ready(function () {
             $('#message').keydown(function(event) {
-                if (event.key == 'Enter') {
-                    event.preventDefault(); // Prevent form submission
-                    message = $('#message').val()
+                if (event.key == 13 ) {
+                    var message = $('#message').val()
+                    if (message != '') {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/chat/message-sent-text/',
+                            data: {
+                                'chat-room-name': '{{room.name}}',
+                                'chat-room-id': '{{room.id}}',
+                                'text-message': message,
+                                'is-reply': false,
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                                console.log('text sent and saved.')
+                                var scrollableContent = document.getElementById("conversationFrame");
+                                scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                                $('#message').val('')
+                                console.log(response.notification_ids)
+                                notificationSocket.send(JSON.stringify({
+                                    'notification_ids': response.notification_ids,
+                                    'csrf_token': '{{csrf_token}}',
+                                }));
+                            }
+                        });
+                    }
+                    else {
+                        console.log('invalid message')
+                    }
+                }
+            })
+            $('#send').click(function () {
+                var message = $('#message').val()
+                if (message != '') {
                     $.ajax({
                         type: 'POST',
                         url: '/chat/message-sent-text/',
@@ -237,43 +268,22 @@
                             'is-reply': false,
                             'csrfmiddlewaretoken': '{{ csrf_token }}'
                         },
-                    success: function(response) {
-                        console.log('text sent and saved.')
-                        var scrollableContent = document.getElementById("conversationFrame");
-                        scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                        $('#message').val('')
-                        notificationSocket.send(JSON.stringify({
-                            'notification_ids': response.notification_ids,
-                            'csrf_token': '{{csrf_token}}',
-                        }));
-                    }
-                });
+                        success: function(response) {
+                            console.log('text sent and saved.')
+                            var scrollableContent = document.getElementById("conversationFrame");
+                            scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                            $('#message').val('')
+                            console.log(response.notification_ids)
+                            notificationSocket.send(JSON.stringify({
+                                'notification_ids': response.notification_ids,
+                                'csrf_token': '{{csrf_token}}',
+                            }));
+                        }
+                    });
                 }
-            })
-            $('#send').click(function () {
-                message = $('#message').val()
-                $.ajax({
-                    type: 'POST',
-                    url: '/chat/message-sent-text/',
-                    data: {
-                        'chat-room-name': '{{room.name}}',
-                        'chat-room-id': '{{room.id}}',
-                        'text-message': message,
-                        'is-reply': false,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        console.log('text sent and saved.')
-                        var scrollableContent = document.getElementById("conversationFrame");
-                        scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                        $('#message').val('')
-                        console.log(response.notification_ids)
-                        notificationSocket.send(JSON.stringify({
-                            'notification_ids': response.notification_ids,
-                            'csrf_token': '{{csrf_token}}',
-                        }));
+                else {
+                        console.log('invalid message')
                     }
-                });
             });
         });
     </script>
@@ -371,6 +381,30 @@
                 }
             }
             $('#conversation-contents').append(newMessageInHtml);
+            var scrollableContent = document.getElementById("conversationFrame");
+            scrollableContent.scrollTop = scrollableContent.scrollHeight;
+            $.ajax({
+                type: 'POST',
+                url: '/universal/remove-notification/',
+                data: {
+                    'chat-room-name': '{{room.name}}',
+                    'chat-room-id': '{{room.id}}',
+                    'text-message': message,
+                    'is-reply': false,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    console.log('text sent and saved.')
+                    var scrollableContent = document.getElementById("conversationFrame");
+                    scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                    $('#message').val('')
+                    console.log(response.notification_ids)
+                    notificationSocket.send(JSON.stringify({
+                        'notification_ids': response.notification_ids,
+                        'csrf_token': '{{csrf_token}}',
+                    }));
+                }
+            });
             
 
         };
@@ -409,19 +443,7 @@
         document.querySelector('#send').onclick = function(e) {
             const messageInput = document.querySelector('#message');
             const message = messageInput.value;
-            messageSocket.send(JSON.stringify({
-                'text': message,
-                'message_type': 'text',
-                'chat_room_id': '{{ room.id }}',
-                'current_url': encodeURIComponent(window.location.href),
-                'sender': '{{username}}',
-                'csrf_token': '{{csrf_token}}',
-            }));
-        };
-        document.querySelector('#message').keydown = function(e) {
-            if (e.key === 'Enter' ) {
-                const messageInput = document.querySelector('#message');
-                const message = messageInput.value;
+            if (message != '') {
                 messageSocket.send(JSON.stringify({
                     'text': message,
                     'message_type': 'text',
@@ -430,6 +452,22 @@
                     'sender': '{{username}}',
                     'csrf_token': '{{csrf_token}}',
                 }));
+            }
+        };
+        document.querySelector('#message').keydown = function(e) {
+            if (e.key == 13 ) {
+                const messageInput = document.querySelector('#message');
+                const message = messageInput.value;
+                if (message != '') {
+                    messageSocket.send(JSON.stringify({
+                        'text': message,
+                        'message_type': 'text',
+                        'chat_room_id': '{{ room.id }}',
+                        'current_url': encodeURIComponent(window.location.href),
+                        'sender': '{{username}}',
+                        'csrf_token': '{{csrf_token}}',
+                    }));
+                }
             }
         };
     </script>

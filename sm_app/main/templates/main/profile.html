@@ -53,12 +53,13 @@
                                 console.log(response.message)
                                 var notification = $("#notification-{{notification.notification_object.pk}}")
                                 notification.remove();
-                                $('#notification-counter').text(response.notification_counter);
-                                if (response.notification_count == 0) {
-                                    $('#notification-counter').remove();
-                                    $('#bell-icon').removeClass('bi-bell-fill');
-                                    $('#bell-icon').addClass('bi-bell');
-                                }
+                                $('#notification-counter').text(response.notification_counter).show();
+                                    if (response.notification_count == 0) {
+                                        $('#notification-counter').text(response.notification_counter).hide();
+                                        $('#notification-counter').remove();
+                                        $('#bell-icon').removeClass('bi-bell-fill');
+                                        $('#bell-icon').addClass('bi-bell');
+                                    }
                             }
                         })
                     })
@@ -80,20 +81,7 @@
         {% endfor %}
 {% endblock %}
 {% block notification_count %}
-    <div id="notification-indicatior">
-        {% if notification_count == 0 %}
-            <script>
-                $(document).ready(function () {
-                    var notification_count = '{{notification_count}}';
-                    var notification_bell = $('#bell-icon');
-                    notification_bell.removeClass('bi-bell-fill');
-                    notification_bell.addClass('bi-bell');
-                })
-            </script>
-        {% else %}
-            <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">{{ notification_count }}
-        {% endif %}
-    </div>
+  {{ notification_count }}
 {% endblock %}
 {% block body %}
 <div class="container">
@@ -200,16 +188,15 @@
     if (data.receiver === '{{user.username}}' ) {
       console.log(data.stored_html_notification)
       $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
-      $('#notification-inbox').append(data.stored_html_notification); // adds html to the notification div that houses the notifications in the offcanvas
+      $('#notification-inbox').prepend(data.stored_html_notification); // adds html to the notification div that houses the notifications in the offcanvas
       $('#inbox').append(data.html_script) // script for removing notificaions after dismissing them
       if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
         $('#bell-icon').removeClass('bi-bell')
         $('#bell-icon').addClass('bi-bell-fill')
         if ($('#notification-counter')) { // if the notification counter already exists
-          $('#notification-counter').text('')
-          $('#notification-counter').text(data.notification_count) // changes the counter to the current number of notifications
+          $('#notification-counter').text(data.notification_count).show() // changes the counter to the current number of notifications
         } else {
-          $('#notification-indicatior').append(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count) // creates the relevant html alongside with the current ammount of notifications inside as well.
+          $('#notification-button').prepend(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + `</span>`) // creates the relevant html alongside with the current ammount of notifications inside as well.
         } 
       }
       
@@ -240,4 +227,15 @@
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 
 </div>
+{% if notification_count == 0 %}
+  <script type="text/javascript">
+    $(document).ready(function () {
+        var notification_counter = $('#notification-counter');
+        notification_counter.text('{{notification_count}}').hide();
+        var notification_bell = $('#bell-icon');
+        notification_bell.removeClass('bi-bell-fill');
+        notification_bell.addClass('bi-bell');
+    })
+  </script>
+{% endif %}
 {% endblock %}

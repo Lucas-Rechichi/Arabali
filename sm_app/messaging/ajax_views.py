@@ -19,33 +19,34 @@ def message_sent_text(request):
     chat_room = rooms.get(id=chat_room_id)
 
     # Creating the new Message and Saving it to the Database
-    if text_message:
+    if text_message and text_message != '':
         new_message = Message(sender=user_stats, room=chat_room, text=text_message)
         new_message.save()
+
+        receivers = chat_room.users.exclude(user=user_stats.user)
+        notification_ids = []
+        for receiver in receivers:
+            new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text)
+            new_notification.save()
+            notification_ids.append(new_notification.id)
+
+        # Assuming you want to convert the datetime to a specific timezone
+        local_timezone = pytz.timezone("Australia/Sydney")
+        local_datetime = new_message.sent_at.astimezone(local_timezone)
+        
+        formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
+        formatted_datetime_capitalized = formatted_datetime.capitalize()
+        # Sending JSON responce
+        responce = {
+            'messageType':'text',
+            'message': new_message.text,
+            'message_user_pfp_url': new_message.sender.pfp.url,
+            'creationDate': formatted_datetime_capitalized,
+            'notification_ids': notification_ids,
+        }
+        return JsonResponse(responce)
     else:
         new_message = Message()
-
-    receivers = chat_room.users.exclude(user=user_stats.user)
-    notification_ids = []
-    for receiver in receivers:
-        new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text)
-        new_notification.save()
-        notification_ids.append(new_notification.id)
-
-    # Assuming you want to convert the datetime to a specific timezone
-    local_timezone = pytz.timezone("Australia/Sydney")
-    local_datetime = new_message.sent_at.astimezone(local_timezone)
-    
-    formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
-    formatted_datetime_capitalized = formatted_datetime.capitalize()
-    # Sending JSON responce
-    responce = {
-        'messageType':'text',
-        'message': new_message.text,
-        'message_user_pfp_url': new_message.sender.pfp.url,
-        'creationDate': formatted_datetime_capitalized,
-        'notification_ids': notification_ids,
-    }
-    return JsonResponse(responce)
+        return JsonResponse({'messageType':'invalid'})
 
 
