@@ -175,53 +175,59 @@
 </div>
 <!-- Websockets for recieving notifications -->
 <script type="text/javascript">
-  const notificationSocket = new WebSocket(
+  let notificationSocket
+  let reconnectionTime = 5000
+  function connectNotificationSocket () {
+    notificationSocket = new WebSocket(
       'ws://' + window.location.host + '/ws/brordcast-message/'
-  );
-  notificationSocket.onopen = function(e) {
-    console.log('connected', e)
-  };
+    );
+    notificationSocket.onopen = function(e) {
+      console.log('connected', e)
+    };
 
-  notificationSocket.onmessage = function(e) {
-    console.log('Message coming though!')
-    const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
-    if (data.receiver === '{{user.username}}' ) {
-      console.log(data.stored_html_notification)
-      $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
-      $('#notification-inbox').prepend(data.stored_html_notification); // adds html to the notification div that houses the notifications in the offcanvas
-      $('#inbox').append(data.html_script) // script for removing notificaions after dismissing them
-      if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
-        $('#bell-icon').removeClass('bi-bell')
-        $('#bell-icon').addClass('bi-bell-fill')
-        if ($('#notification-counter')) { // if the notification counter already exists
-          $('#notification-counter').text(data.notification_count).show() // changes the counter to the current number of notifications
-        } else {
-          $('#notification-button').prepend(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + `</span>`) // creates the relevant html alongside with the current ammount of notifications inside as well.
-        } 
-      }
+    notificationSocket.onmessage = function(e) {
+      console.log('Message coming though!')
+      const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
+      if (data.receiver === '{{user.username}}' ) {
+        console.log(data.stored_html_notification)
+        $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
+        $('#notification-inbox').prepend(data.stored_html_notification); // adds html to the notification div that houses the notifications in the offcanvas
+        $('#inbox').append(data.html_script) // script for removing notificaions after dismissing them
+        if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
+          $('#bell-icon').removeClass('bi-bell')
+          $('#bell-icon').addClass('bi-bell-fill')
+          if ($('#notification-counter')) { // if the notification counter already exists
+            $('#notification-counter').text(data.notification_count).show() // changes the counter to the current number of notifications
+          } else {
+            $('#notification-button').prepend(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + `</span>`) // creates the relevant html alongside with the current ammount of notifications inside as well.
+          } 
+        }
+        
+          var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
       
-        var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
-    
-      if (notificationElement) {
-          var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
-          // Show the toast
-          notification.show();
+        if (notificationElement) {
+            var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
+            // Show the toast
+            notification.show();
+        } else {
+            console.error('Notification element not found:', 'notification-' + data.notification_id);
+        }
       } else {
-          console.error('Notification element not found:', 'notification-' + data.notification_id);
+        console.log('incorrect user')
       }
-    } else {
-      console.log('incorrect user')
-    }
 
-  };
+    };
 
-  notificationSocket.onerror = function(e) {
-      console.error('WebSocket encountered an error:', e);
-  };
+    notificationSocket.onerror = function(e) {
+        console.error('WebSocket encountered an error:', e);
+    };
 
-  notificationSocket.onclose = function(e) {
-      console.error('WebSocket closed unexpectedly:', e);
-  };
+    notificationSocket.onclose = function(e) {
+        console.error('WebSocket closed unexpectedly:', e);
+        setTimeout(connectNotificationSocket, reconnectionTime)
+    };
+  }
+  connectNotificationSocket();
 </script>
 <!-- To store notifications -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
