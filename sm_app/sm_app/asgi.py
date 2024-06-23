@@ -15,7 +15,7 @@ from channels.auth import AuthMiddlewareStack
 import messaging.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sm_app.settings')
-
+# configures the ASGI application and connects our routing urls to the application
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
     'websocket': AuthMiddlewareStack(

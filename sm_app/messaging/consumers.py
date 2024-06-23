@@ -38,7 +38,7 @@ class MessageConsumer(WebsocketConsumer):
             # Take action if the user is not on the specific page or is not allowed in the chatroom
             self.close(code=4001)  # Close the connection with a custom error code
 
-        # Add the WebSocket to the group
+        # Add the user to the channel layer
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
@@ -79,8 +79,9 @@ class MessageConsumer(WebsocketConsumer):
         # Getting relevant database objects
         user = User.objects.get(username=username)
         user_stats = UserStats.objects.get(user=user)
+        user_pfp_url = user_stats.pfp.url
         if message_type == 'text':
-            # Assuming you want to convert the datetime to a specific timezone
+            # Formatting of the timezone when message is displayed on the screen
             local_timezone = pytz.timezone("Australia/Sydney")
             local_datetime = Message.objects.latest('sent_at').sent_at.astimezone(local_timezone)
     
@@ -88,8 +89,7 @@ class MessageConsumer(WebsocketConsumer):
             formatted_datetime_capitalized = formatted_datetime.capitalize()
         else:
             formatted_datetime_capitalized = None  # Ensure this variable is defined
-        user_pfp_url = user_stats.pfp.url
-
+        
         # Sending relevant data over
         self.send(text_data=json.dumps({
             'type': 'incoming_message',
