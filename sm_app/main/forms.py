@@ -12,7 +12,7 @@ class Search(forms.Form):
         super(Search, self).__init__(*args, **kwargs)
         self.fields['query'].widget.attrs['id'] = 'searchQuery'
 
-    query = forms.CharField(label='', max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Search...'}))
+    query = forms.CharField(label='', max_length=100, required=False, widget=forms.TextInput(attrs={'placeholder': 'Search...'}))
 
 
 class EditProfile(forms.Form):

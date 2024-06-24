@@ -297,178 +297,157 @@
     </script>
     <!-- Websocket for sending messages -->
     <script type="text/javascript">
-        var roomId = "{{ room.id }}";  // Django template variable for chatroom ID
-        var roomName = "{{ room.name }}";  // Django template variable for chatroom name
-        var reconnectionTime = 5000;
-        let messageSocket
-        let notificationSocket
-        function connectMessageSocket () {
-            messageSocket = new WebSocket(
-                'ws://' + window.location.host + '/ws/realtime-message-manager/' + roomId
-            );
+        $(document).ready(function () {
+            var roomId = "{{ room.id }}";  // Django template variable for chatroom ID
+            var roomName = "{{ room.name }}";  // Django template variable for chatroom name
+            var reconnectionTime = 5000;
+            let messageSocket
+            let notificationSocket
+            function connectMessageSocket () {
+                messageSocket = new WebSocket(
+                    'ws://' + window.location.host + '/ws/realtime-message-manager/' + roomId
+                );
 
-            messageSocket.onmessage = function(e) {
-                const data = JSON.parse(e.data);
-                console.log(data);
-                if (data.type === 'incoming_message') {
-                    if (data.username === '{{username}}') {
-                        var newMessageInHtml = `
-                            <div class="message">
+                messageSocket.onmessage = function(e) {
+                    const data = JSON.parse(e.data);
+                    console.log(data);
+                    if (data.type === 'incoming_message') {
+                        if (data.username === '{{username}}') {
+                            var newMessageInHtml = `
+                                <div class="message">
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="text-center"><em>` + data.sent_at + `</em></p>
+                                        </div>
+                                    </div>
                                 <div class="row">
-                                    <div class="col">
-                                        <p class="text-center"><em>` + data.sent_at + `</em></p>
+                                    <div class="col-6">
+                                        
                                     </div>
-                                </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    
-                                </div>
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-11">
-                                            <p class="d-flex justify-content-end"><strong>You</strong></p>
-                                        </div>
-                                        <div class="col-1">
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-10 d-flex justify-content-end">
-                                            <div class="card pb-0" style="width: fit-content;">
-                                                <div class="card-body">
-                                                    <p>` + data.message + `</p>
-                                                </div>
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-11">
+                                                <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                            </div>
+                                            <div class="col-1">
                                             </div>
                                         </div>
-                                        <div class="col-1">
-                                            <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`;
-                    } 
-                    else {
-                        var newMessageInHtml = `
-                            <div class="message">
-                                <div class="row">
-                                    <div class="col">
-                                        <p class="text-center"><em>` + data.sent_at + `</em></p>
-                                    </div>
-                                </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-1">
-                                        </div>
-                                        <div class="col-11">
-                                            <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-1">
-                                            <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                        <div class="col-10 d-flex justify-content-start">
-                                            <div class="card pb-0" style="width: fit-content;">
-                                                <div class="card-body">
-                                                    <p>` + data.message + `</p>
+                                        <div class="row">
+                                            <div class="col-10 d-flex justify-content-end">
+                                                <div class="card pb-0" style="width: fit-content;">
+                                                    <div class="card-body">
+                                                        <p>` + data.message + `</p>
+                                                    </div>
                                                 </div>
+                                            </div>
+                                            <div class="col-1">
+                                                <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                            </div>`;
+                        } 
+                        else {
+                            var newMessageInHtml = `
+                                <div class="message">
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="text-center"><em>` + data.sent_at + `</em></p>
+                                        </div>
+                                    </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-1">
+                                            </div>
+                                            <div class="col-11">
+                                                <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-1">
+                                                <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
+                                            <div class="col-10 d-flex justify-content-start">
+                                                <div class="card pb-0" style="width: fit-content;">
+                                                    <div class="card-body">
+                                                        <p>` + data.message + `</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                    </div>
                                 </div>
-                            </div>
-                        </div>`;
+                            </div>`;
+                        }
                     }
+                    $('#conversation-contents').append(newMessageInHtml);
+                    var scrollableContent = document.getElementById("conversationFrame");
+                    scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'chat-room-name': '{{room.name}}',
+                            'chat-room-id': '{{room.id}}',
+                            'text-message': message,
+                            'is-reply': false,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            console.log('Notification removed')
+                            
+                        }
+                    });
+                    
+
+                };
+                messageSocket.onclose = function (e) {
+                    console.error('WebSocket closed unexpectedly:', e);
+                    setTimeout(connectMessageSocket, reconnectionTime);
                 }
-                $('#conversation-contents').append(newMessageInHtml);
-                var scrollableContent = document.getElementById("conversationFrame");
-                scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                $.ajax({
-                    type: 'POST',
-                    url: '/universal/remove-notification/',
-                    data: {
-                        'chat-room-name': '{{room.name}}',
-                        'chat-room-id': '{{room.id}}',
-                        'text-message': message,
-                        'is-reply': false,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        console.log('text sent and saved.')
-                        var scrollableContent = document.getElementById("conversationFrame");
-                        scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                        $('#message').val('')
-                        console.log(response.notification_ids)
-                        notificationSocket.send(JSON.stringify({
-                            'notification_ids': response.notification_ids,
-                            'csrf_token': '{{csrf_token}}',
-                        }));
-                    }
-                });
-                
 
-            };
-            messageSocket.onclose = function (e) {
-                console.error('WebSocket closed unexpectedly:', e);
-                setTimeout(connectMessageSocket, reconnectionTime);
+                messageSocket.onerror = function (e) {
+                    console.error('WebSocket encountered error:', e);
+                }
             }
+            function connectNotificationSocket () {
+                notificationSocket = new WebSocket(
+                    'ws://' + window.location.host + '/ws/brordcast-message/'
+                );
+                notificationSocket.onopen = function() {
+                    
+                };
 
-            messageSocket.onerror = function (e) {
-                console.error('WebSocket encountered error:', e);
+                notificationSocket.onmessage = function(e) {
+                    console.log('got a notification')
+                    // var inbox = document.getElementById('inbox');
+                    // inbox.insertAdjacentHTML('afterbegin', data.html_notification);
+
+                    // var notificationElement = document.getElementById('notification-' + data.notification_id);
+                    // var notification = new bootstrap.Toast(notificationElement);
+
+                    // // Show the toast
+                    // notification.show();
+                };
+
+                notificationSocket.onerror = function(e) {
+                    console.error('WebSocket encountered an error:', e);
+                };
+
+                notificationSocket.onclose = function(e) {
+                    console.error('WebSocket closed unexpectedly:', e);
+                    setTimeout(connectNotificationSocket, reconnectionTime);
+
+                };
             }
-        }
-        function connectNotificationSocket () {
-            notificationSocket = new WebSocket(
-                'ws://' + window.location.host + '/ws/brordcast-message/'
-            );
-            notificationSocket.onopen = function() {
-                
-            };
-
-            notificationSocket.onmessage = function(e) {
-                console.log('got a notification')
-                // var inbox = document.getElementById('inbox');
-                // inbox.insertAdjacentHTML('afterbegin', data.html_notification);
-
-                // var notificationElement = document.getElementById('notification-' + data.notification_id);
-                // var notification = new bootstrap.Toast(notificationElement);
-
-                // // Show the toast
-                // notification.show();
-            };
-
-            notificationSocket.onerror = function(e) {
-                console.error('WebSocket encountered an error:', e);
-            };
-
-            notificationSocket.onclose = function(e) {
-                console.error('WebSocket closed unexpectedly:', e);
-                setTimeout(connectNotificationSocket, reconnectionTime);
-
-            };
-        }
-        connectMessageSocket();
-        connectNotificationSocket();
-        
-        document.querySelector('#send').onclick = function(e) {
-            const messageInput = document.querySelector('#message');
-            const message = messageInput.value;
-            if (message != '') {
-                messageSocket.send(JSON.stringify({
-                    'text': message,
-                    'message_type': 'text',
-                    'chat_room_id': '{{ room.id }}',
-                    'current_url': encodeURIComponent(window.location.href),
-                    'sender': '{{username}}',
-                    'csrf_token': '{{csrf_token}}',
-                }));
-            }
-        };
-        document.querySelector('#message').keydown = function(e) {
-            if (e.keyCode == 13 ) {
+            connectMessageSocket();
+            connectNotificationSocket();
+            
+            document.querySelector('#send').onclick = function(e) {
                 const messageInput = document.querySelector('#message');
                 const message = messageInput.value;
                 if (message != '') {
@@ -481,14 +460,26 @@
                         'csrf_token': '{{csrf_token}}',
                     }));
                 }
-            }
-        };
-        document.querySelector('#search-button').onclick = function(e) {
-            e.preventDefault();
-            var searchBarForm = $('#search-bar-form')
-            searchBarForm.submit();
-        }
-        // queryselector for the searchbar input.
+            };
+            document.querySelector('#message').keydown = function(e) {
+                if (e.keyCode == 13 ) {
+                    e.preventDefault();
+                    const messageInput = document.querySelector('#message');
+                    const message = messageInput.value;
+                    if (message != '') {
+                        messageSocket.send(JSON.stringify({
+                            'text': message,
+                            'message_type': 'text',
+                            'chat_room_id': '{{ room.id }}',
+                            'current_url': encodeURIComponent(window.location.href),
+                            'sender': '{{username}}',
+                            'csrf_token': '{{csrf_token}}',
+                        }));
+                    }
+                }
+            };
+            // queryselector for the searchbar input.
+        })
     </script>
 </div>
 <!-- To store notifications -->
