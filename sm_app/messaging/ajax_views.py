@@ -26,7 +26,7 @@ def message_sent_text(request):
         receivers = chat_room.users.exclude(user=user_stats.user)
         notification_ids = []
         for receiver in receivers:
-            new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text)
+            new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text, relevant_message=new_message)
             new_notification.save()
             notification_ids.append(new_notification.id)
 
@@ -40,6 +40,7 @@ def message_sent_text(request):
         responce = {
             'messageType':'text',
             'message': new_message.text,
+            'message_id': new_message.pk,
             'message_user_pfp_url': new_message.sender.pfp.url,
             'creationDate': formatted_datetime_capitalized,
             'notification_ids': notification_ids,

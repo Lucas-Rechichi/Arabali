@@ -1,7 +1,9 @@
 from datetime import datetime, date
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Notification
+from messaging.models import Message
 from django.core.exceptions import ObjectDoesNotExist
 from main.algorithum import Algorithum
 
@@ -357,8 +359,18 @@ def save_location(request):
     return JsonResponse({'username': user_stats.user.username})
 
 def remove_notification(request):
-    notification_id = request.POST.get('notification_id')
-    notification = Notification.objects.get(id=notification_id)
+    type = request.POST.get('type')
+    if type == 'notification-id':
+        notification_id = request.POST.get('notification_id')
+        notification = Notification.objects.get(id=notification_id)
+    else:
+        receiver_user = User.objects.get(username=request.POST.get('receiver'))
+        receiver_userstats = UserStats.objects.get(user=receiver_user)
+        print(receiver_userstats.user)
+        message_id = request.POST.get('message-id')
+        message = Message.objects.get(id=message_id)
+        notification = Notification.objects.get(relevant_message=message, user=receiver_userstats)
+    print(notification)
     notification.delete()
     notification_count = Notification.objects.all().count()
     print(notification_count)

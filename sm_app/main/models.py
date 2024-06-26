@@ -1,10 +1,9 @@
-from django.db import models
+import os
 
+from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-import os
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 # To direct the images from user imput into their respective folders.
 def get_image_upload_path_posts(instance, filename):
@@ -15,6 +14,10 @@ def get_image_upload_path_posts(instance, filename):
 def get_image_upload_path_profile(instance, filename):
 
     return os.path.join(instance.user.username, 'profile/', filename)
+
+def get_default_content_type(model):
+
+    return ContentType.objects.get_for_model(model).id
 
 # Fields that have only one parent, parent can have only 1 child
 class LikedBy(models.Model):
@@ -62,11 +65,14 @@ class UserStats(models.Model):
         return self.user.username
 
 from messaging.models import ChatRoom
+from messaging.models import Message
 
 # Notifications
 class Notification(models.Model):
     user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)
     source = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, null=False)
+    relevant_message = models.ForeignKey(Message, on_delete=models.CASCADE, null=True)
+    relevant_post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     sender = models.CharField(max_length=300)
     contents = models.TextField()
     time_stamp = models.DateTimeField(auto_now_add=True)

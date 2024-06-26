@@ -56,6 +56,7 @@ class MessageConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['text']
         message_type = text_data_json['message_type']
+        message_id = text_data_json['message_id']
         user = self.scope.get("user")  # Use get to safely get the user who is on the page
         
         if user and user.is_authenticated:
@@ -66,6 +67,7 @@ class MessageConsumer(WebsocketConsumer):
                     'type': 'chat_message',
                     'message_type': message_type,
                     'message': message,
+                    'message_id': message_id,
                     'username': user.username,
                 }
             )
@@ -74,6 +76,7 @@ class MessageConsumer(WebsocketConsumer):
         # Accessing sent data
         message = event['message']
         message_type = event['message_type']
+        message_id = event['message_id']
         username = event['username']
 
         # Getting relevant database objects
@@ -95,6 +98,7 @@ class MessageConsumer(WebsocketConsumer):
             'type': 'incoming_message',
             'message_type': message_type,
             'message': message,
+            'message_id': message_id,
             'username': user.username,
             'sent_at': formatted_datetime_capitalized,
             'user_pfp_url': user_pfp_url
