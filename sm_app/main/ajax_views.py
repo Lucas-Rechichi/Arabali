@@ -360,18 +360,18 @@ def save_location(request):
 
 def remove_notification(request):
     type = request.POST.get('type')
+    print(type)
+    receiver_user = User.objects.get(username=request.POST.get('receiver'))
+    receiver_userstats = UserStats.objects.get(user=receiver_user)
     if type == 'notification-id':
         notification_id = request.POST.get('notification_id')
         notification = Notification.objects.get(id=notification_id)
     else:
-        receiver_user = User.objects.get(username=request.POST.get('receiver'))
-        receiver_userstats = UserStats.objects.get(user=receiver_user)
         print(receiver_userstats.user)
         message_id = request.POST.get('message-id')
         message = Message.objects.get(id=message_id)
         notification = Notification.objects.get(relevant_message=message, user=receiver_userstats)
     print(notification)
     notification.delete()
-    notification_count = Notification.objects.all().count()
-    print(notification_count)
+    notification_count = Notification.objects.filter(user=receiver_userstats).count()
     return JsonResponse({'message': f'Notification; {notification} has been removed', 'notification_count': notification_count})

@@ -195,16 +195,19 @@ class NotificationConsumer(WebsocketConsumer):
                                 type: 'POST',
                                 url: '/universal/remove-notification/',
                                 data: {
-                                    'csrfmiddlewaretoken': ''' + csrf_token + ''',
+                                    'receiver': "''' + new_notification.user.user.username +  '''",
+                                    'type': "notification-id",
+                                    'csrfmiddlewaretoken': "''' + csrf_token + '''",
                                     'notification_id': ''' + f'{new_notification.pk}' + ''',
                                 },
                                 success: function(response) {
                                     console.log(response.message);
-                                    var notification = $("#''' + f'{new_notification.pk}' + '''");
+                                    var notification = $("#notification-''' + f'{new_notification.pk}' + '''");
                                     notification.remove();
-                                    $('#notification-counter').text(response.notification_counter).show();
+                                    $('#notification-counter').text('');
+                                    $('#notification-counter').text(response.notification_count)
                                     if (response.notification_count == 0) {
-                                        $('#notification-counter').text(response.notification_counter).hide();
+                                        $('#notification-counter').text(response.notification_count).hide();
                                         $('#notification-counter').remove();
                                         $('#bell-icon').removeClass('bi-bell-fill');
                                         $('#bell-icon').addClass('bi-bell');
@@ -218,7 +221,9 @@ class NotificationConsumer(WebsocketConsumer):
                                 type: 'POST',
                                 url: '/universal/remove-notification/',
                                 data: {
-                                    'csrfmiddlewaretoken': ''' + f'{csrf_token}' + ''',
+                                    'receiver': "''' + new_notification.user.user.username +  '''",
+                                    'type': "notification-id",
+                                    'csrfmiddlewaretoken': "''' + csrf_token + '''",
                                     'notification_id': ''' + f'{new_notification.pk}' + '''
                                 },
                                 success: function(response) {
