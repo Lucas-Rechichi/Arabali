@@ -155,7 +155,6 @@ class NotificationConsumer(WebsocketConsumer):
             notification = Notification.objects.get(id=notification_id)
             if notification.user.user.username == self.connected_users[self.channel_name].username:
                 new_notification = notification
-                
                 sender_userstats = UserStats.objects.get(user=User.objects.get(username=new_notification.sender))
                 # For the notification icon
                 notification_count = Notification.objects.filter(user=new_notification.user).count()
@@ -190,14 +189,14 @@ class NotificationConsumer(WebsocketConsumer):
                 script = '''
                 <script>
                     $(document).ready(function () {
-                        $("#close-notification-''' + f'{new_notification.pk}' + '''").click(function () {
+                        $("#close-notification-''' + str(new_notification.pk) + '''").click(function () {
                             $.ajax({
                                 type: 'POST',
                                 url: '/universal/remove-notification/',
                                 data: {
                                     'receiver': "''' + new_notification.user.user.username +  '''",
                                     'type': "notification-id",
-                                    'csrfmiddlewaretoken': "''' + csrf_token + '''",
+                                    'csrfmiddlewaretoken': ''' + csrf_token + ''',
                                     'notification_id': ''' + f'{new_notification.pk}' + ''',
                                 },
                                 success: function(response) {
@@ -223,7 +222,7 @@ class NotificationConsumer(WebsocketConsumer):
                                 data: {
                                     'receiver': "''' + new_notification.user.user.username +  '''",
                                     'type': "notification-id",
-                                    'csrfmiddlewaretoken': "''' + csrf_token + '''",
+                                    'csrfmiddlewaretoken': ''' + csrf_token + ''',
                                     'notification_id': ''' + f'{new_notification.pk}' + '''
                                 },
                                 success: function(response) {
