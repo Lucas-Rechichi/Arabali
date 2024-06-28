@@ -185,11 +185,8 @@
                 if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
                     $('#bell-icon').removeClass('bi-bell')
                     $('#bell-icon').addClass('bi-bell-fill')
-                    if ($('#notification-counter')) { // if the notification counter already exists
-                        $('#notification-counter').text(data.notification_count).show() // changes the counter to the current number of notifications
-                    } else {
-                        $('#notification-button').prepend(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + `</span>`) // creates the relevant html alongside with the current ammount of notifications inside as well.
-                    } 
+                    $('#notification-button').append(`<span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">` + data.notification_count + `</span>`) // creates the relevant html alongside with the current ammount of notifications inside as well.
+                    
                 }
 
                 var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast

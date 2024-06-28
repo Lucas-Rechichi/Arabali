@@ -156,6 +156,13 @@ class NotificationConsumer(WebsocketConsumer):
             if notification.user.user.username == self.connected_users[self.channel_name].username:
                 new_notification = notification
                 sender_userstats = UserStats.objects.get(user=User.objects.get(username=new_notification.sender))
+                # For the datetime such that it looks neater when displayed
+                local_timezone = pytz.timezone("Australia/Sydney")
+                local_datetime = new_notification.time_stamp.astimezone(local_timezone)
+                formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
+                formatted_datetime_capitalized = formatted_datetime.capitalize()
+                notification_timestamp = formatted_datetime_capitalized
+
                 # For the notification icon
                 notification_count = Notification.objects.filter(user=new_notification.user).count()
 
@@ -186,53 +193,6 @@ class NotificationConsumer(WebsocketConsumer):
                     </div>
                 </div>
                 '''
-                script = '''
-                <script>
-                    $(document).ready(function () {
-                        $("#close-notification-''' + str(new_notification.pk) + '''").click(function () {
-                            $.ajax({
-                                type: 'POST',
-                                url: '/universal/remove-notification/',
-                                data: {
-                                    'receiver': "''' + new_notification.user.user.username +  '''",
-                                    'type': "notification-id",
-                                    'csrfmiddlewaretoken': ''' + str(csrf_token) + ''',
-                                    'notification_id': ''' + f'{new_notification.pk}' + ''',
-                                },
-                                success: function(response) {
-                                    console.log(response.message);
-                                    var notification = $("#notification-''' + f'{new_notification.pk}' + '''");
-                                    notification.remove();
-                                    $('#notification-counter').text('');
-                                    $('#notification-counter').text(response.notification_count)
-                                    if (response.notification_count == 0) {
-                                        $('#notification-counter').text(response.notification_count).hide();
-                                        $('#notification-counter').remove();
-                                        $('#bell-icon').removeClass('bi-bell-fill');
-                                        $('#bell-icon').addClass('bi-bell');
-                                    }
-                                }
-                            });
-                        });
-
-                        $("#read-notification-''' + str(new_notification.pk) + '''").click(function () {
-                            $.ajax({
-                                type: 'POST',
-                                url: '/universal/remove-notification/',
-                                data: {
-                                    'receiver': "''' + new_notification.user.user.username +  '''",
-                                    'type': "notification-id",
-                                    'csrfmiddlewaretoken': ''' + str(csrf_token) + ''',
-                                    'notification_id': ''' + f'{new_notification.pk}' + '''
-                                },
-                                success: function(response) {
-                                    console.log(response.message);
-                                }
-                            });
-                        });
-                    });
-                </script>
-                '''
 
                 stored_html_notification = f'''
                 <div id="stored-notification-{new_notification.pk}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
@@ -243,7 +203,7 @@ class NotificationConsumer(WebsocketConsumer):
                         <button class="btn p-0 pe-2"  onclick="location.href='/chat/{new_notification.source.name}/{new_notification.source.pk}'" id="read-notification-{new_notification.pk}">
                             <strong class="me-auto">{new_notification.source.name}</strong>
                         </button>
-                        <small class="text-muted pe-2">{new_notification.time_stamp}</small>
+                        <small class="text-muted pe-2">{notification_timestamp}</small>
                         <button type="button ms-2" class="btn-close" id="close-notification-{new_notification.pk}" aria-label="Close"></button>
                     </div>
                     <div class="card-body">

@@ -471,4 +471,15 @@
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 
 </div>
+{% if notification_count == 0 %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var notification_counter = $('#notification-counter');
+            notification_counter.text('{{notification_count}}').hide();
+            var notification_bell = $('#bell-icon');
+            notification_bell.removeClass('bi-bell-fill');
+            notification_bell.addClass('bi-bell');
+        })
+    </script>
+{% endif %}
 {% endblock %}
