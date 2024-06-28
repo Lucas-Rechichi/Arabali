@@ -32,7 +32,7 @@ ul{
                             <a href="/page/recommended|All/1" role="button" class="display-6 link-success link-offset-2 link-underline-opacity-0">Arabali</a>
                         </div>
                         <div class="col-4">
-                            <form action="/search/q/1/1/1" method="post">
+                            <form action="/search/q/1/1/1" method="post" id="search-bar-form">
                                 {% csrf_token %}
                                 <div class="container">
                                     <div class="row">
@@ -43,7 +43,7 @@ ul{
                                             {% block searchBar %}{% endblock %}
                                         </div>
                                         <div class="col-3">
-                                            <button type="submit" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
+                                            <button type="submit" id="search-button" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -57,9 +57,9 @@ ul{
                                     </button>
                                 </div>
                                 <div class="col-6">
-                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnotify" aria-controls="staticBackdrop">
+                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnotify" aria-controls="staticBackdrop" id="notification-button">
                                         <div class="fs-2"><i class="bi bi-bell-fill" id="bell-icon" style="color: #198754;"></i></div>
-                                        {% block notification_count %}{% endblock %}
+                                        <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">{% block notification_count %}{% endblock %}</span>
                                     </button>
                                 </div>
                             </div>
@@ -86,6 +86,17 @@ ul{
                             </ul>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="offcanvasnotify" aria-labelledby="staticBackdropLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title">Notifications</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div id="notification-inbox" style="overflow-y: auto;">
+                    {% block notifications %}{% endblock %}
                 </div>
             </div>
         </div>

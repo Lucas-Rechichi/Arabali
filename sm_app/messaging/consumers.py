@@ -196,7 +196,7 @@ class NotificationConsumer(WebsocketConsumer):
                                 data: {
                                     'receiver': "''' + new_notification.user.user.username +  '''",
                                     'type': "notification-id",
-                                    'csrfmiddlewaretoken': ''' + csrf_token + ''',
+                                    'csrfmiddlewaretoken': ''' + str(csrf_token) + ''',
                                     'notification_id': ''' + f'{new_notification.pk}' + ''',
                                 },
                                 success: function(response) {
@@ -215,14 +215,14 @@ class NotificationConsumer(WebsocketConsumer):
                             });
                         });
 
-                        $("#read-notification-''' + f'{new_notification.pk}' + '''").click(function () {
+                        $("#read-notification-''' + str(new_notification.pk) + '''").click(function () {
                             $.ajax({
                                 type: 'POST',
                                 url: '/universal/remove-notification/',
                                 data: {
                                     'receiver': "''' + new_notification.user.user.username +  '''",
                                     'type': "notification-id",
-                                    'csrfmiddlewaretoken': ''' + csrf_token + ''',
+                                    'csrfmiddlewaretoken': ''' + str(csrf_token) + ''',
                                     'notification_id': ''' + f'{new_notification.pk}' + '''
                                 },
                                 success: function(response) {
@@ -267,7 +267,6 @@ class NotificationConsumer(WebsocketConsumer):
                     'type': 'incoming_notification',
                     'html_notification_popup': html_notification_popup,
                     'stored_html_notification': stored_html_notification,
-                    'html_script':script,
                     'notification_id': notification_id,
                     'notification_count': notification_count,
                     'receiver': new_notification.user.user.username
