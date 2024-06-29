@@ -35,11 +35,11 @@ by right clicking on the image and saving it that way.
 
 - Default user profile picture, for reference, this image is 306 X 306 pixels. Save this image as Default_Profile_Picture.png
 
-![Default_Profile_Picture](https://github.com/Lucas-Rechichi/Arabali/assets/157940317/c347a2f3-0ad2-48fb-9b74-1dfbf94766ac)
+![Default_Profile_Picture](https://github.com/Lucas-Rechichi/Arabali/assets/157940317/1c316c1b-f2be-4da3-bf8c-b58d15dca365)
 
 - Default banner image, for reference, this image is 2106 X 494 pixels. Save this image as Default_Banner_Image.png
 
-![Default_Banner_Image](https://github.com/Lucas-Rechichi/Arabali/assets/157940317/e6e7348a-ee75-439f-ad95-acdb13b252ef)
+![Default_Banner_Image](https://github.com/Lucas-Rechichi/Arabali/assets/157940317/74ba9fe1-5900-4fd2-802a-90bb035762cd)
 
 4. Database Migrations
 The way in which you do these commands depends on what machine that you are running. These instructions assume that you know what machine you are using.
