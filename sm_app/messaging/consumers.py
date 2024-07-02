@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 
 from channels.generic.websocket import WebsocketConsumer
+
 from asgiref.sync import async_to_sync
 
 
@@ -32,17 +33,16 @@ class MessageConsumer(WebsocketConsumer):
 
         # Checking to see if this user has been invited to the chatroom.
         if chat_room.users.filter(user=user_stats.user).exists():
+            # Add the user to the channel layer
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name,
+                self.channel_name
+            )
             # Accept the WebSocket connection
             self.accept()
         else:
             # Take action if the user is not on the specific page or is not allowed in the chatroom
             self.close(code=4001)  # Close the connection with a custom error code
-
-        # Add the user to the channel layer
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name,
-            self.channel_name
-        )
 
     def disconnect(self, close_code):
         # Remove the WebSocket from the group
@@ -57,8 +57,12 @@ class MessageConsumer(WebsocketConsumer):
         message = text_data_json['text']
         message_type = text_data_json['message_type']
         message_id = text_data_json['message_id']
+        is_reply = text_data_json['is_reply']
         user = self.scope.get("user")  # Use get to safely get the user who is on the page
-        
+        if is_reply == 'true':
+            reply_id = text_data_json['reply_id']
+        else:
+            reply_id = None
         if user and user.is_authenticated:
             # Send the message to the group
             async_to_sync(self.channel_layer.group_send)(
@@ -68,6 +72,8 @@ class MessageConsumer(WebsocketConsumer):
                     'message_type': message_type,
                     'message': message,
                     'message_id': message_id,
+                    'is_reply': is_reply,
+                    'reply_id': reply_id,
                     'username': user.username,
                 }
             )
@@ -77,6 +83,8 @@ class MessageConsumer(WebsocketConsumer):
         message = event['message']
         message_type = event['message_type']
         message_id = event['message_id']
+        is_reply = event['is_reply']
+        reply_id = event['reply_id']
         username = event['username']
 
         # Getting relevant database objects
@@ -94,15 +102,32 @@ class MessageConsumer(WebsocketConsumer):
             formatted_datetime_capitalized = None  # Ensure this variable is defined
         
         # Sending relevant data over
-        self.send(text_data=json.dumps({
-            'type': 'incoming_message',
-            'message_type': message_type,
-            'message': message,
-            'message_id': message_id,
-            'username': user.username,
-            'sent_at': formatted_datetime_capitalized,
-            'user_pfp_url': user_pfp_url
-        }))
+        if is_reply == 'true':
+            reply_message = Message.objects.get(id=reply_id)
+            self.send(text_data=json.dumps({
+                'type': 'incoming_reply_text_message',
+                'message_type': message_type,
+                'message': message,
+                'message_id': message_id,
+                'is_reply': is_reply,
+                'reply_message': reply_message.text,
+                'reply_message_user': reply_message.sender.user.username,
+                'reply_id': reply_message.pk,
+                'username': user.username,
+                'sent_at': formatted_datetime_capitalized,
+                'user_pfp_url': user_pfp_url
+            }))
+        else:
+            self.send(text_data=json.dumps({
+                'type': 'incoming_text_message',
+                'message_type': message_type,
+                'message': message,
+                'message_id': message_id,
+                'is_reply': is_reply,
+                'username': user.username,
+                'sent_at': formatted_datetime_capitalized,
+                'user_pfp_url': user_pfp_url
+            }))
 
 class NotificationConsumer(WebsocketConsumer):
     connected_users = {}
@@ -120,7 +145,9 @@ class NotificationConsumer(WebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            self.accept() # connect
+            
+        self.accept() # connect
+            
 
     def disconnect(self, close_code):
         self.connected_users.pop(self.channel_name)
@@ -135,7 +162,6 @@ class NotificationConsumer(WebsocketConsumer):
         # getting relevant data over to the consumer class
         text_data_json = json.loads(text_data)
         notification_ids = text_data_json['notification_ids']
-        csrf_token = text_data_json['csrf_token']
 
         # user_on_page_stats = UserStats.objects.get(user=self.scope['user'])
         # if ChatRoom.objects.filter(id=chat_room_id, users=user_on_page_stats).exists():
@@ -144,13 +170,11 @@ class NotificationConsumer(WebsocketConsumer):
             {
                 'type': 'chat_notification',
                 'notification_ids': notification_ids,
-                'csrf_token': csrf_token
             }
         )
 
     def chat_notification(self, event):
         notification_ids = event['notification_ids']
-        csrf_token = event['csrf_token']
         for notification_id in notification_ids:
             notification = Notification.objects.get(id=notification_id)
             if notification.user.user.username == self.connected_users[self.channel_name].username:
@@ -229,5 +253,6 @@ class NotificationConsumer(WebsocketConsumer):
                     'stored_html_notification': stored_html_notification,
                     'notification_id': notification_id,
                     'notification_count': notification_count,
-                    'receiver': new_notification.user.user.username
+                    'receiver': new_notification.user.user.username,
+                    'source_name': new_notification.source.name,
                 }))

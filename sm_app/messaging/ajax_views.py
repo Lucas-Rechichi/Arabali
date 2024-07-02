@@ -13,22 +13,43 @@ def message_sent_text(request):
     chat_room_name = request.POST.get('chat-room-name')
     chat_room_id = request.POST.get('chat-room-id')
     is_reply = request.POST.get('is-reply')
-
+    
+    
     # Getting Relevant Chatroom
     rooms = ChatRoom.objects.filter(name=chat_room_name)
     chat_room = rooms.get(id=chat_room_id)
-
     # Creating the new Message and Saving it to the Database
     if text_message and text_message != '':
-        new_message = Message(sender=user_stats, room=chat_room, text=text_message)
-        new_message.save()
+        if is_reply == 'true':
+            reply_to_id = request.POST.get('replying-to-id')
+            print(reply_to_id)
+            reply_message = Message.objects.get(id=reply_to_id)
+            new_message = Message(sender=user_stats, room=chat_room, text=text_message, reply=reply_message)
+            new_message.save()
+        else:
+            new_message = Message(sender=user_stats, room=chat_room, text=text_message)
+            new_message.save()
 
         receivers = chat_room.users.exclude(user=user_stats.user)
         notification_ids = []
-        for receiver in receivers:
-            new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text, relevant_message=new_message)
-            new_notification.save()
-            notification_ids.append(new_notification.id)
+        if is_reply == 'true':
+            replying_to_id = request.POST.get('replying_to_id')
+            replied_to_message = Message.objects.get(id=replying_to_id)
+            for receiver in receivers:
+                if receiver == replied_to_message.sender:
+                    notification_contents = f'({receiver.user.username} Replied To You): {new_message.text}'
+                    new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                    new_notification.save()
+                    notification_ids.append(new_notification.id)
+                else:
+                    new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text, relevant_message=new_message)
+                    new_notification.save()
+                    notification_ids.append(new_notification.id)
+        else:
+            for receiver in receivers:
+                new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text, relevant_message=new_message)
+                new_notification.save()
+                notification_ids.append(new_notification.id)
 
         # Assuming you want to convert the datetime to a specific timezone
         local_timezone = pytz.timezone("Australia/Sydney")
@@ -37,14 +58,28 @@ def message_sent_text(request):
         formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
         formatted_datetime_capitalized = formatted_datetime.capitalize()
         # Sending JSON responce
-        responce = {
-            'messageType':'text',
-            'message': new_message.text,
-            'message_id': new_message.pk,
-            'message_user_pfp_url': new_message.sender.pfp.url,
-            'creationDate': formatted_datetime_capitalized,
-            'notification_ids': notification_ids,
-        }
+        if is_reply:
+            responce = {
+                'messageType':'text',
+                'is_reply': is_reply,
+                'reply_id':new_message.reply.pk,
+                'message': new_message.text,
+                'message_id': new_message.pk,
+                'message_user_pfp_url': new_message.sender.pfp.url,
+                'creationDate': formatted_datetime_capitalized,
+                'notification_ids': notification_ids,
+            }
+        else:
+            responce = {
+                'messageType':'text',
+                'is_reply': is_reply,
+                'message': new_message.text,
+                'message_id': new_message.pk,
+                'message_user_pfp_url': new_message.sender.pfp.url,
+                'creationDate': formatted_datetime_capitalized,
+                'notification_ids': notification_ids,
+            }
+        is_reply = 'false'
         return JsonResponse(responce)
     else:
         new_message = Message()

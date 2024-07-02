@@ -44,20 +44,23 @@
                             type: 'POST',
                             url: '/universal/remove-notification/',
                             data: {
+                                'receiver': '{{username}}',
                                 'type': 'notification-id',
                                 'csrfmiddlewaretoken': '{{ csrf_token }}',
                                 'notification_id': '{{notification.notification_object.pk}}'
                             },
                             success: function(response) {
-                                console.log(response.message)
+                                console.log(response.notification_count, response.notification_counter)
                                 var notification = $("#notification-{{notification.notification_object.pk}}")
                                 notification.remove();
-                                $('#notification-counter').text(response.notification_counter);
-                                if (response.notification_count == 0) {
-                                    $('#notification-counter').remove();
-                                    $('#bell-icon').removeClass('bi-bell-fill');
-                                    $('#bell-icon').addClass('bi-bell');
-                                }
+                                $('#notification-counter').text('');
+                                $('#notification-counter').text(response.notification_count);
+                                    if (response.notification_count == 0) {
+                                        $('#notification-counter').text(response.notification_count).hide();
+                                        $('#notification-counter').remove();
+                                        $('#bell-icon').removeClass('bi-bell-fill');
+                                        $('#bell-icon').addClass('bi-bell');
+                                    }
                             }
                         })
                     })
@@ -66,6 +69,7 @@
                             type: 'POST',
                             url: '/universal/remove-notification/',
                             data: {
+                                'receiver': '{{username}}',
                                 'type': 'notification-id',
                                 'csrfmiddlewaretoken': '{{ csrf_token }}',
                                 'notification_id': '{{notification.notification_object.pk}}'
@@ -131,70 +135,170 @@
                 {% for message in messages %}
                     <div class="row">
                         <div class="col">
-                            <p class="text-center"><em>{{message.sent_at}}</em></p>
+                            <p id="message-{{message.id}}" class="text-center"><em>{{message.sent_at}}</em></p>
                         </div>
                     </div>
                     <div class="row">
                         {% if message.sender.user.username == username %}
-                            <div class="col-6">
-                            </div>
-                            <div class="col-6">
-                                <div class="row">
-                                    <div class="col-11">
-                                        <p class="d-flex justify-content-end"><strong>You</strong></p>
+                            {% if message.reply != None %}
+                                <div class="col-6">
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-10 d-flex justify-content-end">
+                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                                <div class="card-header" style="border-bottom: none;">
+                                                    <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message.reply.sender}}</p></a>
+                                                    <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            <p id="message-{{message.id}}" class="d-flex justify-content-start"><strong>You</strong></p>
+                                        </div>
                                     </div>
-                                    <div class="col-1">
+                                    <div class="row">
+                                        <div class="col-10 d-flex justify-content-end">
+                                            <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                                <div class="card-header" style="border-bottom: none;">
+                                                    {% if message.text %}
+                                                        <p>{{message.text}}</p>
+                                                    {% elif message.image %}
+                                                        <img src="{{message.image.url}}" alt="">
+                                                    {% else %} 
+                                                        <video src="{{message.video.url}}" controls></video>
+                                                    {% endif %}
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <img src="{{message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-10 d-flex justify-content-end">
-                                        <div class="card pb-0" style="width: fit-content;">
-                                            <div class="card-body">
-                                                {% if message.text %}
-                                                    <p>{{message.text}}</p>
-                                                {% elif message.image %}
-                                                    <img src="{{message.image.url}}" alt="">
-                                                {% else %} 
-                                                    <video src="{{message.video.url}}" controls></video>
-                                                {% endif %}
+                            {% else %}
+                                <div class="col-6">
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-11">
+                                            <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                        </div>
+                                        <div class="col-1">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-10 d-flex justify-content-end">
+                                            <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
+                                                <div class="card-header" style="border-bottom: none;">
+                                                    {% if message.text %}
+                                                        <p>{{message.text}}</p>
+                                                    {% elif message.image %}
+                                                        <img src="{{message.image.url}}" alt="">
+                                                    {% else %} 
+                                                        <video src="{{message.video.url}}" controls></video>
+                                                    {% endif %}
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <img src="{{message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            {% if message.reply != None %}
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="d-flex justify-content-start"><strong>{{message.sender.user.username}}</strong></p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <img src="{{message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                        </div>
+                                        <div class="col-10 d-flex justify-content-start">
+                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                                <div class="card-header" style="border-bottom: none;">
+                                                    <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message.reply.sender}}</p></a>
+                                                    <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-1">
-                                        <img src="{{message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                    </div>
-                                </div>
-                            </div>
-                        {% else %}
-                        <div class="col-6">
-                            <div class="row">
-                                <div class="col-11">
-                                    <p class="d-flex justify-content-start"><strong>{{message.sender.user.username}}</strong></p>
-                                </div>
-                                <div class="col-1">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-1">
-                                    <img src="{{message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
-                                </div>
-                                <div class="col-11">
-                                    <div class="card" style="width: fit-content;">
-                                        <div class="card-body">
-                                            {% if message.text %}
-                                                <p>{{message.text}}</p>
-                                            {% elif message.image %}
-                                                <img src="{{message.image.url}}" alt="">
-                                            {% else %} 
-                                                <video src="{{message.video.url}}" controls></video>
-                                            {% endif %}
+                                    <div class="row">
+                                        <div class="col-2">
+                                        </div>
+                                        <div class="col-10 d-flex justify-content-start">
+                                            <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                                <div class="card-header" style="border-bottom: none;">
+                                                    {% if message.text %}
+                                                        <p>{{message.text}}</p>
+                                                    {% elif message.image %}
+                                                        <img src="{{message.image.url}}" alt="">
+                                                    {% else %} 
+                                                        <video src="{{message.video.url}}" controls></video>
+                                                    {% endif %}
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                        </div>
+                                <div class="col-6">
+                                </div>
+                            {% else %}
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-10">
+                                            <p class="d-flex justify-content-start"><strong>{{message.sender.user.username}}</strong></p>
+                                        </div>
+                                        <div class="col-2">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <img src="{{message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                        </div>
+                                        <div class="col-10">
+                                            <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
+                                                <div class="card-header" style="border-bottom: none;">
+                                                    {% if message.text %}
+                                                        <p>{{message.text}}</p>
+                                                    {% elif message.image %}
+                                                        <img src="{{message.image.url}}" alt="">
+                                                    {% else %} 
+                                                        <video src="{{message.video.url}}" controls></video>
+                                                    {% endif %}
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                 {% endfor %}
@@ -214,7 +318,8 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-10">
+            <div class="col-10" id="message-div">
+                <input type="hidden" id="is-reply" value="false">
                 <input type="text" id="message" class="form-control p-3 " id="exampleInputEmail1" aria-describedby="emailHelp">
             </div>
             <div class="col-1">
@@ -238,6 +343,33 @@
         var reconnectionTime = 5000;
         let messageSocket
         let notificationSocket
+        function setupReply(messageId, username, message) {
+            const isReply = $('#is-reply');
+            const messageDiv = $('#message-div');
+            if (isReply.val() === 'false') {
+                messageDiv.prepend(`
+                    <div class="card mb-2" id="reply-prompt">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="lead">Replying to <strong>${username}</strong>:</p>
+                                </div>
+                                <div id="reply-information-holder" data-message-id="${messageId}"</div>
+                                <div class="col">
+                                    <p class="text-truncate">${message}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+                );
+                isReply.val('true');
+                $('html, body').animate({ scrollTop: $(document).height() }, 'fast');
+            } else {
+                $('#reply-prompt').remove();
+                isReply.val('false');
+            }
+        }
+
         function connectMessageSocket () {
             messageSocket = new WebSocket(
                 'ws://' + window.location.host + '/ws/realtime-message-manager/' + roomId
@@ -246,78 +378,183 @@
             messageSocket.onmessage = function(e) {
                 const data = JSON.parse(e.data);
                 console.log(data);
-                if (data.type === 'incoming_message') {
+                if (data.type === 'incoming_text_message') {
                     if (data.username === '{{username}}') {
                         var newMessageInHtml = `
                             <div class="message">
                                 <div class="row">
                                     <div class="col">
-                                        <p class="text-center"><em>` + data.sent_at + `</em></p>
+                                        <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
                                     </div>
                                 </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    
-                                </div>
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-11">
-                                            <p class="d-flex justify-content-end"><strong>You</strong></p>
-                                        </div>
-                                        <div class="col-1">
-                                        </div>
+                                <div class="row">
+                                    <div class="col-6">
                                     </div>
-                                    <div class="row">
-                                        <div class="col-10 d-flex justify-content-end">
-                                            <div class="card pb-0" style="width: fit-content;">
-                                                <div class="card-body">
-                                                    <p>` + data.message + `</p>
-                                                </div>
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-11">
+                                                <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                            </div>
+                                            <div class="col-1">
                                             </div>
                                         </div>
-                                        <div class="col-1">
-                                            <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                        <div class="row">
+                                            <div class="col-10 d-flex justify-content-end">
+                                                <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        <p>` + data.message + `</p>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id + `" data-message="` + data.message + `" data-message-sender="` + data.username + `""><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1">
+                                                <img src="` + data.user_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>`;
+                            </div>`;
                     } 
                     else {
                         var newMessageInHtml = `
                             <div class="message">
                                 <div class="row">
                                     <div class="col">
-                                        <p class="text-center"><em>` + data.sent_at + `</em></p>
+                                        <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
                                     </div>
                                 </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-1">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-10">
+                                                <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
+                                            </div>
+                                            <div class="col-2">
+                                            </div>
                                         </div>
-                                        <div class="col-11">
-                                            <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-1">
-                                            <img src="`+ data.user_pfp_url +`" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                        <div class="col-10 d-flex justify-content-start">
-                                            <div class="card pb-0" style="width: fit-content;">
-                                                <div class="card-body">
-                                                    <p>` + data.message + `</p>
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <img src="` + data.user_pfp_url + `" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        <p>` + data.message + `</p>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 <div class="col-6">
                                 </div>
-                            </div>
-                        </div>`;
+                            </div>`;
                     }
+                }
+                else if (data.type === 'incoming_reply_text_message') {
+                    if (data.username === '{{username}}') {
+                        var newMessageInHtml = `
+                            <div class="message">
+                                <div class="row">
+                                    <div class="col">
+                                        <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-10 d-flex justify-content-end">
+                                                <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
+                                                        <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small text-truncate m-0">` + data.reply_message + `</p></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-2">
+                                                <p class="d-flex justify-content-start"><strong>You</strong></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-10 d-flex justify-content-end">
+                                                <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        <p>` + data.message + `</p>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1">
+                                                <img src="` + data.user_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else {
+                            var newMessageInHtml = `
+                                <div class="message">
+                                    <div class="row">
+                                        <div class="col">
+                                            <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <img src="` + data.user_pfp_url +`" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                                </div>
+                                                <div class="col-10 d-flex justify-content-start">
+                                                    <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                                        <div class="card-header" style="border-bottom: none;">
+                                                            <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
+                                                            <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small text-truncate m-0">` + data.reply_message + `</p></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-2">
+                                                </div>
+                                                <div class="col-10 d-flex justify-content-start">
+                                                    <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                                        <div class="card-header" style="border-bottom: none;">
+                                                            <p>` + data.message + `</p>
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                        </div>
+                                    </div>
+                                </div>`;
+                        }
                 }
                 $('#conversation-contents').append(newMessageInHtml);
                 var scrollableContent = document.getElementById("conversationFrame");
@@ -348,24 +585,52 @@
                 console.error('WebSocket encountered error:', e);
             }
         }
+
         function connectNotificationSocket () {
             notificationSocket = new WebSocket(
                 'ws://' + window.location.host + '/ws/brordcast-message/'
             );
-            notificationSocket.onopen = function() {
-                
+            notificationSocket.onopen = function(e) {
+                console.log('connected:', e )
             };
 
             notificationSocket.onmessage = function(e) {
                 console.log('got a notification')
-                // var inbox = document.getElementById('inbox');
-                // inbox.insertAdjacentHTML('afterbegin', data.html_notification);
+                const data = JSON.parse(e.data);
+                if (data.source_name !== '{{room.name}}') { // if the notifiation come fron the chat room already accessing.
+                    console.log('different room')
+                    if (data.receiver === '{{username}}') {
+                        console.log('correct user')
+                        $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
+                        $('#notification-inbox').prepend(data.stored_html_notification); // adds HTML to the notification div that houses the notifications in the off-canvas
+                        
+                        // Update notification count
+                        var notificationCounter = $('#notification-counter');
+                        var newCount = parseInt(notificationCounter.text()) || 0;
+                        notificationCounter.text(newCount + 1).show();
+                        
+                        if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
+                            $('#bell-icon').removeClass('bi-bell');
+                            $('#bell-icon').addClass('bi-bell-fill');
+                        }
 
-                // var notificationElement = document.getElementById('notification-' + data.notification_id);
-                // var notification = new bootstrap.Toast(notificationElement);
+                        var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
 
-                // // Show the toast
-                // notification.show();
+                        if (notificationElement) {
+                            var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
+                            // Show the toast
+                            notification.show();
+                        } else {
+                            console.error('Notification element not found:', 'notification-' + data.notification_id);
+                        }
+
+                        // Attach event handlers to the newly added notification
+                        attachNotificationEventHandlers(data.notification_id, data.receiver);
+                    }
+                }
+                
+                // if yes, mute the notification.
+                // if no, display the notification.
             };
 
             notificationSocket.onerror = function(e) {
@@ -378,6 +643,63 @@
 
             };
         }
+        
+        function attachNotificationEventHandlers(notificationId, receiver) { 
+            $(`#close-notification-${notificationId}`).click(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/universal/remove-notification/',
+                    data: {
+                        'receiver': receiver,
+                        'type': 'notification-id',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'notification_id': notificationId,
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+                        var notification = $(`#stored-notification-${notificationId}`);
+                        notification.remove();
+                        var notificationCounter = $('#notification-counter');
+                        var newCount = parseInt(notificationCounter.text()) - 1;
+
+                        if (newCount <= 0) {
+                            notificationCounter.text('').hide();
+                            $('#bell-icon').removeClass('bi-bell-fill').addClass('bi-bell');
+                        } else {
+                            notificationCounter.text(newCount);
+                        }
+                    }
+                });
+            });
+
+            $(`#read-notification-${notificationId}`).click(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/universal/remove-notification/',
+                    data: {
+                        'receiver': receiver,
+                        'type': 'notification-id',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'notification_id': notificationId,
+                    },
+                    success: function(response) {
+                        console.log(response.message);
+                    }
+                });
+            });
+        }
+        $(document).ready(function() {
+            if ('{{ notification_count }}' == '0') {
+                var notification_counter = $('#notification-counter');
+                notification_counter.text('').hide();
+                var notification_bell = $('#bell-icon');
+                notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
+            } else {
+                var notificationCounter = $('#notification-counter');
+                notificationCounter.text('{{ notification_count }}').show();
+                $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
+            }
+        });
         connectMessageSocket();
         connectNotificationSocket();
     </script>
@@ -387,6 +709,16 @@
                 if (e.keyCode == 13 ) {
                     e.preventDefault();
                     var message = $('#message').val()
+                    let isReply
+                    console.log($('#is-reply').val() == 'true')
+                    if ($('#is-reply').val() === 'true') {
+                        isReply = 'true'
+                        replyMessageId = $('#reply-information-holder').data('message-id');
+                    }
+                    else {
+                        replyMessageId = null
+                    }
+                    console.log(isReply)
                     if (message != '') {
                         $.ajax({
                             type: 'POST',
@@ -395,28 +727,48 @@
                                 'chat-room-name': '{{room.name}}',
                                 'chat-room-id': '{{room.id}}',
                                 'text-message': message,
-                                'is-reply': false,
+                                'is-reply': isReply,
+                                'replying-to-id': replyMessageId,
                                 'csrfmiddlewaretoken': '{{ csrf_token }}'
                             },
                             success: function(response) {
                                 console.log('text sent and saved.')
                                 var scrollableContent = document.getElementById("conversationFrame");
                                 scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                                $('#message').val('')
+                                $('#message').val('');
+                                if ($('#reply-prompt')) {
+                                    $('#reply-prompt').remove();
+                                }
                                 console.log(response.notification_ids)
                                 notificationSocket.send(JSON.stringify({
                                     'notification_ids': response.notification_ids,
                                     'csrf_token': '{{csrf_token}}',
                                 }));
-                                messageSocket.send(JSON.stringify({
-                                    'text': message,
-                                    'message_type': 'text',
-                                    'message_id': response.message_id,
-                                    'chat_room_id': '{{ room.id }}',
-                                    'current_url': encodeURIComponent(window.location.href),
-                                    'sender': '{{username}}',
-                                    'csrf_token': '{{csrf_token}}',
-                                }));
+                                if (response.is_reply === 'true') {
+                                    var replyId = response.reply_id;
+                                    messageSocket.send(JSON.stringify({
+                                        'text': message,
+                                        'message_type': 'text',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                        'reply_id': replyId,
+                                        'chat_room_id': '{{ room.id }}',
+                                        'current_url': encodeURIComponent(window.location.href),
+                                        'sender': '{{username}}',
+                                        'csrf_token': '{{csrf_token}}',
+                                    }));
+                                } else {
+                                    messageSocket.send(JSON.stringify({
+                                        'text': message,
+                                        'message_type': 'text',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                        'chat_room_id': '{{ room.id }}',
+                                        'current_url': encodeURIComponent(window.location.href),
+                                        'sender': '{{username}}',
+                                        'csrf_token': '{{csrf_token}}',
+                                    }));
+                                }
                             }
                         });
                     }
@@ -427,6 +779,16 @@
             })
             $('#send').click(function () {
                 var message = $('#message').val()
+                let isReply
+                console.log($('#is-reply').val() == 'true')
+                if ($('#is-reply').val() === 'true') {
+                    isReply = 'true'
+                    replyMessageId = $('#reply-information-holder').data('message-id');
+                }
+                else {
+                    replyMessageId = null
+                }
+                console.log(replyMessageId, is)
                 if (message != '') {
                     $.ajax({
                         type: 'POST',
@@ -435,28 +797,47 @@
                             'chat-room-name': '{{room.name}}',
                             'chat-room-id': '{{room.id}}',
                             'text-message': message,
-                            'is-reply': false,
+                            'is-reply': isReply,
+                            'replying-to-id': replyMessageId,
                             'csrfmiddlewaretoken': '{{ csrf_token }}'
                         },
                         success: function(response) {
                             console.log('text sent and saved.')
                             var scrollableContent = document.getElementById("conversationFrame");
                             scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                            $('#message').val('')
+                            $('#message').val('');
+                            if ($('#reply-prompt')) {
+                                $('#reply-prompt').remove();
+                            }
                             console.log(response.notification_ids)
                             notificationSocket.send(JSON.stringify({
                                 'notification_ids': response.notification_ids,
-                                'csrf_token': '{{csrf_token}}',
                             }));
-                            messageSocket.send(JSON.stringify({
-                                'text': message,
-                                'message_type': 'text',
-                                'message_id': response.message_id,
-                                'chat_room_id': '{{ room.id }}',
-                                'current_url': encodeURIComponent(window.location.href),
-                                'sender': '{{username}}',
-                                'csrf_token': '{{csrf_token}}',
-                            }));
+                            if (response.is_reply === 'true') {
+                                var replyId = response.reply_id;
+                                messageSocket.send(JSON.stringify({
+                                    'text': message,
+                                    'message_type': 'text',
+                                    'message_id': response.message_id,
+                                    'is_reply': response.is_reply,
+                                    'reply_id': replyId,
+                                    'chat_room_id': '{{ room.id }}',
+                                    'current_url': encodeURIComponent(window.location.href),
+                                    'sender': '{{username}}',
+                                    'csrf_token': '{{csrf_token}}',
+                                }));
+                            } else {
+                                messageSocket.send(JSON.stringify({
+                                    'text': message,
+                                    'message_type': 'text',
+                                    'message_id': response.message_id,
+                                    'is_reply': response.is_reply,
+                                    'chat_room_id': '{{ room.id }}',
+                                    'current_url': encodeURIComponent(window.location.href),
+                                    'sender': '{{username}}',
+                                    'csrf_token': '{{csrf_token}}',
+                                }));
+                            }
                         }
                     });
                 }
@@ -464,6 +845,13 @@
                         console.log('invalid message')
                     }
             });
+            $('#conversation-contents').on('click', '.reply', function () {
+                messageId = $(this).data('message-id');
+                senderUsername = $(this).data('message-sender');
+                message = $(this).data('message');
+                setupReply(messageId, senderUsername, message);
+            })
+
         });
     </script>
 </div>
@@ -471,15 +859,4 @@
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 
 </div>
-{% if notification_count == 0 %}
-    <script type="text/javascript">
-        $(document).ready(function () {
-            var notification_counter = $('#notification-counter');
-            notification_counter.text('{{notification_count}}').hide();
-            var notification_bell = $('#bell-icon');
-            notification_bell.removeClass('bi-bell-fill');
-            notification_bell.addClass('bi-bell');
-        })
-    </script>
-{% endif %}
 {% endblock %}
