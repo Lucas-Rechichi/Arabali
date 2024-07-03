@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Notification
-from messaging.models import Message
+from messaging.models import Message, ChatRoom
 from django.core.exceptions import ObjectDoesNotExist
 from main.algorithum import Algorithum
 
@@ -367,15 +367,21 @@ def remove_notification(request):
             notification_id = request.POST.get('notification_id')
             notification = Notification.objects.get(id=notification_id)
         else:
-            print(receiver_userstats.user)
             message_id = request.POST.get('message-id')
             message = Message.objects.get(id=message_id)
             notification = Notification.objects.get(relevant_message=message, user=receiver_userstats)
             notification_id = notification.pk
+        relevant_chatroom = ChatRoom.objects.get(id=notification.source.pk)
         notification.delete()
         notification_count = Notification.objects.filter(user=receiver_userstats).count()
-        return JsonResponse({'message': f'Notification; {notification} has been removed', 'notification_count': notification_count, 'notification_id': notification_id})
+        response = {
+            'message': f'Notification; {notification} has been removed',
+            'notification_count': notification_count,
+            'notification_id': notification_id,
+            'notification_chatroom_name': relevant_chatroom.name,
+            'notification_chatroom_id': relevant_chatroom.pk,
+        }
+        return JsonResponse({response})
     except:
-        print('error')
         return JsonResponse({})
     

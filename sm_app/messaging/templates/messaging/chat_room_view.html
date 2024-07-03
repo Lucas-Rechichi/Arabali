@@ -14,10 +14,10 @@
         {% for notification in notifications.values %}
             <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                 <div class="card-header">
-                    <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification-{{notification.notification_object.pk}}">
+                    <button class="btn p-0" id="read-notification-{{notification.notification_object.pk}}">
                         <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
                     </button>
-                    <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification-{{notification.notification_object.pk}}">
+                    <button class="btn p-0 pe-2" id="read-notification-{{notification.notification_object.pk}}">
                         <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
                     </button>
                     <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
@@ -76,6 +76,9 @@
                             },
                             success: function(response) {
                                 console.log(response.message)
+                                var domain = window.location.origin;
+                                var path = '/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'
+                                window.location.href = domain + path
                             }
                         })
                     })
@@ -344,9 +347,10 @@
         let messageSocket
         let notificationSocket
         function setupReply(messageId, username, message) {
-            const isReply = $('#is-reply');
+            const isReply = $('#is-reply'); // hidden input field where the message textfield is. tells us if a reply is being made or not.
             const messageDiv = $('#message-div');
-            if (isReply.val() === 'false') {
+            if (isReply.val() === 'false') { // if the reply prompt dosent already exist
+                // show the reply prompt on the user's screen
                 messageDiv.prepend(`
                     <div class="card mb-2" id="reply-prompt">
                         <div class="card-header">
@@ -362,11 +366,11 @@
                         </div>
                     </div>`
                 );
-                isReply.val('true');
-                $('html, body').animate({ scrollTop: $(document).height() }, 'fast');
+                isReply.val('true'); // set the reply value to true, indicating that a reply is being made.
+                $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
             } else {
-                $('#reply-prompt').remove();
-                isReply.val('false');
+                $('#reply-prompt').remove(); // removed created HTML
+                isReply.val('false'); // set the reply value to false, indicating that a reply is not being made.
             }
         }
 
@@ -378,8 +382,8 @@
             messageSocket.onmessage = function(e) {
                 const data = JSON.parse(e.data);
                 console.log(data);
-                if (data.type === 'incoming_text_message') {
-                    if (data.username === '{{username}}') {
+                if (data.type === 'incoming_text_message') { // if the message wasn't a reply
+                    if (data.username === '{{username}}') { 
                         var newMessageInHtml = `
                             <div class="message">
                                 <div class="row">
@@ -684,6 +688,9 @@
                     },
                     success: function(response) {
                         console.log(response.message);
+                        var domain = window.location.origin;
+                        var path = `/chat/${response.notification_chatroom_name}/${response.notification_chatroom_id}`
+                        window.location.href = domain + path
                     }
                 });
             });
@@ -716,6 +723,7 @@
                         replyMessageId = $('#reply-information-holder').data('message-id');
                     }
                     else {
+                        isReply = 'false'
                         replyMessageId = null
                     }
                     console.log(isReply)
@@ -778,17 +786,16 @@
                 }
             })
             $('#send').click(function () {
-                var message = $('#message').val()
-                let isReply
-                console.log($('#is-reply').val() == 'true')
-                if ($('#is-reply').val() === 'true') {
-                    isReply = 'true'
-                    replyMessageId = $('#reply-information-holder').data('message-id');
+                var message = $('#message').val() // get the message
+                let isReply // initalization of the isReply variable
+                if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                    isReply = 'true' 
+                    replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
                 }
                 else {
+                    isReply = 'false'
                     replyMessageId = null
                 }
-                console.log(replyMessageId, is)
                 if (message != '') {
                     $.ajax({
                         type: 'POST',
@@ -802,18 +809,16 @@
                             'csrfmiddlewaretoken': '{{ csrf_token }}'
                         },
                         success: function(response) {
-                            console.log('text sent and saved.')
                             var scrollableContent = document.getElementById("conversationFrame");
                             scrollableContent.scrollTop = scrollableContent.scrollHeight;
                             $('#message').val('');
-                            if ($('#reply-prompt')) {
-                                $('#reply-prompt').remove();
+                            if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                                $('#reply-prompt').remove(); 
                             }
-                            console.log(response.notification_ids)
                             notificationSocket.send(JSON.stringify({
                                 'notification_ids': response.notification_ids,
                             }));
-                            if (response.is_reply === 'true') {
+                            if (response.is_reply === 'true') { // Send over specific data for the case of a reply.
                                 var replyId = response.reply_id;
                                 messageSocket.send(JSON.stringify({
                                     'text': message,
@@ -845,11 +850,12 @@
                         console.log('invalid message')
                     }
             });
-            $('#conversation-contents').on('click', '.reply', function () {
+            $('#conversation-contents').on('click', '.reply', function () { // when the reply button is pressed
+                // Get relevant data stored inside of the button's data attributes
                 messageId = $(this).data('message-id');
                 senderUsername = $(this).data('message-sender');
                 message = $(this).data('message');
-                setupReply(messageId, senderUsername, message);
+                setupReply(messageId, senderUsername, message); // call the setupReply function and pass useful information though.
             })
 
         });

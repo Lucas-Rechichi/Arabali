@@ -133,11 +133,14 @@ class NotificationConsumer(WebsocketConsumer):
     connected_users = {}
 
     def connect(self):
-        user = self.scope["user"] # gets user acessing the consumer class
-        user_stats = UserStats.objects.get(user=user)
-        self.connected_users[self.channel_name] = user_stats.user
-        chat_rooms = ChatRoom.objects.filter(users = user_stats) # gets all chatrooms that the user is invited in
         self.room_group_names = [] # keeps track of all of the chatrooms that will be connected to
+
+        user = self.scope["user"] # gets user acessing the consumer class
+
+        user_stats = UserStats.objects.get(user=user)
+        chat_rooms = ChatRoom.objects.filter(users=user_stats) # gets all chatrooms that the user is invited in
+        self.connected_users[self.channel_name] = user_stats.user
+
         for chat_room in chat_rooms:  
             self.room_group_name = f'notification-stream-{chat_room.pk}' # name is unique to the chatroom's id
             self.room_group_names.append(self.room_group_name)

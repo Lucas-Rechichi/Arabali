@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from main.models import UserStats, Notification
 from messaging.models import ChatRoom, Message
+
 def message_sent_text(request):
     # Get Relevant User
     user = request.user
@@ -13,18 +14,20 @@ def message_sent_text(request):
     chat_room_name = request.POST.get('chat-room-name')
     chat_room_id = request.POST.get('chat-room-id')
     is_reply = request.POST.get('is-reply')
-    
-    
+    is_text = None
+    is_image = None
+    is_video = None
+
     # Getting Relevant Chatroom
     rooms = ChatRoom.objects.filter(name=chat_room_name)
     chat_room = rooms.get(id=chat_room_id)
+
     # Creating the new Message and Saving it to the Database
     if text_message and text_message != '':
-        if is_reply == 'true':
-            reply_to_id = request.POST.get('replying-to-id')
-            print(reply_to_id)
-            reply_message = Message.objects.get(id=reply_to_id)
-            new_message = Message(sender=user_stats, room=chat_room, text=text_message, reply=reply_message)
+        if is_reply == 'true': # if the message is a reply
+            reply_to_id = request.POST.get('replying-to-id') # get the id of the message being replied to
+            reply_message = Message.objects.get(id=reply_to_id) # get the replied message
+            new_message = Message(sender=user_stats, room=chat_room, text=text_message, reply=reply_message) # add in the reply into a new message object
             new_message.save()
         else:
             new_message = Message(sender=user_stats, room=chat_room, text=text_message)
@@ -32,12 +35,10 @@ def message_sent_text(request):
 
         receivers = chat_room.users.exclude(user=user_stats.user)
         notification_ids = []
-        if is_reply == 'true':
-            replying_to_id = request.POST.get('replying_to_id')
-            replied_to_message = Message.objects.get(id=replying_to_id)
+        if is_reply == 'true':  # if the message is a reply
             for receiver in receivers:
-                if receiver == replied_to_message.sender:
-                    notification_contents = f'({receiver.user.username} Replied To You): {new_message.text}'
+                if receiver == reply_message.sender: # if the person being replied to happends to be the user that sent the message being replied to.
+                    notification_contents = f'({receiver.user.username} Replied To You): {new_message.text}' # special message for the user who created the message being replied to.
                     new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=notification_contents, relevant_message=new_message)
                     new_notification.save()
                     notification_ids.append(new_notification.id)
@@ -51,14 +52,15 @@ def message_sent_text(request):
                 new_notification.save()
                 notification_ids.append(new_notification.id)
 
-        # Assuming you want to convert the datetime to a specific timezone
+        # Reformatting of the timezone
         local_timezone = pytz.timezone("Australia/Sydney")
         local_datetime = new_message.sent_at.astimezone(local_timezone)
         
         formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
         formatted_datetime_capitalized = formatted_datetime.capitalize()
+
         # Sending JSON responce
-        if is_reply:
+        if is_reply == 'true': # Send over specific data over for a reply message
             responce = {
                 'messageType':'text',
                 'is_reply': is_reply,
