@@ -245,7 +245,7 @@
                                         <div class="col-2">
                                         </div>
                                         <div class="col-10 d-flex justify-content-start">
-                                            <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                            <div class="card pb-0" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message.text %}
                                                         <p>{{message.text}}</p>
@@ -256,7 +256,7 @@
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
-                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -280,7 +280,7 @@
                                             <img src="{{message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                         </div>
                                         <div class="col-10">
-                                            <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
+                                            <div class="card" style="width: fit-content; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message.text %}
                                                         <p>{{message.text}}</p>
@@ -291,7 +291,7 @@
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
-                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                            <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -313,8 +313,8 @@
         {% csrf_token %}
         <div class="row">
             <div class="col-1">
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-square" style="font-size:  3vw;"></i></button>
                 <div class="btn-group dropup">
-                    <button type="button" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-square" style="font-size:  3vw;"></i></button>
                     <ul class="dropdown-menu p-2 mb-1">
                         <button class="btn" id="init-image" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-images"></i></div> Image</li></button>
                         <button class="btn" id="init-video" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-play-btn"></i></i></div> Video</li></button>
@@ -325,7 +325,7 @@
                 <input type="hidden" id="is-reply" value="false">
                 <input type="hidden" id="is-image" value="false">
                 <input type="hidden" id="is-video" value="false">
-                <input type="text" id="message" class="form-control p-3 " id="exampleInputEmail1" aria-describedby="emailHelp">
+                <input type="text" id="message" class="form-control pb-3 p-4">
             </div>
             <div class="col-1">
                 <div class="card">
@@ -351,68 +351,65 @@
         function setupReply(messageId, username, message) {
             const isReply = $('#is-reply'); // hidden input field where the message textfield is. tells us if a reply is being made or not.
             const isImage = $('#is-image');
+            const isVideo = $('#is-video');
             const messageDiv = $('#message-div');
-            if (isReply.val() === 'false') { // if the reply prompt dosent already exist
-                if (isImage.val() === 'false') {
-                    // show the reply prompt on the user's screen
-                    messageDiv.append(`
-                        <div class="card mt-1" id="reply-prompt">
-                            <div class="card-header">
-                                <div class="row">
-                                    <div class="col">
-                                        <p class="lead">Replying to <strong>${username}</strong>:</p>
-                                    </div>
-                                    <div id="reply-information-holder" data-message-id="${messageId}"</div>
-                                    <div class="col">
-                                        <p class="text-truncate">${message}</p>
-                                    </div>
-                                </div>
+
+            const replyPromptHtml = `
+                <div class="card mt-1" id="reply-prompt" style="border: none;">
+                    <div class="card-header" style="border-bottom: none;">
+                        <div class="row">
+                            <div class="col">
+                                <p class="lead">Replying to <strong>${username}</strong>:</p>
                             </div>
-                        </div>`
-                    );
-                    isReply.val('true'); // set the reply value to true, indicating that a reply is being made.
-                    $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
-                } else {
-                    var imageInput = $('#image-prompt').detach();
-                    var imageInputHtml = imageInput.prop('outerHTML');
-                    var replyInputHtml = `
-                        <div class="card mt-1" id="reply-prompt">
-                            <div class="card-header">
-                                <div class="row">
-                                    <div class="col">
-                                        <p class="lead">Replying to <strong>${username}</strong>:</p>
-                                    </div>
-                                    <div id="reply-information-holder" data-message-id="${messageId}"</div>
-                                    <div class="col">
-                                        <p class="text-truncate">${message}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>`
-                    messageDiv.append(`
-                        <div class="row" id='multi-input-wrapper'>
-                            <div class="col-6">
-                                ` + replyInputHtml + `
-                            </div>
-                            <div class="col-6">
-                                ` + imageInputHtml + `
+                            <div id="reply-information-holder" data-message-id="${messageId}"></div>
+                            <div class="col">
+                                <p class="text-truncate">${message}</p>
                             </div>
                         </div>
-                    `)
-                    isReply.val('true'); // set the reply value to true, indicating that a reply is being made.
-                    $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
+                    </div>
+                </div>`;
+
+            if (isReply.val() === 'false') { // if the reply prompt doesn't already exist
+                if (isImage.val() === 'false') {
+                    // Show the reply prompt on the user's screen
+                    messageDiv.append(replyPromptHtml);
+                    isReply.val('true'); // Set the reply value to true, indicating that a reply is being made.
+                    $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // Animation for better GUI
+                } else {
+                    if (isVideo.val() === 'false') {
+                        var mediaInput = $('#image-prompt').detach();
+                    } else {
+                        var mediaInput = $('#video-prompt').detatch();
+                    }
+                    var mediaInputHtml = mediaInput.prop('outerHTML');
+                    messageDiv.append(`
+                            <div class="row" id="multi-input-wrapper">
+                                <div class="col-6">
+                                    ${replyPromptHtml}
+                                </div>
+                                <div class="col-6">
+                                    ${mediaInputHtml}
+                                </div>
+                            </div>
+                        `);
+                    isReply.val('true'); // Set the reply value to true, indicating that a reply is being made.
+                    $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // Animation for better GUI
                 }
             } else {
                 if (isImage.val() === 'false') {
-                    $('#reply-prompt').remove(); // removed created HTML
-                    isReply.val('false'); // set the reply value to false, indicating that a reply is not being made.
+                    $('#reply-prompt').remove(); // Remove created HTML
+                    isReply.val('false'); // Set the reply value to false, indicating that a reply is not being made.
                 } else {
-                    var imageInput = $('#image-prompt').detach();
-                    var imageInputHtml = imageInput.prop('outerHTML');
+                    if (isVideo.val() === 'false') {
+                        var mediaInput = $('#image-prompt').detach();
+                    } else {
+                        var mediaInput = $('#video-input').detach();
+                    }
+                    var mediaInputHtml = mediaInput.prop('outerHTML');
                     $('#multi-input-wrapper').remove();
                     $('#reply-prompt').remove();
-                    messageDiv.append(imageInputHtml);
-                    isReply.val('true');
+                    messageDiv.append(mediaInputHtml);
+                    isReply.val('false');
                 }
             }
         }
@@ -488,12 +485,12 @@
                                                 <img src="` + data.user_pfp_url + `" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                             </div>
                                             <div class="col-10">
-                                                <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
+                                                <div class="card" style="width: fit-content; border: none; opacity: 85%;">
                                                     <div class="card-header" style="border-bottom: none;">
                                                         <p>` + data.message + `</p>
                                                         <div class="row">
                                                             <div class="col">
-                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -584,12 +581,12 @@
                                                 <div class="col-2">
                                                 </div>
                                                 <div class="col-10 d-flex justify-content-start">
-                                                    <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                                    <div class="card pb-0" style="width: 85%; border: none; opacity: 85%;">
                                                         <div class="card-header" style="border-bottom: none;">
                                                             <p>` + data.message + `</p>
                                                             <div class="row">
                                                                 <div class="col">
-                                                                    <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                                    <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply"></i></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -829,69 +826,73 @@
                 }
             })
             $('#send').click(function () {
-                var message = $('#message').val() // get the message
+                // split this into 3 cases: text, image, and video messages
                 let isReply // initalization of the isReply variable
-                if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
-                    isReply = 'true' 
-                    replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
-                }
-                else {
-                    isReply = 'false'
-                    replyMessageId = null
-                }
-                if (message != '') {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/chat/message-sent-text/',
-                        data: {
-                            'chat-room-name': '{{room.name}}',
-                            'chat-room-id': '{{room.id}}',
-                            'text-message': message,
-                            'is-reply': isReply,
-                            'replying-to-id': replyMessageId,
-                            'csrfmiddlewaretoken': '{{ csrf_token }}'
-                        },
-                        success: function(response) {
-                            var scrollableContent = document.getElementById("conversationFrame");
-                            scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                            $('#message').val('');
-                            if ($('#reply-prompt')) { // remove reply prompt if the user was replying
-                                $('#reply-prompt').remove(); 
-                            }
-                            notificationSocket.send(JSON.stringify({
-                                'notification_ids': response.notification_ids,
-                            }));
-                            if (response.is_reply === 'true') { // Send over specific data for the case of a reply.
-                                var replyId = response.reply_id;
-                                messageSocket.send(JSON.stringify({
-                                    'text': message,
-                                    'message_type': 'text',
-                                    'message_id': response.message_id,
-                                    'is_reply': response.is_reply,
-                                    'reply_id': replyId,
-                                    'chat_room_id': '{{ room.id }}',
-                                    'current_url': encodeURIComponent(window.location.href),
-                                    'sender': '{{username}}',
-                                    'csrf_token': '{{csrf_token}}',
-                                }));
-                            } else {
-                                messageSocket.send(JSON.stringify({
-                                    'text': message,
-                                    'message_type': 'text',
-                                    'message_id': response.message_id,
-                                    'is_reply': response.is_reply,
-                                    'chat_room_id': '{{ room.id }}',
-                                    'current_url': encodeURIComponent(window.location.href),
-                                    'sender': '{{username}}',
-                                    'csrf_token': '{{csrf_token}}',
-                                }));
-                            }
-                        }
-                    });
-                }
-                else {
-                        console.log('invalid message')
+                // for text
+                if ($('#message')) {
+                    var message = $('#message').val() // get the message
+                    if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                        isReply = 'true' 
+                        replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
                     }
+                    else {
+                        isReply = 'false'
+                        replyMessageId = null
+                    }
+                    if (message != '') {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/chat/message-sent-text/',
+                            data: {
+                                'chat-room-name': '{{room.name}}',
+                                'chat-room-id': '{{room.id}}',
+                                'text-message': message,
+                                'is-reply': isReply,
+                                'replying-to-id': replyMessageId,
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                                var scrollableContent = document.getElementById("conversationFrame");
+                                scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                                $('#message').val('');
+                                if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                                    $('#reply-prompt').remove(); 
+                                }
+                                notificationSocket.send(JSON.stringify({
+                                    'notification_ids': response.notification_ids,
+                                }));
+                                if (response.is_reply === 'true') { // Send over specific data for the case of a reply.
+                                    var replyId = response.reply_id;
+                                    messageSocket.send(JSON.stringify({
+                                        'text': message,
+                                        'message_type': 'text',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                        'reply_id': replyId,
+                                        'chat_room_id': '{{ room.id }}',
+                                        'current_url': encodeURIComponent(window.location.href),
+                                        'sender': '{{username}}',
+                                        'csrf_token': '{{csrf_token}}',
+                                    }));
+                                } else {
+                                    messageSocket.send(JSON.stringify({
+                                        'text': message,
+                                        'message_type': 'text',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                        'chat_room_id': '{{ room.id }}',
+                                        'current_url': encodeURIComponent(window.location.href),
+                                        'sender': '{{username}}',
+                                        'csrf_token': '{{csrf_token}}',
+                                    }));
+                                }
+                            }
+                        })
+                    }
+                }
+                // for image
+                        
+                // for video
             });
             $('#conversation-contents').on('click', '.reply', function () { // when the reply button is pressed
                 // Get relevant data stored inside of the button's data attributes
@@ -903,12 +904,20 @@
             $('#init-image').click(function () {
                 const messageDiv = $('#message-div');
                 const isImage = $('#is-image');
+                const isVideo = $('#is-video');
                 const isReply = $('#is-reply');
+                const messageTextBox = $('#message');
+                const messageInputHtml = `<input type="text" id="message" class="form-control pb-3 p-4">`
                 if (isImage.val() === 'false') {
                     if (isReply.val() === 'false') {
+                        if (isVideo.val() === 'true') {
+                            $('#video-prompt').remove();
+                            isVideo.val('false');
+                        }
+                        messageTextBox.remove();
                         messageDiv.append(`
-                            <div class="card mt-1" id="image-prompt">
-                                <div class="card-header pb-4">
+                            <div class="card mt-1" id="image-prompt" style="border: none;">
+                                <div class="card-header pb-4" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col">
                                             <label for="image-file-field" class="form-label">Place image here</label>
@@ -921,11 +930,16 @@
                         isImage.val('true');
                         $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
                     } else {
+                        if (isVideo.val() === 'true') {
+                            $('#video-prompt').remove();
+                            isVideo.val('false');
+                        }
+                        messageTextBox.remove();
                         var replyInput = $('#reply-prompt').detach();
                         var replyInputHtml = replyInput.prop('outerHTML');
                         var imageInputHtml = `
-                            <div class="card mt-1" id="image-prompt">
-                                <div class="card-header pb-4">
+                            <div class="card mt-1" id="image-prompt" style="border: none;">
+                                <div class="card-header pb-4" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col">
                                             <label for="image-file-field" class="form-label">Place image here</label>
@@ -951,19 +965,95 @@
                 } else {
                     if (isReply.val() === 'false') {
                         $('#image-prompt').remove();
+                        messageDiv.append(messageInputHtml)
                         isImage.val('false');
                     } else {
                         var replyInput = $('#reply-prompt').detach();
                         var replyInputHtml = replyInput.prop('outerHTML');
                         $('#multi-input-wrapper').remove();
                         $('#image-prompt').remove();
+                        messageDiv.append(messageInputHtml)
                         messageDiv.append(replyInputHtml);
                         isImage.val('false');
                     }
                 }
             })
             $('#init-video').click(function () {
-                
+                const messageDiv = $('#message-div');
+                const isImage = $('#is-image');
+                const isVideo = $('#is-video');
+                const isReply = $('#is-reply');
+                const messageTextBox = $('#message');
+                const messageInputHtml = `<input type="text" id="message" class="form-control pb-3 p-4">`
+                if (isVideo.val() === 'false') {
+                    if (isReply.val() === 'false') {
+                        if (isImage.val() === 'true') {
+                            $('#image-prompt').remove();
+                            isImage.val('false');
+                        }
+                        messageTextBox.remove();
+                        messageDiv.append(`
+                            <div class="card mt-1" id="video-prompt" style="border: none;">
+                                <div class="card-header pb-4" style="border-bottom: none;">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="video-file-field" class="form-label">Place video here</label>
+                                            <input class="form-control" type="file" id="video-file-field">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `)
+                        isVideo.val('true');
+                        $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
+                    } else {
+                        if (isImage.val() === 'true') {
+                            $('#image-prompt').remove();
+                            isImage.val('false');
+                        }
+                        messageTextBox.remove();
+                        var replyInput = $('#reply-prompt').detach();
+                        var replyInputHtml = replyInput.prop('outerHTML');
+                        var videoInputHtml = `
+                            <div class="card mt-1" id="video-prompt" style="border: none;">
+                                <div class="card-header pb-4" style="border-bottom: none;">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="video-file-field" class="form-label">Place video here</label>
+                                            <input class="form-control" type="file" id="video-file-field">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                        messageDiv.append(`
+                            <div class="row" id='multi-input-wrapper'>
+                                <div class="col-6">
+                                    ` + replyInputHtml + `
+                                </div>
+                                <div class="col-6">
+                                    ` + videoInputHtml + `
+                                </div>
+                            </div>
+                        `)
+                        isVideo.val('true');
+                        $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
+                    }
+                } else {
+                    if (isReply.val() === 'false') {
+                        $('#video-prompt').remove();
+                        messageDiv.append(messageInputHtml);
+                        isVideo.val('false');
+                    } else {
+                        var replyInput = $('#reply-prompt').detach();
+                        var replyInputHtml = replyInput.prop('outerHTML');
+                        $('#multi-input-wrapper').remove();
+                        $('#video-prompt').remove();
+                        messageDiv.append(messageInputHtml);
+                        messageDiv.append(replyInputHtml);
+                        isVideo.val('false');
+                    }
+                }
             })
         });
     </script>
