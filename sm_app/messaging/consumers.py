@@ -54,15 +54,32 @@ class MessageConsumer(WebsocketConsumer):
     def receive(self, text_data):
         # Accessing sent data
         text_data_json = json.loads(text_data)
-        message = text_data_json['text']
+        user = self.scope.get("user")  # Use get to safely get the user who is on the page
+
+        # Getting universal data across all 3 message types
         message_type = text_data_json['message_type']
         message_id = text_data_json['message_id']
         is_reply = text_data_json['is_reply']
-        user = self.scope.get("user")  # Use get to safely get the user who is on the page
+
+        message = Message.objects.get(id=message_id)
+
+        # Getting specific data for message types
+        if message_type == 'text':
+            content = message.text
+        elif message_type == 'image':
+            content = message.image.url
+        elif message_type == 'video':
+            content = message.video.url
+        else:
+            print('invalid message type')
+        
+        # Getting unique data for a reply message
         if is_reply == 'true':
             reply_id = text_data_json['reply_id']
         else:
             reply_id = None
+        
+
         if user and user.is_authenticated:
             # Send the message to the group
             async_to_sync(self.channel_layer.group_send)(
@@ -70,7 +87,7 @@ class MessageConsumer(WebsocketConsumer):
                 {
                     'type': 'chat_message',
                     'message_type': message_type,
-                    'message': message,
+                    'content': content,
                     'message_id': message_id,
                     'is_reply': is_reply,
                     'reply_id': reply_id,
@@ -80,7 +97,7 @@ class MessageConsumer(WebsocketConsumer):
     
     def chat_message(self, event):
         # Accessing sent data
-        message = event['message']
+        content = event['content']
         message_type = event['message_type']
         message_id = event['message_id']
         is_reply = event['is_reply']
@@ -91,43 +108,104 @@ class MessageConsumer(WebsocketConsumer):
         user = User.objects.get(username=username)
         user_stats = UserStats.objects.get(user=user)
         user_pfp_url = user_stats.pfp.url
-        if message_type == 'text':
-            # Formatting of the timezone when message is displayed on the screen
-            local_timezone = pytz.timezone("Australia/Sydney")
-            local_datetime = Message.objects.latest('sent_at').sent_at.astimezone(local_timezone)
-    
-            formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
-            formatted_datetime_capitalized = formatted_datetime.capitalize()
-        else:
-            formatted_datetime_capitalized = None  # Ensure this variable is defined
+        
+        # Formatting of the timezone when message is displayed on the screen
+        local_timezone = pytz.timezone("Australia/Sydney")
+        local_datetime = Message.objects.latest('sent_at').sent_at.astimezone(local_timezone)
+        formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
+        formatted_datetime_capitalized = formatted_datetime.capitalize()
         
         # Sending relevant data over
-        if is_reply == 'true':
-            reply_message = Message.objects.get(id=reply_id)
-            self.send(text_data=json.dumps({
-                'type': 'incoming_reply_text_message',
-                'message_type': message_type,
-                'message': message,
-                'message_id': message_id,
-                'is_reply': is_reply,
-                'reply_message': reply_message.text,
-                'reply_message_user': reply_message.sender.user.username,
-                'reply_id': reply_message.pk,
-                'username': user.username,
-                'sent_at': formatted_datetime_capitalized,
-                'user_pfp_url': user_pfp_url
-            }))
-        else:
-            self.send(text_data=json.dumps({
-                'type': 'incoming_text_message',
-                'message_type': message_type,
-                'message': message,
-                'message_id': message_id,
-                'is_reply': is_reply,
-                'username': user.username,
-                'sent_at': formatted_datetime_capitalized,
-                'user_pfp_url': user_pfp_url
-            }))
+        if message_type == 'text':
+            content_html = f'<p>{content}</p>'
+            if is_reply == 'true':
+                reply_message = Message.objects.get(id=reply_id)
+                reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{content}</p></a>'
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_reply_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'reply_message': reply_message.text,
+                    'reply_message_user': reply_message.sender.user.username,
+                    'reply_id': reply_message.pk,
+                    'reply_html': reply_html,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
+            else:
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
+        elif message_type == 'image':
+            content_html = f'<img src="{content}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">'
+            if is_reply == 'true':
+                reply_message = Message.objects.get(id=reply_id)
+                reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">Image</p></a>'
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_reply_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'reply_message': reply_message.text,
+                    'reply_message_user': reply_message.sender.user.username,
+                    'reply_id': reply_message.pk,
+                    'reply_html': reply_html,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
+            else:
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
+        elif message_type == 'video':
+            content_html = f'<video src="{content}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>'
+            if is_reply == 'true':
+                reply_message = Message.objects.get(id=reply_id)
+                reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">Video</p></a>'
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_reply_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'reply_message': reply_message.text,
+                    'reply_message_user': reply_message.sender.user.username,
+                    'reply_id': reply_message.pk,
+                    'reply_html': reply_html,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
+            else:
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
 
 class NotificationConsumer(WebsocketConsumer):
     connected_users = {}

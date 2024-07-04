@@ -106,7 +106,8 @@ def message_sent_image(request):
         reply_message = Message.objects.get(id=replying_to_id)
         new_message = Message(sender=sender_userstats, room=chat_room, image=image, reply=reply_message)
         new_message.save()
-        # notification things as well
+
+        # notification things
         for receiver in receivers:
             if receiver == reply_message.sender: # if the person being replied to happends to be the user that sent the message being replied to.
                 notification_contents = f'({receiver.user.username} Replied To You): Image' # special message for the user who created the message being replied to.
@@ -122,20 +123,13 @@ def message_sent_image(request):
     else:
         new_message = Message(sender=sender_userstats, room=chat_room, image=image)
         new_message.save()
-        # notification things as well
+
+        # notification things
         for receiver in receivers:
             notification_contents = 'Image'
             new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
             new_notification.save()
             notification_ids.append(new_notification.id)
-
-    # Reformatting of the timezone
-    local_timezone = pytz.timezone("Australia/Sydney")
-    local_datetime = new_message.sent_at.astimezone(local_timezone)
-    
-    formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
-    formatted_datetime_capitalized = formatted_datetime.capitalize()
-
 
     # Sending JSON responce
     if is_reply == 'true': # Send over specific data over for a reply message
@@ -143,20 +137,14 @@ def message_sent_image(request):
             'messageType':'text',
             'is_reply': is_reply,
             'reply_id':new_message.reply.pk,
-            'message': new_message.text,
             'message_id': new_message.pk,
-            'message_user_pfp_url': new_message.sender.pfp.url,
-            'creationDate': formatted_datetime_capitalized,
             'notification_ids': notification_ids,
         }
     else:
         response = {
             'messageType':'text',
             'is_reply': is_reply,
-            'message': new_message.text,
             'message_id': new_message.pk,
-            'message_user_pfp_url': new_message.sender.pfp.url,
-            'creationDate': formatted_datetime_capitalized,
             'notification_ids': notification_ids,
         }
     is_reply = 'false'

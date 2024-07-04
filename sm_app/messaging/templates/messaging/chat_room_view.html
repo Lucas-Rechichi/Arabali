@@ -347,15 +347,14 @@
             </div>
         </div>
     </form>
-    <!-- For conviniance when messaging -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var scrollableContent = document.getElementById("conversationFrame");
-            scrollableContent.scrollTop = scrollableContent.scrollHeight;
-        });
-    </script>
     <!-- Websocket for sending messages -->
     <script type="text/javascript">
+        // for conviniance
+        function reloadPage() {
+                var scrollableContent = document.getElementById("conversationFrame");
+                scrollableContent.scrollTop = scrollableContent.scrollHeight;
+            }
+        setTimeout(reloadPage(), 1000)
         var roomId = "{{ room.id }}";  // Django template variable for chatroom ID
         var roomName = "{{ room.name }}";  // Django template variable for chatroom name
         var reconnectionTime = 5000;
@@ -435,7 +434,8 @@
             messageSocket.onmessage = function(e) {
                 const data = JSON.parse(e.data);
                 console.log(data);
-                if (data.type === 'incoming_text_message') { // if the message wasn't a reply
+                var contentHtml = data.content_html;
+                if (data.type === 'incoming_message') { // if the message wasn't a reply
                     if (data.username === '{{username}}') { 
                         var newMessageInHtml = `
                             <div class="message">
@@ -459,7 +459,7 @@
                                             <div class="col-10 d-flex justify-content-end">
                                                 <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
                                                     <div class="card-header" style="border-bottom: none;">
-                                                        <p>` + data.message + `</p>
+                                                        ` + contentHtml + `
                                                         <div class="row">
                                                             <div class="col">
                                                                 <button type="button" class="btn reply" data-message-id="` + data.message_id + `" data-message="` + data.message + `" data-message-sender="` + data.username + `""><i class="bi bi-reply" style="color: #ffffff;"></i></button>
@@ -500,7 +500,7 @@
                                             <div class="col-10">
                                                 <div class="card" style="width: fit-content; border: none; opacity: 85%;">
                                                     <div class="card-header" style="border-bottom: none;">
-                                                        <p>` + data.message + `</p>
+                                                        ` + contentHtml + `
                                                         <div class="row">
                                                             <div class="col">
                                                                 <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply"></i></button>
@@ -517,6 +517,7 @@
                     }
                 }
                 else if (data.type === 'incoming_reply_text_message') {
+                    var replyHtml = data.reply_html;
                     if (data.username === '{{username}}') {
                         var newMessageInHtml = `
                             <div class="message">
@@ -534,7 +535,7 @@
                                                 <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
                                                     <div class="card-header" style="border-bottom: none;">
                                                         <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
-                                                        <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small text-truncate m-0">` + data.reply_message + `</p></a>
+                                                        ` + replyHtml + `
                                                     </div>
                                                 </div>
                                             </div>
@@ -546,7 +547,7 @@
                                             <div class="col-10 d-flex justify-content-end">
                                                 <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
                                                     <div class="card-header" style="border-bottom: none;">
-                                                        <p>` + data.message + `</p>
+                                                        ` + contentHtml + `
                                                         <div class="row">
                                                             <div class="col">
                                                                 <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply" style="color: #ffffff"></i></button>
@@ -585,7 +586,7 @@
                                                     <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
                                                         <div class="card-header" style="border-bottom: none;">
                                                             <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
-                                                            <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small text-truncate m-0">` + data.reply_message + `</p></a>
+                                                            ` + replyHtml + `
                                                         </div>
                                                     </div>
                                                 </div>
@@ -596,7 +597,7 @@
                                                 <div class="col-10 d-flex justify-content-start">
                                                     <div class="card pb-0" style="width: 85%; border: none; opacity: 85%;">
                                                         <div class="card-header" style="border-bottom: none;">
-                                                            <p>` + data.message + `</p>
+                                                            ` + contentHtml + `
                                                             <div class="row">
                                                                 <div class="col">
                                                                     <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply"></i></button>
@@ -613,9 +614,10 @@
                                 </div>`;
                         }
                 }
+
                 $('#conversation-contents').append(newMessageInHtml);
-                var scrollableContent = document.getElementById("conversationFrame");
-                scrollableContent.scrollTop = scrollableContent.scrollHeight;
+                setTimeout(reloadPage(), 1000)
+
                 $.ajax({
                     type: 'POST',
                     url: '/universal/remove-notification/',
@@ -627,10 +629,8 @@
                     },
                     success: function(response) {
                         console.log('Notification removed')
-                        
                     }
                 });
-                
 
             };
             messageSocket.onclose = function (e) {
@@ -767,74 +767,206 @@
         $(document).ready(function () {
             $('#message').keydown(function (e) {
                 if (e.keyCode == 13 ) {
-                    e.preventDefault();
-                    var message = $('#message').val()
-                    let isReply
-                    console.log($('#is-reply').val() == 'true')
-                    if ($('#is-reply').val() === 'true') {
-                        isReply = 'true'
-                        replyMessageId = $('#reply-information-holder').data('message-id');
-                    }
-                    else {
-                        isReply = 'false'
-                        replyMessageId = null
-                    }
-                    console.log(isReply)
-                    if (message != '') {
-                        $.ajax({
-                            type: 'POST',
-                            url: '/chat/message-sent-text/',
-                            data: {
-                                'chat-room-name': '{{room.name}}',
-                                'chat-room-id': '{{room.id}}',
-                                'text-message': message,
-                                'is-reply': isReply,
-                                'replying-to-id': replyMessageId,
-                                'csrfmiddlewaretoken': '{{ csrf_token }}'
-                            },
-                            success: function(response) {
-                                console.log('text sent and saved.')
-                                var scrollableContent = document.getElementById("conversationFrame");
-                                scrollableContent.scrollTop = scrollableContent.scrollHeight;
-                                $('#message').val('');
-                                if ($('#reply-prompt')) {
-                                    $('#reply-prompt').remove();
-                                }
-                                console.log(response.notification_ids)
-                                notificationSocket.send(JSON.stringify({
-                                    'notification_ids': response.notification_ids,
-                                    'csrf_token': '{{csrf_token}}',
-                                }));
-                                if (response.is_reply === 'true') {
-                                    var replyId = response.reply_id;
-                                    messageSocket.send(JSON.stringify({
-                                        'text': message,
-                                        'message_type': 'text',
-                                        'message_id': response.message_id,
-                                        'is_reply': response.is_reply,
-                                        'reply_id': replyId,
-                                        'chat_room_id': '{{ room.id }}',
-                                        'current_url': encodeURIComponent(window.location.href),
-                                        'sender': '{{username}}',
-                                        'csrf_token': '{{csrf_token}}',
+                    // split this into 3 cases: text, image, and video messages
+                    let isReply // initalization of the isReply variable
+                    // for text
+                    if ($('#is-text').val() === 'true') {
+                        var message = $('#message').val() // get the message
+                        if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                            isReply = 'true' 
+                            replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
+                        }
+                        else {
+                            isReply = 'false'
+                            replyMessageId = null
+                        }
+                        if (message != '') {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/chat/message-sent-text/',
+                                data: {
+                                    'chat-room-name': '{{room.name}}',
+                                    'chat-room-id': '{{room.id}}',
+                                    'text-message': message,
+                                    'is-reply': isReply,
+                                    'replying-to-id': replyMessageId,
+                                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                                },
+                                success: function(response) {
+                                    $('#message').val('');
+                                    if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                                        $('#reply-prompt').remove();
+                                        $('#is-reply').val('false');
+                                    }
+                                    notificationSocket.send(JSON.stringify({
+                                        'notification_ids': response.notification_ids,
                                     }));
-                                } else {
-                                    messageSocket.send(JSON.stringify({
-                                        'text': message,
-                                        'message_type': 'text',
-                                        'message_id': response.message_id,
-                                        'is_reply': response.is_reply,
-                                        'chat_room_id': '{{ room.id }}',
-                                        'current_url': encodeURIComponent(window.location.href),
-                                        'sender': '{{username}}',
-                                        'csrf_token': '{{csrf_token}}',
-                                    }));
+                                    if (response.is_reply === 'true') { // Send over specific data for the case of a reply.
+                                        var replyId = response.reply_id;
+                                        messageSocket.send(JSON.stringify({
+                                            'text': message,
+                                            'message_type': 'text',
+                                            'message_id': response.message_id,
+                                            'is_reply': response.is_reply,
+                                            'reply_id': replyId,
+                                        }));
+                                    } else {
+                                        messageSocket.send(JSON.stringify({
+                                            'text': message,
+                                            'message_type': 'text',
+                                            'message_id': response.message_id,
+                                            'is_reply': response.is_reply,
+                                        }));
+                                    }
                                 }
-                            }
-                        });
+                            })
+                        }
+                    } 
+                    else if ($('#is-image').val() === 'true') { // for image
+                        var imageInput = $('#image-file-field')[0];
+                        var image = imageInput.files[0];
+                        console.log(image)
+                        if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                            isReply = 'true' 
+                            replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
+                        }
+                        else {
+                            isReply = 'false'
+                            replyMessageId = null
+                        }
+                        if (image) {
+                            var imageFormData = new FormData();
+
+                            imageFormData.append('image', image);
+                            imageFormData.append('is_reply', isReply);
+                            imageFormData.append('replying_to_id', replyMessageId);
+                            imageFormData.append('chat_room_id', '{{room.id}}');
+                            imageFormData.append('sender', '{{username}}');
+                            imageFormData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '/chat/message-sent-image/',
+                                processData: false, // Important!
+                                contentType: false, // Important!
+                                data: imageFormData,
+                                success: function(response) {
+                                    console.log('message sent and saved!');
+
+                                    // CSS changes in the event of a message being sent
+                                    if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                                        $('#reply-prompt').remove();
+                                        $('#image-prompt').remove();
+                                        $('#multi-input-wrapper').remove();
+                                        $('#is-reply').val('false');
+                                        $('#is-image').val('false');
+                                        $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                        $('#is-text').val('true');
+                                    } else {
+                                        $('#image-prompt').remove();
+                                        $('#is-image').val('false');
+                                        $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                        $('#is-text').val('true');
+                                    }
+
+                                    // Notification socket
+                                    notificationSocket.send(JSON.stringify({
+                                        'notification_ids': response.notification_ids,
+                                    }));
+
+                                    // Message sockets
+                                    if (response.is_reply === 'true') {
+                                        messageSocket.send(JSON.stringify({
+                                            'message_type': 'image',
+                                            'message_id': response.message_id,
+                                            'is_reply': response.is_reply,
+                                            'reply_id': replyId,
+                                        }))
+                                    } else {
+                                        messageSocket.send(JSON.stringify({
+                                            'message_type': 'image',
+                                            'message_id': response.message_id,
+                                            'is_reply': response.is_reply,
+                                        }))
+                                    }
+                                }
+                            })
+                        } else {
+                            console.log('invalid image');
+                        }
                     }
-                    else {
-                        console.log('invalid message')
+                    else if ($('#is-video').val() === 'true') { // for video
+                        var videoInput = $('#video-file-field')[0];
+                        var video = videoInput.files[0];
+                        console.log(video)
+                        if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                            isReply = 'true' 
+                            replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
+                        }
+                        else {
+                            isReply = 'false'
+                            replyMessageId = null
+                        }
+                        if (video) {
+                            var videoFormData = new FormData();
+
+                            videoFormData.append('video', video);
+                            videoFormData.append('is_reply', isReply);
+                            videoFormData.append('replying_to_id', replyMessageId);
+                            videoFormData.append('chat_room_id', '{{room.id}}');
+                            videoFormData.append('sender', '{{username}}');
+                            videoFormData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                            $.ajax({
+                                type: 'POST',
+                                url: '/chat/message-sent-video/',
+                                processData: false, // Important!
+                                contentType: false, // Important!
+                                data: videoFormData,
+                                success: function(response) {
+                                    console.log('message sent and saved!');
+
+                                    // CSS changes in the event of a message being sent
+                                    if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                                        $('#reply-prompt').remove();
+                                        $('#video-prompt').remove();
+                                        $('#multi-input-wrapper').remove();
+                                        $('#is-reply').val('false');
+                                        $('#is-video').val('false');
+                                        $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                        $('#is-text').val('true');
+                                    } else {
+                                        $('#video-prompt').remove();
+                                        $('#is-video').val('false');
+                                        $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                        $('#is-text').val('true');
+                                    }
+
+                                    // Notification socket
+                                    notificationSocket.send(JSON.stringify({
+                                        'notification_ids': response.notification_ids,
+                                    }));
+
+                                    // Message sockets
+                                    if (response.is_reply === 'true') {
+                                        messageSocket.send(JSON.stringify({
+                                            'message_type': 'video',
+                                            'message_id': response.message_id,
+                                            'is_reply': response.is_reply,
+                                            'reply_id': replyId,
+                                        }))
+                                    } else {
+                                        messageSocket.send(JSON.stringify({
+                                            'message_type': 'video',
+                                            'message_id': response.message_id,
+                                            'is_reply': response.is_reply,
+                                        }))
+                                    }
+                                }
+                            })
+                        } else {
+                            console.log('invalid video');
+                        }
                     }
                 }
             })
@@ -865,11 +997,10 @@
                                 'csrfmiddlewaretoken': '{{ csrf_token }}',
                             },
                             success: function(response) {
-                                var scrollableContent = document.getElementById("conversationFrame");
-                                scrollableContent.scrollTop = scrollableContent.scrollHeight;
                                 $('#message').val('');
                                 if ($('#reply-prompt')) { // remove reply prompt if the user was replying
-                                    $('#reply-prompt').remove(); 
+                                    $('#reply-prompt').remove();
+                                    $('#is-reply').val('false');
                                 }
                                 notificationSocket.send(JSON.stringify({
                                     'notification_ids': response.notification_ids,
@@ -882,10 +1013,6 @@
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
                                         'reply_id': replyId,
-                                        'chat_room_id': '{{ room.id }}',
-                                        'current_url': encodeURIComponent(window.location.href),
-                                        'sender': '{{username}}',
-                                        'csrf_token': '{{csrf_token}}',
                                     }));
                                 } else {
                                     messageSocket.send(JSON.stringify({
@@ -893,10 +1020,6 @@
                                         'message_type': 'text',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
-                                        'chat_room_id': '{{ room.id }}',
-                                        'current_url': encodeURIComponent(window.location.href),
-                                        'sender': '{{username}}',
-                                        'csrf_token': '{{csrf_token}}',
                                     }));
                                 }
                             }
@@ -933,6 +1056,43 @@
                             data: imageFormData,
                             success: function(response) {
                                 console.log('message sent and saved!');
+
+                                // CSS changes in the event of a message being sent
+                                if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                                    $('#reply-prompt').remove();
+                                    $('#image-prompt').remove();
+                                    $('#multi-input-wrapper').remove();
+                                    $('#is-reply').val('false');
+                                    $('#is-image').val('false');
+                                    $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                    $('#is-text').val('true');
+                                } else {
+                                    $('#image-prompt').remove();
+                                    $('#is-image').val('false');
+                                    $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                    $('#is-text').val('true');
+                                }
+
+                                // Notification socket
+                                notificationSocket.send(JSON.stringify({
+                                    'notification_ids': response.notification_ids,
+                                }));
+
+                                // Message sockets
+                                if (response.is_reply === 'true') {
+                                    messageSocket.send(JSON.stringify({
+                                        'message_type': 'image',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                        'reply_id': replyId,
+                                    }))
+                                } else {
+                                    messageSocket.send(JSON.stringify({
+                                        'message_type': 'image',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                    }))
+                                }
                             }
                         })
                     } else {
@@ -969,6 +1129,43 @@
                             data: videoFormData,
                             success: function(response) {
                                 console.log('message sent and saved!');
+
+                                // CSS changes in the event of a message being sent
+                                if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                                    $('#reply-prompt').remove();
+                                    $('#video-prompt').remove();
+                                    $('#multi-input-wrapper').remove();
+                                    $('#is-reply').val('false');
+                                    $('#is-video').val('false');
+                                    $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                    $('#is-text').val('true');
+                                } else {
+                                    $('#video-prompt').remove();
+                                    $('#is-video').val('false');
+                                    $('#message-div').append(`<input type="text" id="message" class="form-control pb-3 p-4">`);
+                                    $('#is-text').val('true');
+                                }
+
+                                // Notification socket
+                                notificationSocket.send(JSON.stringify({
+                                    'notification_ids': response.notification_ids,
+                                }));
+
+                                // Message sockets
+                                if (response.is_reply === 'true') {
+                                    messageSocket.send(JSON.stringify({
+                                        'message_type': 'video',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                        'reply_id': replyId,
+                                    }))
+                                } else {
+                                    messageSocket.send(JSON.stringify({
+                                        'message_type': 'video',
+                                        'message_id': response.message_id,
+                                        'is_reply': response.is_reply,
+                                    }))
+                                }
                             }
                         })
                     } else {
