@@ -8,4 +8,5 @@ urlpatterns = [
     path('chat/<str:room>/<int:room_id>', messaging_views.chat_room_view, name='chat_room'),
 
     path('chat/message-sent-text/', ajax_views.message_sent_text, name='message_sent_text'),
+    path('chat/message-sent-image/', ajax_views.message_sent_image, name='message_sent_image'),
 ]

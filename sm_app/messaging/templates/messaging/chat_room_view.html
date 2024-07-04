@@ -323,6 +323,7 @@
             </div>
             <div class="col-10" id="message-div">
                 <input type="hidden" id="is-reply" value="false">
+                <input type="hidden" id="is-text" value="true">
                 <input type="hidden" id="is-image" value="false">
                 <input type="hidden" id="is-video" value="false">
                 <input type="text" id="message" class="form-control pb-3 p-4">
@@ -829,7 +830,7 @@
                 // split this into 3 cases: text, image, and video messages
                 let isReply // initalization of the isReply variable
                 // for text
-                if ($('#message')) {
+                if ($('#is-text').val() === 'true') {
                     var message = $('#message').val() // get the message
                     if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
                         isReply = 'true' 
@@ -849,7 +850,7 @@
                                 'text-message': message,
                                 'is-reply': isReply,
                                 'replying-to-id': replyMessageId,
-                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                'csrfmiddlewaretoken': '{{ csrf_token }}',
                             },
                             success: function(response) {
                                 var scrollableContent = document.getElementById("conversationFrame");
@@ -889,9 +890,48 @@
                             }
                         })
                     }
-                }
+                } 
                 // for image
-                        
+                else if ($('#is-image').val() === 'true') {
+                    var imageInput = $('#image-file-field')[0];
+                    var image = imageInput.files[0];
+                    console.log(image)
+                    if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                        isReply = 'true' 
+                        replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
+                    }
+                    else {
+                        isReply = 'false'
+                        replyMessageId = null
+                    }
+                    if (image) {
+                        var imageFormData = new FormData();
+
+                        imageFormData.append('image', image);
+                        imageFormData.append('is_reply', isReply);
+                        imageFormData.append('replying_to_id', replyMessageId);
+                        imageFormData.append('chat_room_id', '{{room.id}}');
+                        imageFormData.append('sender', '{{username}}');
+                        imageFormData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/chat/message-sent-image/',
+                            processData: false, // Important!
+                            contentType: false, // Important!
+                            data: imageFormData,
+                            success: function(response) {
+                                console.log('message sent and saved!');
+                            }
+                            
+
+                        })
+                    } else {
+                        console.log('invalid image');
+                    }
+                }
+                
+                
                 // for video
             });
             $('#conversation-contents').on('click', '.reply', function () { // when the reply button is pressed
@@ -903,6 +943,7 @@
             })
             $('#init-image').click(function () {
                 const messageDiv = $('#message-div');
+                const isText = $('#is-text');
                 const isImage = $('#is-image');
                 const isVideo = $('#is-video');
                 const isReply = $('#is-reply');
@@ -915,6 +956,7 @@
                             isVideo.val('false');
                         }
                         messageTextBox.remove();
+                        isText.val('false');
                         messageDiv.append(`
                             <div class="card mt-1" id="image-prompt" style="border: none;">
                                 <div class="card-header pb-4" style="border-bottom: none;">
@@ -935,6 +977,7 @@
                             isVideo.val('false');
                         }
                         messageTextBox.remove();
+                        isText.val('false');
                         var replyInput = $('#reply-prompt').detach();
                         var replyInputHtml = replyInput.prop('outerHTML');
                         var imageInputHtml = `
@@ -966,6 +1009,7 @@
                     if (isReply.val() === 'false') {
                         $('#image-prompt').remove();
                         messageDiv.append(messageInputHtml)
+                        isText.val('true');
                         isImage.val('false');
                     } else {
                         var replyInput = $('#reply-prompt').detach();
@@ -973,6 +1017,7 @@
                         $('#multi-input-wrapper').remove();
                         $('#image-prompt').remove();
                         messageDiv.append(messageInputHtml)
+                        isText.val('true');
                         messageDiv.append(replyInputHtml);
                         isImage.val('false');
                     }
@@ -980,6 +1025,7 @@
             })
             $('#init-video').click(function () {
                 const messageDiv = $('#message-div');
+                const isText = $('#is-text');
                 const isImage = $('#is-image');
                 const isVideo = $('#is-video');
                 const isReply = $('#is-reply');
@@ -992,6 +1038,7 @@
                             isImage.val('false');
                         }
                         messageTextBox.remove();
+                        isText.val('false');
                         messageDiv.append(`
                             <div class="card mt-1" id="video-prompt" style="border: none;">
                                 <div class="card-header pb-4" style="border-bottom: none;">
@@ -1012,6 +1059,7 @@
                             isImage.val('false');
                         }
                         messageTextBox.remove();
+                        isText.val('false');
                         var replyInput = $('#reply-prompt').detach();
                         var replyInputHtml = replyInput.prop('outerHTML');
                         var videoInputHtml = `
@@ -1043,6 +1091,7 @@
                     if (isReply.val() === 'false') {
                         $('#video-prompt').remove();
                         messageDiv.append(messageInputHtml);
+                        isText.val('true');
                         isVideo.val('false');
                     } else {
                         var replyInput = $('#reply-prompt').detach();
@@ -1050,6 +1099,7 @@
                         $('#multi-input-wrapper').remove();
                         $('#video-prompt').remove();
                         messageDiv.append(messageInputHtml);
+                        isText.val('true');
                         messageDiv.append(replyInputHtml);
                         isVideo.val('false');
                     }

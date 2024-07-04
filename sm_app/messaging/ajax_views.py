@@ -1,6 +1,7 @@
 import pytz
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from main.models import UserStats, Notification
 from messaging.models import ChatRoom, Message
 
@@ -14,9 +15,6 @@ def message_sent_text(request):
     chat_room_name = request.POST.get('chat-room-name')
     chat_room_id = request.POST.get('chat-room-id')
     is_reply = request.POST.get('is-reply')
-    is_text = None
-    is_image = None
-    is_video = None
 
     # Getting Relevant Chatroom
     rooms = ChatRoom.objects.filter(name=chat_room_name)
@@ -61,7 +59,7 @@ def message_sent_text(request):
 
         # Sending JSON responce
         if is_reply == 'true': # Send over specific data over for a reply message
-            responce = {
+            response = {
                 'messageType':'text',
                 'is_reply': is_reply,
                 'reply_id':new_message.reply.pk,
@@ -72,7 +70,7 @@ def message_sent_text(request):
                 'notification_ids': notification_ids,
             }
         else:
-            responce = {
+            response = {
                 'messageType':'text',
                 'is_reply': is_reply,
                 'message': new_message.text,
@@ -82,9 +80,39 @@ def message_sent_text(request):
                 'notification_ids': notification_ids,
             }
         is_reply = 'false'
-        return JsonResponse(responce)
+        return JsonResponse(response)
     else:
         new_message = Message()
         return JsonResponse({'messageType':'invalid'})
 
 
+def message_sent_image(request):
+    # Get data sent over
+    image = request.FILES.get('image')
+    chat_room_id = request.POST.get('chat_room_id')
+    is_reply = request.POST.get('is_reply')
+    sender = request.POST.get('sender')
+
+    sender_userstats = UserStats.objects.get(user=User.objects.get(username=sender))
+    chat_room = ChatRoom.objects.get(id=chat_room_id)
+
+    if is_reply == 'true':
+        replying_to_id = request.POST.get('replying_to_id')
+        reply_message = Message.objects.get(id=replying_to_id)
+        new_message = Message(sender=sender_userstats, room=chat_room, image=image, reply=reply_message)
+        new_message.save()
+        # notification things as well
+    else:
+        pass # if the message wasn't a reply
+        # notification things as well
+
+    print(image)
+    response = {
+        'image': str(image),
+        'is_reply': is_reply,
+        'chat_room_id': chat_room_id,
+        'sender': sender,
+    }
+    return JsonResponse(response)
+
+    
