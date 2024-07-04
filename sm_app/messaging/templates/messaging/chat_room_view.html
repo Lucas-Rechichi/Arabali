@@ -152,7 +152,13 @@
                                             <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message.reply.sender}}</p></a>
-                                                    <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
+                                                    {% if message.text %}
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
+                                                    {% elif message.image %}
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Image</p></a>
+                                                    {% else %} 
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Video</p></a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -162,14 +168,14 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-10 d-flex justify-content-end">
-                                            <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
+                                            <div class="card text-bg-success" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message.text %}
                                                         <p>{{message.text}}</p>
                                                     {% elif message.image %}
                                                         <img src="{{message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
                                                     {% else %} 
-                                                        <video src="{{message.video.url}}" controls></video>
+                                                        <video src="{{message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
@@ -204,7 +210,7 @@
                                                     {% elif message.image %}
                                                         <img src="{{message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
                                                     {% else %} 
-                                                        <video src="{{message.video.url}}" controls></video>
+                                                        <video src="{{message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
@@ -236,7 +242,13 @@
                                             <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message.reply.sender}}</p></a>
-                                                    <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
+                                                    {% if message.text %}
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
+                                                    {% elif message.image %}
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Image</p></a>
+                                                    {% else %} 
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Video</p></a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -245,14 +257,14 @@
                                         <div class="col-2">
                                         </div>
                                         <div class="col-10 d-flex justify-content-start">
-                                            <div class="card" style="width: fit-content; border: none; opacity: 85%;">
+                                            <div class="card" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message.text %}
                                                         <p>{{message.text}}</p>
                                                     {% elif message.image %}
                                                         <img src="{{message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
                                                     {% else %} 
-                                                        <video src="{{message.video.url}}" controls></video>
+                                                        <video src="{{message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
@@ -287,7 +299,7 @@
                                                     {% elif message.image %}
                                                         <img src="{{message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
                                                     {% else %} 
-                                                        <video src="{{message.video.url}}" controls></video>
+                                                        <video src="{{message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
@@ -891,8 +903,7 @@
                         })
                     }
                 } 
-                // for image
-                else if ($('#is-image').val() === 'true') {
+                else if ($('#is-image').val() === 'true') { // for image
                     var imageInput = $('#image-file-field')[0];
                     var image = imageInput.files[0];
                     console.log(image)
@@ -923,16 +934,47 @@
                             success: function(response) {
                                 console.log('message sent and saved!');
                             }
-                            
-
                         })
                     } else {
                         console.log('invalid image');
                     }
                 }
-                
-                
-                // for video
+                else if ($('#is-video').val() === 'true') { // for video
+                    var videoInput = $('#video-file-field')[0];
+                    var video = videoInput.files[0];
+                    console.log(video)
+                    if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                        isReply = 'true' 
+                        replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
+                    }
+                    else {
+                        isReply = 'false'
+                        replyMessageId = null
+                    }
+                    if (video) {
+                        var videoFormData = new FormData();
+
+                        videoFormData.append('video', video);
+                        videoFormData.append('is_reply', isReply);
+                        videoFormData.append('replying_to_id', replyMessageId);
+                        videoFormData.append('chat_room_id', '{{room.id}}');
+                        videoFormData.append('sender', '{{username}}');
+                        videoFormData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/chat/message-sent-video/',
+                            processData: false, // Important!
+                            contentType: false, // Important!
+                            data: videoFormData,
+                            success: function(response) {
+                                console.log('message sent and saved!');
+                            }
+                        })
+                    } else {
+                        console.log('invalid video');
+                    }
+                }
             });
             $('#conversation-contents').on('click', '.reply', function () { // when the reply button is pressed
                 // Get relevant data stored inside of the button's data attributes

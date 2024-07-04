@@ -9,4 +9,5 @@ urlpatterns = [
 
     path('chat/message-sent-text/', ajax_views.message_sent_text, name='message_sent_text'),
     path('chat/message-sent-image/', ajax_views.message_sent_image, name='message_sent_image'),
+    path('chat/message-sent-video/', ajax_views.message_sent_video, name='message_sent_video'),
 ]
