@@ -103,7 +103,8 @@ def message_sent_image(request):
         new_message.save()
         # notification things as well
     else:
-        pass # if the message wasn't a reply
+        new_message = Message(sender=sender_userstats, room=chat_room, image=image)
+        new_message.save()
         # notification things as well
 
     print(image)
