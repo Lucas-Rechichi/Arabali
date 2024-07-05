@@ -118,9 +118,16 @@ class MessageConsumer(WebsocketConsumer):
         # Sending relevant data over
         if message_type == 'text':
             content_html = f'<p>{content}</p>'
+            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
             if is_reply == 'true':
                 reply_message = Message.objects.get(id=reply_id)
-                reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{content}</p></a>'
+                if reply_message.text:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                elif reply_message.image:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
                 self.send(text_data=json.dumps({
                     'type': 'incoming_reply_message',
                     'message_type': message_type,
@@ -130,6 +137,8 @@ class MessageConsumer(WebsocketConsumer):
                     'reply_message_user': reply_message.sender.user.username,
                     'reply_id': reply_message.pk,
                     'reply_html': reply_html,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -141,15 +150,24 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
                 }))
         elif message_type == 'image':
             content_html = f'<img src="{content}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">'
+            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Image" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Image" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
             if is_reply == 'true':
                 reply_message = Message.objects.get(id=reply_id)
-                reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">Image</p></a>'
+                if reply_message.text:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                elif reply_message.image:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
                 self.send(text_data=json.dumps({
                     'type': 'incoming_reply_message',
                     'message_type': message_type,
@@ -159,6 +177,8 @@ class MessageConsumer(WebsocketConsumer):
                     'reply_message_user': reply_message.sender.user.username,
                     'reply_id': reply_message.pk,
                     'reply_html': reply_html,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -170,15 +190,24 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
                 }))
         elif message_type == 'video':
             content_html = f'<video src="{content}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>'
+            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
             if is_reply == 'true':
                 reply_message = Message.objects.get(id=reply_id)
-                reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">Video</p></a>'
+                if reply_message.text:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                elif reply_message.image:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
                 self.send(text_data=json.dumps({
                     'type': 'incoming_reply_message',
                     'message_type': message_type,
@@ -188,6 +217,8 @@ class MessageConsumer(WebsocketConsumer):
                     'reply_message_user': reply_message.sender.user.username,
                     'reply_id': reply_message.pk,
                     'reply_html': reply_html,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -199,6 +230,8 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -268,6 +301,11 @@ class NotificationConsumer(WebsocketConsumer):
                 # For the notification icon
                 notification_count = Notification.objects.filter(user=new_notification.user).count()
 
+                if new_notification.relevant_message.text:
+                    notification_contents  = f'<p class="text-truncate ">{new_notification.contents}</p>'
+                else:
+                    notification_contents  = f'<p class="text-truncate "><strong>{new_notification.contents}</strong></p>'
+
                 html_notification_popup = f'''
                 <div id="popup-notification-{new_notification.pk}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
@@ -289,7 +327,7 @@ class NotificationConsumer(WebsocketConsumer):
                         </div>
                         <div class="row">
                             <div class="col mt-2">
-                                <p class="text-truncate ">{new_notification.contents}</p>
+                                {notification_contents}
                             </div>
                         </div>
                     </div>
@@ -317,7 +355,7 @@ class NotificationConsumer(WebsocketConsumer):
                         </div>
                         <div class="row">
                             <div class="col mt-2">
-                                <p class="text-truncate ">{new_notification.contents}</p>
+                                {notification_contents}
                             </div>
                         </div>
                     </div>

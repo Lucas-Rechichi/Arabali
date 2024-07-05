@@ -33,7 +33,11 @@
                 </div>
                 <div class="row">
                     <div class="col mt-2">
-                        <p class="text-truncate ">{{notification.notification_object.contents}}</p>
+                        {% if notification.notification_object.relevant_message.text %}
+                            <p class="text-truncate">{{notification.notification_object.contents}}</p>
+                        {% else %}
+                            <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

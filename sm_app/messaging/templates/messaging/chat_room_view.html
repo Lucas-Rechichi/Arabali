@@ -32,7 +32,11 @@
                     </div>
                     <div class="row">
                         <div class="col mt-2">
-                            <p class="text-truncate ">{{notification.notification_object.contents}}</p>
+                            {% if notification.notification_object.relevant_message.text %}
+                                <p class="text-truncate">{{notification.notification_object.contents}}</p>
+                            {% else %}
+                                <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -155,9 +159,9 @@
                                                     {% if message.reply.text %}
                                                         <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
                                                     {% elif message.reply.image %}
-                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Image</p></a>
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
                                                     {% elif message.reply.video %} 
-                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Video</p></a>
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
                                                     {% else %}
                                                     {% endif %}
                                                 </div>
@@ -182,7 +186,7 @@
                                                         <div class="col">
                                                             {% if message.text %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message.image %} &lt;
+                                                            {% elif message.image %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Image" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
                                                             {% else %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Video" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
@@ -223,7 +227,7 @@
                                                         <div class="col">
                                                             {% if message.text %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message.image %} &lt;
+                                                            {% elif message.image %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Image" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
                                                             {% else %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Video" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
@@ -258,9 +262,9 @@
                                                     {% if message.reply.text %}
                                                         <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message.reply.text}}</p></a>
                                                     {% elif message.reply.image %}
-                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Image</p></a>
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
                                                     {% elif message.reply.video %} 
-                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">Video</p></a>
+                                                        <a href="#message-{{message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
                                                     {% else %}
                                                     {% endif %}
                                                 </div>
@@ -284,7 +288,7 @@
                                                         <div class="col">
                                                             {% if message.text %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message.image %} &lt;
+                                                            {% elif message.image %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Image" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
                                                             {% else %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Video" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
@@ -325,7 +329,7 @@
                                                         <div class="col">
                                                             {% if message.text %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="{{message.text}}" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message.image %} &lt;
+                                                            {% elif message.image %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Image" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
                                                             {% else %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message.id}}" data-message="Video" data-message-sender="{{message.sender.user.username}}" id="reply-button-{{message.id}}"><i class="bi bi-reply"></i></button>
@@ -461,6 +465,8 @@
                 const data = JSON.parse(e.data);
                 console.log(data);
                 var contentHtml = data.content_html;
+                var selfReplyButtonHtml = data.self_reply_button_html
+                var otherReplyButtonHtml = data.other_reply_button_html
                 if (data.type === 'incoming_message') { // if the message wasn't a reply
                     if (data.username === '{{username}}') { 
                         var newMessageInHtml = `
@@ -488,7 +494,7 @@
                                                         ` + contentHtml + `
                                                         <div class="row">
                                                             <div class="col">
-                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id + `" data-message="` + data.message + `" data-message-sender="` + data.username + `""><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                ` + selfReplyButtonHtml + `
                                                             </div>
                                                         </div>
                                                     </div>
@@ -529,7 +535,7 @@
                                                         ` + contentHtml + `
                                                         <div class="row">
                                                             <div class="col">
-                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply"></i></button>
+                                                                ` + otherReplyButtonHtml + `
                                                             </div>
                                                         </div>
                                                     </div>
@@ -542,7 +548,7 @@
                             </div>`;
                     }
                 }
-                else if (data.type === 'incoming_reply_text_message') {
+                else if (data.type === 'incoming_reply_message') {
                     var replyHtml = data.reply_html;
                     if (data.username === '{{username}}') {
                         var newMessageInHtml = `
@@ -576,7 +582,7 @@
                                                         ` + contentHtml + `
                                                         <div class="row">
                                                             <div class="col">
-                                                                <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply" style="color: #ffffff"></i></button>
+                                                                ` + selfReplyButtonHtml + `
                                                             </div>
                                                         </div>
                                                     </div>
@@ -626,7 +632,7 @@
                                                             ` + contentHtml + `
                                                             <div class="row">
                                                                 <div class="col">
-                                                                    <button type="button" class="btn reply" data-message-id="` + data.message_id +`" data-message="` + data.message + `" data-message-sender="` + data.username + `"><i class="bi bi-reply"></i></button>
+                                                                    ` + otherReplyButtonHtml + `
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1023,6 +1029,7 @@
                                 'csrfmiddlewaretoken': '{{ csrf_token }}',
                             },
                             success: function(response) {
+                                console.log(response.is_reply)
                                 $('#message').val('');
                                 if ($('#reply-prompt')) { // remove reply prompt if the user was replying
                                     $('#reply-prompt').remove();
