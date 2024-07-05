@@ -8,6 +8,7 @@ import pytz
 from datetime import datetime
 from urllib.parse import unquote
 from main.models import UserStats, Notification
+from main.extras import remove_until_character
 from messaging.extras import replace_spaces
 from messaging.models import ChatRoom, Message
 from django.contrib.auth.models import User
@@ -304,8 +305,13 @@ class NotificationConsumer(WebsocketConsumer):
                 if new_notification.relevant_message.text:
                     notification_contents  = f'<p class="text-truncate ">{new_notification.contents}</p>'
                 else:
-                    notification_contents  = f'<p class="text-truncate "><strong>{new_notification.contents}</strong></p>'
-
+                    if new_notification.relevant_message.reply:
+                        contents = remove_until_character(new_notification.contents, ':')
+                        contents_a = remove_until_character(contents, ' ')
+                        notification_contents  = f'<p class="text-truncate ">({new_notification.sender} Replied to You): <strong>{contents_a}</strong></p>'
+                    else:
+                        notification_contents  = f'<p class="text-truncate "><strong>{new_notification.contents}</strong></p>'
+                print(notification_contents)
                 html_notification_popup = f'''
                 <div id="popup-notification-{new_notification.pk}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">

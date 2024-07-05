@@ -36,7 +36,15 @@
                         {% if notification.notification_object.relevant_message.text %}
                             <p class="text-truncate">{{notification.notification_object.contents}}</p>
                         {% else %}
-                            <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                            {% if notification.notification_object.relevant_message.reply %}
+                                {% if notification.notification_object.relevant_message.image %}
+                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Image</strong></p>
+                                {% else %}
+                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Video</strong></p>
+                                {% endif %}
+                            {% else %}
+                                <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

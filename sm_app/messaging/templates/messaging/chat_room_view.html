@@ -35,7 +35,15 @@
                             {% if notification.notification_object.relevant_message.text %}
                                 <p class="text-truncate">{{notification.notification_object.contents}}</p>
                             {% else %}
+                                {% if notification.notification_object.relevant_message.reply %}
+                                    {% if notification.notification_object.relevant_message.image %}
+                                        <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Image</strong></p>
+                                    {% else %}
+                                        <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Video</strong></p>
+                                    {% endif %}
+                                {% else %}
                                 <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -840,7 +848,7 @@
                                             'message_type': 'text',
                                             'message_id': response.message_id,
                                             'is_reply': response.is_reply,
-                                            'reply_id': replyId,
+                                            'reply_id': response.reply_id,
                                         }));
                                     } else {
                                         messageSocket.send(JSON.stringify({
@@ -912,7 +920,7 @@
                                             'message_type': 'image',
                                             'message_id': response.message_id,
                                             'is_reply': response.is_reply,
-                                            'reply_id': replyId,
+                                            'reply_id': response.reply_id,
                                         }))
                                     } else {
                                         messageSocket.send(JSON.stringify({
@@ -985,7 +993,7 @@
                                             'message_type': 'video',
                                             'message_id': response.message_id,
                                             'is_reply': response.is_reply,
-                                            'reply_id': replyId,
+                                            'reply_id': response.reply_id,
                                         }))
                                     } else {
                                         messageSocket.send(JSON.stringify({
@@ -1045,7 +1053,7 @@
                                         'message_type': 'text',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
-                                        'reply_id': replyId,
+                                        'reply_id': response.reply_id,
                                     }));
                                 } else {
                                     messageSocket.send(JSON.stringify({
@@ -1072,6 +1080,7 @@
                         replyMessageId = null
                     }
                     if (image) {
+                        // special data passing for images
                         var imageFormData = new FormData();
 
                         imageFormData.append('image', image);
@@ -1117,7 +1126,7 @@
                                         'message_type': 'image',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
-                                        'reply_id': replyId,
+                                        'reply_id': response.reply_id,
                                     }))
                                 } else {
                                     messageSocket.send(JSON.stringify({
@@ -1222,13 +1231,14 @@
                 const messageTextBox = $('#message');
                 const messageInputHtml = `<input type="text" id="message" class="form-control pb-3 p-4">`
                 if (isImage.val() === 'false') {
-                    if (isReply.val() === 'false') {
+                    if (isReply.val() === 'false') { // if false, display only the image prompt
                         if (isVideo.val() === 'true') {
-                            $('#video-prompt').remove();
+                            $('#video-prompt').remove(); // can only do either an image or a video at once.
                             isVideo.val('false');
                         }
-                        messageTextBox.remove();
+                        messageTextBox.remove(); // no text allowed as well
                         isText.val('false');
+                        // image prompt
                         messageDiv.append(`
                             <div class="card mt-1" id="image-prompt" style="border: none;">
                                 <div class="card-header pb-4" style="border-bottom: none;">
@@ -1241,9 +1251,9 @@
                                 </div>
                             </div>
                         `)
-                        isImage.val('true');
+                        isImage.val('true'); // set the hidden element to true
                         $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
-                    } else {
+                    } else { // display both the image prompt and the reply prompt
                         if (isVideo.val() === 'true') {
                             $('#video-prompt').remove();
                             isVideo.val('false');
@@ -1264,6 +1274,7 @@
                                 </div>
                             </div>
                         `
+                        // wrapper to nicely format both prompts
                         messageDiv.append(`
                             <div class="row" id='multi-input-wrapper'>
                                 <div class="col-6">
@@ -1277,11 +1288,11 @@
                         isImage.val('true');
                         $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // animation for better GUI
                     }
-                } else {
+                } else { // removal of the image prompt
                     if (isReply.val() === 'false') {
                         $('#image-prompt').remove();
-                        messageDiv.append(messageInputHtml)
-                        isText.val('true');
+                        messageDiv.append(messageInputHtml) // bring back the text box
+                        isText.val('true'); 
                         isImage.val('false');
                     } else {
                         var replyInput = $('#reply-prompt').detach();
