@@ -1,6 +1,5 @@
 import pytz
 
-from moviepy.editor import VideoFileClip
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -169,17 +168,14 @@ def message_sent_video(request):
         new_message = Message(sender=sender_userstats, room=chat_room, video=video, reply=reply_message)
         new_message.save()
         # notification things as well
-        video_path = new_message.video.path
-        video_clip = VideoFileClip(video_path)
-        length = video_clip.duration
         for receiver in receivers:
             if receiver == reply_message.sender: # if the person being replied to happends to be the user that sent the message being replied to.
-                notification_contents = f'({receiver.user.username} Replied To You): Video ({length}s)' # special message for the user who created the message being replied to.
+                notification_contents = f'({receiver.user.username} Replied To You): Video' # special message for the user who created the message being replied to.
                 new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
                 new_notification.save()
                 notification_ids.append(new_notification.id)
             else:
-                notification_contents = f'Video ({length}s)'
+                notification_contents = f'Video'
                 new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
                 new_notification.save()
                 notification_ids.append(new_notification.id)
@@ -187,12 +183,9 @@ def message_sent_video(request):
     else:
         new_message = Message(sender=sender_userstats, room=chat_room, video=video)
         new_message.save()
-        # notification things as well
-        video_path = new_message.video.path
-        video_clip = VideoFileClip(video_path)
-        length = video_clip.duration
+        
         for receiver in receivers:
-            notification_contents = f'Video ({length}s)'
+            notification_contents = f'Video'
             new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
             new_notification.save()
             notification_ids.append(new_notification.id)
