@@ -115,7 +115,7 @@
                     <form method="post" id="poll-form">
                         <!-- Title -->
                         <label for="poll-title" class="form-label">Poll Title</label>
-                        <input type="text" class="form-control" id="poll-title">
+                        <textarea type="text" class="form-control" id="poll-title"></textarea>
                         <br>
                         <!-- Hidden input holding number of options -->
                         <input type="hidden" id="poll-options-count" value="3">
@@ -123,17 +123,17 @@
                         <div id="options-div">
                             <div id="option-1-wrapper">
                                 <label for="option-1" class="form-label">Option 1</label>
-                                <input type="text" class="form-control" id="option-1">
+                                <input type="text" class="form-control option" id="option-1" data-option-number="1">
                                 <br>
                             </div>
                             <div id="option-2-wrapper">
                                 <label for="option-2" class="form-label">Option 2</label>
-                                <input type="text" class="form-control" id="option-1">
+                                <input type="text" class="form-control option" id="option-1" data-option-number="2">
                                 <br>
                             </div>
                             <div id="option-3-wrapper">
                                 <label for="option-3" class="form-label">Option 3</label>
-                                <input type="text" class="form-control" id="option-1">
+                                <input type="text" class="form-control option" id="option-1" data-option-number="3">
                                 <br>
                             </div>
                         </div>
@@ -145,8 +145,48 @@
                             <div class="col-1">
                                 <button type="button" class="btn btn-outline-success" id="subtract-option"><i class="bi bi-dash"></i></button>
                             </div>
+                            <div class="col-10 d-flex justify-content-end">
+                                <button type="button" class="btn btn-success" id="confirm-poll">Create Poll</button>
+                            </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+        <!-- Preview of poll -->
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header" style="background-color: #ffffff; border-bottom: none;">
+                    <h4 class="display-4 text-center">Preview</h4>
+                </div>
+                <div class="card-body">
+                    <p id="poll-title-preview"></p>
+                    <div id="options-preview-div">
+                        <div id="option-1-preview">
+                            <div class="progress" role="progressbar" aria-label="Option 1 Preview" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: 20%">
+                                    <p class="m-0" id="option-1-text-preview"></p>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                        <div id="option-2-preview">
+                            <div class="progress" role="progressbar" aria-label="Option 2 Preview" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: 20%">
+                                    <p class="m-0" id="option-2-text-preview"></p>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                        <div id="option-3-preview">
+                            <div class="progress" role="progressbar" aria-label="Option 3 Preview" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: 20%">
+                                    <p class="m-0" id="option-3-text-preview"></p>
+                                </div>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -156,16 +196,30 @@
     $(document).ready(function () {
         // For adding and subtracting options
         $('#add-option').click(function () {
+
             var optionCount = $('#poll-options-count').val(); // get current option count
             optionCount = Number(optionCount);
             optionCount += 1; // add 1
+
             $('#options-div').append(`
                 <div id="option-${optionCount}-wrapper">
                     <label for="option-${optionCount}" class="form-label">Option ${optionCount}</label>
-                    <input type="text" class="form-control" id="option-${optionCount}">
+                    <input type="text" class="form-control option" id="option-${optionCount}" data-option-number="${optionCount}">
                     <br>
                 </div>
             `)
+
+            $('#options-preview-div').append(`
+                <div id="option-${optionCount}-preview">
+                    <div class="progress" role="progressbar" aria-label="Option ${optionCount} Preview" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width: 20%">
+                            <p class="m-0" id="option-${optionCount}-text-preview"></p>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            `)
+
             $('#poll-options-count').val(optionCount);
             if (optionCount >= 5) {
                 $('#add-option').prop("disabled", true);
@@ -178,6 +232,7 @@
             var optionCount = $('#poll-options-count').val(); // get current option count
             optionCount = Number(optionCount);
             $('#option-' + optionCount + '-wrapper').remove();
+            $('#option-' + optionCount + '-preview').remove();
             optionCount -= 1; // subtract 1
             $('#poll-options-count').val(optionCount);
             if (optionCount <= 2) {
@@ -187,6 +242,25 @@
                 $('#add-option').prop("disabled", false);
             }
             
+        })
+        // code for when the text boxes are modified: update the look of the preview
+        // poll title
+        $('#poll-title').on('input', function () {
+            var textInput = $(this).val();
+            var pollTitlePreview = $('#poll-title-preview');
+            pollTitlePreview.text('');
+            pollTitlePreview.text(textInput)
+        })
+        $('#options-div').on('input', '.option', function () {
+            var optionInput = $(this).val();
+            var optionNumber = $(this).data('option-number');
+            var pollOptionPreviewText = $('#option-' + optionNumber + '-text-preview');
+            pollOptionPreviewText.text('');
+            pollOptionPreviewText.text(optionInput);
+        })
+        $('confirm-poll').click(function () {
+            var pollTitle = $('#poll-title').val();
+            // complete poll form submission.
         })
     })
 </script>
