@@ -365,9 +365,20 @@
             <div class="col-1">
                 <button type="button" class="btn btn-outline-success" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-square" style="font-size:  3vw;"></i></button>
                 <div class="btn-group dropup">
-                    <ul class="dropdown-menu p-2 mb-1">
-                        <button class="btn" id="init-image" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-images"></i></div> Image</li></button>
-                        <button class="btn" id="init-video" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-play-btn"></i></i></div> Video</li></button>
+                    <ul class="dropdown-menu p-2 mb-1" style="width: 300px">
+                        <div class="row">
+                            <div class="col-4">
+                                <p>Messages</p>
+                                <button class="btn" id="init-image" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-images"></i></div> Image</li></button>
+                                <button class="btn" id="init-video" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-play-btn"></i></i></div> Video</li></button>
+                            </div>
+                            <div class="col-2">
+                            </div>
+                            <div class="col-4">
+                                <p>Events</p>
+                                <button class="btn" type="button" onclick="location.href='/create_poll/'"><li class="custom-icon"><div class="fs-4"><i class="bi bi-bar-chart-fill"></i></div> Poll</li></button>
+                            </div>
+                        </div>
                     </ul>
                 </div>
             </div>
@@ -388,11 +399,11 @@
     <!-- Websocket for sending messages -->
     <script type="text/javascript">
         // for conviniance
-        function reloadPage() {
+        function scrollBarAtBottom() {
                 var scrollableContent = document.getElementById("conversationFrame");
                 scrollableContent.scrollTop = scrollableContent.scrollHeight;
             }
-        setTimeout(reloadPage(), 1000)
+        setTimeout(scrollBarAtBottom(), 1000)
         var roomId = "{{ room.id }}";  // Django template variable for chatroom ID
         var roomName = "{{ room.name }}";  // Django template variable for chatroom name
         var reconnectionTime = 5000;
@@ -475,8 +486,8 @@
                 var contentHtml = data.content_html;
                 var selfReplyButtonHtml = data.self_reply_button_html
                 var otherReplyButtonHtml = data.other_reply_button_html
-                if (data.type === 'incoming_message') { // if the message wasn't a reply
-                    if (data.username === '{{username}}') { 
+                if (data.type === 'incoming_message') { // If the message wasn't a reply
+                    if (data.username === '{{username}}') { // Self
                         var newMessageInHtml = `
                             <div class="message">
                                 <div class="row">
@@ -516,7 +527,7 @@
                                 </div>
                             </div>`;
                     } 
-                    else {
+                    else { // other
                         var newMessageInHtml = `
                             <div class="message">
                                 <div class="row">
@@ -556,9 +567,9 @@
                             </div>`;
                     }
                 }
-                else if (data.type === 'incoming_reply_message') {
-                    var replyHtml = data.reply_html;
-                    if (data.username === '{{username}}') {
+                else if (data.type === 'incoming_reply_message') { // For replies
+                    var replyHtml = data.reply_html; // Get special html for a reply message
+                    if (data.username === '{{username}}') { // Self
                         var newMessageInHtml = `
                             <div class="message">
                                 <div class="row">
@@ -603,7 +614,7 @@
                                     </div>
                                 </div>
                             </div>`;
-                        } else {
+                        } else { // Other
                             var newMessageInHtml = `
                                 <div class="message">
                                     <div class="row">
@@ -654,9 +665,8 @@
                                 </div>`;
                         }
                 }
-                console.log(newMessageInHtml)
                 $('#conversation-contents').append(newMessageInHtml);
-                setTimeout(reloadPage(), 1000)
+                setTimeout(scrollBarAtBottom(), 1000)
 
                 $.ajax({
                     type: 'POST',

@@ -141,3 +141,16 @@ def create_chat_room(request, increment):
         'notification_count': init['notification_count']
     }
     return render(request, 'messaging/create_chat_room.html', variables)
+
+def create_poll(request):
+    if UserStats.objects.get(user=request.user).is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+    init = initialize_page(request)
+
+    variables = {
+        'username': init['username'],
+        'search_bar': init['search_bar'],
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count'],
+    }
+    return render(request, 'messaging/create_poll.html', variables)

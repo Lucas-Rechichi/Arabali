@@ -275,8 +275,6 @@ class NotificationConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         notification_ids = text_data_json['notification_ids']
 
-        # user_on_page_stats = UserStats.objects.get(user=self.scope['user'])
-        # if ChatRoom.objects.filter(id=chat_room_id, users=user_on_page_stats).exists():
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
@@ -292,6 +290,7 @@ class NotificationConsumer(WebsocketConsumer):
             if notification.user.user.username == self.connected_users[self.channel_name].username:
                 new_notification = notification
                 sender_userstats = UserStats.objects.get(user=User.objects.get(username=new_notification.sender))
+
                 # For the datetime such that it looks neater when displayed
                 local_timezone = pytz.timezone("Australia/Sydney")
                 local_datetime = new_notification.time_stamp.astimezone(local_timezone)
@@ -302,6 +301,7 @@ class NotificationConsumer(WebsocketConsumer):
                 # For the notification icon
                 notification_count = Notification.objects.filter(user=new_notification.user).count()
 
+                # Formatting of the notification content for image and video responses as well as replies from them as well. 
                 if new_notification.relevant_message.text:
                     notification_contents  = f'<p class="text-truncate ">{new_notification.contents}</p>'
                 else:

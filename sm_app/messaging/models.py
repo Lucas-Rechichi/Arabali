@@ -33,3 +33,19 @@ class Message(models.Model):
     image = models.ImageField(null=True, upload_to=get_image_upload_path_message)
     video = models.FileField(null=True, upload_to=get_video_upload_path_message)
     sent_at = models.DateTimeField(auto_now_add=True)
+
+
+# Polling Models
+class PollMessage(models.Model):
+    sender = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, null=False) 
+    title = models.CharField(max_length=255, null=False)
+    sent_at = models.DateTimeField(auto_now_add=True) 
+
+class PollOption(models.Model):
+    poll = models.ForeignKey(PollMessage, on_delete=models.CASCADE, null=False)
+    option = models.CharField(max_length=155, null=False)
+
+class PollingChoice(models.Model):
+    option = models.ForeignKey(PollOption, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)

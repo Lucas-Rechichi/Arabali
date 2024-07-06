@@ -1,0 +1,316 @@
+{% extends 'main/template.html' %}
+{% load crispy_forms_tags %} 
+{% block title %} 
+{{ user.username }} 
+{% endblock %}
+{% block topsidebar %}
+<li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{user.username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
+{% endblock %}
+{% block middlesidebar %}
+<li class="custom-icon"><div class="fs-4"><i class="bi bi-gear-wide-connected" style="color: #787878;"></i></div> <a href="/settings/{{user.username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
+{% endblock %}
+{% block searchBar %}
+{{ search_bar|crispy }}
+{% endblock %}
+{% block notifications %}
+    <!-- loops though all notifications sent to the document -->
+    {% for notification in notifications.values %}
+        <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="card-header">
+                <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification-{{notification.notification_object.pk}}">
+                    <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                </button>
+                <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification-{{notification.notification_object.pk}}">
+                    <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
+                </button>
+                <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
+                <button type="button ms-2" class="btn-close" id="close-notification-{{notification.notification_object.pk}}" aria-label="Close"></button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <img src="{{notification.sender_pfp_url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                        <em>{{notification.notification_object.sender}}</em>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col mt-2">
+                        {% if notification.notification_object.relevant_message.text %}
+                            <p class="text-truncate">{{notification.notification_object.contents}}</p>
+                        {% else %}
+                            {% if notification.notification_object.relevant_message.reply %}
+                                {% if notification.notification_object.relevant_message.image %}
+                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Image</strong></p>
+                                {% else %}
+                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Video</strong></p>
+                                {% endif %}
+                            {% else %}
+                                <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- script for removing notifications if a user dismisses the notification or chjecks out the notification. -->
+        <script> 
+            $(document).ready(function () {
+                $('#close-notification-{{notification.notification_object.pk}}').click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'receiver': '{{username}}',
+                            'type': 'notification-id',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'notification_id': '{{notification.notification_object.pk}}'
+                        },
+                        success: function(response) {
+                            console.log(response.notification_count, response.notification_counter)
+                            var notification = $("#notification-{{notification.notification_object.pk}}")
+                            notification.remove();
+                            $('#notification-counter').text('');
+                            $('#notification-counter').text(response.notification_count);
+                                if (response.notification_count == 0) {
+                                    $('#notification-counter').text(response.notification_count).hide();
+                                    $('#notification-counter').remove();
+                                    $('#bell-icon').removeClass('bi-bell-fill');
+                                    $('#bell-icon').addClass('bi-bell');
+                                }
+                        }
+                    })
+                })
+                $('#read-notification-{{notification.notification_object.pk}}').click(function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'receiver': '{{username}}',
+                            'type': 'notification-id',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'notification_id': '{{notification.notification_object.pk}}'
+                        },
+                        success: function(response) {
+                            console.log(response.message)
+                        }
+                    })
+                })
+            })
+        </script>
+    {% endfor %}
+{% endblock %}
+<!-- for the notification counter -->
+{% block notification_count %} 
+    {{ notification_count }}
+{% endblock %}
+{% block body %}
+<div class="container">
+    <div class="row d-flex justify-content-center">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header" style="background-color: #ffffff; border-bottom: none;">
+                    <h4 class="display-4 text-center">Create Poll</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="poll-form">
+                        <!-- Title -->
+                        <label for="poll-title" class="form-label">Poll Title</label>
+                        <input type="text" class="form-control" id="poll-title">
+                        <br>
+                        <!-- Hidden input holding number of options -->
+                        <input type="hidden" id="poll-options-count" value="3">
+                        <!-- Options -->
+                        <div id="options-div">
+                            <div id="option-1-wrapper">
+                                <label for="option-1" class="form-label">Option 1</label>
+                                <input type="text" class="form-control" id="option-1">
+                                <br>
+                            </div>
+                            <div id="option-2-wrapper">
+                                <label for="option-2" class="form-label">Option 2</label>
+                                <input type="text" class="form-control" id="option-1">
+                                <br>
+                            </div>
+                            <div id="option-3-wrapper">
+                                <label for="option-3" class="form-label">Option 3</label>
+                                <input type="text" class="form-control" id="option-1">
+                                <br>
+                            </div>
+                        </div>
+                        <!-- Buttons for adding and subtracting polling options -->
+                        <div class="row">
+                            <div class="col-1">
+                                <button type="button" class="btn btn-outline-success" id="add-option"><i class="bi bi-plus"></i></button>
+                            </div>
+                            <div class="col-1">
+                                <button type="button" class="btn btn-outline-success" id="subtract-option"><i class="bi bi-dash"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // For adding and subtracting options
+        $('#add-option').click(function () {
+            var optionCount = $('#poll-options-count').val(); // get current option count
+            optionCount = Number(optionCount);
+            optionCount += 1; // add 1
+            $('#options-div').append(`
+                <div id="option-${optionCount}-wrapper">
+                    <label for="option-${optionCount}" class="form-label">Option ${optionCount}</label>
+                    <input type="text" class="form-control" id="option-${optionCount}">
+                    <br>
+                </div>
+            `)
+            $('#poll-options-count').val(optionCount);
+            if (optionCount >= 5) {
+                $('#add-option').prop("disabled", true);
+            }
+            if (optionCount > 2) {
+                $('#subtract-option').prop("disabled", false);
+            }
+        })
+        $('#subtract-option').click(function () {
+            var optionCount = $('#poll-options-count').val(); // get current option count
+            optionCount = Number(optionCount);
+            $('#option-' + optionCount + '-wrapper').remove();
+            optionCount -= 1; // subtract 1
+            $('#poll-options-count').val(optionCount);
+            if (optionCount <= 2) {
+                $('#subtract-option').prop("disabled", true);
+            }
+            if (optionCount < 5) {
+                $('#add-option').prop("disabled", false);
+            }
+            
+        })
+    })
+</script>
+<!-- Websockets for recieving notifications -->
+<script type="text/javascript">
+    let notificationSocket;
+    let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
+
+    function connectNotificationSocket() { // function for connecting to the websocket.
+        notificationSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/brordcast-message/'
+        ); // connect to the relevant consumer class: NotificationConsumer
+
+        notificationSocket.onopen = function(e) {
+            console.log('connected', e);
+        };
+
+        notificationSocket.onmessage = function(e) { // when the consumer class sends a message through
+            console.log('Message coming through!');
+            const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
+
+            if (data.receiver === '{{username}}') { // if the data belongs to this specific user
+                $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
+                $('#notification-inbox').prepend(data.stored_html_notification); // adds HTML to the notification div that houses the notifications in the off-canvas
+                
+                // Update notification count
+                var notificationCounter = $('#notification-counter');
+                var newCount = parseInt(notificationCounter.text()) || 0;
+                notificationCounter.text(newCount + 1).show();
+                
+                if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
+                    $('#bell-icon').removeClass('bi-bell');
+                    $('#bell-icon').addClass('bi-bell-fill');
+                }
+
+                var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
+
+                if (notificationElement) {
+                    var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
+                    // Show the toast
+                    notification.show();
+                } else {
+                    console.error('Notification element not found:', 'notification-' + data.notification_id);
+                }
+
+                // Attach event handlers to the newly added notification
+                attachNotificationEventHandlers(data.notification_id, data.receiver);
+            } else {
+                console.log('incorrect user');
+            }
+        };
+
+        notificationSocket.onerror = function(e) {
+            console.error('WebSocket encountered an error:', e);
+        };
+
+        notificationSocket.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly:', e);
+            setTimeout(connectNotificationSocket, reconnectionTime); // attempt a reconnection to this websocket
+        };
+    }
+
+    function attachNotificationEventHandlers(notificationId, receiver) {
+        $(`#close-notification-${notificationId}`).click(function() {
+            $.ajax({
+                type: 'POST',
+                url: '/universal/remove-notification/',
+                data: {
+                    'receiver': receiver,
+                    'type': 'notification-id',
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'notification_id': notificationId,
+                },
+                success: function(response) {
+                    console.log(response.message);
+                    var notification = $(`#stored-notification-${notificationId}`);
+                    notification.remove();
+                    var notificationCounter = $('#notification-counter');
+                    var newCount = parseInt(notificationCounter.text()) - 1;
+
+                    if (newCount <= 0) {
+                        notificationCounter.text('').hide();
+                        $('#bell-icon').removeClass('bi-bell-fill').addClass('bi-bell');
+                    } else {
+                        notificationCounter.text(newCount);
+                    }
+                }
+            });
+        });
+
+        $(`#read-notification-${notificationId}`).click(function() {
+            $.ajax({
+                type: 'POST',
+                url: '/universal/remove-notification/',
+                data: {
+                    'receiver': receiver,
+                    'type': 'notification-id',
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'notification_id': notificationId,
+                },
+                success: function(response) {
+                    console.log(response.message);
+                }
+            });
+        });
+    }
+
+    $(document).ready(function() {
+        if ('{{ notification_count }}' == '0') {
+            var notification_counter = $('#notification-counter');
+            notification_counter.text('').hide();
+            var notification_bell = $('#bell-icon');
+            notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
+        } else {
+            var notificationCounter = $('#notification-counter');
+            notificationCounter.text('{{ notification_count }}').show();
+            $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
+        }
+    });
+
+    connectNotificationSocket(); // connect to the relevant websocket
+</script>
+<!-- To store notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+
+</div>
+{% endblock %}
