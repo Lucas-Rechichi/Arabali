@@ -42,10 +42,14 @@ class PollMessage(models.Model):
     title = models.CharField(max_length=255, null=False)
     sent_at = models.DateTimeField(auto_now_add=True) 
 
+    def has_voted(self, user):
+        return PollingChoice.objects.filter(option__poll=self, voter=user).exists()
+
+
 class PollOption(models.Model):
-    poll = models.ForeignKey(PollMessage, on_delete=models.CASCADE, null=False)
+    poll = models.ForeignKey(PollMessage, on_delete=models.CASCADE, null=False, related_name='options')
     option = models.CharField(max_length=155, null=False)
 
 class PollingChoice(models.Model):
-    option = models.ForeignKey(PollOption, on_delete=models.CASCADE, null=False)
-    user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)
+    option = models.ForeignKey(PollOption, on_delete=models.CASCADE, null=False, related_name='choices')
+    voter = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)

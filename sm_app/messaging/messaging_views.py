@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from main.models import Following, Post, UserStats
 from main.algorithum import Algorithum
-from messaging.models import ChatRoom, Message
+from messaging.models import ChatRoom, Message, PollMessage, PollOption
 from messaging.forms import CreateChatRoom
 from messaging.extras import get_chat_rooms
 from main.extras import initialize_page
@@ -45,13 +45,28 @@ def chat_room_view(request, room, room_id):
         return render(request, 'main/error.html', {'issue': 'Cannot access this chatroom.'})
     
     # Getting the messages associated with this chatroom
+    all_messages = []
     messages = Message.objects.filter(room=chat_room)
+    poll_messages = PollMessage.objects.filter(room=chat_room)
+    for message in messages:
+        all_messages.append({
+            'message': message,
+            'has_chosen': None,
+        })
+    for poll_message in poll_messages:
+        all_messages.append({
+            'message': poll_message,
+            'has_chosen': poll_message.has_voted(user=user_stats)
+        })
+    sorted_all_messages = sorted(all_messages, key=lambda message: message['message'].sent_at)
+    
 
     # Passing data over to HTML document
     variables = {
         'chat_rooms': chat_rooms,
         'room': chat_room,
-        'messages': messages,
+        'messages': sorted_all_messages,
+        'poll_messages': poll_messages,
         'username': init['username'],
         'search_bar': init['search_bar'],
         'notifications': init['notification_list'],
@@ -142,15 +157,17 @@ def create_chat_room(request, increment):
     }
     return render(request, 'messaging/create_chat_room.html', variables)
 
-def create_poll(request):
+def create_poll(request, room, room_id):
     if UserStats.objects.get(user=request.user).is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     init = initialize_page(request)
-
+    chat_room = ChatRoom.objects.get(id=room_id)
     variables = {
         'username': init['username'],
         'search_bar': init['search_bar'],
         'notifications': init['notification_list'],
         'notification_count': init['notification_count'],
+        'room': chat_room,
+
     }
     return render(request, 'messaging/create_poll.html', variables)

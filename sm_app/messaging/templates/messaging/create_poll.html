@@ -128,12 +128,12 @@
                             </div>
                             <div id="option-2-wrapper">
                                 <label for="option-2" class="form-label">Option 2</label>
-                                <input type="text" class="form-control option" id="option-1" data-option-number="2">
+                                <input type="text" class="form-control option" id="option-2" data-option-number="2">
                                 <br>
                             </div>
                             <div id="option-3-wrapper">
                                 <label for="option-3" class="form-label">Option 3</label>
-                                <input type="text" class="form-control option" id="option-1" data-option-number="3">
+                                <input type="text" class="form-control option" id="option-3" data-option-number="3">
                                 <br>
                             </div>
                         </div>
@@ -258,8 +258,33 @@
             pollOptionPreviewText.text('');
             pollOptionPreviewText.text(optionInput);
         })
-        $('confirm-poll').click(function () {
+        $('#confirm-poll').click(function () {
             var pollTitle = $('#poll-title').val();
+            var options = {}
+            for (let i = 1; i <= 5; i++) {
+                if ($('#option-' + i)) {
+                    options['option_' + i] =  $('#option-' + i).val();
+                }
+                else {
+                    break;
+                }
+            }
+            console.log(options)
+            $.ajax({
+                type: 'POST',
+                url: '/polls/create-poll/',
+                data: {
+                    'poll_title': pollTitle,
+                    'options_dict': options,
+                    'chatroom_id': '{{room.id}}',
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    console.log('success');
+                    location.href = '/chat/{{room.name}}/{{room.id}}'
+                }
+
+            })
             // complete poll form submission.
         })
     })

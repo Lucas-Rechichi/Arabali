@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
-from messaging.models import ChatRoom, Message
+from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice
 
 
 def message_sent_text(request):
@@ -222,4 +222,54 @@ def message_sent_video(request):
         }
     is_reply = 'false'
     return JsonResponse(response)
+
+def create_poll(request):
+
+    print(request.POST)
+    # Get sent data
+    poll_title = request.POST.get('poll_title')
+    chatroom_id = request.POST.get('chatroom_id')
+    options = []
+
+    for x in range(1,6):
+        option = request.POST.get(f'options_dict[option_{x}]')
+        print(option)
+        if option is not None:
+            options.append(option)
     
+
+    sender = request.user
+    sender_userstats = UserStats.objects.get(user=sender)
+    chat_room = ChatRoom.objects.get(id=chatroom_id)
+    
+    new_poll = PollMessage(sender=sender_userstats, room=chat_room, title=poll_title)
+    new_poll.save()
+
+    for option in options:
+        new_poll_option = PollOption(poll=new_poll, option=option)
+        new_poll_option.save()
+
+    response = {}
+    return JsonResponse(response)
+    
+def vote_for_poll(request):
+    option_id = request.POST.get('option_id')
+
+    voter = request.user
+    voter_userstats = UserStats.objects.get(user=voter)
+    option = PollOption.objects.get(id=option_id)
+    poll = PollMessage.objects.get(id=option.poll.pk)
+
+    if PollingChoice.objects.filter(option=option, voter=voter_userstats).exists():
+        choice = PollingChoice.objects.get(option=option, voter=voter_userstats)
+        choice.delete()
+    else:
+        new_choice = PollingChoice(option=option, voter=voter_userstats)
+        new_choice.save()
+    
+    # Calculating the choice % 
+    option_choice_count = option.choices.all().count()
+    poll_choice_count = poll.options.all().count()
+    option_percent = (option_choice_count / poll_choice_count) * 100
+
+    return None
