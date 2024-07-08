@@ -233,7 +233,6 @@ def create_poll(request):
 
     for x in range(1,6):
         option = request.POST.get(f'options_dict[option_{x}]')
-        print(option)
         if option is not None:
             options.append(option)
     
@@ -282,10 +281,6 @@ def vote_for_poll(request):
     new_choice = PollingChoice(option=selected_option, voter=voter_userstats)
     new_choice.save()
     
-    # Calculating the choice % 
-    # option_choice_count = option.choices.all().count()
-    # poll_choice_count = poll.options.all().count()
-    # option_percent = (option_choice_count / poll_choice_count) * 100
     response = {
         'option_id': option_id
     }

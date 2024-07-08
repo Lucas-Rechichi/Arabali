@@ -416,6 +416,8 @@ class EventConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         event_type = text_data_json['event_type']
 
+        user = self.scope.get("user")
+
         if event_type == 'create_poll':
             poll_id = text_data_json['poll_id']
             async_to_sync(self.channel_layer.group_send)(
@@ -424,6 +426,7 @@ class EventConsumer(WebsocketConsumer):
                     'type': 'event_manager',
                     'event_type': event_type,
                     'poll_id': poll_id,
+                    'sender': user.username,
                 }
             )
     
@@ -444,14 +447,15 @@ class EventConsumer(WebsocketConsumer):
             poll_sent_at = formatted_datetime_capitalized
 
             options = []
-            for option in poll.options:
+            for option in poll.options.all():
                 options.append({
                     'option_name': option.option,
                     'option_id': option.pk,
                 })
             option_count = len(options)
 
-            user = self.scope['user']
+            sender = event['sender']
+            user = User.objects.get(username=sender)
             user_pfp_url = UserStats.objects.get(user=user).pfp.url 
 
             self.send(text_data=json.dumps({
@@ -460,6 +464,7 @@ class EventConsumer(WebsocketConsumer):
                     'poll_id': poll_id,
                     'poll_sent_at': poll_sent_at,
                     'options': options,
-                    'sender': user.username,
+                    'option_count': option_count,
+                    'sender': sender,
                     'sender_pfp_url': user_pfp_url
                 }))

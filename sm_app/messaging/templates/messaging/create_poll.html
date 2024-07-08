@@ -194,6 +194,33 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function () {
+        let reconnectionTime = 5000;
+        const roomId = '{{room.id}}'
+        function connectEventSocket () {
+                eventSocket = new WebSocket(
+                    'ws://' + window.location.host + '/ws/realtime-event-manager/' + roomId
+                );
+
+                eventSocket.onopen = function(e) {
+                    console.log('connected', e);
+                };
+
+                eventSocket.onmessage = function (e) {
+                    // location.href = '/chat/{{room.name}}/{{room.id}}'
+                }
+
+                eventSocket.onclose = function (e) {
+                    console.error('WebSocket closed unexpectedly:', e);
+                    setTimeout(connectEventSocket, reconnectionTime);
+                }
+
+                eventSocket.onerror = function (e) {
+                    console.error('WebSocket encountered error:', e);
+                }
+            }
+
+        connectEventSocket();
+
         // For adding and subtracting options
         $('#add-option').click(function () {
 
@@ -280,36 +307,19 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(response) {
+                    console.log('poll created!')
                     eventSocket.send(JSON.stringify({
-                        'event_type': 'creating_poll',
+                        'event_type': 'create_poll',
                         'poll_id': response.poll_id,
                     }));
-                    location.href = '/chat/{{room.name}}/{{room.id}}'
+                    
+                    
                 }
 
             })
             // complete poll form submission.
         })
     })
-</script>
-<script type="text/javascript">
-    let reconnectionTime = 5000;
-    const roomId = '{{room.id}}'
-    function connectEventSocket () {
-            eventSocket = new WebSocket(
-                'ws://' + window.location.host + '/ws/realtime-event-manager/' + roomId
-            );
-
-            eventSocket.onclose = function (e) {
-                console.error('WebSocket closed unexpectedly:', e);
-                setTimeout(connectEventSocket, reconnectionTime);
-            }
-
-            eventSocket.onerror = function (e) {
-                console.error('WebSocket encountered error:', e);
-            }
-        }
-    connectEventSocket();
 </script>
 <!-- Websockets for recieving notifications -->
 <script type="text/javascript">

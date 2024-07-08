@@ -152,49 +152,49 @@ MEDIA_URL = '/arabali_users/'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
-# Logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'WARNING',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-        'daphne': {
-            'handlers': ['console'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-        'channels': {
-            'handlers': ['console'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-        'asgi': {
-            'handlers': ['console'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
-    },
-}
+# # Logging
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'WARNING',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'WARNING',
+#             'propagate': True,
+#         },
+#         'daphne': {
+#             'handlers': ['console'],
+#             'level': 'WARNING',
+#             'propagate': True,
+#         },
+#         'channels': {
+#             'handlers': ['console'],
+#             'level': 'WARNING',
+#             'propagate': True,
+#         },
+#         'asgi': {
+#             'handlers': ['console'],
+#             'level': 'WARNING',
+#             'propagate': True,
+#         },
+#     },
+# }
 
-logging.getLogger().setLevel(logging.WARNING)
+# logging.getLogger().setLevel(logging.WARNING)
