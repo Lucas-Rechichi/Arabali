@@ -232,6 +232,81 @@
                                                         <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
                                                     {% else %}
                                                         {% if message_dict.has_chosen %}
+                                                            <div style="width: 300px;"></div>
+                                                            <p class="small text-center">Poll</p>
+                                                            <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                            {% for option_properties in message_dict.option_list %}
+                                                                {% if option_properties.chosen_by_user %}
+                                                                    <div id="option-{{option_properties.option.id}}">
+                                                                        <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>{{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'>{{choice.voter}}{% endfor %}</div></div>">
+                                                                            <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;">
+                                                                                <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                                    <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-text" style="color: black;">{{option_properties.option.option}}</p>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="progress-bar" id="anti-percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #e9ecef;">
+                                                                            </div>
+                                                                        </div>
+                                                                        <br>
+                                                                    </div>
+                                                                    <script text="text/javascript">
+                                                                        $(document).ready(function () {
+                                                                            const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                            const antiProgressBar = $('#anti-percent-bar-{{option_properties.option.id}}');
+                                                                            const optionDistrbution = $('#option-disribution-{{option_properties.option.id}}');
+
+                                                                            if ('{{option_properties.percent}}' <= 10) {
+                                                                                progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                            } else {
+                                                                                progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                            }
+                                                                            antiProgressBar.css('width', '{{option_properties.anti_percent}}%');
+
+                                                                            var tooltipHtml = `
+                                                                            
+                                                                            `;
+                                                                            optionDistrbution.attr('data-bs-title', tooltipHtml);
+                                                                        })
+                                                                    </script>
+                                                                {% else %}
+                                                                    <div id="option-{{option_properties.option.id}}">
+                                                                        <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>{{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'>{{choice.voter}}{% endfor %}</div></div>">
+                                                                            <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;">
+                                                                                <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                                    <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-text" style="color: black;">{{option_properties.option.option}}</p>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="progress-bar" id="anti-percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #e9ecef;">
+                                                                            </div>
+                                                                        </div>
+                                                                        <br>
+                                                                    </div>
+                                                                    <script text="text/javascript">
+                                                                        $(document).ready(function () {
+                                                                            const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                            const antiProgressBar = $('#anti-percent-bar-{{option_properties.option.id}}');
+                                                                            const optionDistrbution = $('#option-disribution-{{option_properties.option.id}}');
+
+                                                                            if ('{{option_properties.percent}}' <= 10) {
+                                                                                progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                            } else {
+                                                                                progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                            }
+                                                                            antiProgressBar.css('width', '{{option_properties.anti_percent}}%');
+
+                                                                            var tooltipHtml = `
+                                                                            <p>{{option_properties.percent}}%</p>
+                                                                            <ul>
+                                                                                {% for choice in option_properties.option.choices.all %}
+                                                                                    <li>{{choice.voter}}</li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                            `;
+                                                                            optionDistrbution.attr('data-bs-title', tooltipHtml);
+                                                                        })
+                                                                    </script>
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         {% else %}
                                                             <div style="width: 300px;"></div>
                                                             <p class="small text-center">Poll</p>
@@ -350,8 +425,102 @@
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
                                                         <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
-                                                    {% else %} 
+                                                    {% elif message_dict.message.video %} 
                                                         <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                    {% else %}
+                                                        {% if message_dict.has_chosen %}
+                                                            <div style="width: 300px;"></div>
+                                                            <p class="small text-center">Poll</p>
+                                                            <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                            {% for option_properties in message_dict.option_list %}
+                                                                {% if option_properties.chosen_by_user %}
+                                                                    <div id="option-{{option_properties.option.id}}">
+                                                                        <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>{{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'>{{choice.voter}}{% endfor %}</div></div>">
+                                                                            <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;">
+                                                                                <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                                    <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-text" style="color: black;">{{option_properties.option.option}}</p>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="progress-bar" id="anti-percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #e9ecef;">
+                                                                            </div>
+                                                                        </div>
+                                                                        <br>
+                                                                    </div>
+                                                                    <script text="text/javascript">
+                                                                        $(document).ready(function () {
+                                                                            const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                            const antiProgressBar = $('#anti-percent-bar-{{option_properties.option.id}}');
+                                                                            const optionDistrbution = $('#option-disribution-{{option_properties.option.id}}');
+
+                                                                            if ('{{option_properties.percent}}' <= 10) {
+                                                                                progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                            } else {
+                                                                                progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                            }
+                                                                            antiProgressBar.css('width', '{{option_properties.anti_percent}}%');
+
+                                                                            var tooltipHtml = `
+                                                                            
+                                                                            `;
+                                                                            optionDistrbution.attr('data-bs-title', tooltipHtml);
+                                                                        })
+                                                                    </script>
+                                                                {% else %}
+                                                                    <div id="option-{{option_properties.option.id}}">
+                                                                        <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>{{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'>{{choice.voter}}{% endfor %}</div></div>">
+                                                                            <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;">
+                                                                                <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                                    <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-text" style="color: black;">{{option_properties.option.option}}</p>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="progress-bar" id="anti-percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #e9ecef;">
+                                                                            </div>
+                                                                        </div>
+                                                                        <br>
+                                                                    </div>
+                                                                    <script text="text/javascript">
+                                                                        $(document).ready(function () {
+                                                                            const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                            const antiProgressBar = $('#anti-percent-bar-{{option_properties.option.id}}');
+                                                                            const optionDistrbution = $('#option-disribution-{{option_properties.option.id}}');
+
+                                                                            if ('{{option_properties.percent}}' <= 10) {
+                                                                                progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                            } else {
+                                                                                progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                            }
+                                                                            antiProgressBar.css('width', '{{option_properties.anti_percent}}%');
+
+                                                                            var tooltipHtml = `
+                                                                            <p>{{option_properties.percent}}%</p>
+                                                                            <ul>
+                                                                                {% for choice in option_properties.option.choices.all %}
+                                                                                    <li>{{choice.voter}}</li>
+                                                                                {% endfor %}
+                                                                            </ul>
+                                                                            `;
+                                                                            optionDistrbution.attr('data-bs-title', tooltipHtml);
+                                                                        })
+                                                                    </script>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            <div style="width: 300px;"></div>
+                                                            <p class="small text-center">Poll</p>
+                                                            <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                            {% for option in message_dict.message.options.all %}
+                                                                <div id="option-{{option.id}}">
+                                                                    <div class="progress" role="progressbar" aria-label="Option: {{option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                        <div class="progress-bar" style="width: 100%; background-color: #e9ecef;">
+                                                                            <button class="m-0 p-0 btn poll-option" id="poll-option-{{option.id}}" data-option-id="{{option.id}}">
+                                                                                <p class="m-0 text-start ps-2" id="option-{{option.id}}-text" style="color: black;">{{option.option}}</p>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% endif %}
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
@@ -418,6 +587,9 @@
     </form>
     <!-- Websocket for sending messages -->
     <script type="text/javascript">
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
         // for conviniance
         function scrollBarAtBottom() {
                 var scrollableContent = document.getElementById("conversationFrame");
@@ -712,6 +884,77 @@
                 console.error('WebSocket encountered error:', e);
             }
         }
+        
+        function connectEventSocket () {
+            eventSocket = new WebSocket(
+                'ws://' + window.location.host + '/ws/realtime-event-manager/' + roomId
+            );
+
+            eventSocket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+                if (data.type === 'incoming_poll_message') {
+                    if (data.sender === '{{username}}')
+                    var newMessageInHtml = `
+                        <div class="message">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="text-center"><em>` + data.poll_sent_at + `</em></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-11">
+                                            <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                        </div>
+                                        <div class="col-1">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-10 d-flex justify-content-end">
+                                            <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
+                                                <div class="card-header" style="border-bottom: none;">
+                                                    // start fix //
+                                                    <div style="width: 300px;"></div>
+                                                    <p class="small text-center">Poll</p>
+                                                    <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                    {% for option in message_dict.message.options.all %}
+                                                        <div id="option-{{option.id}}">
+                                                            <div class="progress" role="progressbar" aria-label="Option: {{option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                <div class="progress-bar" style="width: 100%; background-color: #e9ecef;">
+                                                                    <button class="m-0 p-0 btn poll-option" id="poll-option-{{option.id}}" data-option-id="{{option.id}}">
+                                                                        <p class="m-0 text-start ps-2" id="option-{{option.id}}-text" style="color: black;">{{option.option}}</p>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <br>
+                                                        </div>
+                                                    {% endfor %}
+                                                    // end fix //
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1">
+                                            <img src="` + data.sender_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            }
+
+            eventSocket.onclose = function (e) {
+                console.error('WebSocket closed unexpectedly:', e);
+                setTimeout(connectEventSocket, reconnectionTime);
+            }
+
+            eventSocket.onerror = function (e) {
+                console.error('WebSocket encountered error:', e);
+            }
+        }
 
         function connectNotificationSocket () {
             notificationSocket = new WebSocket(
@@ -831,6 +1074,7 @@
             }
         });
         connectMessageSocket();
+        connectEventSocket();
         connectNotificationSocket();
     </script>
     <script>

@@ -249,27 +249,44 @@ def create_poll(request):
         new_poll_option = PollOption(poll=new_poll, option=option)
         new_poll_option.save()
 
-    response = {}
+    response = {
+        'poll_id': new_poll.pk,
+    }
     return JsonResponse(response)
     
 def vote_for_poll(request):
+
+    # Getting relevant data
     option_id = request.POST.get('option_id')
-
     voter = request.user
+    
+    # Getting relevant database things
     voter_userstats = UserStats.objects.get(user=voter)
-    option = PollOption.objects.get(id=option_id)
-    poll = PollMessage.objects.get(id=option.poll.pk)
+    selected_option = PollOption.objects.get(id=option_id)
+    poll = PollMessage.objects.get(id=selected_option.poll.pk)
+    other_options = list(poll.options.all())
 
-    if PollingChoice.objects.filter(option=option, voter=voter_userstats).exists():
-        choice = PollingChoice.objects.get(option=option, voter=voter_userstats)
-        choice.delete()
-    else:
-        new_choice = PollingChoice(option=option, voter=voter_userstats)
-        new_choice.save()
+    # Collectiong all of the polling options
+    options = []
+    options.append(selected_option)
+    for other_option in other_options:
+        options.append(other_option)
+    
+    # Deleting choice created by this user specifically
+    for option in options: 
+        if PollingChoice.objects.filter(option=option,voter=voter_userstats).exists():
+            choice = PollingChoice.objects.get(option=option, voter=voter_userstats)
+            choice.delete()
+
+    # Adding in the new choice made
+    new_choice = PollingChoice(option=selected_option, voter=voter_userstats)
+    new_choice.save()
     
     # Calculating the choice % 
-    option_choice_count = option.choices.all().count()
-    poll_choice_count = poll.options.all().count()
-    option_percent = (option_choice_count / poll_choice_count) * 100
-
-    return None
+    # option_choice_count = option.choices.all().count()
+    # poll_choice_count = poll.options.all().count()
+    # option_percent = (option_choice_count / poll_choice_count) * 100
+    response = {
+        'option_id': option_id
+    }
+    return JsonResponse(response)

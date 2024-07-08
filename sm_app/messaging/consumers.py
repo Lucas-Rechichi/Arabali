@@ -10,7 +10,7 @@ from urllib.parse import unquote
 from main.models import UserStats, Notification
 from main.extras import remove_until_character
 from messaging.extras import replace_spaces
-from messaging.models import ChatRoom, Message
+from messaging.models import ChatRoom, Message, PollMessage
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 
@@ -377,4 +377,89 @@ class NotificationConsumer(WebsocketConsumer):
                     'notification_count': notification_count,
                     'receiver': new_notification.user.user.username,
                     'source_name': new_notification.source.name,
+                }))
+
+class EventConsumer(WebsocketConsumer):
+    def connect(self):
+        # Collects relevant information about the chatroom.
+        self.room_id = self.scope['url_route']['kwargs']['room_id']
+        user = self.scope["user"]
+
+        # Getting relevant database objects
+        chat_room = ChatRoom.objects.get(id=self.room_id)
+        user_stats = UserStats.objects.get(user=user)
+
+        # Defining the room name
+        self.room_group_name = f'event_room_{self.room_id}'
+
+        # Checking to see if this user has been invited to the chatroom.
+        if chat_room.users.filter(user=user_stats.user).exists():
+            # Add the user to the channel layer
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name,
+                self.channel_name
+            )
+            # Accept the WebSocket connection
+            self.accept()
+        else:
+            # Take action if the user is not on the specific page or is not allowed in the chatroom
+            self.close(code=4001)  # Close the connection with a custom error code
+
+    def disconnect(self, close_code):
+        # Remove the WebSocket from the group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+    
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        event_type = text_data_json['event_type']
+
+        if event_type == 'create_poll':
+            poll_id = text_data_json['poll_id']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'event_manager',
+                    'event_type': event_type,
+                    'poll_id': poll_id,
+                }
+            )
+    
+    def event_manager(self, event):
+        event_type = event['event_type']
+
+        if event_type == 'create_poll':
+            poll_id = event['poll_id']
+
+            poll = PollMessage.objects.get(id=poll_id)
+            poll_title = poll.title
+
+            # For the datetime such that it looks neater when displayed
+            local_timezone = pytz.timezone("Australia/Sydney")
+            local_datetime = poll.sent_at.astimezone(local_timezone)
+            formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
+            formatted_datetime_capitalized = formatted_datetime.capitalize()
+            poll_sent_at = formatted_datetime_capitalized
+
+            options = []
+            for option in poll.options:
+                options.append({
+                    'option_name': option.option,
+                    'option_id': option.pk,
+                })
+            option_count = len(options)
+
+            user = self.scope['user']
+            user_pfp_url = UserStats.objects.get(user=user).pfp.url 
+
+            self.send(text_data=json.dumps({
+                    'type': 'incoming_poll_message',
+                    'poll_title': poll_title,
+                    'poll_id': poll_id,
+                    'poll_sent_at': poll_sent_at,
+                    'options': options,
+                    'sender': user.username,
+                    'sender_pfp_url': user_pfp_url
                 }))

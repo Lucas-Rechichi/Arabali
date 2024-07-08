@@ -280,7 +280,10 @@
                     'csrfmiddlewaretoken': '{{ csrf_token }}',
                 },
                 success: function(response) {
-                    console.log('success');
+                    eventSocket.send(JSON.stringify({
+                        'event_type': 'creating_poll',
+                        'poll_id': response.poll_id,
+                    }));
                     location.href = '/chat/{{room.name}}/{{room.id}}'
                 }
 
@@ -289,10 +292,29 @@
         })
     })
 </script>
+<script type="text/javascript">
+    let reconnectionTime = 5000;
+    const roomId = '{{room.id}}'
+    function connectEventSocket () {
+            eventSocket = new WebSocket(
+                'ws://' + window.location.host + '/ws/realtime-event-manager/' + roomId
+            );
+
+            eventSocket.onclose = function (e) {
+                console.error('WebSocket closed unexpectedly:', e);
+                setTimeout(connectEventSocket, reconnectionTime);
+            }
+
+            eventSocket.onerror = function (e) {
+                console.error('WebSocket encountered error:', e);
+            }
+        }
+    connectEventSocket();
+</script>
 <!-- Websockets for recieving notifications -->
 <script type="text/javascript">
     let notificationSocket;
-    let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
+    reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
 
     function connectNotificationSocket() { // function for connecting to the websocket.
         notificationSocket = new WebSocket(

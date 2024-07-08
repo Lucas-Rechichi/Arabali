@@ -5,4 +5,5 @@ from messaging import consumers
 websocket_urlpatterns = [
     re_path(r'ws/brordcast-message/', consumers.NotificationConsumer.as_asgi()),
     re_path(r'ws/realtime-message-manager/(?P<room_id>\d+)', consumers.MessageConsumer.as_asgi()),
+    re_path(r'ws/realtime-event-manager/(?P<room_id>\d+)', consumers.EventConsumer.as_asgi()),
 ]

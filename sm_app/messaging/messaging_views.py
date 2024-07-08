@@ -1,8 +1,7 @@
 from django.shortcuts import render
 
-from main.models import Following, Post, UserStats
-from main.algorithum import Algorithum
-from messaging.models import ChatRoom, Message, PollMessage, PollOption
+from main.models import Following, UserStats
+from messaging.models import ChatRoom, Message, PollMessage, PollingChoice
 from messaging.forms import CreateChatRoom
 from messaging.extras import get_chat_rooms
 from main.extras import initialize_page
@@ -52,11 +51,38 @@ def chat_room_view(request, room, room_id):
         all_messages.append({
             'message': message,
             'has_chosen': None,
+            'option_list': None,
         })
     for poll_message in poll_messages:
+        all_options = poll_message.options.all()
+        all_votes = 0
+        option_votes_list = []
+        option_percentage_list = []
+
+        for option in all_options:
+            option_votes = 0 
+            all_votes += option.choices.all().count()
+            option_votes += option.choices.all().count()
+            option_votes_list.append({
+                'option': option,
+                'value': option_votes,
+            })
+        for y in range(0, len(option_votes_list)):
+            try:
+                option_percent = (option_votes_list[y]['value'] / all_votes) * 100
+            except ZeroDivisionError:
+                option_percent = 0
+            option_anti_percent = 100 - option_percent
+            option_percentage_list.append({
+                'option': option_votes_list[y]['option'],
+                'percent': round(option_percent, 1),
+                'anti_percent': round(option_anti_percent, 1),
+                'chosen_by_user': PollingChoice.objects.filter(option=option_votes_list[y]['option'], voter=user_stats).exists(),
+            })
         all_messages.append({
             'message': poll_message,
-            'has_chosen': poll_message.has_voted(user=user_stats)
+            'has_chosen': poll_message.has_voted(user=user_stats),
+            'option_list': option_percentage_list,
         })
     sorted_all_messages = sorted(all_messages, key=lambda message: message['message'].sent_at)
     
