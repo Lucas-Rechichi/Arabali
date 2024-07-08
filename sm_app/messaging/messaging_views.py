@@ -75,6 +75,7 @@ def chat_room_view(request, room, room_id):
             option_anti_percent = 100 - option_percent
             option_percentage_list.append({
                 'option': option_votes_list[y]['option'],
+                'option_votes': option_votes_list[y]['value'],
                 'percent': round(option_percent, 1),
                 'anti_percent': round(option_anti_percent, 1),
                 'chosen_by_user': PollingChoice.objects.filter(option=option_votes_list[y]['option'], voter=user_stats).exists(),

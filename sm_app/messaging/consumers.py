@@ -10,7 +10,7 @@ from urllib.parse import unquote
 from main.models import UserStats, Notification
 from main.extras import remove_until_character
 from messaging.extras import replace_spaces
-from messaging.models import ChatRoom, Message, PollMessage
+from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice
 from django.contrib.auth.models import User
 from django.middleware.csrf import get_token
 
@@ -429,6 +429,17 @@ class EventConsumer(WebsocketConsumer):
                     'sender': user.username,
                 }
             )
+        elif event_type == 'vote_for_poll':
+            option_id = text_data_json['option_id']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'event_manager',
+                    'event_type': event_type,
+                    'option_id': option_id,
+                    'voter': user.username,
+                }
+            )
     
     def event_manager(self, event):
         event_type = event['event_type']
@@ -464,6 +475,33 @@ class EventConsumer(WebsocketConsumer):
                     'poll_id': poll_id,
                     'poll_sent_at': poll_sent_at,
                     'options': options,
+                    'option_count': option_count,
+                    'sender': sender,
+                    'sender_pfp_url': user_pfp_url
+                }))
+            
+        elif event_type == 'vote_for_poll':
+            option_id = event['option_id']
+
+            voter = event['voter']
+            voter_user = User.objects.get(username=voter)
+            voter_userstats = UserStats.objects.get(user=voter_user)
+            option = PollOption.objects.get(id=option_id)
+            choice = PollingChoice.objects.get(option=option, voter=voter_userstats)
+
+            poll_title = option.poll.title
+
+            options_list = []
+            for option_x in option.poll.options.all():
+                options_list.append({
+                    'option_name': option_x.option,
+                    
+                })
+            self.send(text_data=json.dumps({
+                    'type': 'incoming_poll_message',
+                    'poll_title': poll_title,
+                    'poll_id': poll_id,
+                    'options': options_list,
                     'option_count': option_count,
                     'sender': sender,
                     'sender_pfp_url': user_pfp_url
