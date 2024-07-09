@@ -492,17 +492,33 @@ class EventConsumer(WebsocketConsumer):
             poll_title = option.poll.title
 
             options_list = []
+            total_votes = 0
+            for option_y in option.poll.options.all():
+                total_votes += option_y.choices.all().count()
+            
             for option_x in option.poll.options.all():
+                amount_of_votes = option_x.choices.all().count()
+                vote_percent = (amount_of_votes / total_votes) * 100
+                choice_voters = []
+                for choice_x in option_x.choices.all():
+                    choice_voters.append({
+                        'voter': choice_x.voter,
+                    })
                 options_list.append({
                     'option_name': option_x.option,
-                    
+                    'option_id': option_x.pk,
+                    'amount_of_votes': amount_of_votes,
+                    'voters': choice_voters,
+                    'vote_percent': vote_percent,
                 })
+
             self.send(text_data=json.dumps({
-                    'type': 'incoming_poll_message',
+                    'type': 'incoming_poll_vote',
                     'poll_title': poll_title,
                     'poll_id': poll_id,
-                    'options': options_list,
+                    'voted_for_option_id': option_id,
+                    'has_chosen': option.poll.has_voted(voter_userstats),
+                    'voter': voter,
+                    'options': options_list, 
                     'option_count': option_count,
-                    'sender': sender,
-                    'sender_pfp_url': user_pfp_url
                 }))
