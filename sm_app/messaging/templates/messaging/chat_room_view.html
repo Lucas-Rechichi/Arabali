@@ -941,9 +941,9 @@
                     $('#conversation-contents').append(newMessageInHtml);
                     setTimeout(scrollBarAtBottom(), 1000);
                 }
-                else if (data.type === 'incoming_poll_vote') {
+                if (data.type === 'incoming_poll_vote') {
                     if (data.voter === '{{username}}') { // if we made the vote
-                        if ($('#poll-message-' + data.poll_id).data('graded-poll') === 'true') { // if we have already voted beforehand
+                        if ($('#poll-message-' + data.poll_id).data('graded-poll') === true) { // if we have already voted beforehand
                             // change specific things
                             // get relevant HTML elements, change them.
                             for (let i = 0; i < data.option_count; i++) {
@@ -956,8 +956,7 @@
                                 var percent = data.options[i].vote_percent;
                                 var optionCount = data.options[i].amount_of_votes;
                                 var choicesHtml = '';
-
-                                for (let q = 0; q < optionCount; q++) {
+                                for (let q = 0; q < data.options[i].amount_of_votes; q++) {
                                     var choiceHtml = `
                                         <div class='row'>
                                             <div class='col'>
@@ -997,7 +996,7 @@
                         }
                     } 
                     else { // if someone else made the vote
-                        if ($('#poll-message-' + data.poll_id).data('graded-poll') === 'true') { // if we have already voted beforehand
+                        if ($('#poll-message-' + data.poll_id).data('graded-poll') === true) { // if we have already voted beforehand
                             // change specific things
                             // get relevant HTML elements, change them.
                             for (let i = 0; i < data.option_count; i++) {
@@ -1010,8 +1009,7 @@
                                 var percent = data.options[i].vote_percent;
                                 var optionCount = data.options[i].amount_of_votes;
                                 var choicesHtml = '';
-
-                                for (let q = 0; q < optionCount; q++) {
+                                for (let q = 0; q < data.options[i].amount_of_votes; q++) {
                                     var choiceHtml = `
                                         <div class='row'>
                                             <div class='col'>
