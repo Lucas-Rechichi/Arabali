@@ -490,6 +490,8 @@ class EventConsumer(WebsocketConsumer):
             choice = PollingChoice.objects.get(option=option, voter=voter_userstats)
 
             poll_title = option.poll.title
+            poll_id = option.poll.pk
+            option_count = option.poll.options.all().count()
 
             options_list = []
             total_votes = 0
@@ -502,7 +504,7 @@ class EventConsumer(WebsocketConsumer):
                 choice_voters = []
                 for choice_x in option_x.choices.all():
                     choice_voters.append({
-                        'voter': choice_x.voter,
+                        'voter': choice_x.voter.user.username,
                     })
                 options_list.append({
                     'option_name': option_x.option,
