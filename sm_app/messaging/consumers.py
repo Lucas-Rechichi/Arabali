@@ -301,16 +301,19 @@ class NotificationConsumer(WebsocketConsumer):
                 # For the notification icon
                 notification_count = Notification.objects.filter(user=new_notification.user).count()
 
-                # Formatting of the notification content for image and video responses as well as replies from them as well. 
-                if new_notification.relevant_message.text:
-                    notification_contents  = f'<p class="text-truncate ">{new_notification.contents}</p>'
-                else:
-                    if new_notification.relevant_message.reply:
-                        contents = remove_until_character(new_notification.contents, ':')
-                        contents_a = remove_until_character(contents, ' ')
-                        notification_contents  = f'<p class="text-truncate ">({new_notification.sender} Replied to You): <strong>{contents_a}</strong></p>'
+                # Formatting of the notification content for image and video responses as well as replies from them as well.
+                if new_notification.relevant_message:
+                    if new_notification.relevant_message.text:
+                        notification_contents  = f'<p class="text-truncate ">{new_notification.contents}</p>'
                     else:
-                        notification_contents  = f'<p class="text-truncate "><strong>{new_notification.contents}</strong></p>'
+                        if new_notification.relevant_message.reply:
+                            contents = remove_until_character(new_notification.contents, ':')
+                            contents_a = remove_until_character(contents, ' ')
+                            notification_contents  = f'<p class="text-truncate ">({new_notification.sender} Replied to You): <strong>{contents_a}</strong></p>'
+                        else:
+                            notification_contents  = f'<p class="text-truncate "><strong>{new_notification.contents}</strong></p>'
+                else: # for poll messages
+                    notification_contents = f'<p class="text-truncate "><strong>Poll: </strong>{new_notification.contents}</p>'
                 print(notification_contents)
                 html_notification_popup = f'''
                 <div id="popup-notification-{new_notification.pk}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -491,6 +494,7 @@ class EventConsumer(WebsocketConsumer):
 
             poll_title = option.poll.title
             poll_id = option.poll.pk
+            poll_sender = option.poll.sender.user.username
             option_count = option.poll.options.all().count()
 
             options_list = []
@@ -511,12 +515,13 @@ class EventConsumer(WebsocketConsumer):
                     'option_id': option_x.pk,
                     'amount_of_votes': amount_of_votes,
                     'voters': choice_voters,
-                    'vote_percent': vote_percent,
+                    'vote_percent': round(vote_percent, 1),
                 })
 
             self.send(text_data=json.dumps({
                     'type': 'incoming_poll_vote',
                     'poll_title': poll_title,
+                    'poll_sender': poll_sender,
                     'poll_id': poll_id,
                     'voted_for_option_id': option_id,
                     'has_chosen': option.poll.has_voted(voter_userstats),

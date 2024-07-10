@@ -64,14 +64,15 @@ class UserStats(models.Model):
     def __str__(self):
         return self.user.username
 
-from messaging.models import ChatRoom
-from messaging.models import Message
+from messaging.models import ChatRoom, Message, PollMessage
+
 
 # Notifications
 class Notification(models.Model):
     user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)
     source = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, null=False)
     relevant_message = models.ForeignKey(Message, on_delete=models.CASCADE, null=True)
+    relevant_poll = models.ForeignKey(PollMessage, on_delete=models.CASCADE, null=True)
     relevant_post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     sender = models.CharField(max_length=300)
     contents = models.TextField()

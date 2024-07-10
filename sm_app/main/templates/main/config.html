@@ -128,6 +128,8 @@
                             <div class="col mt-2">
                                 {% if notification.notification_object.relevant_message.text %}
                                     <p class="text-truncate">{{notification.notification_object.contents}}</p>
+                                {% elif notification.notification_object.relevant_poll %}
+                                    <p class="text-truncate"><strong>Poll: </strong>{{notification.notification_object.contents}}</p>
                                 {% else %}
                                     {% if notification.notification_object.relevant_message.reply %}
                                         {% if notification.notification_object.relevant_message.image %}

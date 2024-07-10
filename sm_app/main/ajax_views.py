@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Notification
-from messaging.models import Message, ChatRoom
+from messaging.models import Message, ChatRoom, PollMessage
 from django.core.exceptions import ObjectDoesNotExist
 from main.algorithum import Algorithum
 
@@ -366,6 +366,11 @@ def remove_notification(request):
         if type == "notification-id":
             notification_id = request.POST.get('notification_id')
             notification = Notification.objects.get(id=notification_id)
+        elif type == "poll_message_id":
+            poll_id = request.POST.get('poll_id')
+            poll_message = PollMessage.objects.get(id=poll_id)
+            notification = Notification.objects.get(relevant_poll=poll_message, user=receiver_userstats)
+            notification_id = notification.pk
         else:
             message_id = request.POST.get('message-id')
             message = Message.objects.get(id=message_id)

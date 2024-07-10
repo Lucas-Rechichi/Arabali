@@ -34,6 +34,8 @@
                         <div class="col mt-2">
                             {% if notification.notification_object.relevant_message.text %}
                                 <p class="text-truncate">{{notification.notification_object.contents}}</p>
+                            {% elif notification.notification_object.relevant_poll %}
+                                <p class="text-truncate"><strong>Poll: </strong>{{notification.notification_object.contents}}</p>
                             {% else %}
                                 {% if notification.notification_object.relevant_message.reply %}
                                     {% if notification.notification_object.relevant_message.image %}
@@ -239,9 +241,9 @@
                                                                     {% if option_properties.chosen_by_user %}
                                                                         <div id="option-{{option_properties.option.id}}">
                                                                             <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(255, 255, 255);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>Distribution: {{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;">
-                                                                                    <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;" data-option-id="{{option_properties.option.id}}">
+                                                                                    <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
                                                                                         <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
                                                                                     </button>
                                                                                 </div>
@@ -261,9 +263,9 @@
                                                                     {% else %}
                                                                         <div id="option-{{option_properties.option.id}}">
                                                                             <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(255, 253, 253);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>Distribution: {{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;">
-                                                                                    <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;" data-option-id="{{option_properties.option.id}}">
+                                                                                    <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
                                                                                         <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
                                                                                     </button>
                                                                                 </div>
@@ -409,9 +411,9 @@
                                                                     {% if option_properties.chosen_by_user %}
                                                                         <div id="option-{{option_properties.option.id}}">
                                                                             <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(0, 0, 0);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>Distribution: {{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;">
-                                                                                    <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;" data-option-id="{{option_properties.option.id}}">
+                                                                                    <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
                                                                                         <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
                                                                                     </button>
                                                                                 </div>
@@ -431,9 +433,9 @@
                                                                     {% else %}
                                                                         <div id="option-{{option_properties.option.id}}">
                                                                             <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(0, 0, 0);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" data-bs-title="<div class='row'><div class='col'>Distribution: {{option_properties.percent}}% {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                <div class="progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;">
-                                                                                    <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}">
+                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;" data-option-id="{{option_properties.option.id}}">
+                                                                                    <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
                                                                                         <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
                                                                                     </button>
                                                                                 </div>
@@ -530,6 +532,7 @@
                 var scrollableContent = document.getElementById("conversationFrame");
                 scrollableContent.scrollTop = scrollableContent.scrollHeight;
             }
+        let intervalId;
         setTimeout(scrollBarAtBottom(), 1000)
         var roomId = "{{ room.id }}";  // Django template variable for chatroom ID
         var roomName = "{{ room.name }}";  // Django template variable for chatroom name
@@ -871,7 +874,7 @@
                                                     <div class="card-header" style="border-bottom: none;">
                                                         <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="false">
                                                             <p class="small text-center">Poll</p>
-                                                            <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                            <p id="poll-title-{{message_dict.message.id}}">` + data.poll_title + `</p>
                                                             ` + optionsHtml + `
                                                         </div>
                                                     </div>
@@ -911,7 +914,7 @@
                                     <div class="col-6">
                                         <div class="row">
                                             <div class="col-11">
-                                                <p class="d-flex justify-content-end"><strong>` + data.sender + `</strong></p>
+                                                <p class="d-flex justify-content-start"><strong>` + data.sender + `</strong></p>
                                             </div>
                                             <div class="col-1">
                                             </div>
@@ -920,12 +923,12 @@
                                             <div class="col-1">
                                                 <img src="` + data.sender_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
                                             </div>
-                                            <div class="col-10 d-flex justify-content-end">
+                                            <div class="col-10 d-flex justify-content-start">
                                                 <div class="card text-bg-light pb-0" style="width: fit-content; border: none; opacity: 85%;">
                                                     <div class="card-header" style="border-bottom: none;">
                                                         <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="false">
                                                             <p class="small text-center">Poll</p>
-                                                            <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                            <p id="poll-title-{{message_dict.message.id}}">` + data.poll_title + `</p>
                                                             ` + optionsHtml + `
                                                         </div>
                                                     </div>
@@ -940,6 +943,19 @@
                     }
                     $('#conversation-contents').append(newMessageInHtml);
                     setTimeout(scrollBarAtBottom(), 1000);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'type': 'poll_message_id',
+                            'poll-id': data.poll_id,
+                            'receiver': '{{username}}',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            console.log('Notification removed')
+                        }
+                    });
                 }
                 if (data.type === 'incoming_poll_vote') {
                     if (data.voter === '{{username}}') { // if we made the vote
@@ -949,7 +965,7 @@
                             for (let i = 0; i < data.option_count; i++) {
                                 // getting relevant HTML elements
                                 var percentBar = $('#percent-bar-' + data.options[i].option_id);
-                                var optionDistributionElement = $('#option-distribution-' + data.options[i].option_id);
+                                var optionButton = $('#poll-option-' + data.options[i].option_id);
                                 var optionCountElement = $('#option-' + data.options[i].option_id + '-count' );
                                 
                                 // store new information into variables
@@ -968,9 +984,9 @@
                                 }
 
                                 var optionDistributionHtml = `
-                                    <div class='row'>
+                                    <div class='row'  id='hidden-info-` + data.options[i].option_id +`'>
                                         <div class='col'>
-                                            Distribution: ` + data.options[i].vote_percent + `% 
+                                            ` + data.options[i].vote_percent + `% Voted
                                             ` + choicesHtml + `
                                         </div>
                                     </div>
@@ -982,17 +998,105 @@
                                 } else {
                                     percentBar.animate({width: '' + data.options[i].vote_percent + '%'}, 1000, 'linear') // changing the progress bar
                                 }
-                                if (data.options[i].option_id === data.voted_for_option_id) { // if this option was the one that the user has voted, not needed in the other 'change specific case' outcome.
+                                if (data.options[i].option_id == data.voted_for_option_id) { // if this option was the one that the user has voted, not needed in the other 'change specific case' outcome.
                                     percentBar.css( 'background-color', '#1eff4b' ); // green for selected option
                                 } else {
                                     percentBar.css( 'background-color', '#c3c3c3' ); // grey for non-selected option
                                 }
-                                optionDistributionElement.attr('data-bs-title', optionDistributionHtml); // updates the tooltip
+                                optionButton.data('hidden-info', optionDistributionHtml); // updates the popup
                                 optionCountElement.text(optionCount); // updates the counter
                             }
                         }
                         else { // first vote for this poll
                             // recreate the look of the poll message, to graded version.
+                            var optionsHtml = ''
+                            for (let i = 0; i < data.option_count; i++) {
+                                var choicesHtml = ''
+                                if (data.options[i].vote_percent <= 10) {
+                                    var votePercentDisplay = 10;
+                                } else {
+                                    var votePercentDisplay = data.options[i].vote_percent;
+                                }
+                                for (let w = 0; w < data.options[i].amount_of_votes; w++) {
+                                    var choiceHtml = `
+                                        <div class='row'>
+                                            <div class='col'>
+                                                <i class='bi bi-arrow-right-short'></i>` + data.options[i].voters[w].voter + `
+                                            </div>
+                                        </div>
+                                    `;
+                                    choicesHtml += choiceHtml;
+                                }
+                                if (data.poll_sender === data.voter) { // if you have voted in your own poll
+                                    if (data.options[i].option_id == data.voted_for_option_id) { // you clicked this option
+                                        var optionHtml = `
+                                            <div id="option-` + data.options[i].option_id +`">
+                                                <p class="m-0 text-start" id="option-` + data.options[i].option_id +`-text" style="color: rgb(255, 255, 255);">` + data.options[i].option_name + `</p>
+                                                <div id="option-disribution-` + data.options[i].option_id +`" class="progress" role="progressbar" aria-label="Option: ` + data.options[i].option_name + `" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-` + data.options[i].option_id +`" style="width: ` + votePercentDisplay + `%; background-color: #1eff4b;" data-option-id="` + data.options[i].option_id +`">
+                                                        <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-` + data.options[i].option_id +`" data-option-id="` + data.options[i].option_id +`"  data-hidden-info="<div class='row' id='hidden-info-` + data.options[i].option_id +`'><div class='col'>` + data.options[i].vote_percent + `% Voted` + choicesHtml + `</div></div>">
+                                                            <p class="m-0 text-start ps-2" id="option-` + data.options[i].option_id +`-count" style="color: rgb(0, 0, 0);">` + data.options[i].amount_of_votes + `</p>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                            </div>
+                                        `;
+                                    } else { // you did not click this option
+                                        var optionHtml = `
+                                            <div id="option-` + data.options[i].option_id +`">
+                                                <p class="m-0 text-start" id="option-` + data.options[i].option_id +`-text" style="color: rgb(255, 255, 255);">` + data.options[i].option_name + `</p>
+                                                <div id="option-disribution-` + data.options[i].option_id +`" class="progress" role="progressbar" aria-label="Option: ` + data.options[i].option_name + `" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-` + data.options[i].option_id +`" style="width: ` + votePercentDisplay + `%; background-color: #c3c3c3;" data-option-id="` + data.options[i].option_id +`">
+                                                        <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-` + data.options[i].option_id +`" data-option-id="` + data.options[i].option_id +`"  data-hidden-info="<div class='row' id='hidden-info-` + data.options[i].option_id +`'><div class='col'>` + data.options[i].vote_percent + `% Voted` + choicesHtml + `</div></div>">
+                                                            <p class="m-0 text-start ps-2" id="option-` + data.options[i].option_id +`-count" style="color: rgb(0, 0, 0);">` + data.options[i].amount_of_votes + `</p>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                            </div>
+                                        `;
+                                    }
+                                } else { // votiong on someone else's poll
+                                    if (data.options[i].option_id == data.voted_for_option_id) { // you clicked this option
+                                        var optionHtml = `
+                                            <div id="option-` + data.options[i].option_id +`">
+                                                <p class="m-0 text-start" id="option-` + data.options[i].option_id +`-text" style="color: rgb(0, 0, 0);">` + data.options[i].option_name + `</p>
+                                                <div id="option-disribution-` + data.options[i].option_id +`" class="progress" role="progressbar" aria-label="Option: ` + data.options[i].option_name + `" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-` + data.options[i].option_id +`" style="width: ` + votePercentDisplay + `%; background-color: #1eff4b;" data-option-id="` + data.options[i].option_id +`">
+                                                        <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-` + data.options[i].option_id +`" data-option-id="` + data.options[i].option_id +`"  data-hidden-info="<div class='row' id='hidden-info-` + data.options[i].option_id +`'><div class='col'>` + data.options[i].vote_percent + `% Voted` + choicesHtml + `</div></div>">
+                                                            <p class="m-0 text-start ps-2" id="option-` + data.options[i].option_id +`-count" style="color: rgb(0, 0, 0);">` + data.options[i].amount_of_votes + `</p>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                            </div>
+                                        `;
+                                    } else { // you did not click this option
+                                        var optionHtml = `
+                                            <div id="option-` + data.options[i].option_id +`">
+                                                <p class="m-0 text-start" id="option-` + data.options[i].option_id +`-text" style="color: rgb(0, 0, 0);">` + data.options[i].option_name + `</p>
+                                                <div id="option-disribution-` + data.options[i].option_id +`" class="progress" role="progressbar" aria-label="Option: ` + data.options[i].option_name + `" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-` + data.options[i].option_id +`" style="width: ` + votePercentDisplay + `%; background-color: #c3c3c3;" data-option-id="` + data.options[i].option_id +`">
+                                                        <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-` + data.options[i].option_id +`" data-option-id="` + data.options[i].option_id +`"  data-hidden-info="<div class='row' id='hidden-info-` + data.options[i].option_id +`'><div class='col'>` + data.options[i].vote_percent + `% Voted` + choicesHtml + `</div></div>">
+                                                            <p class="m-0 text-start ps-2" id="option-` + data.options[i].option_id +`-count" style="color: rgb(0, 0, 0);">` + data.options[i].amount_of_votes + `</p>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                            </div>
+                                        `;
+                                    }
+                                }
+                                optionsHtml += optionHtml
+                            }
+                            var pollHtml = `
+                                <p class="small text-center">Poll</p>
+                                <p id="poll-title-` + data.poll_id + `">` + data.poll_title + `</p>
+                                ` + optionsHtml + `
+                            `;
+                            $('#poll-message-' + data.poll_id).html(pollHtml); // replace the inner html with the graded version of the poll
+                            $('#poll-message-' + data.poll_id).data('graded-poll', 'true'); // change the state of the poll message
                         }
                     } 
                     else { // if someone else made the vote
@@ -1002,7 +1106,7 @@
                             for (let i = 0; i < data.option_count; i++) {
                                 // getting relevant HTML elements
                                 var percentBar = $('#percent-bar-' + data.options[i].option_id);
-                                var optionDistributionElement = $('#option-distribution-' + data.options[i].option_id);
+                                var optionButton = $('#poll-option-' + data.options[i].option_id);
                                 var optionCountElement = $('#option-' + data.options[i].option_id + '-count' );
                                 
                                 // store new information into variables
@@ -1021,9 +1125,9 @@
                                 }
 
                                 var optionDistributionHtml = `
-                                    <div class='row'>
+                                    <div class='row' id='hidden-info-` + data.options[i].option_id +`'>
                                         <div class='col'>
-                                            Distribution: ` + data.options[i].vote_percent + `% 
+                                            ` + data.options[i].vote_percent + `% Voted
                                             ` + choicesHtml + `
                                         </div>
                                     </div>
@@ -1035,7 +1139,7 @@
                                 } else {
                                     percentBar.animate({width: '' + data.options[i].vote_percent + '%'}, 1000, 'linear') // changing the progress bar
                                 }
-                                optionDistributionElement.attr('data-bs-title', optionDistributionHtml); // updates the tooltip
+                                optionButton.data('hidden-info', optionDistributionHtml); // updates the popup
                                 optionCountElement.text(optionCount); // updates the counter
                             }
                         }
@@ -1773,12 +1877,35 @@
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
                     success: function(response) {
+                        notificationSocket.send(JSON.stringify({
+                            'notification_ids': response.notification_ids,
+                        }));
                         eventSocket.send(JSON.stringify({
                             'event_type': 'vote_for_poll',
                             'option_id': response.option_id,
                         }))
                     }
                 })
+            })
+            // for seeing who voted
+            $('#conversation-contents').on('mouseenter', '.poll-option', function () {
+                var optionID = $(this).data('option-id');
+                var optionDiv = $('#option-' + optionID);
+                var hiddenInfo = $(this).data('hidden-info');
+                var begunHovering = true
+                intervalId = setInterval(function() {
+                    if (begunHovering) {
+                        optionDiv.append(hiddenInfo);
+                        begunHovering = false
+                    }
+                }, 500); // Interval time in milliseconds
+            })
+            $('#conversation-contents').on('mouseleave', '.poll-option', function () {
+                var optionID = $(this).data('option-id');
+                var optionDiv = $('#option-' + optionID);
+                var hiddenInfo = $('#hidden-info-' + optionID);
+                clearInterval(intervalId);
+                hiddenInfo.remove();
             })
         });
     </script>

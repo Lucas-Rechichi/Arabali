@@ -236,7 +236,6 @@ def create_poll(request):
         if option is not None:
             options.append(option)
     
-
     sender = request.user
     sender_userstats = UserStats.objects.get(user=sender)
     chat_room = ChatRoom.objects.get(id=chatroom_id)
@@ -248,8 +247,16 @@ def create_poll(request):
         new_poll_option = PollOption(poll=new_poll, option=option)
         new_poll_option.save()
 
+    notification_ids = []
+    for receiver_userstats in chat_room.users.exclude(user=request.user):
+        new_notification_text = new_poll.title
+        new_notification = Notification(sender=request.user.username, user=receiver_userstats, source=chat_room, contents=new_notification_text, relevant_poll=new_poll)
+        new_notification.save()
+        notification_ids.append(new_notification.pk)
+
     response = {
         'poll_id': new_poll.pk,
+        'notification_ids': notification_ids,
     }
     return JsonResponse(response)
     
