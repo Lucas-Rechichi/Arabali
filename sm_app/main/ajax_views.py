@@ -362,31 +362,23 @@ def remove_notification(request):
     type = request.POST.get('type')
     receiver_user = User.objects.get(username=request.POST.get('receiver'))
     receiver_userstats = UserStats.objects.get(user=receiver_user)
-    try:
-        if type == "notification-id":
-            notification_id = request.POST.get('notification_id')
-            notification = Notification.objects.get(id=notification_id)
-        elif type == "poll_message_id":
-            poll_id = request.POST.get('poll_id')
-            poll_message = PollMessage.objects.get(id=poll_id)
-            notification = Notification.objects.get(relevant_poll=poll_message, user=receiver_userstats)
-            notification_id = notification.pk
-        else:
-            message_id = request.POST.get('message-id')
-            message = Message.objects.get(id=message_id)
-            notification = Notification.objects.get(relevant_message=message, user=receiver_userstats)
-            notification_id = notification.pk
-        relevant_chatroom = ChatRoom.objects.get(id=notification.source.pk)
-        notification.delete()
-        notification_count = Notification.objects.filter(user=receiver_userstats).count()
-        response = {
-            'message': f'Notification; {notification} has been removed',
-            'notification_count': notification_count,
-            'notification_id': notification_id,
-            'notification_chatroom_name': relevant_chatroom.name,
-            'notification_chatroom_id': relevant_chatroom.pk,
-        }
-        return JsonResponse({response})
-    except:
-        return JsonResponse({})
+    if type == "notification-id":
+        notification_id = request.POST.get('notification_id')
+        notification = Notification.objects.get(id=notification_id)
+    elif type == "poll_message_id":
+        poll_id = request.POST.get('poll_id')
+        print(poll_id)
+        poll_message = PollMessage.objects.get(id=poll_id)
+        notification = Notification.objects.get(relevant_poll=poll_message, user=receiver_userstats)
+        notification_id = notification.pk
+    else:
+        message_id = request.POST.get('message-id')
+        message = Message.objects.get(id=message_id)
+        notification = Notification.objects.get(relevant_message=message, user=receiver_userstats)
+        notification_id = notification.pk
+    notification.delete()
+    print('notification deleted.')
+    response = {}
+    return JsonResponse(response)
+
     

@@ -286,7 +286,7 @@
                                                                 {% endfor %}
                                                             </div>
                                                         {% else %}
-                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="false">
+                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
                                                                 <p class="small text-center">Poll</p>
                                                                 <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
                                                                 {% for option in message_dict.message.options.all %}
@@ -456,7 +456,7 @@
                                                                 {% endfor %}
                                                             </div>
                                                         {% else %}
-                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="false">
+                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
                                                                 <p class="small text-center">Poll</p>
                                                                 <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
                                                                 {% for option in message_dict.message.options.all %}
@@ -872,7 +872,7 @@
                                             <div class="col-10 d-flex justify-content-end">
                                                 <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
                                                     <div class="card-header" style="border-bottom: none;">
-                                                        <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="false">
+                                                        <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
                                                             <p class="small text-center">Poll</p>
                                                             <p id="poll-title-{{message_dict.message.id}}">` + data.poll_title + `</p>
                                                             ` + optionsHtml + `
@@ -926,7 +926,7 @@
                                             <div class="col-10 d-flex justify-content-start">
                                                 <div class="card text-bg-light pb-0" style="width: fit-content; border: none; opacity: 85%;">
                                                     <div class="card-header" style="border-bottom: none;">
-                                                        <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="false">
+                                                        <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
                                                             <p class="small text-center">Poll</p>
                                                             <p id="poll-title-{{message_dict.message.id}}">` + data.poll_title + `</p>
                                                             ` + optionsHtml + `
@@ -948,7 +948,7 @@
                         url: '/universal/remove-notification/',
                         data: {
                             'type': 'poll_message_id',
-                            'poll-id': data.poll_id,
+                            'poll_id': data.poll_id,
                             'receiver': '{{username}}',
                             'csrfmiddlewaretoken': '{{ csrf_token }}'
                         },
@@ -959,7 +959,7 @@
                 }
                 if (data.type === 'incoming_poll_vote') {
                     if (data.voter === '{{username}}') { // if we made the vote
-                        if ($('#poll-message-' + data.poll_id).data('graded-poll') === true) { // if we have already voted beforehand
+                        if ($('#poll-message-' + data.poll_id).data('graded-poll')) { // if we have already voted beforehand
                             // change specific things
                             // get relevant HTML elements, change them.
                             for (let i = 0; i < data.option_count; i++) {
@@ -1096,12 +1096,11 @@
                                 ` + optionsHtml + `
                             `;
                             $('#poll-message-' + data.poll_id).html(pollHtml); // replace the inner html with the graded version of the poll
-                            $('#poll-message-' + data.poll_id).removeAttr('data-graded-poll'); // change the state of the poll message
-                            $('#poll-message-' + data.poll_id).attr('data-graded-poll', 'true');
+                            $('#poll-message-' + data.poll_id).attr('data-graded-poll', true);
                         }
                     } 
                     else { // if someone else made the vote
-                        if ($('#poll-message-' + data.poll_id).data('graded-poll') === true) { // if we have already voted beforehand
+                        if ($('#poll-message-' + data.poll_id).data('graded-poll')) { // if we have already voted beforehand
                             // change specific things
                             // get relevant HTML elements, change them.
                             for (let i = 0; i < data.option_count; i++) {
@@ -1146,6 +1145,7 @@
                         }
                         else { // if we haven't interacted with this poll before
                             // do nothing
+                            console.log('nothing happend.')
                         }
                     }
                 } 

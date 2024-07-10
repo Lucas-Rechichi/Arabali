@@ -372,6 +372,9 @@
                             'event_type': 'create_poll',
                             'poll_id': response.poll_id,
                         }));
+                        notificationSocket.send(JSON.stringify({
+                            'notification_ids': response.notification_ids,
+                        }))
                         var confirmingModal = new bootstrap.Modal(document.getElementById('sending-poll-modal'), {
                             keyboard: false
                         });
