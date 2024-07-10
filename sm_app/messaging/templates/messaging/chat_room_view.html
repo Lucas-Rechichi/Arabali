@@ -1096,7 +1096,8 @@
                                 ` + optionsHtml + `
                             `;
                             $('#poll-message-' + data.poll_id).html(pollHtml); // replace the inner html with the graded version of the poll
-                            $('#poll-message-' + data.poll_id).data('graded-poll', 'true'); // change the state of the poll message
+                            $('#poll-message-' + data.poll_id).removeAttr('data-graded-poll'); // change the state of the poll message
+                            $('#poll-message-' + data.poll_id).attr('data-graded-poll', 'true');
                         }
                     } 
                     else { // if someone else made the vote

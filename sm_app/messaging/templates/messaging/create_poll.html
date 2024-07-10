@@ -194,6 +194,54 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="sent-poll-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="lead">Poll</p>
+            </div>
+            <div class="modal-body">
+                <p class="lead text-center">Your poll for the chatroom {{room.name}} has been created.</p>
+            </div>
+            <div class="modal-footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6 d-flex justify-content-start mb-2">
+                            <button type="button" class="btn btn-success" onclick="location.href='/chat/{{room.name}}/{{room.id}}'">
+                                <p class="small p-0 m-0">Return</p>
+                            </button>
+                        </div>
+                        <div class="col-6 d-flex justify-content-end mb-2">
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                                <p class="small p-0 m-0">Make Another</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="sending-poll-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="lead">Poll</p>
+                <button class="btn btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="lead text-center">Creating Poll...</p>
+                <div class="d-flex justify-content-center">
+                    <span class="spinner-border spinner-border-lg text-secondary" aria-hidden="true" style="width: 3rem; height: 3rem;"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row d-flex justify-content-evenly">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     $(document).ready(function () {
         let reconnectionTime = 5000;
@@ -208,7 +256,6 @@
                 };
 
                 eventSocket.onmessage = function (e) {
-                    // location.href = '/chat/{{room.name}}/{{room.id}}'
                 }
 
                 eventSocket.onclose = function (e) {
@@ -325,8 +372,17 @@
                             'event_type': 'create_poll',
                             'poll_id': response.poll_id,
                         }));
-                        
-                        
+                        var confirmingModal = new bootstrap.Modal(document.getElementById('sending-poll-modal'), {
+                            keyboard: false
+                        });
+                        confirmingModal.show();
+                        setTimeout(function () {
+                            confirmingModal.hide();
+                            var confirmModal = new bootstrap.Modal(document.getElementById('sent-poll-modal'), {
+                                keyboard: false
+                            });
+                            confirmModal.show();
+                        }, 1000)
                     }
                 })
             }
