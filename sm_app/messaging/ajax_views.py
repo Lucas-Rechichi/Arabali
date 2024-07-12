@@ -225,7 +225,6 @@ def message_sent_video(request):
 
 def create_poll(request):
 
-    print(request.POST)
     # Get sent data
     poll_title = request.POST.get('poll_title')
     chatroom_id = request.POST.get('chatroom_id')

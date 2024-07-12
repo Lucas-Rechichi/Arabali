@@ -5,14 +5,11 @@ django.setup()
 
 import json
 import pytz
-from datetime import datetime
-from urllib.parse import unquote
 from main.models import UserStats, Notification
 from main.extras import remove_until_character
 from messaging.extras import replace_spaces
 from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice
 from django.contrib.auth.models import User
-from django.middleware.csrf import get_token
 
 from channels.generic.websocket import WebsocketConsumer
 
@@ -490,8 +487,7 @@ class EventConsumer(WebsocketConsumer):
             voter_user = User.objects.get(username=voter)
             voter_userstats = UserStats.objects.get(user=voter_user)
             option = PollOption.objects.get(id=option_id)
-            choice = PollingChoice.objects.get(option=option, voter=voter_userstats)
-
+            
             poll_title = option.poll.title
             poll_id = option.poll.pk
             poll_sender = option.poll.sender.user.username

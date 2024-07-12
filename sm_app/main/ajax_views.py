@@ -367,7 +367,6 @@ def remove_notification(request):
         notification = Notification.objects.get(id=notification_id)
     elif type == "poll_message_id":
         poll_id = request.POST.get('poll_id')
-        print(poll_id)
         poll_message = PollMessage.objects.get(id=poll_id)
         notification = Notification.objects.get(relevant_poll=poll_message, user=receiver_userstats)
         notification_id = notification.pk
@@ -377,7 +376,6 @@ def remove_notification(request):
         notification = Notification.objects.get(relevant_message=message, user=receiver_userstats)
         notification_id = notification.pk
     notification.delete()
-    print('notification deleted.')
     response = {}
     return JsonResponse(response)
 

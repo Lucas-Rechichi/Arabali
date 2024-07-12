@@ -1878,9 +1878,6 @@
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
                     success: function(response) {
-                        notificationSocket.send(JSON.stringify({
-                            'notification_ids': response.notification_ids,
-                        }));
                         eventSocket.send(JSON.stringify({
                             'event_type': 'vote_for_poll',
                             'option_id': response.option_id,
@@ -1899,7 +1896,7 @@
                         optionDiv.append(hiddenInfo);
                         begunHovering = false
                     }
-                }, 500); // Interval time in milliseconds
+                }, 500);
             })
             $('#conversation-contents').on('mouseleave', '.poll-option', function () {
                 var optionID = $(this).data('option-id');
