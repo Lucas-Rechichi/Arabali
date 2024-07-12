@@ -81,7 +81,7 @@ class Notification(models.Model):
     def __str__(self):
         return f'Notification for user: {self.user}'
 
-# To let users choose what messages/posts give them a notifitation
+# To let users choose what messages give them a notifitation
 class MessageNotificationSetting(models.Model):
     user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
     source = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
