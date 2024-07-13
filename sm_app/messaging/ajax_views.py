@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
-from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice
+from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting
 
 
 def message_sent_text(request):
@@ -293,4 +293,51 @@ def vote_for_poll(request):
     return JsonResponse(response)
 
 def change_settings(request):
-    pass
+    # Get the setting type
+    setting_type = request.POST.get('setting_type')
+    if setting_type:
+        if setting_type == 'apply_general': # if we are changing something within the general section of the settings
+            # For Notifications:
+            chosen_setting = request.POST.get('chosen_setting')
+            chat_room_id = request.POST.get('chat_room_id')
+            user = request.user
+
+            user_stats = UserStats.objects.get(user=user)
+            chat_room = ChatRoom.objects.get(id=chat_room_id)
+            message_notification_setting = MessageNotificationSetting.objects.get(user=user_stats, source=chat_room)
+
+            if chosen_setting == 'allow_notifications': # If the chosen setting was to allow notifications
+                # Set the chosen setting to 'True', set all other options to 'False'.
+                message_notification_setting.allow_all = True
+                message_notification_setting.replies_only = False
+                message_notification_setting.mute_all = False
+
+            elif chosen_setting == 'replies_only':
+                message_notification_setting.allow_all = False
+                message_notification_setting.replies_only = True
+                message_notification_setting.mute_all = False
+
+            elif chosen_setting == 'mute_notiufications':
+                message_notification_setting.allow_all = False
+                message_notification_setting.replies_only = False
+                message_notification_setting.mute_all = True
+
+            else:
+                print(f'invalid choice made of {chosen_setting}')
+
+            message_notification_setting.save()
+            print(f'message setting for user: {user_stats.user.username}, has ben changed for notifications, to {chosen_setting}.')
+            is_successful = True
+
+        elif setting_type == 'apply_styling':
+            pass
+        else:
+            print(f'invaid setting type of {setting_type}')
+            is_successful = False
+    else:
+        print('no setting type stated.')
+        is_successful = False
+    response = {
+        'successful': is_successful,
+    }
+    return JsonResponse(response)

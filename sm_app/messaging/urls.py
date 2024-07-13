@@ -16,5 +16,5 @@ urlpatterns = [
     path('polls/create-poll/', ajax_views.create_poll, name='create_poll'),
     path('polls/vote-for-poll/', ajax_views.vote_for_poll, name='vote_for_poll'),
 
-    path('chat-settings/change_settings/', ajax_views.change_settings, name='change_settings'),
+    path('chat_settings/change-settings/', ajax_views.change_settings, name='change_settings'),
 ]

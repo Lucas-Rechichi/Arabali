@@ -35,6 +35,17 @@ class Message(models.Model):
     sent_at = models.DateTimeField(auto_now_add=True)
 
 
+# To let users choose what messages give them a notifitation
+class MessageNotificationSetting(models.Model):
+    user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
+    source = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    allow_all = models.BooleanField(default=True)
+    replies_only = models.BooleanField(default=False)
+    mute_all = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Settings for user: {self.user} in group: {self.source}'
+
 # Polling Models
 class PollMessage(models.Model):
     sender = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)

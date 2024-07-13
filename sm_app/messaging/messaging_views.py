@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from main.models import Following, UserStats
-from messaging.models import ChatRoom, Message, PollMessage, PollingChoice
+from messaging.models import ChatRoom, Message, PollMessage, PollingChoice, MessageNotificationSetting
 from messaging.forms import CreateChatRoom
 from messaging.extras import get_chat_rooms
 from main.extras import initialize_page
@@ -169,7 +169,7 @@ def create_chat_room(request, increment):
                 room_bg_image = request.FILES.get('room_bg_image')
             except:
                 room_bg_image = None
-                print('No Custom Backround Image Incerted')
+                print('No Custom Backround Image Inserted')
             
             # Getting the invited users
             invited_users = []
@@ -185,6 +185,10 @@ def create_chat_room(request, increment):
             invited_users.append(user_stats)
             new_chatroom.users.set(invited_users)
             new_chatroom.save()
+            for invited_user in invited_users:
+                new_message_notification_setting = MessageNotificationSetting(user=invited_user, source=new_chatroom)
+                new_message_notification_setting.save()
+            
     else:
         chat_room_form = CreateChatRoom()
 

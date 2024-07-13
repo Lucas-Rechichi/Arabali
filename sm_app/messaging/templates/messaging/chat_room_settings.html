@@ -333,6 +333,7 @@
         </div>
     </div>
 </div>
+<!-- Modal for leaving a chatroom -->
 <div class="modal fade" id="leave-chatroom-modal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -358,6 +359,31 @@
         </div>
     </div>
 </div>
+<!-- Modal for changing settings -->
+<div class="modal fade" id="changed-settings-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong>Success</strong>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <p class="lead">Settings Updated!</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <i class="bi bi-check2-circle" style="font-size: 5rem; color: #198754;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#settings-view').on('click', '.change', function () {
@@ -367,20 +393,21 @@
                 var replyChoice = $('#allow-replies-only').is(':checked');
                 var muteChoice = $('#mute-all-notifications').is(':checked');
 
-                if (allowchoice) {
-                    var chosenSetting = 'allow-notifications';
+                if (allowChoice) {
+                    var chosenSetting = 'allow_notifications';
                 } else if (replyChoice) {
-                    var chosenSetting = 'replies only';
+                    var chosenSetting = 'replies_only';
                 } else if (muteChoice) {
-                    var chosenSetting = 'mute-notifications';
+                    var chosenSetting = 'mute_notifications';
                 } else {
                     console.log('radio button error')
                 }
 
                 $.ajax({
                     type: 'POST',
-                    url: '//',
+                    url: '/chat_settings/change-settings/',
                     data: {
+                        'setting_type': 'apply_general',
                         'chosen_setting': chosenSetting,
                         'username': '{{username}}',
                         'chat_room_id': '{{room.id}}',
@@ -388,6 +415,15 @@
                     },
                     success: function (response) {
                         console.log('notification setting changed')
+                        var isSuccessful = response.successful;
+                        var confirmationModalElement = document.getElementById('changed-settings-modal');
+                        var confirmationModal = new bootstrap.Modal(confirmationModalElement, {
+                            keyboard: false
+                        });
+                        if (isSuccessful) {
+                            confirmationModal.show();
+                        }
+
                     }
                 })
             } else if (applyFor === 'apply-styling') {

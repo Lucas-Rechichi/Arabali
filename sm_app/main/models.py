@@ -81,18 +81,6 @@ class Notification(models.Model):
     def __str__(self):
         return f'Notification for user: {self.user}'
 
-# To let users choose what messages give them a notifitation
-class MessageNotificationSetting(models.Model):
-    user = models.ForeignKey(UserStats, on_delete=models.CASCADE)
-    source = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
-    messages = models.BooleanField()
-    replies = models.BooleanField()
-
-    def __str__(self):
-        return f'Settings for user: {self.user} in group: {self.source}'
-
-
-
 # Comment Models   
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
