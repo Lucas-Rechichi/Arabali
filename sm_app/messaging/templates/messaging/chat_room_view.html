@@ -150,9 +150,12 @@
                         <ul class="dropdown-menu ps-3" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);"> 
                             <div class="row">
                                 <div class="col">
-                                    <button class="btn" type="button" onclick="location.href=''"><li class="custom-icon"><i class="bi bi-gear-fill mt-1" style="font-size: 18px;"></i> Settings</li></button>
-                                    <button class="btn" type="button" onclick="location.href=''"><li class="custom-icon"><i class="bi bi-question-circle mt-1" style="font-size: 18px;"></i> Details</li></button>
-                                    <button class="btn" type="button" onclick="location.href=''"><li class="custom-icon"><i class="bi bi-box-arrow-right mt-1" style="color: #dc3545; font-size: 18px;"></i> <p class="text-danger p-0 m-0">Leave</p></li></button>
+                                    <!-- Redirect to page -->
+                                    <button class="btn" type="button" onclick="location.href='/chat_settings/{{room.name}}/{{room.id}}/'"><li class="custom-icon"><i class="bi bi-gear-fill mt-1" style="font-size: 18px;"></i> Settings</li></button>
+                                    <!-- Open offcanvas -->
+                                    <button class="btn" type="button"><li class="custom-icon"><i class="bi bi-question-circle mt-1" style="font-size: 18px;"></i> Details</li></button>
+                                    <!-- open confirmation modal -->
+                                    <button class="btn" type="button"><li class="custom-icon"><i class="bi bi-box-arrow-right mt-1" style="color: #dc3545; font-size: 18px;"></i> <p class="text-danger p-0 m-0">Leave</p></li></button>
                                 </div>
                             </div>
                         </ul>

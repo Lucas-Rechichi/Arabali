@@ -72,12 +72,10 @@ def chat_room_view(request, room, room_id):
                 option_percent = (option_votes_list[y]['value'] / all_votes) * 100
             except ZeroDivisionError:
                 option_percent = 0
-            option_anti_percent = 100 - option_percent
             option_percentage_list.append({
                 'option': option_votes_list[y]['option'],
                 'option_votes': option_votes_list[y]['value'],
                 'percent': round(option_percent, 1),
-                'anti_percent': round(option_anti_percent, 1),
                 'chosen_by_user': PollingChoice.objects.filter(option=option_votes_list[y]['option'], voter=user_stats).exists(),
             })
         all_messages.append({
@@ -100,6 +98,27 @@ def chat_room_view(request, room, room_id):
         'notification_count': init['notification_count']
     }
     return render(request, 'messaging/chat_room_view.html', variables)
+
+def chat_room_settings(request, room, room_id):
+
+    if UserStats.objects.get(user=request.user).is_banned:
+        return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+    
+    # Checking to see if the user has been invited to this chat room.
+    if UserStats.objects.get(user=request.user) not in ChatRoom.objects.get(id=room_id).users.all():
+        return render(request, 'main/error.html', {'issue': 'Cannot access this chatroom.'})
+
+    chat_room = ChatRoom.objects.get(id=room_id)
+    print(request.POST)
+    init = initialize_page(request)
+    variables = {
+        'room': chat_room,
+        'username': init['username'],
+        'search_bar': init['search_bar'],
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
+    }
+    return render(request, 'messaging/chat_room_settings.html', variables)
 
 @login_required
 def create_chat_room(request, increment):
@@ -198,3 +217,5 @@ def create_poll(request, room, room_id):
 
     }
     return render(request, 'messaging/create_poll.html', variables)
+
+
