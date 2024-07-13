@@ -291,3 +291,6 @@ def vote_for_poll(request):
         'option_id': option_id
     }
     return JsonResponse(response)
+
+def change_settings(request):
+    pass
