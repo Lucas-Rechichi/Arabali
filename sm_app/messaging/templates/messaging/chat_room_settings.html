@@ -343,12 +343,10 @@
             <div class="modal-body">
                 <p class="text-center">Do you wish to leave this chatroom?</p>
                 <p class="small text-center">This cannot be undone.</p>
-                <form method="post" action="/chat/">
-                    {% csrf_token %}
-                    <input type="hidden" name="leave_chatroom" value="true">
+                <form method="post">
                     <div class="row">
                         <div class="col-6 d-flex justify-content-start">
-                            <button type="button"  class="btn btn-danger">Leave</button>
+                            <button type="button" id="leave-chatroom-button"  class="btn btn-danger">Leave</button>
                         </div>
                         <div class="col-6 d-flex justify-content-end">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -428,9 +426,32 @@
                 })
             } else if (applyFor === 'apply-styling') {
                 console.log('changing styling!');
+                var newTitle = $();
+                var newIcon = $();
+                var newRoomBGImage = $();
+                console.log(newTitle, newIcon, newRoomBGImage)
             } else {
                 console.log('invalid setting button');
             }
+        })
+        $('#leave-chatrrom-button').click(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/chat_settings/leave-chatroom/',
+                data: {
+                    'chat_room_id': '{{room.id}}',
+                    'csrfmidlewaretoken': '{{csrf_token}}',
+                },
+                success: function (response) {
+                    var isSuccessful = response.successful;
+                    if (isSuccessful) {
+                        location.href = '/chat/';
+                    } else {
+                        console.log('removal insuccessful.')
+                    }
+                }
+
+            })
         })
     })
 </script>

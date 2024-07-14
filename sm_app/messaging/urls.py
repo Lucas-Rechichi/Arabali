@@ -17,4 +17,5 @@ urlpatterns = [
     path('polls/vote-for-poll/', ajax_views.vote_for_poll, name='vote_for_poll'),
 
     path('chat_settings/change-settings/', ajax_views.change_settings, name='change_settings'),
+    path('chat_settings/leave-chatroom/', ajax_views.leave_chatroom, name='leave_chatroom')
 ]

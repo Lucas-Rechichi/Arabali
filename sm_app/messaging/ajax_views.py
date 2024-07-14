@@ -341,3 +341,22 @@ def change_settings(request):
         'successful': is_successful,
     }
     return JsonResponse(response)
+
+def leave_chatroom(request):
+    try:
+        room_id = request.POST.get('chat_room_id')
+        user = request.user
+
+        user_stats = UserStats.objects.get(user=user)
+        chat_room = ChatRoom.objects.get(id=room_id)
+
+        chat_room.users.remove(user_stats)
+        chat_room.save()
+        valid = True
+    except:
+        print(f'error removing {user.username} from room with id {room_id}.')
+        valid = False
+    response = {
+        'successful': valid
+    }
+    return JsonResponse(response)
