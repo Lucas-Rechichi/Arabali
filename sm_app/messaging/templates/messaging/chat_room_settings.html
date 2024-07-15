@@ -203,7 +203,7 @@
                                             <br>
                                             <p class="small m-0 ms-1">Change Chatroom Backround Image:</p>
                                             <div class="input-group input-group-sm" style="width: 60%;">
-                                                <input type="file" id="chat-room-icon" class="form-control">
+                                                <input type="file" id="chat-room-bg-image" class="form-control">
                                             </div>
                                             <br>
                                             <button type="button" class="btn btn-success mt-2 change" id="apply-styling-settings" data-button-type="apply-styling">Update</button>
@@ -425,11 +425,47 @@
                     }
                 })
             } else if (applyFor === 'apply-styling') {
-                console.log('changing styling!');
-                var newTitle = $();
-                var newIcon = $();
-                var newRoomBGImage = $();
-                console.log(newTitle, newIcon, newRoomBGImage)
+
+                var newName = $('#chat-room-name').val();
+                var newIcon = $('#chat-room-icon')[0].files[0];
+                var newRoomBGImage = $('#chat-room-bg-image')[0].files[0];
+
+                if (!newName) {
+                    newName = null;
+                }
+                if (!newIcon) {
+                    newIcon = null;
+                }
+                if (!newRoomBGImage) {
+                    newRoomBGImage = null;
+                }
+                changeChatroomData = new FormData();
+
+                changeChatroomData.append('new_name', newName)
+                changeChatroomData.append('new_icon', newIcon)
+                changeChatroomData.append('new_room_bg_image', newRoomBGImage)
+                changeChatroomData.append('setting_type', 'apply_styling')
+                changeChatroomData.append('chat_room_id', '{{room.id}}')
+                changeChatroomData.append('csrfmiddlewaretoken', '{{csrf_token}}')
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat_settings/change-settings/',
+                    processData: false, // Important!
+                    contentType: false, // Important!
+                    data: changeChatroomData,
+                    success: function (response) {
+                        console.log('chatroom styling changed.')
+                        var isSuccessful = response.successful;
+                        var confirmationModalElement = document.getElementById('changed-settings-modal');
+                        var confirmationModal = new bootstrap.Modal(confirmationModalElement, {
+                            keyboard: false
+                        });
+                        if (isSuccessful) {
+                            confirmationModal.show();
+                        }
+                    }
+                })
             } else {
                 console.log('invalid setting button');
             }

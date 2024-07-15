@@ -1,4 +1,5 @@
 import pytz
+import os
 
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -330,7 +331,87 @@ def change_settings(request):
             is_successful = True
 
         elif setting_type == 'apply_styling':
-            pass
+            chat_room_id = request.POST.get('chat_room_id')
+            new_name = request.POST.get('new_name')
+            new_icon = request.FILES.get('new_icon')
+            new_room_bg_image = request.FILES.get('new_room_bg_image')
+            user = request.user
+
+            chat_room = ChatRoom.objects.get(id=chat_room_id)
+            user_stats = UserStats.objects.get(user=user)
+
+            # getting and formatting of old paths to old images
+            old_icon_url = chat_room.icon.url.removeprefix('/') 
+            old_room_bg_image_url = chat_room.room_bg_image.url.removeprefix('/')
+            print(old_icon_url, old_room_bg_image_url)
+
+            # delete files first before renaming the files
+
+            if new_name:
+                old_name = chat_room.name
+                chat_room.name = new_name
+                chat_room.save()
+
+                # Changing paths on images for the chatroom
+                old_icon = str(chat_room.icon)
+                old_icon_object = chat_room.icon
+                old_icon_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_icon)
+
+                os.remove(old_icon_path)
+
+                chat_room.icon = old_icon_object
+                chat_room.save()
+
+                old_room_bg_image = str(chat_room.room_bg_image)
+                old_room_bg_image_object = chat_room.room_bg_image
+                old_room_bg_image_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_room_bg_image)
+
+                os.remove(old_room_bg_image_path)
+
+                chat_room.icon = old_room_bg_image_object
+                chat_room.save()
+
+                # Change message paths
+                messages = Message.objects.get(room=chat_room)
+                for message in messages:
+                    if message.image:
+                        image_object = message.image
+                        image = str(message.image)
+                        image_path = os.path.join('arabali_users', 'Rooms', old_name, 'message_images', image)
+
+                        os.remove(image_path)
+
+                        message.image = image_object
+                        message.save()
+
+                    elif message.video:
+                        pass
+                        # Do the same process as above but for videos
+                    else:
+                        print('text message')
+            else:
+                old_name = chat_room.name
+                new_name = old_name
+            if new_icon:
+                old_icon = str(chat_room.icon)
+                old_icon_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_icon)
+                os.remove(old_icon_path)
+
+                chat_room.icon = new_icon
+                chat_room.save()
+            else:
+                pass
+            if new_room_bg_image: # changing room BG image
+                old_room_bg_image = str(chat_room.room_bg_image)
+            else:
+                pass
+            
+            
+            
+
+            
+            is_successful = False
+
         else:
             print(f'invaid setting type of {setting_type}')
             is_successful = False

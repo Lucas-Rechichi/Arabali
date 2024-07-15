@@ -24,6 +24,10 @@ class Configure():
                 issue = 'Cannot be named Images due to the default image directory being called Images.'
                 print(f'error: {issue}')
                 return issue
+            if request.POST.get('username') == 'Rooms': # if the new username is Rooms
+                issue = 'Cannot be named Rooms due to the chatroom directory being called Rooms.'
+                print(f'error: {issue}')
+                return issue
             for x in range(0, users.count()):
                 if request.POST.get('username') == str(users[x]): # if the new usermane is any existing username on the app
                     issue = 'Username Taken.'
@@ -71,7 +75,7 @@ class Configure():
         followers_instance = user_stats.followers # now the new username is used.
         following_instance = list(user_stats.following.all())
 
-        # function that unpacks followers and adds nthem to the following of a userstats object.
+        # function that unpacks followers and adds them to the following of a userstats object.
         def adding_following_to_userstats(user_stats, following_instance):
             for follower in following_instance:
                 user_stats.following.add(follower)
