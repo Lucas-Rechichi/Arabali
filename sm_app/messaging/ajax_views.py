@@ -340,13 +340,6 @@ def change_settings(request):
             chat_room = ChatRoom.objects.get(id=chat_room_id)
             user_stats = UserStats.objects.get(user=user)
 
-            # getting and formatting of old paths to old images
-            old_icon_url = chat_room.icon.url.removeprefix('/') 
-            old_room_bg_image_url = chat_room.room_bg_image.url.removeprefix('/')
-            print(old_icon_url, old_room_bg_image_url)
-
-            # delete files first before renaming the files
-
             if new_name:
                 old_name = chat_room.name
                 chat_room.name = new_name
@@ -359,59 +352,81 @@ def change_settings(request):
 
                 os.remove(old_icon_path)
 
-                chat_room.icon = old_icon_object
-                chat_room.save()
-
                 old_room_bg_image = str(chat_room.room_bg_image)
                 old_room_bg_image_object = chat_room.room_bg_image
                 old_room_bg_image_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_room_bg_image)
 
                 os.remove(old_room_bg_image_path)
 
-                chat_room.icon = old_room_bg_image_object
-                chat_room.save()
-
                 # Change message paths
+                message_images = {}
+                message_videos = {}
                 messages = Message.objects.get(room=chat_room)
                 for message in messages:
                     if message.image:
                         image_object = message.image
+                        message_images[message.pk] = image_object
+
                         image = str(message.image)
                         image_path = os.path.join('arabali_users', 'Rooms', old_name, 'message_images', image)
-
                         os.remove(image_path)
 
-                        message.image = image_object
+                    elif message.video:
+                        video_object = message.video
+                        message_videos[message.pk] = video_object
+
+                        video = str(message.video)
+                        video_path = os.path.join('arabali_users', 'Rooms', old_name, 'message_videos', video)
+                        os.remove(video_path)
+
+                # Deleting old directory for chatroom.
+                os.remove(f'arabali_users/Rooms/{old_name}')
+
+                # Replacing the new paths with images and videos from this chatroom.
+                chat_room.icon = old_room_bg_image_object
+                chat_room.save()
+
+                chat_room.icon = old_icon_object
+                chat_room.save()
+
+                for message in messages:
+                    if message.image:
+                        message.image = message_images[message.pk]
                         message.save()
 
                     elif message.video:
-                        pass
-                        # Do the same process as above but for videos
+                        message.video = message_videos[message.pk]
+                        message.save()
+
                     else:
                         print('text message')
+                    
+                print(f'Chatroom name changed from {old_name} to {chat_room.name}.')
             else:
-                old_name = chat_room.name
-                new_name = old_name
+                pass
             if new_icon:
-                old_icon = str(chat_room.icon)
-                old_icon_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_icon)
+                old_icon_string = str(chat_room.icon)
+                old_icon_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_icon_string)
                 os.remove(old_icon_path)
 
                 chat_room.icon = new_icon
                 chat_room.save()
+                print('Chatroom icon image changed.')
             else:
                 pass
             if new_room_bg_image: # changing room BG image
-                old_room_bg_image = str(chat_room.room_bg_image)
+                old_room_bg_image_string = str(chat_room.room_bg_image)
+                old_room_bg_image_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_room_bg_image_string)
+                os.remove(old_room_bg_image_path)
+
+                chat_room.room_bg_image = new_room_bg_image
+                chat_room.save
+                print('Chatroom background image changed.')
             else:
                 pass
             
-            
-            
-
-            
-            is_successful = False
-
+            is_successful = True
+            print(f'Styling changed for chatroom {chat_room.name}')
         else:
             print(f'invaid setting type of {setting_type}')
             is_successful = False

@@ -272,7 +272,7 @@
                                                 <i class="bi bi-arrow-right mt-3"></i>
                                             </div>
                                             <div class="col-5 d-flex justify-content-center">
-                                                <img id="updated-chatroom-icon" src="{{room.room_bg_image.url}}" alt="{{room.name}}'s backround image" style="height:4rem; width:8rem; border-radius: 1rem;">
+                                                <img id="updated-chatroom-bg-image" src="{{room.room_bg_image.url}}" alt="{{room.name}}'s backround image" style="height:4rem; width:8rem; border-radius: 1rem;">
                                             </div>
                                         </div>
                                     </div>
@@ -295,7 +295,7 @@
                                     <div class="col">
                                         <p class="lead text-center">Chatroom Members</p>
                                         <form method="post">
-                                            <div id="chatroom-members-list">
+                                            <div id="chatroom-members-list" data-members="[{% for user in room.users.all %}'{{user.user.username}}',{% endfor %}]">
                                                 {% for user in room.users.all %}
                                                     <div class="row">
                                                         <div class="col">
@@ -303,21 +303,21 @@
                                                         </div>
                                                     </div>
                                                 {% endfor %}
-                                                <br>
-                                                <div class="row">
-                                                    <div class="col-6 d-flex justify-content-end">
-                                                        <button type="button" class="btn btn-outline-warning">Assign Owner</button>
-                                                    </div>
-                                                    <div class="col-6 d-flex justify-content-start">
-                                                        <button type="button" class="btn btn-outline-danger">Remove Users</button>
-                                                    </div>
+                                            </div>
+                                            <br>
+                                            <div class="row">
+                                                <div class="col-6 d-flex justify-content-end">
+                                                    <button type="button" class="btn btn-outline-warning" id="activate_owner_select_button">Assign Owner</button>
                                                 </div>
-                                                <br>
-                                                <p class="lead text-center">Danger</p>
-                                                <div class="row">
-                                                    <div class="col d-flex justify-content-center">
-                                                        <button type="button" class="btn btn-danger">Delete Chatroom</button>
-                                                    </div>
+                                                <div class="col-6 d-flex justify-content-start">
+                                                    <button type="button" class="btn btn-outline-danger" id="activate_remove_select_button">Remove Users</button>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <p class="lead text-center">Danger</p>
+                                            <div class="row">
+                                                <div class="col d-flex justify-content-center">
+                                                    <button type="button" class="btn btn-danger">Delete Chatroom</button>
                                                 </div>
                                             </div>
                                         </form>
@@ -488,6 +488,43 @@
                 }
 
             })
+        })
+        $('#chat-room-name').on('input', function () {
+            var newName = $('#chat-room-name').val();
+            $('#updated-chatroom-name').text('');
+            $('#updated-chatroom-name').text(newName);
+        })
+        $('#chat-room-icon').on('change', function () {
+            var newIcon = $('#chat-room-icon')[0].files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#updated-chatroom-icon').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(newIcon)
+        })
+        $('#chat-room-bg-image').on('change', function () {
+            console.log('change')
+            var newRoomBGImage = $('#chat-room-bg-image')[0].files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#updated-chatroom-bg-image').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(newRoomBGImage)
+        })
+        $('#activate_owner_select_button').click(function () {
+            var userList = JSON.parse($('#chatroom-members-list').data('members'));
+            for (let i = 0; i < userList.length; i++) {
+                console.log(userList[i])
+                // SyntaxError: Unexpected token ''', "['Third-use"... is not valid JSON
+                // at JSON.parse (<anonymous>)
+                // at HTMLButtonElement.<anonymous> (3/:662:33)
+                // at HTMLButtonElement.dispatch (jquery-3.6.0.min.js:2:43064)
+                // at v.handle (jquery-3.6.0.min.js:2:41048)
+            }
         })
     })
 </script>
