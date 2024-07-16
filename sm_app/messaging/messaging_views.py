@@ -107,12 +107,18 @@ def chat_room_settings(request, room, room_id):
     # Checking to see if the user has been invited to this chat room.
     if UserStats.objects.get(user=request.user) not in ChatRoom.objects.get(id=room_id).users.all():
         return render(request, 'main/error.html', {'issue': 'Cannot access this chatroom.'})
+    init = initialize_page(request)
 
     chat_room = ChatRoom.objects.get(id=room_id)
-    print(request.POST)
-    init = initialize_page(request)
+    chat_room_users = list(chat_room.users.all())
+    chat_room_user_list = []
+    for chat_room_user in chat_room_users:
+        chat_room_user_list.append(chat_room_user.user.username)
+    print(chat_room_user_list)
+
     variables = {
         'room': chat_room,
+        'room_user_list': chat_room_user_list,
         'username': init['username'],
         'search_bar': init['search_bar'],
         'notifications': init['notification_list'],

@@ -295,7 +295,8 @@
                                     <div class="col">
                                         <p class="lead text-center">Chatroom Members</p>
                                         <form method="post">
-                                            <div id="chatroom-members-list" data-members="[{% for user in room.users.all %}'{{user.user.username}}',{% endfor %}]">
+                                            <!-- put a custom filter on user list -->
+                                            <div id="chatroom-members-list" data-members="[{{ user_list}}]"> 
                                                 {% for user in room.users.all %}
                                                     <div class="row">
                                                         <div class="col">
@@ -516,19 +517,13 @@
             reader.readAsDataURL(newRoomBGImage)
         })
         $('#activate_owner_select_button').click(function () {
-            var userList = JSON.parse($('#chatroom-members-list').data('members'));
+            var userList = JSON.parse($('#chatroom-members-list').text());
             for (let i = 0; i < userList.length; i++) {
                 console.log(userList[i])
-                // SyntaxError: Unexpected token ''', "['Third-use"... is not valid JSON
-                // at JSON.parse (<anonymous>)
-                // at HTMLButtonElement.<anonymous> (3/:662:33)
-                // at HTMLButtonElement.dispatch (jquery-3.6.0.min.js:2:43064)
-                // at v.handle (jquery-3.6.0.min.js:2:41048)
             }
         })
     })
 </script>
-
 
 <!-- Websockets for recieving notifications -->
 <script type="text/javascript">
