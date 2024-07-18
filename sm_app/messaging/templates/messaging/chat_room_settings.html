@@ -1,4 +1,5 @@
 {% extends 'main/template.html' %}
+{% load filters %}
 {% load crispy_forms_tags %} 
 {% block title %} 
 {{ user.username }} 
@@ -296,11 +297,11 @@
                                         <p class="lead text-center">Chatroom Members</p>
                                         <form method="post">
                                             <!-- put a custom filter on user list -->
-                                            <div id="chatroom-members-list" data-members="[{{ user_list}}]"> 
+                                            <div id="chatroom-members-list"> 
                                                 {% for user in room.users.all %}
                                                     <div class="row">
                                                         <div class="col">
-                                                            <p class="text-center m-0">{{user.user.username}}</p>
+                                                            <p id="chatroom-user-{{forloop.counter}}" class="text-center m-0" data-userstats-id="{{user.id}}">{{user.user.username}}</p>
                                                         </div>
                                                     </div>
                                                 {% endfor %}
@@ -379,6 +380,36 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for assigning an owner (admin only) -->
+<div class="modal fade" id="assign-owner-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong>Assign a New Owner</strong>
+            </div>
+            <div class="modal-body">
+                {% for user in room.users.all %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-user-{{forloop.counter}}" data-userstats-id="{{user.id}}">
+                        <label class="form-check-label" for="select-user-{{forloop.counter}}">
+                            {{user.user.username}}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-warning">Assign</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -517,10 +548,10 @@
             reader.readAsDataURL(newRoomBGImage)
         })
         $('#activate_owner_select_button').click(function () {
-            var userList = JSON.parse($('#chatroom-members-list').text());
-            for (let i = 0; i < userList.length; i++) {
-                console.log(userList[i])
-            }
+            var assignOwnerModal = new bootstrap.Modal(document.getElementById('assign-owner-modal'), {
+                keyboard: false
+            })
+            assignOwnerModal.show()
         })
     })
 </script>
