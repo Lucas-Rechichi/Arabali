@@ -456,3 +456,7 @@ def leave_chatroom(request):
         'successful': valid
     }
     return JsonResponse(response)
+
+def admin_settings(request):
+    response = {}
+    return JsonResponse(response)

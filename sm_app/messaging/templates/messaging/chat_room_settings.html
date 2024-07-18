@@ -309,7 +309,7 @@
                                             <br>
                                             <div class="row">
                                                 <div class="col-6 d-flex justify-content-end">
-                                                    <button type="button" class="btn btn-outline-warning" id="activate_owner_select_button">Assign Owner</button>
+                                                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#assign-owner-modal">Assign Owner</button>
                                                 </div>
                                                 <div class="col-6 d-flex justify-content-start">
                                                     <button type="button" class="btn btn-outline-danger" id="activate_remove_select_button">Remove Users</button>
@@ -392,19 +392,21 @@
                 <strong>Assign a New Owner</strong>
             </div>
             <div class="modal-body">
-                {% for user in room.users.all %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-user-{{forloop.counter}}" data-userstats-id="{{user.id}}">
-                        <label class="form-check-label" for="select-user-{{forloop.counter}}">
-                            {{user.user.username}}
-                        </label>
-                    </div>
-                {% endfor %}
+                <div id="assign-owner-list">
+                    {% for user in room.users.all %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-user-{{forloop.counter}}" data-userstats-id="{{user.id}}">
+                            <label class="form-check-label" for="select-user-{{forloop.counter}}">
+                                {{user.user.username}}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
                 <div class="row">
                     <div class="col-6">
-                        <button type="button" class="btn btn-warning">Assign</button>
+                        <button type="button" class="btn btn-warning" id="confirm-assign-owner">Assign</button>
                     </div>
                     <div class="col-6">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -547,11 +549,23 @@
 
             reader.readAsDataURL(newRoomBGImage)
         })
-        $('#activate_owner_select_button').click(function () {
-            var assignOwnerModal = new bootstrap.Modal(document.getElementById('assign-owner-modal'), {
-                keyboard: false
-            })
-            assignOwnerModal.show()
+        $('#confirm-assign-owner').click(function () {
+            var userCount = $('#assign-owner-list').children().length
+            for (let i = 0; i < userCount + 1; i++) {
+                var checked = $('#select-user-'+ i).is(':checked');
+                if (checked);
+                    var selectedOptionElement = $('#select-user-'+ i);
+                    break;
+            }
+            if (!selectedOptionElement) {
+                console.log('nothing selected')
+            } else {
+                var selectedOptionUserstatsID = selectedOptionElement.data('userstats-id');
+                $.ajax({
+                    type: 'POST',
+                    url: '/'
+                })
+            }
         })
     })
 </script>
