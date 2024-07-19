@@ -469,8 +469,15 @@ def admin_settings(request):
             
             chatroom.owner = new_owner_userstats.user
             chatroom.save()
+            print(f'user {new_owner_userstats.user.username} is now owner of the chatroom {chatroom.name}.')
         elif setting_type == 'remove_users':
-            pass
+            remove_userstats_id_list = request.POST.get('userstats_id_list')
+            print(remove_userstats_id_list)
+            for userstats_id in remove_userstats_id_list:
+                user_stats = UserStats.objects.get(id=userstats_id)
+                chatroom.users.remove(user_stats)
+                chatroom.save()
+                print(f'removed user {user_stats.user.username} from chatroom {chatroom.name}')
         else:
             print('invalid setting type.')
         response = {}

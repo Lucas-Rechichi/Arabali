@@ -292,39 +292,47 @@
                                     </div>
                                 </div>
                                 <hr>
+                                {% if room.owner.username == username %}
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="lead text-center">Chatroom Members</p>
+                                            <form method="post">
+                                                <!-- put a custom filter on user list -->
+                                                <div id="chatroom-members-list"> 
+                                                    {% for user in room.users.all %}
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <p id="chatroom-user-{{forloop.counter}}" class="text-center m-0" data-userstats-id="{{user.id}}">{{user.user.username}}</p>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                                <br>
+                                                <div class="row">
+                                                    <div class="col-6 d-flex justify-content-end">
+                                                        <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#assign-owner-modal">Assign Owner</button>
+                                                    </div>
+                                                    <div class="col-6 d-flex justify-content-start">
+                                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#remove-users-modal">Remove Users</button>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <p class="lead text-center">Danger</p>
+                                                <div class="row">
+                                                    <div class="col d-flex justify-content-center">
+                                                        <button type="button" class="btn btn-danger">Delete Chatroom</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                {% else %}
                                 <div class="row">
                                     <div class="col">
-                                        <p class="lead text-center">Chatroom Members</p>
-                                        <form method="post">
-                                            <!-- put a custom filter on user list -->
-                                            <div id="chatroom-members-list"> 
-                                                {% for user in room.users.all %}
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            <p id="chatroom-user-{{forloop.counter}}" class="text-center m-0" data-userstats-id="{{user.id}}">{{user.user.username}}</p>
-                                                        </div>
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-                                            <br>
-                                            <div class="row">
-                                                <div class="col-6 d-flex justify-content-end">
-                                                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#assign-owner-modal">Assign Owner</button>
-                                                </div>
-                                                <div class="col-6 d-flex justify-content-start">
-                                                    <button type="button" class="btn btn-outline-danger" id="activate_remove_select_button">Remove Users</button>
-                                                </div>
-                                            </div>
-                                            <br>
-                                            <p class="lead text-center">Danger</p>
-                                            <div class="row">
-                                                <div class="col d-flex justify-content-center">
-                                                    <button type="button" class="btn btn-danger">Delete Chatroom</button>
-                                                </div>
-                                            </div>
-                                        </form>
+                                        <p class="text-center lead">You do not have acess to these settings. Only the owner of this chatroom has acess to these settings.</p>
                                     </div>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -384,6 +392,7 @@
         </div>
     </div>
 </div>
+{% if room.owner.username == username %}
 <!-- Modal for assigning an owner (admin only) -->
 <div class="modal fade" id="assign-owner-modal">
     <div class="modal-dialog">
@@ -395,8 +404,8 @@
                 <div id="assign-owner-list">
                     {% for user in room.users.all %}
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-user-{{forloop.counter}}" data-userstats-id="{{user.id}}">
-                            <label class="form-check-label" for="select-user-{{forloop.counter}}">
+                            <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-owner-{{forloop.counter}}" data-userstats-id="{{user.id}}">
+                            <label class="form-check-label" for="select-owner-{{forloop.counter}}">
                                 {{user.user.username}}
                             </label>
                         </div>
@@ -416,6 +425,39 @@
         </div>
     </div>
 </div>
+<!-- Modal for removing users (admin only) -->
+<div class="modal fade" id="remove-users-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong>Remove Users</strong>
+            </div>
+            <div class="modal-body">
+                <div id="remove-users-list">
+                    {% for user in room.users.all %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="remove-user-checkbox-button" id="select-remove-user-{{forloop.counter}}" data-userstats-id="{{user.id}}">
+                            <label class="form-check-label" for="select-remove-user-{{forloop.counter}}">
+                                {{user.user.username}}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-danger" id="confirm-remove-users">Remove</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 <script type="text/javascript">
     $(document).ready(function () {
         $('#settings-view').on('click', '.change', function () {
@@ -551,11 +593,11 @@
         })
         $('#confirm-assign-owner').click(function () {
             var userCount = $('#assign-owner-list').children().length
-            for (let i = 0; i < userCount + 1; i++) {
-                var checked = $('#select-user-'+ i).is(':checked');
+            for (let i = 1; i < userCount + 1; i++) {
+                var checked = $('#select-owner-'+ i).is(':checked');
                 console.log(checked)
                 if (checked) {
-                    var selectedOptionElement = $('#select-user-'+ i);
+                    var selectedOptionElement = $('#select-owner-'+ i);
                     break;
                 }
             }
@@ -573,10 +615,40 @@
                         'chatroom_id': '{{room.id}}',
                         'csrfmiddlewaretoken': '{{csrf_token}}',
                     },
-                    success: function(response){
-                        window.location.href = '/'
+                    success: function(response) {
+                        window.location.href = '/chat_settings/{{room.name}}/{{room.id}}/'
                     }
-                        
+                })
+            }
+        })
+        $('#confirm-remove-users').click(function () {
+            var userCount = $('#remove-users-list').children().length
+            var checkedUserstatsID = []
+            var hasClicked = false
+            for (let i = 1; i < userCount + 1; i++) {
+                var checked = $('#select-remove-user-' + i).is(':checked');
+                if (checked) {
+                    userstatsID = $('#select-remove-user-' + i).data('userstats-id');
+                    checkedUserstatsID.push(userstatsID);
+                    hasClicked = true
+                }
+            }
+            if (!hasClicked) {
+                console.log('nobody selected to be removed.')
+            } else {
+                console.log(checkedUserstatsID)
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat_admin/admin-settings/',
+                    data: {
+                        'setting_type': 'remove_users',
+                        'userstats_id_list': checkedUserstatsID,
+                        'chatroom_id': '{{room.id}}',
+                        'csrfmiddlewaretoken': '{{csrf_token}}'
+                    },
+                    success: function(response) {
+                        window.location.href = '/chat_settings/{{room.name}}/{{room.id}}/'
+                    }
                 })
             }
         })
