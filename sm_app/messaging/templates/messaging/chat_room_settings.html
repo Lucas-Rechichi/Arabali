@@ -320,7 +320,7 @@
                                                 <p class="lead text-center">Danger</p>
                                                 <div class="row">
                                                     <div class="col d-flex justify-content-center">
-                                                        <button type="button" class="btn btn-danger">Delete Chatroom</button>
+                                                        <button type="button" class="btn btn-danger" id="delete-chatroom">Delete Chatroom</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -642,7 +642,7 @@
                     url: '/chat_admin/admin-settings/',
                     data: {
                         'setting_type': 'remove_users',
-                        'userstats_id_list': checkedUserstatsID,
+                        'userstats_id_list': JSON.stringify(checkedUserstatsID),
                         'chatroom_id': '{{room.id}}',
                         'csrfmiddlewaretoken': '{{csrf_token}}'
                     },

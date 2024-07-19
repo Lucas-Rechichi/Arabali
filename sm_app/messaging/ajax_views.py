@@ -1,5 +1,6 @@
 import pytz
 import os
+import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -458,6 +459,7 @@ def leave_chatroom(request):
     return JsonResponse(response)
 
 def admin_settings(request):
+    print(request.POST)
     chatroom_id = request.POST.get('chatroom_id')
     chatroom = ChatRoom.objects.get(id=chatroom_id)
 
@@ -471,8 +473,7 @@ def admin_settings(request):
             chatroom.save()
             print(f'user {new_owner_userstats.user.username} is now owner of the chatroom {chatroom.name}.')
         elif setting_type == 'remove_users':
-            remove_userstats_id_list = request.POST.get('userstats_id_list')
-            print(remove_userstats_id_list)
+            remove_userstats_id_list = json.loads(request.POST.get('userstats_id_list'))
             for userstats_id in remove_userstats_id_list:
                 user_stats = UserStats.objects.get(id=userstats_id)
                 chatroom.users.remove(user_stats)
