@@ -1,6 +1,7 @@
 import os
 
 from django.db import models
+from django.contrib.auth.models import User
 from main.models import UserStats
 # Create your models here.
 
@@ -23,6 +24,7 @@ class ChatRoom(models.Model):
     icon = models.ImageField(null=False, upload_to=get_image_upload_path_room)
     room_bg_image = models.ImageField(upload_to=get_image_upload_path_room)
     users = models.ManyToManyField(UserStats)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
 
 
 class Message(models.Model):

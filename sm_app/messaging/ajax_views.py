@@ -458,5 +458,23 @@ def leave_chatroom(request):
     return JsonResponse(response)
 
 def admin_settings(request):
-    response = {}
-    return JsonResponse(response)
+    chatroom_id = request.POST.get('chatroom_id')
+    chatroom = ChatRoom.objects.get(id=chatroom_id)
+
+    if chatroom.owner.username == request.user.username:
+        setting_type = request.POST.get('setting_type')
+        if setting_type == 'assign_owner':
+            new_owner_userstats_id = request.POST.get('userstats_id')
+            new_owner_userstats = UserStats.objects.get(id=new_owner_userstats_id)
+            
+            chatroom.owner = new_owner_userstats.user
+            chatroom.save()
+        elif setting_type == 'remove_users':
+            pass
+        else:
+            print('invalid setting type.')
+        response = {}
+        return JsonResponse(response)
+    else:
+        print('incorrect user. Only owners can access this setting.')
+        return JsonResponse({})

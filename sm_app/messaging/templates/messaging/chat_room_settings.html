@@ -553,17 +553,30 @@
             var userCount = $('#assign-owner-list').children().length
             for (let i = 0; i < userCount + 1; i++) {
                 var checked = $('#select-user-'+ i).is(':checked');
-                if (checked);
+                console.log(checked)
+                if (checked) {
                     var selectedOptionElement = $('#select-user-'+ i);
                     break;
+                }
             }
             if (!selectedOptionElement) {
                 console.log('nothing selected')
             } else {
+                console.log(selectedOptionElement)
                 var selectedOptionUserstatsID = selectedOptionElement.data('userstats-id');
                 $.ajax({
                     type: 'POST',
-                    url: '/'
+                    url: '/chat_admin/admin-settings/',
+                    data: {
+                        'setting_type': 'assign_owner',
+                        'userstats_id': selectedOptionUserstatsID,
+                        'chatroom_id': '{{room.id}}',
+                        'csrfmiddlewaretoken': '{{csrf_token}}',
+                    },
+                    success: function(response){
+                        window.location.href = '/'
+                    }
+                        
                 })
             }
         })
