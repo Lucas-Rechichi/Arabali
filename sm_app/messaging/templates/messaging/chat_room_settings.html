@@ -199,6 +199,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <p class="lead">Invite Members</p>
+                                        <p class="small m-0">Start typing in members usernames to invite.</p>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -208,8 +209,8 @@
                                         <br>
                                         <button type="button" class="btn btn-success" id="invite-members" disabled>Invite</button>
                                     </div>
-                                    <div class="col-2">
-                                        <button type="button" class="btn btn-success" id="add-member">Add</button>
+                                    <div class="col-4">
+                                        <ul id="selected-members" class="list-group mt-2"></ul>
                                     </div>
                                 </div>
                             </div>
@@ -746,42 +747,67 @@
                 }
             })
         })
-        $('#invite-member-textbox').on('keydown', function () {
+        $('#invite-member-textbox').on('input', function () {
             var query = $('#invite-member-textbox').val();
-            if (query.length > 0) {
-                $.ajax({
-                    type: 'POST',
-                    url: '/universal/realtime-suggestions/',
-                    data: {
-                        'query': query,
-                        'answer_catergory': 'UserStats',
-                        'csrfmiddlewaretoken': '{{csrf_token}}',
-                    },
-                    success: function(response)  {
-                        console.log('suggestions made.')
-                        var suggestionsList = $('#suggested-members');
-                        suggestionsList.html();
-                        var listHtml = ''
-                        for (let i = 0; i < response.exact_solutions.length; i++) {
-                            var suggestionHtml = `
-                                <li>
-                                    <button type="button" class="btn" id="suggestion-">`+ response.exact_solutions[i]['name'] + `</button>
-                                </li>
-                            `;
-                            listHtml += suggestionHtml
-                        }
-                        for (let i = 0; i < response.approx_solutions.length; i++) {
-                            var suggestionHtml = `
-                                <li>
-                                    <button type="button" class="btn" id="suggestion-">`+ response.approx_solutions[i]['name'] + `</button>
-                                </li>
-                            `;
-                            listHtml += suggestionHtml
-                        }
-
-                        suggestionsList.html(listHtml)
+            $.ajax({
+                type: 'POST',
+                url: '/universal/realtime-suggestions/',
+                data: {
+                    'query': query,
+                    'answer_catergory': 'UserStats',
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                },
+                success: function(response)  {
+                    console.log('suggestions made.')
+                    var suggestionsList = $('#suggested-members');
+                    suggestionsList.empty();
+                    var listHtml = ''
+                    for (let i = 0; i < response.exact_solutions.length; i++) {
+                        var suggestionHtml = `
+                            <li>
+                                <button type="button" class="btn add-user" data-username="` + response.exact_solutions[i]['name'] + `">`+ response.exact_solutions[i]['name'] + `</button>
+                            </li>
+                        `;
+                        listHtml += suggestionHtml
                     }
-                })
+                    for (let i = 0; i < response.approx_solutions.length; i++) {
+                        var suggestionHtml = `
+                            <li>
+                                <button type="button" class="btn add-user" data-username="` + response.approx_solutions[i]['name'] + `">`+ response.approx_solutions[i]['name'] + `</button>
+                            </li>
+                        `;
+                        listHtml += suggestionHtml
+                    }
+                    suggestionsList.html(listHtml)
+                }
+            })
+        })
+        var selectedUserList = []
+        $('#settings-view').on('click', '.add-user', function () {
+            var username = $(this).data('username');
+            if (!selectedUserList.includes(username)) {
+                var invitedUserList = $('#selected-members');
+                var listLength = invitedUserList.children('li').length;
+                var userHtml = `
+                    <li id="selected-user-` + listLength + `" data-username="` + username + `">
+                        <p>` + username + `<button type="button" class="btn btn-close remove-selected-user ms-4" data-iteration-id="` + listLength + `"></button></p> 
+                    </li>
+                `;
+                invitedUserList.append(userHtml)
+                selectedUserList.push(username)
+                $('#invite-members').removeAttr('disabled');
+            } else {
+                console.log('username already selected.')
+            }
+        })
+        $('#settings-view').on('click', '.remove-selected-user', function () {
+            var iterationID = $(this).data('iteration-id');
+            var relevantListChild = $('#selected-user-' + iterationID);
+            var username = relevantListChild.data('username');
+            relevantListChild.remove();
+            selectedUserList.pop(username);
+            if (selectedUserList.length == 0) {
+                $('#invite-members').attr('disabled', true);
             }
         })
     })
