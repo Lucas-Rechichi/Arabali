@@ -149,22 +149,43 @@
                                         <form method="post">
                                             <p class="lead">Mute Notifications</p>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="allow-all-notifications" checked>
-                                                <label class="form-check-label" for="allow-all-notifications">
-                                                    Allow All Notifications
-                                                </label>
+                                                {% if message_notification_setting.allow_all %}
+                                                    <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="allow-all-notifications" checked>
+                                                    <label class="form-check-label" for="allow-all-notifications">
+                                                        Allow All Notifications
+                                                    </label>
+                                                {% else %}
+                                                    <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="allow-all-notifications">
+                                                    <label class="form-check-label" for="allow-all-notifications">
+                                                        Allow All Notifications
+                                                    </label>
+                                                {% endif %}
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="allow-replies-only">
-                                                <label class="form-check-label" for="allow-all-notifications">
-                                                    Replies Only
-                                                </label>
+                                                {% if message_notification_setting.replies_only %}
+                                                    <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="allow-replies-only" checked>
+                                                    <label class="form-check-label" for="allow-all-notifications">
+                                                        Replies Only
+                                                    </label>
+                                                {% else %}
+                                                    <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="allow-replies-only">
+                                                    <label class="form-check-label" for="allow-all-notifications">
+                                                        Replies Only
+                                                    </label>
+                                                {% endif %}
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="mute-all-notifications">
-                                                <label class="form-check-label" for="allow-all-notifications">
-                                                    Mute All Notifications
-                                                </label>
+                                                {% if message_notification_setting.mute_all %}
+                                                    <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="mute-all-notifications" checked>
+                                                    <label class="form-check-label" for="allow-all-notifications">
+                                                        Mute All Notifications
+                                                    </label>
+                                                {% else %}
+                                                    <input class="form-check-input" type="radio" name="mute-notification-setting-radio" id="mute-all-notifications">
+                                                    <label class="form-check-label" for="allow-all-notifications">
+                                                        Mute All Notifications
+                                                    </label>
+                                                {% endif %}
                                             </div>
                                             <button type="button" class="btn btn-success mt-2 change" id="apply-general-settings" data-button-type="apply-general">Apply</button>
                                         </form>
@@ -299,13 +320,21 @@
                                             <form method="post">
                                                 <!-- put a custom filter on user list -->
                                                 <div id="chatroom-members-list"> 
-                                                    {% for user in room.users.all %}
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                <p id="chatroom-user-{{forloop.counter}}" class="text-center m-0" data-userstats-id="{{user.id}}">{{user.user.username}}</p>
+                                                    <div class="row">
+                                                        {% for user in room.users.all %}
+                                                            <div class="col-2 d-flex justify-content-end">
+                                                                <img src="{{user.pfp.url}}" alt="{{user.user.username}}'s profile picture" style="height: 2.5vw; width: 2.5vw;">
                                                             </div>
-                                                        </div>
-                                                    {% endfor %}
+                                                            <div class="col-2 d-flex justify-content-start">
+                                                                {% if user.user.username == room.owner.username %}
+                                                                    <p id="chatroom-user-{{forloop.counter}}" class="text-center text-warning pt-2" data-userstats-id="{{user.id}}">{{user.user.username}}</p>
+                                                                {% else %}
+                                                                    <p id="chatroom-user-{{forloop.counter}}" class="text-center pt-2" data-userstats-id="{{user.id}}">{{user.user.username}}</p>
+                                                                {% endif %}
+                                                            </div> 
+                                                            <br>
+                                                        {% endfor %}
+                                                    </div>
                                                 </div>
                                                 <br>
                                                 <div class="row">
@@ -320,7 +349,7 @@
                                                 <p class="lead text-center">Danger</p>
                                                 <div class="row">
                                                     <div class="col d-flex justify-content-center">
-                                                        <button type="button" class="btn btn-danger" id="delete-chatroom">Delete Chatroom</button>
+                                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete-chatroom-modal">Delete Chatroom</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -404,10 +433,17 @@
                 <div id="assign-owner-list">
                     {% for user in room.users.all %}
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-owner-{{forloop.counter}}" data-userstats-id="{{user.id}}">
-                            <label class="form-check-label" for="select-owner-{{forloop.counter}}">
-                                {{user.user.username}}
-                            </label>
+                            {% if user.user.username == room.owner.username %}
+                                <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-owner-{{forloop.counter}}" data-userstats-id="{{user.id}}" checked>
+                                <label class="form-check-label text-warning" for="select-owner-{{forloop.counter}}">
+                                    {{user.user.username}}
+                                </label>
+                            {% else %}
+                                <input class="form-check-input" type="radio" name="assign-owner-radio-button" id="select-owner-{{forloop.counter}}" data-userstats-id="{{user.id}}">
+                                <label class="form-check-label" for="select-owner-{{forloop.counter}}">
+                                    {{user.user.username}} 
+                                </label>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -451,6 +487,34 @@
                     </div>
                     <div class="col-6">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for deleting a chatroom (admin only) -->
+<div class="modal fade" id="delete-chatroom-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong>WARNING</strong>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <p class="lead text-center text-danger">Are you sure that you want to delete this chatroom?</p>
+                        <p class="small text-center">This is irreversible.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-danger" id="confirm-delete-chatroom">Delete</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancell</button>
                     </div>
                 </div>
             </div>
@@ -651,6 +715,19 @@
                     }
                 })
             }
+        })
+        $('#confirm-delete-chatroom').click(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/chat_admin/delete-chatroom/',
+                data: {
+                    'chatroom_id': '{{room.id}}',
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                },
+                success: function (response) {
+                    window.location.href = '/chat/';
+                }
+            })
         })
     })
 </script>

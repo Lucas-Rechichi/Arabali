@@ -39,20 +39,31 @@ def message_sent_text(request):
         notification_ids = []
         if is_reply == 'true':  # if the message is a reply
             for receiver in receivers:
+                message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
                 if receiver == reply_message.sender: # if the person being replied to happends to be the user that sent the message being replied to.
-                    notification_contents = f'({receiver.user.username} Replied To You): {new_message.text}' # special message for the user who created the message being replied to.
-                    new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=notification_contents, relevant_message=new_message)
-                    new_notification.save()
-                    notification_ids.append(new_notification.id)
+                    if message_notification_setting.replies_only or message_notification_setting.allow_all:
+                        notification_contents = f'({receiver.user.username} Replied To You): {new_message.text}' # special message for the user who created the message being replied to.
+                        new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                        new_notification.save()
+                        notification_ids.append(new_notification.id)
+                    else:
+                        print(f'notification muted for user {receiver.user.username}')
                 else:
+                    if message_notification_setting.allow_all:
+                        new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text, relevant_message=new_message)
+                        new_notification.save()
+                        notification_ids.append(new_notification.id)
+                    else:
+                        print(f'notification muted for user {receiver.user.username}')
+        else:
+            for receiver in receivers:
+                message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
+                if message_notification_setting.allow_all:
                     new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text, relevant_message=new_message)
                     new_notification.save()
                     notification_ids.append(new_notification.id)
-        else:
-            for receiver in receivers:
-                new_notification = Notification(user=receiver, sender=user_stats.user.username, source=chat_room, contents=new_message.text, relevant_message=new_message)
-                new_notification.save()
-                notification_ids.append(new_notification.id)
+                else:
+                    print(f'notification muted for user {receiver.user.username}')
 
         # Reformatting of the timezone
         local_timezone = pytz.timezone("Australia/Sydney")
@@ -110,16 +121,23 @@ def message_sent_image(request):
 
         # notification things
         for receiver in receivers:
+            message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
             if receiver == reply_message.sender: # if the person being replied to happends to be the user that sent the message being replied to.
-                notification_contents = f'({receiver.user.username} Replied To You): Image' # special message for the user who created the message being replied to.
-                new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
-                new_notification.save()
-                notification_ids.append(new_notification.id)
+                if message_notification_setting.replies_only or message_notification_setting.allow_all:
+                    notification_contents = f'({receiver.user.username} Replied To You): Image' # special message for the user who created the message being replied to.
+                    new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                    new_notification.save()
+                    notification_ids.append(new_notification.id)
+                else:
+                    print(f'notification muted for user {receiver.user.username}')
             else:
-                notification_contents = 'Image'
-                new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
-                new_notification.save()
-                notification_ids.append(new_notification.id)
+                if message_notification_setting.allow_all:
+                    notification_contents = 'Image'
+                    new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                    new_notification.save()
+                    notification_ids.append(new_notification.id)
+                else:
+                    print(f'notification muted for user {receiver.user.username}')
 
     else:
         new_message = Message(sender=sender_userstats, room=chat_room, image=image)
@@ -127,10 +145,14 @@ def message_sent_image(request):
 
         # notification things
         for receiver in receivers:
-            notification_contents = 'Image'
-            new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
-            new_notification.save()
-            notification_ids.append(new_notification.id)
+            message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
+            if message_notification_setting.allow_all:
+                notification_contents = 'Image'
+                new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                new_notification.save()
+                notification_ids.append(new_notification.id)
+            else:
+                print(f'notification muted for user {receiver.user.username}')
 
     # Sending JSON responce
     if is_reply == 'true': # Send over specific data over for a reply message
@@ -171,26 +193,37 @@ def message_sent_video(request):
         new_message.save()
         # notification things as well
         for receiver in receivers:
+            message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
             if receiver == reply_message.sender: # if the person being replied to happends to be the user that sent the message being replied to.
-                notification_contents = f'({receiver.user.username} Replied To You): Video' # special message for the user who created the message being replied to.
-                new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
-                new_notification.save()
-                notification_ids.append(new_notification.id)
+                if message_notification_setting.replies_only or message_notification_setting.allow_all:
+                    notification_contents = f'({receiver.user.username} Replied To You): Video' # special message for the user who created the message being replied to.
+                    new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                    new_notification.save()
+                    notification_ids.append(new_notification.id)
+                else:
+                    print(f'notification muted for user {receiver.user.username}')
             else:
-                notification_contents = f'Video'
-                new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
-                new_notification.save()
-                notification_ids.append(new_notification.id)
+                if message_notification_setting.allow_all:
+                    notification_contents = f'Video'
+                    new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                    new_notification.save()
+                    notification_ids.append(new_notification.id)
+                else:
+                    print(f'notification muted for user {receiver.user.username}')
 
     else:
         new_message = Message(sender=sender_userstats, room=chat_room, video=video)
         new_message.save()
         
         for receiver in receivers:
-            notification_contents = f'Video'
-            new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
-            new_notification.save()
-            notification_ids.append(new_notification.id)
+            message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
+            if message_notification_setting.allow_all:
+                notification_contents = f'Video'
+                new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
+                new_notification.save()
+                notification_ids.append(new_notification.id)
+            else:
+                print(f'notification muted for user {receiver.user.username}')
             
     # Reformatting of the timezone
     local_timezone = pytz.timezone("Australia/Sydney")
@@ -250,10 +283,14 @@ def create_poll(request):
 
     notification_ids = []
     for receiver_userstats in chat_room.users.exclude(user=request.user):
-        new_notification_text = new_poll.title
-        new_notification = Notification(sender=request.user.username, user=receiver_userstats, source=chat_room, contents=new_notification_text, relevant_poll=new_poll)
-        new_notification.save()
-        notification_ids.append(new_notification.pk)
+        message_notification_setting = MessageNotificationSetting.objects.get(user=receiver_userstats, source=chat_room)
+        if message_notification_setting.allow_all:
+            new_notification_text = new_poll.title
+            new_notification = Notification(sender=request.user.username, user=receiver_userstats, source=chat_room, contents=new_notification_text, relevant_poll=new_poll)
+            new_notification.save()
+            notification_ids.append(new_notification.pk)
+        else:
+            print(f'notification muted for user {receiver_userstats.user.username}')
 
     response = {
         'poll_id': new_poll.pk,
@@ -459,7 +496,6 @@ def leave_chatroom(request):
     return JsonResponse(response)
 
 def admin_settings(request):
-    print(request.POST)
     chatroom_id = request.POST.get('chatroom_id')
     chatroom = ChatRoom.objects.get(id=chatroom_id)
 
@@ -481,8 +517,28 @@ def admin_settings(request):
                 print(f'removed user {user_stats.user.username} from chatroom {chatroom.name}')
         else:
             print('invalid setting type.')
-        response = {}
-        return JsonResponse(response)
+        return JsonResponse({})
+    else:
+        print('incorrect user. Only owners can access this setting.')
+        return JsonResponse({})
+    
+def delete_chatroom(request):
+    chatroom_id = request.POST.get('chatroom_id')
+    chatroom = ChatRoom.objects.get(id=chatroom_id)
+    if chatroom.owner.username == request.user.username:
+        # Getting image paths
+        icon_path = chatroom.icon.url.removeprefix('/')
+        room_bg_image_path = chatroom.room_bg_image.url.removeprefix('/')
+
+        # Deleting images
+        os.remove(icon_path)
+        os.remove(room_bg_image_path)
+
+        # Deleting chatroom
+        chatroom.delete()
+        print(f'chatroom {chatroom.name} with id {chatroom.pk} has been deleted.')
+
+        return JsonResponse({})
     else:
         print('incorrect user. Only owners can access this setting.')
         return JsonResponse({})
