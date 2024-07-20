@@ -195,6 +195,25 @@
                                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#leave-chatroom-modal">Leave Chatroom</button>
                                     </div>
                                 </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="lead">Invite Members</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" id="invite-member-textbox">
+                                        <ul id="suggested-members" class="list-group mt-2" style="display: none;"></ul>
+                                        <div id="selected-members-list">
+                                        </div>
+                                        <br>
+                                        <button type="button" class="btn btn-success" id="invite-members" disabled>Invite</button>
+                                    </div>
+                                    <div class="col-2">
+                                        <button type="button" class="btn btn-success" id="add-member">Add</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -728,6 +747,22 @@
                     window.location.href = '/chat/';
                 }
             })
+        })
+        $('#invite-member-textbox').on('input', function () {
+            var query = $('#invite-member-textbox').val();
+            if (query.length > 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'universal/realtime-suggestions',
+                    data: {
+                        'query': query,
+                        'csrfmiddlewaretoken': '{{csrf_token}}',
+                    },
+                    success: function(response)  {
+                        console.log('suggestions made.')
+                    }
+                })
+            }
         })
     })
 </script>

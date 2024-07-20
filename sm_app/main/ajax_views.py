@@ -2,6 +2,7 @@ from datetime import datetime, date
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from main.extras import capitalize_plus
 from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Notification
 from messaging.models import Message, ChatRoom, PollMessage
 from django.core.exceptions import ObjectDoesNotExist
@@ -379,4 +380,13 @@ def remove_notification(request):
     response = {}
     return JsonResponse(response)
 
+def realtime_suggestions(request):
+    query = request.POST.get('query')
+    captialized_query = capitalize_plus(query)
+    highest_q_value = len(query) * 2
+    suggestions = {
+        'exact': {},
+        'approximate':{}
+    }
+    
     
