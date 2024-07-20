@@ -204,9 +204,7 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <input type="text" class="form-control" id="invite-member-textbox">
-                                        <ul id="suggested-members" class="list-group mt-2" style="display: none;"></ul>
-                                        <div id="selected-members-list">
-                                        </div>
+                                        <ul id="suggested-members" class="list-group mt-2"></ul>
                                         <br>
                                         <button type="button" class="btn btn-success" id="invite-members" disabled>Invite</button>
                                     </div>
@@ -748,18 +746,40 @@
                 }
             })
         })
-        $('#invite-member-textbox').on('input', function () {
+        $('#invite-member-textbox').on('keydown', function () {
             var query = $('#invite-member-textbox').val();
             if (query.length > 0) {
                 $.ajax({
                     type: 'POST',
-                    url: 'universal/realtime-suggestions',
+                    url: '/universal/realtime-suggestions/',
                     data: {
                         'query': query,
+                        'answer_catergory': 'UserStats',
                         'csrfmiddlewaretoken': '{{csrf_token}}',
                     },
                     success: function(response)  {
                         console.log('suggestions made.')
+                        var suggestionsList = $('#suggested-members');
+                        suggestionsList.html();
+                        var listHtml = ''
+                        for (let i = 0; i < response.exact_solutions.length; i++) {
+                            var suggestionHtml = `
+                                <li>
+                                    <button type="button" class="btn" id="suggestion-">`+ response.exact_solutions[i]['name'] + `</button>
+                                </li>
+                            `;
+                            listHtml += suggestionHtml
+                        }
+                        for (let i = 0; i < response.approx_solutions.length; i++) {
+                            var suggestionHtml = `
+                                <li>
+                                    <button type="button" class="btn" id="suggestion-">`+ response.approx_solutions[i]['name'] + `</button>
+                                </li>
+                            `;
+                            listHtml += suggestionHtml
+                        }
+
+                        suggestionsList.html(listHtml)
                     }
                 })
             }
