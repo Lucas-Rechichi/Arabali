@@ -192,7 +192,7 @@
                                     </div>
                                     <div class="col-6">
                                         <p class="lead">Extras</p>
-                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#leave-chatroom-modal">Leave Chatroom</button>
+                                        <button type="button" class="btn btn-outline-danger" id="leave-chatroom">Leave Chatroom</button>
                                     </div>
                                 </div>
                                 <br>
@@ -406,7 +406,7 @@
                             <button type="button" id="leave-chatroom-button"  class="btn btn-danger">Leave</button>
                         </div>
                         <div class="col-6 d-flex justify-content-end">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#leave-chatroom-modal">Cancel</button>
                         </div>
                     </div>
                 </form>
@@ -703,13 +703,27 @@
                 console.log('invalid setting button');
             }
         })
+
+        var leaveChatroomModal = new bootstrap.Modal(document.getElementById('leave-chatroom-modal'), {
+            keyboard: false
+        });
+        $('#leave-chatroom').click(function () {
+            leaveChatroomModal.show();
+        })
         $('#leave-chatroom-button').click(function () {
             if ('{{username}}' === '{{room.owner.username}}') {
                 console.log('cannot leave room, must assign a new owner first.')
+
+                leaveChatroomModal.hide();
+
+                setTimeout(function() {
                 var errorModal = new bootstrap.Modal(document.getElementById('leave-chatroom-error'), {
                     keyboard: false
                 });
                 errorModal.show();
+                }, 500)
+                
+
             } else {
                 $.ajax({
                 type: 'POST',
