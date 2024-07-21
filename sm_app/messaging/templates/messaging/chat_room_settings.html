@@ -490,6 +490,33 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="leave-chatroom-error">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong>ERROR</strong>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col">
+                        <p class="lead text-center">Cannot Leave Chatroom.</p>
+                        <p class="text-center">Must assign someone to be the new owner of this chatroom first.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#assign-owner-modal">Assign owner</button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal for deleting a chatroom (admin only) -->
 <div class="modal fade" id="delete-chatroom-modal">
     <div class="modal-dialog">
@@ -676,13 +703,20 @@
                 console.log('invalid setting button');
             }
         })
-        $('#leave-chatrrom-button').click(function () {
-            $.ajax({
+        $('#leave-chatroom-button').click(function () {
+            if ('{{username}}' === '{{room.owner.username}}') {
+                console.log('cannot leave room, must assign a new owner first.')
+                var errorModal = new bootstrap.Modal(document.getElementById('leave-chatroom-error'), {
+                    keyboard: false
+                });
+                errorModal.show();
+            } else {
+                $.ajax({
                 type: 'POST',
                 url: '/chat_settings/leave-chatroom/',
                 data: {
                     'chat_room_id': '{{room.id}}',
-                    'csrfmidlewaretoken': '{{csrf_token}}',
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
                 },
                 success: function (response) {
                     var isSuccessful = response.successful;
@@ -694,6 +728,8 @@
                 }
 
             })
+            }
+            
         })
         $('#chat-room-name').on('input', function () {
             var newName = $('#chat-room-name').val();
