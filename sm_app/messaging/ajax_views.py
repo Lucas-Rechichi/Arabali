@@ -476,6 +476,33 @@ def change_settings(request):
     }
     return JsonResponse(response)
 
+def invite_users(request):
+    chatroom_id = request.POST.get('chatroom_id')
+    user_list = json.loads(request.POST.get('user_list'))
+
+    chatroom = ChatRoom.objects.get(id=chatroom_id)
+
+    response_user_list = []
+    for user in user_list:
+        user_object = User.objects.get(username=user)
+        user_stats = UserStats.objects.get(user=user_object)
+
+        chatroom.users.add(user_stats)
+        chatroom.save()
+
+        response_user_list.append({
+            'username': user,
+            'user_pfp_url': user_stats.pfp.url
+        })
+    message = 'New Users Invited'
+    response = {
+        'message': message,
+        'user_list': response_user_list,
+        'user_list_count': len(response_user_list),
+    }
+
+    return JsonResponse(response)
+
 def leave_chatroom(request):
     try:
         room_id = request.POST.get('chat_room_id')
@@ -507,17 +534,45 @@ def admin_settings(request):
             
             chatroom.owner = new_owner_userstats.user
             chatroom.save()
+
             print(f'user {new_owner_userstats.user.username} is now owner of the chatroom {chatroom.name}.')
+            message = f'New owner of the chatroom is {new_owner_userstats.user.username}'
+            owner_username = new_owner_userstats.user.username
+            owner_pfp_url  = new_owner_userstats.pfp.url
+            removed_users = None
+            removed_user_count = None
+
         elif setting_type == 'remove_users':
+            removed_users = []
             remove_userstats_id_list = json.loads(request.POST.get('userstats_id_list'))
+
             for userstats_id in remove_userstats_id_list:
                 user_stats = UserStats.objects.get(id=userstats_id)
                 chatroom.users.remove(user_stats)
                 chatroom.save()
-                print(f'removed user {user_stats.user.username} from chatroom {chatroom.name}')
+                removed_users.append({
+                    'username': user_stats.user.username,
+                    'user_pfp_url': user_stats.pfp.url,
+                })
+
+            print(f'removed user {user_stats.user.username} from chatroom {chatroom.name}')
+            message = f'Users have been removed from the chatroom.'
+            owner_username = None
+            owner_pfp_url = None
+            removed_user_count = len(removed_users)
+
         else:
             print('invalid setting type.')
-        return JsonResponse({})
+
+        response = {
+            'message': message,
+            'owner_username': owner_username,
+            'owner_pfp_url': owner_pfp_url,
+            'removed_users': removed_users,
+            'removed_user_count': removed_user_count,
+        }
+        return JsonResponse(response)
+    
     else:
         print('incorrect user. Only owners can access this setting.')
         return JsonResponse({})
@@ -537,8 +592,8 @@ def delete_chatroom(request):
         # Deleting chatroom
         chatroom.delete()
         print(f'chatroom {chatroom.name} with id {chatroom.pk} has been deleted.')
-
         return JsonResponse({})
     else:
         print('incorrect user. Only owners can access this setting.')
         return JsonResponse({})
+    

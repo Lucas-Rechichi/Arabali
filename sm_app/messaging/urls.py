@@ -17,7 +17,11 @@ urlpatterns = [
     path('polls/vote-for-poll/', ajax_views.vote_for_poll, name='vote_for_poll'),
 
     path('chat_settings/change-settings/', ajax_views.change_settings, name='change_settings'),
-    path('chat_admin/admin-settings/', ajax_views.admin_settings, name='admin_settings'),
+    path('chat_settings/invite-users/', ajax_views.invite_users, name='invite_users'),
     path('chat_settings/leave-chatroom/', ajax_views.leave_chatroom, name='leave_chatroom'),
+    
+
+    path('chat_admin/admin-settings/', ajax_views.admin_settings, name='admin_settings'),
+
 
 ]
