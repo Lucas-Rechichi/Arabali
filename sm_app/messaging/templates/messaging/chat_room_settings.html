@@ -209,7 +209,11 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <input type="text" class="form-control" id="invite-member-textbox">
-                                        <ul id="suggested-members" class="list-group mt-2"></ul>
+                                        <div class="card" id="suggested-members-card" style="display: none;">
+                                            <div class="card-body">
+                                                <ul id="suggested-members" class="list-group mt-2"></ul>
+                                            </div>
+                                        </div>
                                         <br>
                                         <button type="button" class="btn btn-success" id="invite-members" disabled>Invite</button>
                                     </div>
@@ -340,7 +344,6 @@
                                         <div class="col">
                                             <p class="lead text-center">Chatroom Members</p>
                                             <form method="post">
-                                                <!-- put a custom filter on user list -->
                                                 <div id="chatroom-members-list"> 
                                                     <div class="row">
                                                         {% for user in room.users.all %}
@@ -982,15 +985,17 @@
             var query = $('#invite-member-textbox').val();
             $.ajax({
                 type: 'POST',
-                url: '/universal/realtime-suggestions/',
+                url: '/universal/realtime-suggestions-manager/',
                 data: {
                     'query': query,
+                    'type': 'search',
                     'answer_catergory': 'UserStats',
                     'csrfmiddlewaretoken': '{{csrf_token}}',
                 },
                 success: function(response)  {
                     console.log('suggestions made.')
                     var suggestionsList = $('#suggested-members');
+                    var suggestionsCard = document.getElementById('suggested-members-card')
                     suggestionsList.empty();
                     var listHtml = ''
                     for (let i = 0; i < response.exact_solutions.length; i++) {
@@ -1007,11 +1012,31 @@
                                 <button type="button" class="btn add-user" data-username="` + response.approx_solutions[i]['name'] + `">`+ response.approx_solutions[i]['name'] + `</button>
                             </li>
                         `;
-                        listHtml += suggestionHtml
+                        listHtml += suggestionHtml;
                     }
                     suggestionsList.html(listHtml)
+                    if (response.exact_solutions.length > 0) {
+                        suggestionsCard.style.display = 'block';
+                    } else {
+                        suggestionsCard.style.display = 'none';
+                    }
                 }
             })
+        })
+        $('#invite-member-textbox').on('click', function () {
+            var suggestionsCard = document.getElementById('suggested-members-card');
+            if (suggestionsCard.style.display === 'none') {
+                $.ajax({
+                    type: 'POST',
+                    url: '/universal/realtime-suggestions-manager/',
+                    data: {
+                        'csrfmiddlewaretoken': '{{csrf_token}}'
+                    },
+                    success: function (response) {
+                        console.log('done')
+                    }
+                })
+            }
         })
         var selectedUserList = []
         $('#settings-view').on('click', '.add-user', function () {

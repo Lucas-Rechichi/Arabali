@@ -25,6 +25,6 @@ urlpatterns = [
     path('page/error/', ajax_v.ajax_error, name="ajax_error"),
     path('page/save-location/', ajax_v.save_location, name='save_location'),
     path('universal/remove-notification/', ajax_v.remove_notification, name='remove_notification'),
-    path('universal/realtime-suggestions/', ajax_v.realtime_suggestions, name='realtime_suggestions')
+    path('universal/realtime-suggestions-manager/', ajax_v.realtime_suggestions_manager, name='realtime_suggestions')
 ]
 
