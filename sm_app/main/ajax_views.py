@@ -1,3 +1,5 @@
+import json
+
 from datetime import datetime, date
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -392,69 +394,101 @@ def realtime_suggestions_manager(request):
             'exact': {},
             'approx':{}
         }
-        # Gets all possible exact solutions for the inserted query
-        exact_solutions = {}
-        changed_query = captialized_query
-        for b in range(len(changed_query)):
-            exact_solutions[b + 1] = changed_query
-            changed_query = remove_last_character(changed_query)
 
-        # Gets all possible approximate solutions for the inserted query
-        approximate_solutions = {}
-        broken_query = [x for x in captialized_query] 
-        for a in range(len(captialized_query)):
-            approximate_solutions[a + 1] =  broken_query[a]
-
-        
         if answer_catergory == 'UserStats':
             model_records = UserStats.objects.all()
+            if len(query) <= 2:
 
-            for model_record in model_records:
-                for combination_id, solution in exact_solutions.items():
-                    if str(solution) in str(model_record.user.username): # if the string is present within this user's name
-                        if model_record.user.pk not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys(): # Removes duplicates for both exact and approx solutions
-                            suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
+                # Gets all possible approximate solutions for the inserted query
+                approximate_solutions = {}
+                broken_query = [x for x in captialized_query] 
+                for a in range(len(captialized_query)):
+                    approximate_solutions[a + 1] =  broken_query[a]
 
-                    if str(solution.lower()) in str(model_record.user.username):
-                        if model_record.user.pk  not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys():
-                            suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
+                for model_record in model_records:
+                    split_result_dict = {}
+                    split_result_list = [x for x in (model_record.user.username)] 
+                    for a in range(len(model_record.user.username)):
+                        split_result_dict[split_result_list[a]] =  [a + 1]
+                    for combination_id, solution in approximate_solutions.items():
+                        if str(solution) in str(model_record.user.username):
+                            if model_record.user.pk  not in suggestions['approx'].keys() and model_record.user.pk not in suggestions['exact'].keys():
+                                for char_index, char in approximate_solutions.items():
+                                    if char in split_result_list:
+                                        combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
+                                suggestions['approx'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': approx_display(combination_id, highest_q_value), 'user_pfp_url': model_record.pfp.url}
 
-            for model_record in model_records:
-                split_result_dict = {}
-                split_result_list = [x for x in (model_record.user.username)] 
-                for a in range(len(model_record.user.username)):
-                    split_result_dict[split_result_list[a]] =  [a + 1]
-                for combination_id, solution in approximate_solutions.items():
-                    if str(solution) in str(model_record.user.username):
-                        if model_record.user.pk  not in suggestions['approx'].keys() and model_record.user.pk not in suggestions['exact'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            suggestions['approx'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': approx_display(combination_id, highest_q_value)}
+                        if str(solution.lower()) in str(model_record.user.username):
+                            if model_record.user.pk  not in suggestions['approx'].keys() and model_record.user.pk not in suggestions['exact'].keys():
+                                for char_index, char in approximate_solutions.items():
+                                    if char in split_result_list:
+                                        combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
+                                suggestions['approx'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': approx_display(combination_id, highest_q_value), 'user_pfp_url': model_record.pfp.url}
 
-                    if str(solution.lower()) in str(model_record.user.username):
-                        if model_record.user.pk  not in suggestions['approx'].keys() and model_record.user.pk not in suggestions['exact'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            suggestions['approx'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': approx_display(combination_id, highest_q_value)}
+                sorted_users = sorted(suggestions['approx'].items(), key=lambda item: item[1]['value'], reverse=True)
+                suggestions['approx'] = {k: v for k, v in sorted_users}
+                solutions = [a for a in suggestions['approx'].values()]
+                
+            elif len(query) == 2 :
+                # Gets all possible exact solutions for the inserted query
+                exact_solutions = {}
+                changed_query = captialized_query
+                for b in range(len(changed_query)):
+                    exact_solutions[b + 1] = changed_query
+                    changed_query = remove_last_character(changed_query)
 
-            sorted_users = sorted(suggestions['exact'].items(), key=lambda item: item[1]['value'], reverse=True)
-            suggestions['exact'] = {k: v for k, v in sorted_users}
+                for model_record in model_records:
+                    for combination_id, solution in exact_solutions.items():
+                        if str(solution) in str(model_record.user.username): # if the string is present within this user's name
+                            if model_record.user.pk not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys(): # Removes duplicates for both exact and approx solutions
+                                suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
 
-            sorted_users = sorted(suggestions['approx'].items(), key=lambda item: item[1]['value'], reverse=True)
-            suggestions['approx'] = {k: v for k, v in sorted_users}
+                        if str(solution.lower()) in str(model_record.user.username):
+                            if model_record.user.pk  not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys():
+                                suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
 
-            print(suggestions)
-            
+                sorted_users = sorted(suggestions['exact'].items(), key=lambda item: item[1]['value'], reverse=True)
+                suggestions['exact'] = {k: v for k, v in sorted_users}
+                solutions = [e for e in suggestions['exact'].values()]
+                print(suggestions)
+                
+            else:
+                # Gets all possible exact solutions for the inserted query. Removes the least likely value every charater over 2.
+                exact_solutions = {}
+                changed_query = captialized_query
+                for b in range(len(changed_query)):
+                    exact_solutions[b + 1] = changed_query
+                    changed_query = remove_last_character(changed_query)
+
+                extra_chars = len(query) - 2
+                for _ in range(1, extra_chars + 1):
+                    exact_solutions.popitem()
+                    print(exact_solutions)
+
+                for model_record in model_records:
+                    for combination_id, solution in exact_solutions.items():
+                        if str(solution) in str(model_record.user.username): # if the string is present within this user's name
+                            if model_record.user.pk not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys(): # Removes duplicates for both exact and approx solutions
+                                suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
+
+                        if str(solution.lower()) in str(model_record.user.username):
+                            if model_record.user.pk  not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys():
+                                suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
+
+                sorted_users = sorted(suggestions['exact'].items(), key=lambda item: item[1]['value'], reverse=True)
+                suggestions['exact'] = {k: v for k, v in sorted_users}
+                solutions = [e for e in suggestions['exact'].values()]
+                print(suggestions)
+
         else:
             print('invalid catergory to search for.')
-
+        print(sorted_users)
         response = {
-            'exact_solutions': [e for e in suggestions['exact'].values()],
-            'approx_solutions': [a for a in suggestions['approx'].values()],
+            'query_length': len(query),
+            'solutions': solutions,
         }
-        return JsonResponse(response)
+        return JsonResponse(response, safe=False)
+
     elif type == 'recommend':
         user = request.user
         user_stats = UserStats.objects.get(user=user)
