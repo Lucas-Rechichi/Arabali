@@ -383,6 +383,12 @@ def remove_notification(request):
     return JsonResponse(response)
 
 def realtime_suggestions_manager(request):
+    try:
+        abs_cutoff_value = request.POST.get('abs_cutoff_value')
+        if abs_cutoff_value == None:
+            abs_cutoff_value = 4
+    except:
+        abs_cutoff_value = 4
     type = request.POST.get('type')
     if type == 'search':
         query = request.POST.get('query')
@@ -397,7 +403,7 @@ def realtime_suggestions_manager(request):
 
         if answer_catergory == 'UserStats':
             model_records = UserStats.objects.all()
-            if len(query) <= 2:
+            if len(query) <= abs_cutoff_value:
 
                 # Gets all possible approximate solutions for the inserted query
                 approximate_solutions = {}
@@ -429,7 +435,7 @@ def realtime_suggestions_manager(request):
                 suggestions['approx'] = {k: v for k, v in sorted_users}
                 solutions = [a for a in suggestions['approx'].values()]
                 
-            elif len(query) == 2 :
+            elif len(query) == abs_cutoff_value :
                 # Gets all possible exact solutions for the inserted query
                 exact_solutions = {}
                 changed_query = captialized_query
@@ -460,7 +466,7 @@ def realtime_suggestions_manager(request):
                     exact_solutions[b + 1] = changed_query
                     changed_query = remove_last_character(changed_query)
 
-                extra_chars = len(query) - 2
+                extra_chars = len(query) - abs_cutoff_value
                 for _ in range(1, extra_chars + 1):
                     exact_solutions.popitem()
                     print(exact_solutions)
@@ -492,19 +498,18 @@ def realtime_suggestions_manager(request):
     elif type == 'recommend':
         user = request.user
         user_stats = UserStats.objects.get(user=user)
-        user_following_objects = Following.objects.all()
+        user_follower_object = Following.objects.get(subscribers=user_stats.user.username)
+        followers = UserStats.objects.filter(following=user_follower_object)
 
-        followers = []
-        for follower_object in user_following_objects:
-            if user_stats.following.filter(subscribers=follower_object):
-                follower_user = User.objects.get(username=follower_object)
-                follower_userstats = UserStats.objects.get(user=follower_user)
-                followers.append({
-                    'username': follower_userstats.user.username,
-                    'user_pfp_url': follower_userstats.pfp.url,
-                })
+        follower_list = []
+        for follower in followers:
+            follower_list.append({
+                'username': follower.user.username,
+                'user_pfp_url': follower.pfp.url,
+            })
+        print(follower_list)
         response = {
-            'follower_list': followers
+            'follower_list': follower_list
         }
         return JsonResponse(response)
     else:

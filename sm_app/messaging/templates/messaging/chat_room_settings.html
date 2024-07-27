@@ -209,7 +209,7 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <input type="text" class="form-control" id="invite-member-textbox">
-                                        <div class="card" id="suggested-members-card" style="display: none;">
+                                        <div class="card" id="suggested-members-card" style="display: none; max-height: 167px; max-width: 248px; overflow-y: auto;">
                                             <div class="card-body">
                                                 <ul id="suggested-members" class="list-group mt-2"></ul>
                                             </div>
@@ -996,11 +996,12 @@
                     var suggestionsList = $('#suggested-members');
                     var suggestionsCard = document.getElementById('suggested-members-card')
                     suggestionsList.empty();
-                    var listHtml = ''
+                    var listHtml = '<p class="lead text-center">Results</p>'
                     console.log(response.solutions)
                     for (let i = 0; i < response.solutions.length; i++) {
                         var suggestionHtml = `
-                            <li>
+                            <li class="custom-icon">
+                                <img src="` + response.solutions[i]['user_pfp_url'] + `" alt="" style="width: 1rem; height: 1rem; border-radius: 0.5rem;">
                                 <button type="button" class="btn add-user m-0 p-0" data-username="` + response.solutions[i]['name'] + `">`+ response.solutions[i]['name'] + `</button>
                             </li>
                         `;
@@ -1009,8 +1010,41 @@
                     suggestionsList.html(listHtml)
                     if (response.solutions.length > 0) {
                         suggestionsCard.style.display = 'block';
+
+                    } else if (response.solutions.length == 0 && query !== '') {
+                        var noResponsePrompt = `
+                            <li>
+                                <p class="text-center">No users match your query</p>
+                            </li>
+                        `;
+                        suggestionsList.html(noResponsePrompt)
+
                     } else {
                         suggestionsCard.style.display = 'none';
+                        $.ajax({
+                            type: 'POST',
+                            url: '/universal/realtime-suggestions-manager/',
+                            data: {
+                                'type': 'recommend',
+                                'csrfmiddlewaretoken': '{{csrf_token}}',
+                            },
+                            success: function (response) {
+                                var suggestionsList = $('#suggested-members');
+                                var usersHtml = '<p class="lead text-center">Suggested members</p>';
+                                console.log(response.follower_list)
+                                for (let i = 0; i < response.follower_list.length; i++) {
+                                    var userHtml = `
+                                        <li class="custom-icon">
+                                            <img src="` + response.follower_list[i]['user_pfp_url'] + `" alt="" style="width: 1rem; height: 1rem; border-radius: 0.5rem;">
+                                            <button type="button" class="btn add-user m-0 p-0" data-username="` + response.follower_list[i]['username'] + `">`+ response.follower_list[i]['username'] + `</button>
+                                        </li>
+                                    `;
+                                    usersHtml += userHtml
+                                }
+                                suggestionsList.html(usersHtml);
+                                suggestionsCard.style.display = 'block';
+                            }
+                        })
                     }
                 }
             })
@@ -1022,16 +1056,41 @@
                     type: 'POST',
                     url: '/universal/realtime-suggestions-manager/',
                     data: {
-                        'csrfmiddlewaretoken': '{{csrf_token}}'
+                        'type': 'recommend',
+                        'csrfmiddlewaretoken': '{{csrf_token}}',
                     },
                     success: function (response) {
-                        console.log('done')
+                        var suggestionsList = $('#suggested-members');
+                        var usersHtml = '<p class="lead text-center">Suggested members</p>';
+                        console.log(response.follower_list)
+                        for (let i = 0; i < response.follower_list.length; i++) {
+                            var userHtml = `
+                                <li class="custom-icon">
+                                    <img src="` + response.follower_list[i]['user_pfp_url'] + `" alt="" style="width: 1rem; height: 1rem; border-radius: 0.5rem;">
+                                    <button type="button" class="btn add-user m-0 p-0" data-username="` + response.follower_list[i]['username'] + `">`+ response.follower_list[i]['username'] + `</button>
+                                </li>
+                            `;
+                            usersHtml += userHtml
+                        }
+                        suggestionsList.html(usersHtml);
+                        suggestionsCard.style.display = 'block';
                     }
                 })
             }
         })
+        $('#invite-member-textbox').on('blur', function () {
+            var suggestionsCard = document.getElementById('suggested-members-card');
+            var suggestionsList = $('#suggested-members');
+            setTimeout(function () {
+                suggestionsList.html('');
+                suggestionsCard.style.display = 'none';
+            }, 300)
+            
+        })
         var selectedUserList = []
-        $('#settings-view').on('click', '.add-user', function () {
+        $('#settings-view').on('mousedown', '.add-user', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
             var username = $(this).data('username');
             if (!selectedUserList.includes(username)) {
                 var invitedUserList = $('#selected-members');
@@ -1048,7 +1107,9 @@
                 console.log('username already selected.')
             }
         })
-        $('#settings-view').on('click', '.remove-selected-user', function () {
+        $('#settings-view').on('mousedown', '.remove-selected-user', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
             var iterationID = $(this).data('iteration-id');
             var relevantListChild = $('#selected-user-' + iterationID);
             var username = relevantListChild.data('username');
