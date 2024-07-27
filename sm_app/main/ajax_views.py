@@ -412,14 +412,14 @@ def realtime_suggestions_manager(request):
                         split_result_dict[split_result_list[a]] =  [a + 1]
                     for combination_id, solution in approximate_solutions.items():
                         if str(solution) in str(model_record.user.username):
-                            if model_record.user.pk  not in suggestions['approx'].keys() and model_record.user.pk not in suggestions['exact'].keys():
+                            if model_record.user.pk  not in suggestions['approx'].keys():
                                 for char_index, char in approximate_solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
                                 suggestions['approx'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': approx_display(combination_id, highest_q_value), 'user_pfp_url': model_record.pfp.url}
 
                         if str(solution.lower()) in str(model_record.user.username):
-                            if model_record.user.pk  not in suggestions['approx'].keys() and model_record.user.pk not in suggestions['exact'].keys():
+                            if model_record.user.pk  not in suggestions['approx'].keys():
                                 for char_index, char in approximate_solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
@@ -440,11 +440,11 @@ def realtime_suggestions_manager(request):
                 for model_record in model_records:
                     for combination_id, solution in exact_solutions.items():
                         if str(solution) in str(model_record.user.username): # if the string is present within this user's name
-                            if model_record.user.pk not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys(): # Removes duplicates for both exact and approx solutions
+                            if model_record.user.pk not in suggestions['exact'].keys(): # Removes duplicates for both exact and approx solutions
                                 suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
 
                         if str(solution.lower()) in str(model_record.user.username):
-                            if model_record.user.pk  not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys():
+                            if model_record.user.pk  not in suggestions['exact'].keys():
                                 suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
 
                 sorted_users = sorted(suggestions['exact'].items(), key=lambda item: item[1]['value'], reverse=True)
@@ -468,11 +468,11 @@ def realtime_suggestions_manager(request):
                 for model_record in model_records:
                     for combination_id, solution in exact_solutions.items():
                         if str(solution) in str(model_record.user.username): # if the string is present within this user's name
-                            if model_record.user.pk not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys(): # Removes duplicates for both exact and approx solutions
+                            if model_record.user.pk not in suggestions['exact'].keys(): # Removes duplicates for both exact and approx solutions
                                 suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
 
                         if str(solution.lower()) in str(model_record.user.username):
-                            if model_record.user.pk  not in suggestions['exact'].keys() and model_record.user.pk not in suggestions['approx'].keys():
+                            if model_record.user.pk  not in suggestions['exact'].keys():
                                 suggestions['exact'][model_record.user.pk] = {'id': model_record.user.pk,'name': model_record.user.username, 'value': exact_display(modified_reciprocal(combination_id)), 'user_pfp_url': model_record.pfp.url}
 
                 sorted_users = sorted(suggestions['exact'].items(), key=lambda item: item[1]['value'], reverse=True)

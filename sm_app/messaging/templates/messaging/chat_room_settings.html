@@ -474,7 +474,7 @@
             </div>
             <div class="modal-body">
                 <div id="remove-users-list">
-                    {% for user in room.users.all %}
+                    {% for user in room_members %}
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="remove-user-checkbox-button" id="select-remove-user-{{forloop.counter}}" data-userstats-id="{{user.id}}">
                             <label class="form-check-label" for="select-remove-user-{{forloop.counter}}">
@@ -1001,18 +1001,10 @@
                     for (let i = 0; i < response.solutions.length; i++) {
                         var suggestionHtml = `
                             <li>
-                                <button type="button" class="btn add-user" data-username="` + response.solutions[i]['name'] + `">`+ response.exact_solutions[i]['name'] + `</button>
+                                <button type="button" class="btn add-user" data-username="` + response.solutions[i]['name'] + `">`+ response.solutions[i]['name'] + `</button>
                             </li>
                         `;
                         listHtml += suggestionHtml
-                    }
-                    for (let i = 0; i < response.solutions.length; i++) {
-                        var suggestionHtml = `
-                            <li>
-                                <button type="button" class="btn add-user" data-username="` + response.solutions[i]['name'] + `">`+ response.approx_solutions[i]['name'] + `</button>
-                            </li>
-                        `;
-                        listHtml += suggestionHtml;
                     }
                     suggestionsList.html(listHtml)
                     if (response.solutions.length > 0) {

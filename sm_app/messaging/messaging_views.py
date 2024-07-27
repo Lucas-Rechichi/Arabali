@@ -111,13 +111,17 @@ def chat_room_settings(request, room, room_id):
     init = initialize_page(request)
 
     chat_room = ChatRoom.objects.get(id=room_id)
+    user_message_notification_settings = MessageNotificationSetting.objects.get(user=UserStats.objects.get(user=request.user))
     chat_room_users = list(chat_room.users.all())
+    chatroom_members = chat_room.users.exclude(user=chat_room.owner)
+
     chat_room_user_list = []
     for chat_room_user in chat_room_users:
         chat_room_user_list.append(chat_room_user.user.username)
-    user_message_notification_settings = MessageNotificationSetting.objects.get(user=UserStats.objects.get(user=request.user))
+    
     variables = {
         'room': chat_room,
+        'room_members': chatroom_members,
         'message_notification_setting': user_message_notification_settings,
         'room_user_list': chat_room_user_list,
         'username': init['username'],
