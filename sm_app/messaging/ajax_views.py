@@ -386,27 +386,27 @@ def change_settings(request):
                 # Changing paths on images for the chatroom
                 old_icon = str(chat_room.icon)
                 old_icon_object = chat_room.icon
-                old_icon_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_icon)
+                old_icon_path = os.path.join('arabali_users', old_icon)
 
                 os.remove(old_icon_path)
 
                 old_room_bg_image = str(chat_room.room_bg_image)
                 old_room_bg_image_object = chat_room.room_bg_image
-                old_room_bg_image_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_room_bg_image)
+                old_room_bg_image_path = os.path.join('arabali_users', old_room_bg_image)
 
                 os.remove(old_room_bg_image_path)
 
                 # Change message paths
                 message_images = {}
                 message_videos = {}
-                messages = Message.objects.get(room=chat_room)
+                messages = Message.objects.filter(room=chat_room)
                 for message in messages:
                     if message.image:
                         image_object = message.image
                         message_images[message.pk] = image_object
 
                         image = str(message.image)
-                        image_path = os.path.join('arabali_users', 'Rooms', old_name, 'message_images', image)
+                        image_path = os.path.join('arabali_users', image)
                         os.remove(image_path)
 
                     elif message.video:
@@ -414,13 +414,13 @@ def change_settings(request):
                         message_videos[message.pk] = video_object
 
                         video = str(message.video)
-                        video_path = os.path.join('arabali_users', 'Rooms', old_name, 'message_videos', video)
+                        video_path = os.path.join('arabali_users', video)
                         os.remove(video_path)
 
                 # Deleting old directory for chatroom.
-                os.remove(f'arabali_users/Rooms/{old_name}')
+                os.removedirs(f'arabali_users/Rooms/{old_name}/room_images')
 
-                # Replacing the new paths with images and videos from this chatroom.
+                # Replacing the new paths with images and videos from this chatroom. # Up to here in debugging this code.
                 chat_room.icon = old_room_bg_image_object
                 chat_room.save()
 
@@ -444,7 +444,7 @@ def change_settings(request):
                 pass
             if new_icon:
                 old_icon_string = str(chat_room.icon)
-                old_icon_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_icon_string)
+                old_icon_path = os.path.join('arabali_users', old_icon_string)
                 os.remove(old_icon_path)
 
                 chat_room.icon = new_icon
@@ -454,7 +454,7 @@ def change_settings(request):
                 pass
             if new_room_bg_image: # changing room BG image
                 old_room_bg_image_string = str(chat_room.room_bg_image)
-                old_room_bg_image_path = os.path.join('arabai_users', 'Rooms', old_name, 'room_images', old_room_bg_image_string)
+                old_room_bg_image_path = os.path.join('arabali_users', old_room_bg_image_string)
                 os.remove(old_room_bg_image_path)
 
                 chat_room.room_bg_image = new_room_bg_image

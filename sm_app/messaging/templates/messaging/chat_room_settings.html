@@ -757,6 +757,10 @@
             var newName = $('#chat-room-name').val();
             $('#updated-chatroom-name').text('');
             $('#updated-chatroom-name').text(newName);
+
+            if (newName === '') {
+                $('#updated-chatroom-name').text('{{room.name}}');
+            }
         })
         $('#chat-room-icon').on('change', function () {
             var newIcon = $('#chat-room-icon')[0].files[0];
@@ -1063,7 +1067,6 @@
                     success: function (response) {
                         var suggestionsList = $('#suggested-members');
                         var usersHtml = '<p class="lead text-center">Suggested members</p>';
-                        console.log(response.follower_list)
                         for (let i = 0; i < response.follower_list.length; i++) {
                             var userHtml = `
                                 <li class="custom-icon">

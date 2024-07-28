@@ -383,14 +383,14 @@ def remove_notification(request):
     return JsonResponse(response)
 
 def realtime_suggestions_manager(request):
-    try:
-        abs_cutoff_value = request.POST.get('abs_cutoff_value')
-        if abs_cutoff_value == None:
-            abs_cutoff_value = 4
-    except:
-        abs_cutoff_value = 4
     type = request.POST.get('type')
     if type == 'search':
+        try:
+            abs_cutoff_value = request.POST.get('abs_cutoff_value')
+            if abs_cutoff_value == None:
+                abs_cutoff_value = 4
+        except:
+            abs_cutoff_value = 4
         query = request.POST.get('query')
         answer_catergory = request.POST.get('answer_catergory')
 
@@ -507,7 +507,6 @@ def realtime_suggestions_manager(request):
                 'username': follower.user.username,
                 'user_pfp_url': follower.pfp.url,
             })
-        print(follower_list)
         response = {
             'follower_list': follower_list
         }
