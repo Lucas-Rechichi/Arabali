@@ -4,6 +4,7 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.core.files import File
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
 from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting
@@ -385,13 +386,13 @@ def change_settings(request):
 
                 # Changing paths on images for the chatroom
                 old_icon = str(chat_room.icon)
-                old_icon_object = chat_room.icon
+                old_icon_object = chat_room.icon.path
                 old_icon_path = os.path.join('arabali_users', old_icon)
 
                 os.remove(old_icon_path)
 
                 old_room_bg_image = str(chat_room.room_bg_image)
-                old_room_bg_image_object = chat_room.room_bg_image
+                old_room_bg_image_object = chat_room.room_bg_image.path
                 old_room_bg_image_path = os.path.join('arabali_users', old_room_bg_image)
 
                 os.remove(old_room_bg_image_path)
@@ -417,15 +418,18 @@ def change_settings(request):
                         video_path = os.path.join('arabali_users', video)
                         os.remove(video_path)
 
-                # Deleting old directory for chatroom.
-                os.removedirs(f'arabali_users/Rooms/{old_name}/room_images')
+                # Replacing old directory for chatroom.
+                os.replace(os.path.join('arabali_users', 'Rooms', old_name), os.path.join('arabali_users', 'Rooms', new_name))
 
                 # Replacing the new paths with images and videos from this chatroom. # Up to here in debugging this code.
-                chat_room.icon = old_room_bg_image_object
-                chat_room.save()
+                print(new_icon, new_room_bg_image)
+                with open(old_icon_object, 'rb') as icon_file:
+                    chat_room.icon = File(icon_file)
+                    chat_room.save()
 
-                chat_room.icon = old_icon_object
-                chat_room.save()
+                with open(old_room_bg_image_object, 'rb') as room_bg_image_file:
+                    chat_room.room_bg_image = File(room_bg_image_file)
+                    chat_room.save()
 
                 for message in messages:
                     if message.image:
