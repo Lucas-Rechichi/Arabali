@@ -1,13 +1,17 @@
+import logging
 import pytz
 import os
 import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.core.files import File
+from django.core.files.storage import default_storage
+from django.core.exceptions import SuspiciousFileOperation
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
 from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting
+from messaging.extras import change_user_directory
+from sm_app import settings
 
 
 def message_sent_text(request):
@@ -369,7 +373,9 @@ def change_settings(request):
             print(f'message setting for user: {user_stats.user.username}, has ben changed for notifications, to {chosen_setting}.')
             is_successful = True
 
-        elif setting_type == 'apply_styling':
+        elif setting_type == 'apply_styling': # Fix
+
+            # Getting relevant data
             chat_room_id = request.POST.get('chat_room_id')
             new_name = request.POST.get('new_name')
             new_icon = request.FILES.get('new_icon')
@@ -377,40 +383,112 @@ def change_settings(request):
             user = request.user
 
             chat_room = ChatRoom.objects.get(id=chat_room_id)
-            
-            if not new_name:
-                new_name = chat_room.name # Old name
-            if not new_icon:
-                new_icon = chat_room.icon 
-            if not new_room_bg_image:
-                new_room_bg_image = chat_room.room_bg_image
-            
-            owner = chat_room.owner
-            old_name = chat_room.name
-            old_icon = chat_room.icon
-            old_room_bg_image = chat_room.room_bg_image
 
-            users = []
+            # checking to see if a new username has been entered.
+            if new_name:
+                changing_name = new_name
+                current_name = chat_room.name
+
+                # Getting and creating old paths and new path strings respectively.
+                old_dir_name = chat_room.name
+                new_dir_name = changing_name
+
+                old_dir = os.path.join('arabali_users', 'Rooms', old_dir_name)
+                new_dir = os.path.join('arabali_users', 'Rooms', new_dir_name)
+                
+                print(f'New Chatroom Name: {new_name}')
+
+            else:
+                changing_name = chat_room.name
+                current_name = chat_room.name
+
+                old_dir_name = chat_room.name
+                new_dir_name = changing_name
+
+                old_dir = os.path.join('arabali_users', 'Rooms', old_dir_name)
+                new_dir = os.path.join('arabali_users', 'Rooms', new_dir_name)
+                
+                print(f'Current Chatroom Name: {current_name}')
+
+            # Get the current owner of the chatroom
+            chatroom_owner = chat_room.owner
+
+            # Saving the users and their notification settings for this chatroom.
+            chatroom_users = []
+            chatroom_notification_setting_objects = {}
             for user in chat_room.users.all():
-                users.append(user)
+                chatroom_users.append(user)
+                message_notification_setting = MessageNotificationSetting.objects.get(user=user, source=chat_room)
+                chatroom_notification_setting_objects[user.pk] = message_notification_setting
 
-            main_messages = Message.objects.get(room=chat_room)
-            poll_messages = PollMessage.objects.get(room=chat_room)
+            # Save the messages that were associated with the chatroom.
+            main_messages = Message.objects.filter(room=chat_room)
+            poll_messages = Message.objects.filter(room=chat_room)
 
-            os.remove(os.path.join('arabali_users', 'Rooms', old_name, 'room_images', old_icon.name))
-            os.remove(os.path.join('arabali_users', 'Rooms', old_name, 'room_images', old_room_bg_image.name))
+            print('Saving data complete.')
 
-            os.removedirs('arabali_users', 'Rooms', old_name)
+            if new_icon and new_room_bg_image:
+                # Both icon and bg image
+                print('New icon and BG image.')
+                old_icon_path = os.path.join('arabali_users', chat_room.icon.name)
+                old_room_bg_image_path = os.path.join('arabali_users', chat_room.room_bg_image.name)
 
-            chat_room.delete()
+                os.remove(old_icon_path)
+                os.remove(old_room_bg_image_path)
 
-            new_chatroom = ChatRoom(name=new_name, owner=owner, icon=new_icon.file, room_bg_image= new_room_bg_image.file)
+                change_user_directory(old_dir, new_dir)
+
+            elif new_icon and not new_room_bg_image:
+                print('New icon')
+                old_icon_path = os.path.join('arabali_users', chat_room.icon.name)
+
+                old_room_bg_image_path = str(os.path.join('arabali_users', chat_room.room_bg_image.name))
+                new_room_bg_image = old_room_bg_image_path.replace(current_name, changing_name)
+
+                os.remove(old_icon_path)
+
+                change_user_directory(old_dir, new_dir)
+            elif not new_icon and new_room_bg_image:
+                print('New BG image')
+                old_room_bg_image_path = os.path.join('arabali_users', chat_room.room_bg_image.name)
+                
+                old_icon_path = str(os.path.join('arabali_users', chat_room.icon.name))
+                new_icon = old_icon_path.replace(current_name, changing_name)
+
+                os.remove(old_room_bg_image_path)
+
+                change_user_directory(old_dir, new_dir)
+            else:
+                print('Neither')
+
+                old_icon_path = str(os.path.join('arabali_users', chat_room.icon.name))
+                new_icon = old_icon_path.replace(current_name, changing_name)
+
+                old_room_bg_image_path = str(os.path.join('arabali_users', chat_room.room_bg_image.name))
+                new_room_bg_image = old_room_bg_image_path.replace(current_name, changing_name)
+
+                change_user_directory(old_dir, new_dir)
+
+            # chat_room.delete()
+
+            new_chatroom = ChatRoom(name=changing_name, icon=new_icon, room_bg_image=new_room_bg_image, owner=chatroom_owner)
             new_chatroom.save()
 
-            for user in users:
-                chat_room.users.add(user)
-                chat_room.save()
-            
+            for user in chatroom_users:
+                new_chatroom.users.add(user)
+                new_chatroom.save()
+                notification_setting = chatroom_notification_setting_objects[user.pk]
+                notification_setting.source = new_chatroom
+                notification_setting.save()
+
+            for message in main_messages:
+                message.room = new_chatroom
+                message.save()
+
+            for message in poll_messages:
+                message.room = new_chatroom
+                message.save()
+
             is_successful = True
             print(f'Styling changed for chatroom {chat_room.name}')
         else:
