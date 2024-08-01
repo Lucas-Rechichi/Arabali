@@ -442,7 +442,7 @@ def change_settings(request):
                 print('New icon')
                 old_icon_path = os.path.join('arabali_users', chat_room.icon.name)
 
-                old_room_bg_image_path = str(os.path.join('arabali_users', chat_room.room_bg_image.name))
+                old_room_bg_image_path = str(chat_room.room_bg_image)
                 new_room_bg_image = old_room_bg_image_path.replace(current_name, changing_name)
 
                 os.remove(old_icon_path)
@@ -452,7 +452,7 @@ def change_settings(request):
                 print('New BG image')
                 old_room_bg_image_path = os.path.join('arabali_users', chat_room.room_bg_image.name)
                 
-                old_icon_path = str(os.path.join('arabali_users', chat_room.icon.name))
+                old_icon_path = str(chat_room.icon)
                 new_icon = old_icon_path.replace(current_name, changing_name)
 
                 os.remove(old_room_bg_image_path)
@@ -461,15 +461,15 @@ def change_settings(request):
             else:
                 print('Neither')
 
-                old_icon_path = str(os.path.join('arabali_users', chat_room.icon.name))
+                old_icon_path = str(chat_room.icon)
                 new_icon = old_icon_path.replace(current_name, changing_name)
 
-                old_room_bg_image_path = str(os.path.join('arabali_users', chat_room.room_bg_image.name))
+                old_room_bg_image_path = str(chat_room.room_bg_image)
                 new_room_bg_image = old_room_bg_image_path.replace(current_name, changing_name)
 
                 change_user_directory(old_dir, new_dir)
 
-            # chat_room.delete()
+            chat_room.delete()
 
             new_chatroom = ChatRoom(name=changing_name, icon=new_icon, room_bg_image=new_room_bg_image, owner=chatroom_owner)
             new_chatroom.save()
@@ -491,6 +491,12 @@ def change_settings(request):
 
             is_successful = True
             print(f'Styling changed for chatroom {chat_room.name}')
+            response = {
+                'successful': is_successful,
+                'new_chatroom_id': new_chatroom.pk,
+                'new_chatroom_name': new_chatroom.name
+            }
+            return JsonResponse(response)
         else:
             print(f'invaid setting type of {setting_type}')
             is_successful = False

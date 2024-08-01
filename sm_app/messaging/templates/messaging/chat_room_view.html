@@ -153,12 +153,85 @@
                                     <!-- Redirect to page -->
                                     <button class="btn" type="button" onclick="location.href='/chat_settings/{{room.name}}/{{room.id}}/'"><li class="custom-icon"><i class="bi bi-gear-fill mt-1" style="font-size: 18px;"></i> Settings</li></button>
                                     <!-- Open offcanvas -->
-                                    <button class="btn" type="button"><li class="custom-icon"><i class="bi bi-question-circle mt-1" style="font-size: 18px;"></i> Details</li></button>
+                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailsPage"><li class="custom-icon"><i class="bi bi-question-circle mt-1" style="font-size: 18px;"></i>Details</li></button>
                                     <!-- open confirmation modal -->
-                                    <button class="btn" type="button"><li class="custom-icon"><i class="bi bi-box-arrow-right mt-1" style="color: #dc3545; font-size: 18px;"></i> <p class="text-danger p-0 m-0">Leave</p></li></button>
+                                    <button class="btn" type="button" id="leave-chatroom"><li class="custom-icon"><i class="bi bi-box-arrow-right mt-1" style="color: #dc3545; font-size: 18px;"></i> <p class="text-danger p-0 m-0">Leave</p></li></button>
                                 </div>
                             </div>
                         </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Details offcanvas -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="detailsPage">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title"></h5>Chatroom Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="row">
+                    <div class="col">
+                        <p class="lead">Chatroom Members</p>
+                        <ul class="custom-icon">
+                            {% for user in room.users.all %}
+                            <li><button class="btn" onclick="location.href='/profile/{{user.user.username}}'"><img src="{{user.pfp.url}}" alt="{{user.user.username}}'s profile picture" style="max-width: 2rem; max-height: 2rem; border-radius: 1rem;"> {{user.user.username}}</button></li>
+                            <br>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Modal for leaving chatroom -->
+        <div class="modal fade" id="leave-chatroom-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <strong>WARNING</strong>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-center">Do you wish to leave this chatroom?</p>
+                        <p class="small text-center">This cannot be undone.</p>
+                        <form method="post">
+                            <div class="row">
+                                <div class="col-6 d-flex justify-content-start">
+                                    <button type="button" id="leave-chatroom-button"  class="btn btn-danger">Leave</button>
+                                </div>
+                                <div class="col-6 d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-bs-target="#leave-chatroom-modal">Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Leave chatroom error modal -->
+        <div class="modal fade" id="leave-chatroom-error">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <strong>ERROR</strong>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <p class="lead text-center">Cannot Leave Chatroom.</p>
+                                <p class="text-center">Must assign someone to be the new owner of this chatroom first.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-success" onclick="location.href='/chat_settings/{{room.name}}/{{room.id}}'">Go to settings</button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -868,7 +941,7 @@
                     if (data.sender === '{{username}}') {
                         let optionsHtml = '';
                         // for loop
-                        for (let i=0; i < data.option_count; i++ ) {
+                        for (let i = 0; i < data.option_count; i++ ) {
                             var optionHtml = `
                                 <div id="option-` + data.options[i].option_id + `">  
                                     <button class="btn btn-light poll-option" id="poll-option-` + data.options[i].option_id + `" data-option-id="` + data.options[i].option_id + `" style="width: 100%;">
@@ -1933,6 +2006,46 @@
                 var hiddenInfo = $('#hidden-info-' + optionID);
                 clearInterval(intervalId);
                 hiddenInfo.remove();
+            })
+            var leaveChatroomModal = new bootstrap.Modal(document.getElementById('leave-chatroom-modal'), {
+                keyboard: false
+            });
+            $('#leave-chatroom').click(function () {
+                leaveChatroomModal.show();
+            })
+            $('#leave-chatroom-button').click(function () {
+                if ('{{username}}' === '{{room.owner.username}}') {
+                    console.log('cannot leave room, must assign a new owner first.')
+
+                    leaveChatroomModal.hide();
+
+                    setTimeout(function() {
+                    var errorModal = new bootstrap.Modal(document.getElementById('leave-chatroom-error'), {
+                        keyboard: false
+                    });
+                    errorModal.show();
+                    }, 500)
+                    
+
+                } else {
+                    $.ajax({
+                    type: 'POST',
+                    url: '/chat_settings/leave-chatroom/',
+                    data: {
+                        'chat_room_id': '{{room.id}}',
+                        'csrfmiddlewaretoken': '{{csrf_token}}',
+                    },
+                    success: function (response) {
+                        var isSuccessful = response.successful;
+                        if (isSuccessful) {
+                            location.href = '/chat/';
+                        } else {
+                            console.log('removal insuccessful.')
+                        }
+                    }
+
+                })
+                }
             })
         });
     </script>

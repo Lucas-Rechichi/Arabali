@@ -546,7 +546,7 @@
                         <button type="button" class="btn btn-danger" id="confirm-delete-chatroom">Delete</button>
                     </div>
                     <div class="col-6">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancell</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelb</button>
                     </div>
                 </div>
             </div>
@@ -690,7 +690,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button class="btn btn-secondary" onclick="location.href='/chat_settings/${response.new_chatroom_name}/${response.new_chatroom_id}/'">Close</button>
                                             </div>
                                         </div>
                                     </div>
@@ -711,7 +711,7 @@
                 console.log('invalid setting button');
             }
         })
-
+        
         var leaveChatroomModal = new bootstrap.Modal(document.getElementById('leave-chatroom-modal'), {
             keyboard: false
         });
