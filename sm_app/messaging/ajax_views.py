@@ -373,7 +373,7 @@ def change_settings(request):
             print(f'message setting for user: {user_stats.user.username}, has ben changed for notifications, to {chosen_setting}.')
             is_successful = True
 
-        elif setting_type == 'apply_styling': # Fix
+        elif setting_type == 'apply_styling':
 
             # Getting relevant data
             chat_room_id = request.POST.get('chat_room_id')
