@@ -614,8 +614,8 @@ def delete_chatroom(request):
     chatroom = ChatRoom.objects.get(id=chatroom_id)
     if chatroom.owner.username == request.user.username:
         # Getting image paths
-        icon_path = chatroom.icon.url.removeprefix('/')
-        room_bg_image_path = chatroom.room_bg_image.url.removeprefix('/')
+        icon_path = os.path.join('arabali_users', chatroom.icon.name)
+        room_bg_image_path = os.path.join('arabali_users', chatroom.room_bg_image.name)
 
         # Deleting images
         os.remove(icon_path)
@@ -625,6 +625,7 @@ def delete_chatroom(request):
         chatroom.delete()
         print(f'chatroom {chatroom.name} with id {chatroom.pk} has been deleted.')
         return JsonResponse({})
+
     else:
         print('incorrect user. Only owners can access this setting.')
         return JsonResponse({})

@@ -111,7 +111,7 @@ def chat_room_settings(request, room, room_id):
     init = initialize_page(request)
 
     chat_room = ChatRoom.objects.get(id=room_id)
-    user_message_notification_settings = MessageNotificationSetting.objects.get(user=UserStats.objects.get(user=request.user))
+    user_message_notification_settings = MessageNotificationSetting.objects.get(user=UserStats.objects.get(user=request.user), source=chat_room)
     chat_room_users = list(chat_room.users.all())
     chatroom_members = chat_room.users.exclude(user=chat_room.owner)
 
@@ -191,7 +191,7 @@ def create_chat_room(request, increment):
                     invited_users.append(relevant_user)
 
             # Create the chat room
-            new_chatroom = ChatRoom(name=room_name, icon=room_icon, room_bg_image=room_bg_image)
+            new_chatroom = ChatRoom(name=room_name, icon=room_icon, room_bg_image=room_bg_image, owner=request.user)
             new_chatroom.save()
             invited_users.append(user_stats)
             new_chatroom.users.set(invited_users)

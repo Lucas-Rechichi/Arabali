@@ -20,7 +20,7 @@ urlpatterns = [
     path('chat_settings/invite-users/', ajax_views.invite_users, name='invite_users'),
     path('chat_settings/leave-chatroom/', ajax_views.leave_chatroom, name='leave_chatroom'),
     
-
+    path('chat_admin/delete-chatroom/', ajax_views.delete_chatroom, name='delete_chatroom'),
     path('chat_admin/admin-settings/', ajax_views.admin_settings, name='admin_settings'),
 
 
