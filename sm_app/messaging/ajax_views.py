@@ -1,12 +1,14 @@
-import logging
+
 import pytz
 import os
+import shutil
 import json
 
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.core.files.storage import default_storage
 from django.core.exceptions import SuspiciousFileOperation
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
 from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting
@@ -613,13 +615,50 @@ def delete_chatroom(request):
     chatroom_id = request.POST.get('chatroom_id')
     chatroom = ChatRoom.objects.get(id=chatroom_id)
     if chatroom.owner.username == request.user.username:
+        messages_in_chatroom = True
+
         # Getting image paths
         icon_path = os.path.join('arabali_users', chatroom.icon.name)
         room_bg_image_path = os.path.join('arabali_users', chatroom.room_bg_image.name)
 
         # Deleting images
-        os.remove(icon_path)
-        os.remove(room_bg_image_path)
+        try:
+            os.remove(icon_path)
+            os.remove(room_bg_image_path)
+        except OSError or Exception as e:
+            print(e)
+
+        # Deleting all images and videos related to messages.
+        try:
+            messages = Message.objects.get(room=chatroom)
+        except ObjectDoesNotExist or Exception as e:
+            messages_in_chatroom = False
+
+        if messages_in_chatroom:
+            try:
+                for message in messages:
+                    if message.text:
+                        print('Text message')
+                    elif message.image:
+                        image_path = os.path.join('arabali_users', message.image.name)
+                        os.remove(image_path)
+                    elif message.video:
+                        video_path = os.path.join('arabali_users', message.video.name)
+                        os.remove(video_path)
+                    else:
+                        print('Invalid message type.')
+
+            except OSError or Exception as e:
+                print(e)
+        else:
+            print('No messages in this chatroom.')
+            
+        # Delete chatroom directory
+        chatroom_dir = os.path.join('arabali_users', 'Rooms', chatroom.name)
+        try:
+            shutil.rmtree(chatroom_dir)
+        except FileNotFoundError or Exception as e:
+            print(e)
 
         # Deleting chatroom
         chatroom.delete()
