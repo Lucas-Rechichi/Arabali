@@ -143,7 +143,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # url configuration
-LOGIN_REDIRECT_URL =  "/page/"
+LOGIN_REDIRECT_URL =  "/page/recommended|All/1"
 LOGOUT_REDIRECT_URL =  "/logout/"
 
 # images

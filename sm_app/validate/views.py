@@ -30,23 +30,20 @@ def create_user_path_for_images(user, image, sub_directory):
 def sign_up_page(request):
     if ArabaliConfigure.objects.get(name='Can Sign Up').allowed:
         if request.method == "POST":
-                #print(request.FILES)  # Print uploaded files
-                #print(request.POST.get('username'))
-                #print(request.POST, request.POST.get('username'))
-                name = request.POST.get('username')
-                f = CreateNewUser(request.POST)
-                if f.is_valid():
-                    f.save()
-                    # creating directory for the user
-                    u = User.objects.get(username=name)
-                    create_user_directory(user=u, sub_directory='profile')
-                    us = UserStats(user=u, followers=0, pfp='Images/Default_User_Images/Default_Profile_Picture.png', banner='Images/Default_User_Images/Default_Banner_Image.png')
-                    us.save()
-                    b = Following(subscribers=u.username)
-                    b.save()
-                    c = LikedBy(name=u.username)
-                    c.save()
-                    return redirect('/login/')
+            name = request.POST.get('username')
+            f = CreateNewUser(request.POST)
+            if f.is_valid():
+                f.save()
+                # creating directory for the user
+                u = User.objects.get(username=name)
+                create_user_directory(user=u, sub_directory='profile')
+                us = UserStats(user=u, followers=0, pfp='Images/Default_User_Images/Default_Profile_Picture.png', banner='Images/Default_User_Images/Default_Banner_Image.png')
+                us.save()
+                b = Following(subscribers=u.username)
+                b.save()
+                c = LikedBy(name=u.username)
+                c.save()
+                return redirect('/login/')
         else:
             f = CreateNewUser()
         
@@ -62,7 +59,7 @@ def login_page(request):
 
     if user is not None:
         login(request, user)
-        return redirect("/page/recommended|All/1")
+        return redirect("/page/recommended|All/1/")
     return render(request, "validate/login.html")
 
 def logout_page(request):
