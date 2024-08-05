@@ -2020,7 +2020,7 @@
                                 <div class="card-header" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col d-flex justify-content-center">
-                                            <p id="voice-prompt-text">Press the microphone to start recoding voice</p>
+                                            <p id="voice-prompt-text">Press the microphone to start recroding voice</p>
                                         </div>
                                     </div>
                                     <div class="row" id="voice-control-pannel">
@@ -2052,7 +2052,7 @@
                                 <div class="card-header" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col d-flex justify-content-center">
-                                            <p id="voice-prompt-text">Press the microphone to start recoding voice</p>
+                                            <p id="voice-prompt-text">Press the microphone to start recording voice</p>
                                         </div>
                                     </div>
                                     <div class="row" id="voice-control-pannel">
@@ -2093,7 +2093,19 @@
                         isVoice.val('false');
                     }
                 }
-            })
+            });
+            // Permission logic for voice messages
+            $('#request-recording').click(function () {
+                console.log('requesting media.')
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function(stream) {
+                        $('#status').text('Microphone access granted.');
+                        
+                    })
+                    .catch(function(err) {
+                        $('#status').text('Microphone access denied: ' + err.message);
+                    });
+            });
             // for polling
             $('#conversation-contents').on('click', '.poll-option', function () {
                 var optionID = $(this).data('option-id');
