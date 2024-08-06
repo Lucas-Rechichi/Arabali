@@ -2025,7 +2025,9 @@
                                     </div>
                                     <div class="row" id="voice-control-pannel">
                                         <div class="col d-flex justify-content-center">
-                                            <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                            <div id="recording-controls">
+                                                <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2057,7 +2059,9 @@
                                     </div>
                                     <div class="row" id="voice-control-pannel">
                                         <div class="col d-flex justify-content-center">
-                                            <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                            <div id="recording-controls">
+                                                <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2099,41 +2103,78 @@
             var awaitingMicrophoneModal = new bootstrap.Modal(document.getElementById('awaiting-microphone-modal'), {
                 keyboard: false
             });
+            let audioRecorder;
+            let recordedChunks = [];
 
-            $('#message-div').on('click', '.request-recording', function () {
-                console.log('Showing awaitingMicrophoneModal');
-                awaitingMicrophoneModal.show();
+            $('#message-div').on('click', '.request-recording, .recording-active', function () {
+                // Check if the button has the class 'request-recording' to start recording
+                if ($(this).hasClass('request-recording')) {
+                    awaitingMicrophoneModal.show();
 
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(function(stream) {
-                        console.log('Microphone access granted.');
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(function(stream) {
+                            console.log('Microphone access granted.');
 
-                        setTimeout(function () {
-                            awaitingMicrophoneModal.hide();
-                        }, 1000)
+                            setTimeout(function () {
+                                awaitingMicrophoneModal.hide();
+                            }, 1000)
 
-                        // change the look of the message div to tell the user that it has begun recording
-                        $('#mic-icon').removeClass('bi-mic').addClass('bi-mic-fill');
-                        $('#mic-icon').css('color', '#dc3545');
-                        $('#voice-prompt-text').text('');
-                        $('#voice-prompt-text').text('Recording...');
+                            // Change the look of the message div to tell the user that it has begun recording
+                            $('#mic-icon').removeClass('bi-mic').addClass('bi-mic-fill');
+                            $('#mic-icon').css('color', '#dc3545');
+                            $('#voice-prompt-text').text('Recording...');
+                            
+                            audioRecorder = new MediaRecorder(stream);
 
-                    })
-                    .catch(function(err) {
-                        console.log('Microphone access denied: ' + err.message);
+                            // Logic for sending recorded audio and storing it  
+                            audioRecorder.ondataavailable = function(event) {
+                                if (event.data.size > 0) {
+                                    recordedChunks.push(event.data);
+                                }
+                            };
 
-                        setTimeout(function () {
-                            awaitingMicrophoneModal.hide();
-                        }, 1000)
+                            // When recording stops, store the audio in an audio tag
+                            audioRecorder.onstop = function() {
+                                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                                const audioURL = URL.createObjectURL(blob);
+                                var audioHtml = `
+                                    <audio src="${audioURL}" controls></audio>
+                                `;
+                                $('#recording-controls').html(audioHtml);
+                                recordedChunks = [];
+                            };
+                            
+                            // Start recording and change button state
+                            audioRecorder.start();
+                            $('.request-recording').removeClass('request-recording').addClass('recording-active');
 
-                        setTimeout(function () {
-                            var deniedMicrophoneModal = new bootstrap.Modal(document.getElementById('denied-microphone-access'), {
-                                keyboard: false
-                            });
+                        })
+                        .catch(function(err) {
+                            console.log('Microphone access denied: ' + err.message);
 
-                            deniedMicrophoneModal.show();
-                        }, 1000);  // Adjust the delay if needed
-                    });
+                            setTimeout(function () {
+                                awaitingMicrophoneModal.hide();
+                            }, 1000)
+
+                            setTimeout(function () {
+                                var deniedMicrophoneModal = new bootstrap.Modal(document.getElementById('denied-microphone-access'), {
+                                    keyboard: false
+                                });
+
+                                deniedMicrophoneModal.show();
+                            }, 1000);  // Adjust the delay if needed
+                        });
+                }
+                // Check if the button has the class 'recording-active' to stop recording
+                else if ($(this).hasClass('recording-active')) {
+                    if (audioRecorder && audioRecorder.state === 'recording') {
+                        audioRecorder.stop();
+                        $('#mic-icon').removeClass('bi-mic-fill').addClass('bi-mic');
+                        $('#mic-icon').css('color', '');
+                        $('#voice-prompt-text').text('Recording stopped.');
+                        $('.recording-active').removeClass('recording-active').addClass('request-recording');
+                    }
+                }
             });
             // for polling
             $('#conversation-contents').on('click', '.poll-option', function () {
