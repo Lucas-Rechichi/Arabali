@@ -2106,7 +2106,7 @@
             let audioRecorder;
             let recordedChunks = [];
 
-            $('#message-div').on('click', '.request-recording, .recording-active', function () {
+            $('#message-div').on('click', '.request-recording, .recording-active, .confirm-recording, .deny-recording', function () {
                 // Check if the button has the class 'request-recording' to start recording
                 if ($(this).hasClass('request-recording')) {
                     awaitingMicrophoneModal.show();
@@ -2120,6 +2120,9 @@
                             }, 1000)
 
                             // Change the look of the message div to tell the user that it has begun recording
+                            if ($('#recording-preview-controls')) {
+                                $('#recording-preview-controls').remove();
+                            }
                             $('#mic-icon').removeClass('bi-mic').addClass('bi-mic-fill');
                             $('#mic-icon').css('color', '#dc3545');
                             $('#voice-prompt-text').text('Recording...');
@@ -2138,9 +2141,15 @@
                                 const blob = new Blob(recordedChunks, { type: 'audio/webm' });
                                 const audioURL = URL.createObjectURL(blob);
                                 var audioHtml = `
-                                    <audio src="${audioURL}" controls></audio>
+                                    <div class="d-inline-flex" id="recording-preview-controls">
+                                        <button type="button" class="btn confirm-recording"><i class="bi bi-check-lg"></i></button>
+                                        <audio src="${audioURL}" controls></audio>
+                                        <button type="button" class="btn deny-recording"><i class="bi bi-x-lg"></i></button>
+                                    </div>
+                                    <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
                                 `;
                                 $('#recording-controls').html(audioHtml);
+                                $('#voice-prompt-text').text('Audio recording successful.');
                                 recordedChunks = [];
                             };
                             
@@ -2169,11 +2178,17 @@
                 else if ($(this).hasClass('recording-active')) {
                     if (audioRecorder && audioRecorder.state === 'recording') {
                         audioRecorder.stop();
-                        $('#mic-icon').removeClass('bi-mic-fill').addClass('bi-mic');
-                        $('#mic-icon').css('color', '');
-                        $('#voice-prompt-text').text('Recording stopped.');
-                        $('.recording-active').removeClass('recording-active').addClass('request-recording');
+                        // $('#mic-icon').removeClass('bi-mic-fill').addClass('bi-mic');
+                        // $('#mic-icon').css('color', '');
+                        // $('#voice-prompt-text').text('Recording stopped.');
+                        // $('.recording-active').removeClass('recording-active').addClass('request-recording');
                     }
+                }
+                else if ($(this).hasClass('confirm-recording')) {
+                    // How to send over the newly recorded audio over to be processed?
+                }
+                else if ($(this).hasClass('deny-recording')) {
+                    $('#recording-preview-controls').remove();
                 }
             });
             // for polling
