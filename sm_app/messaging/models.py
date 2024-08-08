@@ -19,6 +19,10 @@ def get_video_upload_path_message(instance, filename):
 
     return os.path.join('Rooms/', instance.room.name , 'message_videos/' , instance.sender.user.username , filename)
 
+def get_audio_upload_path_message(instance, filename):
+
+    return os.path.join('Rooms/', instance.room.name , 'message_audio_recordings/' , instance.sender.user.username , filename)
+
 class ChatRoom(models.Model):
     name = models.CharField(max_length=150)
     icon = models.ImageField(null=False, upload_to=get_image_upload_path_room)
@@ -34,6 +38,7 @@ class Message(models.Model):
     text = models.TextField(null=True)
     image = models.ImageField(null=True, upload_to=get_image_upload_path_message)
     video = models.FileField(null=True, upload_to=get_video_upload_path_message)
+    audio = models.FileField(null=True, upload_to=get_audio_upload_path_message)
     sent_at = models.DateTimeField(auto_now_add=True)
 
 

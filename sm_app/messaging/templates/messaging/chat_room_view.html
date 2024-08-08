@@ -40,8 +40,11 @@
                                 {% if notification.notification_object.relevant_message.reply %}
                                     {% if notification.notification_object.relevant_message.image %}
                                         <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Image</strong></p>
-                                    {% else %}
+                                    {% elif notification.notification_object.relevent_message.video %}
                                         <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Video</strong></p>
+                                    {% elif notification.notification_object.relvevant_message.audio %}
+                                        <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Audio</strong></p>
+                                    {% else %}
                                     {% endif %}
                                 {% else %}
                                 <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
@@ -263,6 +266,8 @@
                                                         <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
                                                     {% elif message_dict.message.reply.video %} 
                                                         <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
+                                                    {% elif message_dict.message.reply.audio %}
+                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
                                                     {% else %}
                                                     {% endif %}
                                                 </div>
@@ -280,8 +285,11 @@
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
                                                         <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
-                                                    {% else %} 
+                                                    {% elif message_dict.message.video %} 
                                                         <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                    {% elif message_dict.message.audio %}
+                                                        <audio src="{{message_dict.message.audio.url}}" controls></audio>
+                                                    {% else %}
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
@@ -323,6 +331,8 @@
                                                         <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
                                                     {% elif message_dict.message.video %} 
                                                         <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                    {% elif message_dict.message.audio %}
+                                                        <audio src="{{message_dict.message.audio.url}}" controls></audio>
                                                     {% else %}
                                                         {% if message_dict.has_chosen %}
                                                             <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="true">
@@ -398,7 +408,9 @@
                                                             {% elif message_dict.message.image %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
                                                             {% elif message_dict.message.video %} 
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                            
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                            {% elif message_dict.message.audio %}
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
                                                             {% else %}
                                                             {% endif %}
                                                         </div>
@@ -434,6 +446,8 @@
                                                         <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
                                                     {% elif message_dict.message.reply.video %} 
                                                         <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
+                                                    {% elif message_dict.message.reply.audio %}
+                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
                                                     {% else %}
                                                     {% endif %}
                                                 </div>
@@ -450,8 +464,11 @@
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
                                                         <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
-                                                    {% else %} 
+                                                    {% elif message_dict.message.video %} 
                                                         <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                    {% elif message_dict.message.audio %}
+                                                        <audio src="{{message_dict.message.audio.url}}" controls></audio>
+                                                    {% else %}
                                                     {% endif %}
                                                     <div class="row">
                                                         <div class="col">
@@ -493,6 +510,8 @@
                                                         <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
                                                     {% elif message_dict.message.video %} 
                                                         <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                    {% elif message_dict.message.audio %}
+                                                        <audio src="{{message_dict.message.audio.url}}" controls></audio>
                                                     {% else %}
                                                         {% if message_dict.has_chosen %}
                                                             <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="true">
@@ -564,11 +583,13 @@
                                                     <div class="row">
                                                         <div class="col">
                                                             {% if message_dict.message.text %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
                                                             {% elif message_dict.message.image %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
                                                             {% elif message_dict.message.video %} 
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                            
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                            {% elif message_dict.message.audio %}
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
                                                             {% else %}
                                                             {% endif %}
                                                         </div>
@@ -2105,6 +2126,7 @@
             });
             let audioRecorder;
             let recordedChunks = [];
+            let blob;
 
             $('#message-div').on('click', '.request-recording, .recording-active, .confirm-recording, .deny-recording', function () {
                 // Check if the button has the class 'request-recording' to start recording
@@ -2138,7 +2160,7 @@
 
                             // When recording stops, store the audio in an audio tag
                             audioRecorder.onstop = function() {
-                                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                                blob = new Blob(recordedChunks, { type: 'audio/webm' });
                                 const audioURL = URL.createObjectURL(blob);
                                 var audioHtml = `
                                     <div class="d-inline-flex" id="recording-preview-controls">
@@ -2185,7 +2207,63 @@
                     }
                 }
                 else if ($(this).hasClass('confirm-recording')) {
-                    // How to send over the newly recorded audio over to be processed?
+                    var isReply;
+                    var replyMessageId;
+                    let audioData = new FormData();
+                    
+                    if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
+                        isReply = 'true' 
+                        replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
+                    }
+                    else {
+                        isReply = 'false'
+                        replyMessageId = null
+                    }
+
+                    audioData.append('audio', blob);
+                    audioData.append('chatroom_id', '{{room.id}}');
+                    audioData.append('is_reply', isReply);
+                    audioData.append('replying_to_id', replyMessageId)
+                    audioData.append('csrfmiddlewaretoken', '{{csrf_token}}')
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/chat/message-sent-audio/',
+                        processData: false,
+                        contentType: false,
+                        data: audioData,
+                        success: function (response) {
+                            console.log('message sent and saved.')
+
+                            // Removal of voice prompt and recreation of the text input field.
+                            $('#voice-prompt').remove();
+                            $('#message_div').append('<input type="text" id="message" class="form-control pb-3 p-4">')
+                            $('#is-text').val('true');
+
+                            // Notification websocket
+                            // Notification socket
+                            notificationSocket.send(JSON.stringify({
+                                'notification_ids': response.notification_ids,
+                            }));
+
+                            // Message sockets
+                            if (response.is_reply === 'true') {
+                                messageSocket.send(JSON.stringify({
+                                    'message_type': 'audio',
+                                    'message_id': response.message_id,
+                                    'is_reply': response.is_reply,
+                                    'reply_id': replyId,
+                                }))
+                            } else {
+                                messageSocket.send(JSON.stringify({
+                                    'message_type': 'audio',
+                                    'message_id': response.message_id,
+                                    'is_reply': response.is_reply,
+                                }))
+                            }
+
+                        }
+                    })
                 }
                 else if ($(this).hasClass('deny-recording')) {
                     $('#recording-preview-controls').remove();

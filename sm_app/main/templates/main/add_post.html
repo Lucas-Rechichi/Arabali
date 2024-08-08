@@ -41,11 +41,14 @@
                             {% if notification.notification_object.relevant_message.reply %}
                                 {% if notification.notification_object.relevant_message.image %}
                                     <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Image</strong></p>
-                                {% else %}
+                                {% elif notification.notification_object.relevent_message.video %}
                                     <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Video</strong></p>
+                                {% elif notification.notification_object.relvevant_message.audio %}
+                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Audio</strong></p>
+                                {% else %}
                                 {% endif %}
                             {% else %}
-                                <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                            <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
                             {% endif %}
                         {% endif %}
                     </div>

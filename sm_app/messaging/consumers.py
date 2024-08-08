@@ -68,6 +68,8 @@ class MessageConsumer(WebsocketConsumer):
             content = message.image.url
         elif message_type == 'video':
             content = message.video.url
+        elif message_type == 'audio':
+            content = message.audio.url
         else:
             print('invalid message type')
         
@@ -234,6 +236,49 @@ class MessageConsumer(WebsocketConsumer):
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
                 }))
+
+        elif message_type == 'audio':
+            content_html = f'<audio src="{content}" controls class="mt-1"></audio>'
+            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
+            if is_reply == 'true':
+                reply_message = Message.objects.get(id=reply_id)
+                if reply_message.text:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                elif reply_message.image:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_reply_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'reply_message_user': reply_message.sender.user.username,
+                    'reply_id': reply_message.pk,
+                    'reply_html': reply_html,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
+            else:
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_message',
+                    'message_type': message_type,
+                    'content_html':content_html,
+                    'message_id': message_id,
+                    'is_reply': is_reply,
+                    'self_reply_button_html': self_reply_button_html,
+                    'other_reply_button_html': other_reply_button_html,
+                    'username': user.username,
+                    'sent_at': formatted_datetime_capitalized,
+                    'user_pfp_url': user_pfp_url
+                }))
+        else:
+            print('Invalid message type.')
 
 class NotificationConsumer(WebsocketConsumer):
     connected_users = {}
