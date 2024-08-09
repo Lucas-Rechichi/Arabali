@@ -126,8 +126,12 @@ class MessageConsumer(WebsocketConsumer):
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
                 elif reply_message.image:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                else:
+                elif reply_message.video:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                elif reply_message.audio:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
                 self.send(text_data=json.dumps({
                     'type': 'incoming_reply_message',
                     'message_type': message_type,
@@ -166,8 +170,12 @@ class MessageConsumer(WebsocketConsumer):
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
                 elif reply_message.image:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                else:
+                elif reply_message.video:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                elif reply_message.audio:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
                 self.send(text_data=json.dumps({
                     'type': 'incoming_reply_message',
                     'message_type': message_type,
@@ -206,8 +214,12 @@ class MessageConsumer(WebsocketConsumer):
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
                 elif reply_message.image:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                else:
+                elif reply_message.video:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                elif reply_message.audio:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
                 self.send(text_data=json.dumps({
                     'type': 'incoming_reply_message',
                     'message_type': message_type,
@@ -239,16 +251,20 @@ class MessageConsumer(WebsocketConsumer):
 
         elif message_type == 'audio':
             content_html = f'<audio src="{content}" controls class="mt-1"></audio>'
-            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
-            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
+            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Audio" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Audio" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
             if is_reply == 'true':
                 reply_message = Message.objects.get(id=reply_id)
                 if reply_message.text:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
                 elif reply_message.image:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                else:
+                elif reply_message.video:
                     reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                elif reply_message.audio:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                else:
+                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
                 self.send(text_data=json.dumps({
                     'type': 'incoming_reply_message',
                     'message_type': message_type,

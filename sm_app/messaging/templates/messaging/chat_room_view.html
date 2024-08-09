@@ -295,10 +295,13 @@
                                                         <div class="col">
                                                             {% if message_dict.message.text %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message_dict.message.image %} 
+                                                            {% elif message_dict.message.image %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% else %} 
+                                                            {% elif message_dict.message.video %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                            {% elif message_dict.message.audio %}
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
+                                                            {% else %}
                                                             {% endif %}
                                                         </div>
                                                     </div>
@@ -476,8 +479,11 @@
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
                                                             {% elif message_dict.message.image %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% else %}
+                                                            {% elif message_dict.message.video %} 
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                            {% elif message_dict.message.audio %}
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                        
+                                                            {% else %}
                                                             {% endif %}
                                                         </div>
                                                     </div>
@@ -583,13 +589,13 @@
                                                     <div class="row">
                                                         <div class="col">
                                                             {% if message_dict.message.text %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
                                                             {% elif message_dict.message.image %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
                                                             {% elif message_dict.message.video %} 
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
                                                             {% elif message_dict.message.audio %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
+                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                        
                                                             {% else %}
                                                             {% endif %}
                                                         </div>
@@ -621,7 +627,7 @@
                                 <p>Messages</p>
                                 <button class="btn" id="init-image" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-images"></i></div> Image</li></button>
                                 <button class="btn" id="init-video" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-play-btn"></i></i></div> Video</li></button>
-                                <button class="btn" id="init-voice" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-mic-fill"></i></div> Voice</li></button>
+                                <button class="btn" id="init-voice" type="button"><li class="custom-icon"><div class="fs-4"><i class="bi bi-mic-fill"></i></div> Audio/Voice</li></button>
                             </div>
                             <div class="col-2">
                             </div>
@@ -2041,13 +2047,15 @@
                                 <div class="card-header" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col d-flex justify-content-center">
-                                            <p id="voice-prompt-text">Press the microphone to start recroding voice</p>
+                                            <p id="voice-prompt-text">Press the microphone to start recroding voice or upload an audio file.</p>
                                         </div>
                                     </div>
                                     <div class="row" id="voice-control-pannel">
                                         <div class="col d-flex justify-content-center">
                                             <div id="recording-controls">
                                                 <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                                <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                                                <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
                                             </div>
                                         </div>
                                     </div>
@@ -2075,13 +2083,15 @@
                                 <div class="card-header" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col d-flex justify-content-center">
-                                            <p id="voice-prompt-text">Press the microphone to start recording voice</p>
+                                            <p id="voice-prompt-text">Press the microphone to start recroding voice or upload an audio file.</p>
                                         </div>
                                     </div>
                                     <div class="row" id="voice-control-pannel">
                                         <div class="col d-flex justify-content-center">
                                             <div id="recording-controls">
                                                 <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                                <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                                                <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
                                             </div>
                                         </div>
                                     </div>
@@ -2119,14 +2129,37 @@
                     }
                 }
             });
+            // for the audio file upload
+            $('#message-div').on('input', '.audio-upload', function (event) {
+                var audioFile = event.target.files[0];
+                if (audioFile) {
+                    var audioURL = URL.createObjectURL(audioFile);
+                    var audioHtml = `
+                        <div class="d-inline-flex" id="recording-preview-controls">
+                            <button type="button" class="btn confirm-recording"><i class="bi bi-check-lg"></i></button>
+                            <button type="button" class="btn deny-recording"><i class="bi bi-x-lg"></i></button>
+                            <audio src="${audioURL}" controls></audio>
+                        </div>
+                        <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                        <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                        <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
+                    `;
+                    $('#recording-controls').html(audioHtml);
+                    $('#voice-prompt-text').text('Audio message vaildated.');
+                } else {
+                    console.log('Error getting audio file.')
+                }
+            })
 
             // Permission logic for voice messages
             var awaitingMicrophoneModal = new bootstrap.Modal(document.getElementById('awaiting-microphone-modal'), {
                 keyboard: false
             });
             let audioRecorder;
-            let recordedChunks = [];
+            let audioStream;
             let blob;
+
+            let recordedChunks = [];
 
             $('#message-div').on('click', '.request-recording, .recording-active, .confirm-recording, .deny-recording', function () {
                 // Check if the button has the class 'request-recording' to start recording
@@ -2135,6 +2168,7 @@
 
                     navigator.mediaDevices.getUserMedia({ audio: true })
                         .then(function(stream) {
+                            audioStream = stream
                             console.log('Microphone access granted.');
 
                             setTimeout(function () {
@@ -2165,14 +2199,19 @@
                                 var audioHtml = `
                                     <div class="d-inline-flex" id="recording-preview-controls">
                                         <button type="button" class="btn confirm-recording"><i class="bi bi-check-lg"></i></button>
-                                        <audio src="${audioURL}" controls></audio>
                                         <button type="button" class="btn deny-recording"><i class="bi bi-x-lg"></i></button>
+                                        <audio src="${audioURL}" controls></audio>
                                     </div>
                                     <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                    <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                                    <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
                                 `;
                                 $('#recording-controls').html(audioHtml);
                                 $('#voice-prompt-text').text('Audio recording successful.');
                                 recordedChunks = [];
+                                audioStream.getTracks().forEach(track => track.stop());
+                                audioStream = null; // Clear the stream reference
+                                console.log('Microphone access stopped.');
                             };
                             
                             // Start recording and change button state
@@ -2200,10 +2239,6 @@
                 else if ($(this).hasClass('recording-active')) {
                     if (audioRecorder && audioRecorder.state === 'recording') {
                         audioRecorder.stop();
-                        // $('#mic-icon').removeClass('bi-mic-fill').addClass('bi-mic');
-                        // $('#mic-icon').css('color', '');
-                        // $('#voice-prompt-text').text('Recording stopped.');
-                        // $('.recording-active').removeClass('recording-active').addClass('request-recording');
                     }
                 }
                 else if ($(this).hasClass('confirm-recording')) {
@@ -2267,6 +2302,7 @@
                 }
                 else if ($(this).hasClass('deny-recording')) {
                     $('#recording-preview-controls').remove();
+                    $('#voice-prompt-text').text('Press the microphone to start recroding voice or upload an audio file.');
                 }
             });
             // for polling
