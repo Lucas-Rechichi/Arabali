@@ -54,7 +54,7 @@ class MessageConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         user = self.scope.get("user")  # Use get to safely get the user who is on the page
 
-        # Getting universal data across all 3 message types
+        # Getting universal data across all 4 message types
         message_type = text_data_json['message_type']
         message_id = text_data_json['message_id']
         is_reply = text_data_json['is_reply']
@@ -370,6 +370,7 @@ class NotificationConsumer(WebsocketConsumer):
                             notification_contents  = f'<p class="text-truncate ">({new_notification.sender} Replied to You): <strong>{contents_a}</strong></p>'
                         else:
                             notification_contents  = f'<p class="text-truncate "><strong>{new_notification.contents}</strong></p>'
+
                 else: # for poll messages
                     notification_contents = f'<p class="text-truncate "><strong>Poll: </strong>{new_notification.contents}</p>'
                 print(notification_contents)

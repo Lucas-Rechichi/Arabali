@@ -675,6 +675,7 @@
             const isReply = $('#is-reply'); // hidden input field where the message textfield is. tells us if a reply is being made or not.
             const isImage = $('#is-image');
             const isVideo = $('#is-video');
+            const isVoice = $('#is-voice');
             const messageDiv = $('#message-div');
 
             const replyPromptHtml = `
@@ -693,16 +694,20 @@
                 </div>`;
 
             if (isReply.val() === 'false') { // if the reply prompt doesn't already exist
-                if (isImage.val() === 'false') {
+                if (isImage.val() === 'false' && isVideo.val() === 'false' && isVoice.val() === 'false') {
                     // Show the reply prompt on the user's screen
                     messageDiv.append(replyPromptHtml);
                     isReply.val('true'); // Set the reply value to true, indicating that a reply is being made.
                     $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // Animation for better GUI
                 } else {
-                    if (isVideo.val() === 'false') {
+                    if (isImage.val() === 'true') {
                         var mediaInput = $('#image-prompt').detach();
+                    } else if (isVideo.val() === 'true') {
+                        var mediaInput = $('#video-prompt').detach();
+                    } else if (isVoice.val() === 'true') {
+                        var mediaInput = $('#voice-prompt').detach();
                     } else {
-                        var mediaInput = $('#video-prompt').detatch();
+                        console.log('error')
                     }
                     var mediaInputHtml = mediaInput.prop('outerHTML');
                     messageDiv.append(`
@@ -719,14 +724,18 @@
                     $('html, body').animate({ scrollTop: $(document).height() }, 'fast'); // Animation for better GUI
                 }
             } else {
-                if (isImage.val() === 'false') {
+                if (isImage.val() === 'false' && isVideo.val() === 'false' && isVoice.val() === 'false') {
                     $('#reply-prompt').remove(); // Remove created HTML
                     isReply.val('false'); // Set the reply value to false, indicating that a reply is not being made.
                 } else {
-                    if (isVideo.val() === 'false') {
+                    if (isImage.val() === 'true') {
                         var mediaInput = $('#image-prompt').detach();
+                    } else if (isVideo.val() === 'true') {
+                        var mediaInput = $('#video-prompt').detach();
+                    } else if (isVoice.val() === 'true') {
+                        var mediaInput = $('#voice-prompt').detach();
                     } else {
-                        var mediaInput = $('#video-input').detach();
+                        console.log('error')
                     }
                     var mediaInputHtml = mediaInput.prop('outerHTML');
                     $('#multi-input-wrapper').remove();
@@ -2273,11 +2282,15 @@
 
                             // Removal of voice prompt and recreation of the text input field.
                             $('#voice-prompt').remove();
-                            $('#message_div').append('<input type="text" id="message" class="form-control pb-3 p-4">')
-                            $('#is-voice').val('false')
+                            $('#is-voice').val('false');
+                            $('#message-div').append('<input type="text" id="message" class="form-control pb-3 p-4">')
                             $('#is-text').val('true');
 
-                            // Notification websocket
+                            if ($('#is-reply').val() === 'true') { // if the message was a reply message
+                                $('#reply-prompt').remove();
+                                $('#is-reply').val('false');
+                            }
+
                             // Notification socket
                             notificationSocket.send(JSON.stringify({
                                 'notification_ids': response.notification_ids,
@@ -2289,7 +2302,7 @@
                                     'message_type': 'audio',
                                     'message_id': response.message_id,
                                     'is_reply': response.is_reply,
-                                    'reply_id': replyId,
+                                    'reply_id': response.reply_id,
                                 }))
                             } else {
                                 messageSocket.send(JSON.stringify({
@@ -2392,7 +2405,7 @@
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 </div>
 
-<!-- For requesting microplone permissions -->
+<!-- For requesting microphone permissions -->
 <div class="modal fade" id="awaiting-microphone-modal">
     <div class="modal-dialog">
         <div class="modal-content">

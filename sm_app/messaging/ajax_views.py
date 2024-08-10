@@ -288,7 +288,7 @@ def message_sent_audio(request):
             message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
             if receiver == reply_message.sender: # if the person being replied to happends to be the user that sent the message being replied to.
                 if message_notification_setting.replies_only or message_notification_setting.allow_all:
-                    notification_contents = f'({receiver.user.username} Replied To You): Audio Recording' # special message for the user who created the message being replied to.
+                    notification_contents = f'({receiver.user.username} Replied To You): Audio' # special message for the user who created the message being replied to.
                     new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
                     new_notification.save()
                     notification_ids.append(new_notification.id)
@@ -296,7 +296,7 @@ def message_sent_audio(request):
                     print(f'notification muted for user {receiver.user.username}')
             else:
                 if message_notification_setting.allow_all:
-                    notification_contents = f'Video'
+                    notification_contents = f'Audio'
                     new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
                     new_notification.save()
                     notification_ids.append(new_notification.id)
@@ -310,7 +310,7 @@ def message_sent_audio(request):
         for receiver in receivers:
             message_notification_setting = MessageNotificationSetting.objects.get(user=receiver, source=chat_room)
             if message_notification_setting.allow_all:
-                notification_contents = f'Audio Recording'
+                notification_contents = f'Audio'
                 new_notification = Notification(user=receiver, sender=sender, source=chat_room, contents=notification_contents, relevant_message=new_message)
                 new_notification.save()
                 notification_ids.append(new_notification.id)
