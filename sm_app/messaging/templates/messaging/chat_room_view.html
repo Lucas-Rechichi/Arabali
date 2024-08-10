@@ -2054,8 +2054,8 @@
                                         <div class="col d-flex justify-content-center">
                                             <div id="recording-controls">
                                                 <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
-                                                <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
-                                                <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
+                                                <button type="button" class="btn upload-element" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                                                <input type="file" class="audio-upload upload-element" id="audio-upload-field" style="display: none;">
                                             </div>
                                         </div>
                                     </div>
@@ -2078,7 +2078,7 @@
                         isText.val('false');
                         var replyInput = $('#reply-prompt').detach();
                         var replyInputHtml = replyInput.prop('outerHTML');
-                        var videoInputHtml = `
+                        var audioInputHtml = `
                             <div class="card mt-1" id="voice-prompt" style="border: none;">
                                 <div class="card-header" style="border-bottom: none;">
                                     <div class="row">
@@ -2090,8 +2090,8 @@
                                         <div class="col d-flex justify-content-center">
                                             <div id="recording-controls">
                                                 <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
-                                                <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
-                                                <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
+                                                <button type="button" class="btn upload-element" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                                                <input type="file" class="audio-upload upload-element" id="audio-upload-field" style="display: none;">
                                             </div>
                                         </div>
                                     </div>
@@ -2104,7 +2104,7 @@
                                     ` + replyInputHtml + `
                                 </div>
                                 <div class="col-6">
-                                    ` + videoInputHtml + `
+                                    ` + audioInputHtml + `
                                 </div>
                             </div>
                         `)
@@ -2141,8 +2141,8 @@
                             <audio src="${audioURL}" controls></audio>
                         </div>
                         <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
-                        <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
-                        <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
+                        <button type="button" class="btn upload-element" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                        <input type="file" class="audio-upload upload-element" id="audio-upload-field" style="display: none;">
                     `;
                     $('#recording-controls').html(audioHtml);
                     $('#voice-prompt-text').text('Audio message vaildated.');
@@ -2166,74 +2166,75 @@
                 if ($(this).hasClass('request-recording')) {
                     awaitingMicrophoneModal.show();
 
-                    navigator.mediaDevices.getUserMedia({ audio: true })
-                        .then(function(stream) {
-                            audioStream = stream
-                            console.log('Microphone access granted.');
-
-                            setTimeout(function () {
+                    setTimeout(function () {
+                        navigator.mediaDevices.getUserMedia({ audio: true })
+                            .then(function(stream) {
                                 awaitingMicrophoneModal.hide();
-                            }, 1000)
+                                audioStream = stream
+                                console.log('Microphone access granted.');
 
-                            // Change the look of the message div to tell the user that it has begun recording
-                            if ($('#recording-preview-controls')) {
-                                $('#recording-preview-controls').remove();
-                            }
-                            $('#mic-icon').removeClass('bi-mic').addClass('bi-mic-fill');
-                            $('#mic-icon').css('color', '#dc3545');
-                            $('#voice-prompt-text').text('Recording...');
-                            
-                            audioRecorder = new MediaRecorder(stream);
+                                
 
-                            // Logic for sending recorded audio and storing it  
-                            audioRecorder.ondataavailable = function(event) {
-                                if (event.data.size > 0) {
-                                    recordedChunks.push(event.data);
+                                // Change the look of the message div to tell the user that it has begun recording
+                                if ($('#recording-preview-controls')) {
+                                    $('#recording-preview-controls').remove();
+                                    $('.upload-element').remove();
+
                                 }
-                            };
+                                $('.upload-element').remove();
+                                $('#mic-icon').removeClass('bi-mic').addClass('bi-mic-fill');
+                                $('#mic-icon').css('color', '#dc3545');
+                                $('#voice-prompt-text').text('Recording...');
+                                
+                                audioRecorder = new MediaRecorder(stream);
 
-                            // When recording stops, store the audio in an audio tag
-                            audioRecorder.onstop = function() {
-                                blob = new Blob(recordedChunks, { type: 'audio/webm' });
-                                const audioURL = URL.createObjectURL(blob);
-                                var audioHtml = `
-                                    <div class="d-inline-flex" id="recording-preview-controls">
-                                        <button type="button" class="btn confirm-recording"><i class="bi bi-check-lg"></i></button>
-                                        <button type="button" class="btn deny-recording"><i class="bi bi-x-lg"></i></button>
-                                        <audio src="${audioURL}" controls></audio>
-                                    </div>
-                                    <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
-                                    <button type="button" class="btn" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
-                                    <input type="file" class="audio-upload" id="audio-upload-field" style="display: none;">
-                                `;
-                                $('#recording-controls').html(audioHtml);
-                                $('#voice-prompt-text').text('Audio recording successful.');
-                                recordedChunks = [];
-                                audioStream.getTracks().forEach(track => track.stop());
-                                audioStream = null; // Clear the stream reference
-                                console.log('Microphone access stopped.');
-                            };
-                            
-                            // Start recording and change button state
-                            audioRecorder.start();
-                            $('.request-recording').removeClass('request-recording').addClass('recording-active');
+                                // Logic for sending recorded audio and storing it  
+                                audioRecorder.ondataavailable = function(event) {
+                                    if (event.data.size > 0) {
+                                        recordedChunks.push(event.data);
+                                    }
+                                };
 
-                        })
-                        .catch(function(err) {
-                            console.log('Microphone access denied: ' + err.message);
+                                // When recording stops, store the audio in an audio tag
+                                audioRecorder.onstop = function() {
+                                    blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                                    const audioURL = URL.createObjectURL(blob);
+                                    var audioHtml = `
+                                        <div class="d-inline-flex" id="recording-preview-controls">
+                                            <button type="button" class="btn confirm-recording"><i class="bi bi-check-lg"></i></button>
+                                            <button type="button" class="btn deny-recording"><i class="bi bi-x-lg"></i></button>
+                                            <audio src="${audioURL}" controls></audio>
+                                        </div>
+                                        <button class="btn request-recording" type="button"><i id="mic-icon" class="bi bi-mic"></i></button>
+                                        <button type="button" class="btn upload-element" onclick="document.getElementById('audio-upload-field').click();"><i class="bi bi-upload"></i></button>
+                                        <input type="file" class="audio-upload upload-element" id="audio-upload-field" style="display: none;">
+                                    `;
+                                    $('#recording-controls').html(audioHtml);
+                                    $('#voice-prompt-text').text('Audio recording successful.');
+                                    recordedChunks = [];
+                                    audioStream.getTracks().forEach(track => track.stop());
+                                    audioStream = null; // Clear the stream reference
+                                    console.log('Microphone access stopped.');
+                                };
+                                
+                                // Start recording and change button state
+                                audioRecorder.start();
+                                $('.request-recording').removeClass('request-recording').addClass('recording-active');
 
-                            setTimeout(function () {
+                            })
+                            .catch(function(err) {
+                                console.log('Microphone access denied: ' + err.message);
+
                                 awaitingMicrophoneModal.hide();
-                            }, 1000)
 
-                            setTimeout(function () {
-                                var deniedMicrophoneModal = new bootstrap.Modal(document.getElementById('denied-microphone-access'), {
-                                    keyboard: false
-                                });
-
-                                deniedMicrophoneModal.show();
-                            }, 1000);  // Adjust the delay if needed
-                        });
+                                setTimeout(function () {
+                                    var deniedMicrophoneModal = new bootstrap.Modal(document.getElementById('denied-microphone-access'), {
+                                        keyboard: false
+                                    });
+                                    deniedMicrophoneModal.show();
+                                }, 1000);  // Adjust the delay if needed
+                            });
+                    }, 1000)
                 }
                 // Check if the button has the class 'recording-active' to stop recording
                 else if ($(this).hasClass('recording-active')) {
@@ -2273,6 +2274,7 @@
                             // Removal of voice prompt and recreation of the text input field.
                             $('#voice-prompt').remove();
                             $('#message_div').append('<input type="text" id="message" class="form-control pb-3 p-4">')
+                            $('#is-voice').val('false')
                             $('#is-text').val('true');
 
                             // Notification websocket
@@ -2422,7 +2424,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col">
-                        <p class="lead text-center">Microphone permissions denied. To create voice messages, please allow microphone permissins on your web browser</p>
+                        <p class="lead text-center">Microphone permissions denied. To create voice messages, please allow microphone permissions on your web browser</p>
                     </div>
                 </div>
                 <div class="row">
