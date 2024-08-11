@@ -157,7 +157,7 @@
                                     <button class="btn" type="button" onclick="location.href='/chat_settings/{{room.name}}/{{room.id}}/'"><li class="custom-icon"><i class="bi bi-gear-fill mt-1" style="font-size: 18px;"></i> Settings</li></button>
                                     <!-- Open offcanvas -->
                                     <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailsPage"><li class="custom-icon"><i class="bi bi-question-circle mt-1" style="font-size: 18px;"></i>Details</li></button>
-                                    <!-- open confirmation modal -->
+                                    <!-- Open confirmation modal -->
                                     <button class="btn" type="button" id="leave-chatroom"><li class="custom-icon"><i class="bi bi-box-arrow-right mt-1" style="color: #dc3545; font-size: 18px;"></i> <p class="text-danger p-0 m-0">Leave</p></li></button>
                                 </div>
                             </div>
@@ -302,6 +302,32 @@
                                                             {% elif message_dict.message.audio %}
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
                                                             {% else %}
+                                                            {% endif %}
+                                                            {% if not message_dict.message.text %}
+                                                                <div class="btn-group dropstart">
+                                                                    <button type="button" class="btn additional-actions" data-bs-toggle="dropdown" aria-expanded="false" data-message-id="{{message_dict.message.id}}" style="border-radius: 0.375rem;"><i class="bi bi-three-dots" style="color: #ffffff;"></i></button>
+                                                                    <ul class="dropdown-menu p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+                                                                        <div class="row">
+                                                                            <button type="button" class="btn copy-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button>
+                                                                            <button type="button" class="btn download-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-arrow-left-right"></i> Swap</button>
+                                                                                <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                                                        </div>
+                                                                    </ul>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="btn-group dropstart">
+                                                                    <button type="button" class="btn additional-actions" data-bs-toggle="dropdown" aria-expanded="false" data-message-id="{{message_dict.message.id}}" style="border-radius: 0.375rem;"><i class="bi bi-three-dots" style="color: #ffffff;"></i></button>
+                                                                    <ul class="dropdown-menu p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <button type="button" class="btn copy-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button>
+                                                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                                                <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </ul>
+                                                                </div>
                                                             {% endif %}
                                                         </div>
                                                     </div>
