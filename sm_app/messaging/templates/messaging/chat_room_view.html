@@ -246,7 +246,7 @@
                 {% for message_dict in messages %}
                     <div class="row">
                         <div class="col">
-                            <p id="message-{{message_dict.message.id}}" class="text-center"><em>{{message_dict.message.sent_at}}</em></p>
+                            <p id="message-timestamp-{{message_dict.message.id}}" class="text-center"><em>{{message_dict.message.sent_at}}</em></p>
                         </div>
                     </div>
                     <div class="row">
@@ -256,29 +256,29 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="row">
-                                        <div class="col-10 d-flex justify-content-end">
-                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                        <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-reply-container-{{message_dict.message.id}}">
+                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%; z-index: 1; position: relative;">
                                                 <div class="card-header" style="border-bottom: none;">
-                                                    <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
+                                                    <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
                                                     {% if message_dict.message.reply.text %}
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
                                                     {% elif message_dict.message.reply.image %}
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
                                                     {% elif message_dict.message.reply.video %} 
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
                                                     {% elif message_dict.message.reply.audio %}
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
                                                     {% else %}
                                                     {% endif %}
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-2">
-                                            <p id="message-{{message_dict.message.id}}" class="d-flex justify-content-start"><strong>You</strong></p>
+                                            <p id="message-timestamp-{{message_dict.message.id}}" class="d-flex justify-content-start"><strong>You</strong></p>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-10 d-flex justify-content-end">
+                                        <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card text-bg-success" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message_dict.message.text %}
@@ -303,32 +303,6 @@
                                                                 <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
                                                             {% else %}
                                                             {% endif %}
-                                                            {% if not message_dict.message.text %}
-                                                                <div class="btn-group dropstart">
-                                                                    <button type="button" class="btn additional-actions" data-bs-toggle="dropdown" aria-expanded="false" data-message-id="{{message_dict.message.id}}" style="border-radius: 0.375rem;"><i class="bi bi-three-dots" style="color: #ffffff;"></i></button>
-                                                                    <ul class="dropdown-menu p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-                                                                        <div class="row">
-                                                                            <button type="button" class="btn copy-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button>
-                                                                            <button type="button" class="btn download-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-arrow-left-right"></i> Swap</button>
-                                                                                <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
-                                                                        </div>
-                                                                    </ul>
-                                                                </div>
-                                                            {% else %}
-                                                                <div class="btn-group dropstart">
-                                                                    <button type="button" class="btn additional-actions" data-bs-toggle="dropdown" aria-expanded="false" data-message-id="{{message_dict.message.id}}" style="border-radius: 0.375rem;"><i class="bi bi-three-dots" style="color: #ffffff;"></i></button>
-                                                                    <ul class="dropdown-menu p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-                                                                        <div class="row">
-                                                                            <div class="col">
-                                                                                <button type="button" class="btn copy-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button>
-                                                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                                                                <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </ul>
-                                                                </div>
-                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -339,6 +313,28 @@
                                         </div>
                                     </div>
                                 </div>
+                                {% if not message_dict.message.text %}
+                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        {% if message_dict.message.image %}
+                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% elif message_dict.message.video %}
+                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% elif message_dict.message.audio %}
+                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% else %}
+                                        {% endif %}
+                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                    </ul>
+                                {% else %}
+                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button>
+                                        <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                    </ul>
+                                {% endif %}
                             {% else %}
                                 <div class="col-6">
                                 </div>
@@ -351,7 +347,7 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-10 d-flex justify-content-end">
+                                        <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message_dict.message.text %}
@@ -452,6 +448,30 @@
                                         </div>
                                     </div>
                                 </div>
+                                {% if not message_dict.option_list %}
+                                    {% if not message_dict.message.text %}
+                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            {% if message_dict.message.image %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.video %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.audio %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% else %}
+                                            {% endif %}
+                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                        </ul>
+                                    {% else %}
+                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-type="text"><i class="bi bi-copy"></i> Copy</button>
+                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                        </ul>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         {% else %}
                             {% if message_dict.message.reply != None %}
@@ -465,18 +485,18 @@
                                         <div class="col-2">
                                             <img src="{{message_dict.message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                         </div>
-                                        <div class="col-10 d-flex justify-content-start">
-                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                        <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="{{message_dict.message.id}}" id="message-reply-container-{{message_dict.message.id}}">
+                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%; z-index: 1; position: relative;">
                                                 <div class="card-header" style="border-bottom: none;">
-                                                    <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
+                                                    <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
                                                     {% if message_dict.message.reply.text %}
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
                                                     {% elif message_dict.message.reply.image %}
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
                                                     {% elif message_dict.message.reply.video %} 
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
                                                     {% elif message_dict.message.reply.audio %}
-                                                        <a href="#message-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
                                                     {% else %}
                                                     {% endif %}
                                                 </div>
@@ -486,7 +506,7 @@
                                     <div class="row">
                                         <div class="col-2">
                                         </div>
-                                        <div class="col-10 d-flex justify-content-start">
+                                        <div class="col-10 hidden-options d-flex justify-content-start" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message_dict.message.text %}
@@ -520,6 +540,22 @@
                                 </div>
                                 <div class="col-6">
                                 </div>
+                                {% if not message_dict.message.text %}
+                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        {% if message_dict.message.image %}
+                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                        {% elif message_dict.message.video %}
+                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                        {% elif message_dict.message.audio %}
+                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                        {% else %}
+                                        {% endif %}
+                                    </ul>
+                                {% else %}
+                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button></li>
+                                    </ul>
+                                {% endif %}
                             {% else %}
                                 <div class="col-6">
                                     <div class="row">
@@ -533,7 +569,7 @@
                                         <div class="col-2">
                                             <img src="{{message_dict.message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                         </div>
-                                        <div class="col-10">
+                                        <div class="col-10 hidden-options" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card" style="width: fit-content; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message_dict.message.text %}
@@ -633,6 +669,28 @@
                                 </div>
                                 <div class="col-6">
                                 </div>
+                                {% if not message_dict.option_list %}
+                                    {% if not message_dict.message.text %}
+                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            {% if message_dict.message.image %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            {% elif message_dict.message.video %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            {% elif message_dict.message.audio %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            {% else %}
+                                            {% endif %}
+                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                        </ul>
+                                    {% else %}
+                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button></li>
+                                            <li><button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-pencil-fill"></i> Edit</button></li>
+                                            <li><button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button></li>
+                                        </ul>
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     </div>
@@ -2424,6 +2482,159 @@
                 })
                 }
             })
+            // Deactivation of the context-menu when a left-click is registered.
+            $(document).on("click", function() {
+                $('.options').fadeOut(200);
+            });
+
+            // For activating the context-menu, so that a user can edit, delete, download, or copy a message.
+            $('#conversation-contents').on('contextmenu', '.hidden-options', function (e) {
+                e.preventDefault();
+
+                $('.options').fadeOut(200);
+
+                var messageID = $(this).data('message-id');
+                console.log(messageID)
+                var optionsPage = $('.options-' + messageID);
+
+                if (optionsPage.css('display') === 'block') {
+                    $('.options').fadeOut(200);
+                }
+                setTimeout(function () {
+                    optionsPage.css({
+                        display: "block",
+                        position: "fixed",
+                        zIndex: 10000,
+                        left: e.pageX,
+                        top: e.pageY,
+                    });
+                }, 300)
+                
+            });
+            $('.options').on('click', '.copy-message', function () {
+                var text = $(this).data('text')
+                console.log(text)
+                if (text) {
+                    var tempInput = $('<input>');
+                    $('body').append(tempInput);
+                    tempInput.val(text).select();
+
+                    document.execCommand("copy");
+
+                    tempInput.remove();
+                } else {
+                    console.log('text not found.');
+                }
+            })
+
+            $('.options').on('click', '.download-message', function () {
+                var url = $(this).data('download-url');
+                var messageType = $(this).data('type');
+                if (url && messageType) {
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'file' // Must be defined or the file dosen't download.
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            })
+
+            $('.options').on('click', '.edit-message', function () {
+                var messageType = $(this).data('type');
+                var messageID = $(this).data('message-id');
+
+                var replySection = $('#message-reply-container-' + messageID);
+                var bodySection = $('#message-body-container-' + messageID);
+
+                if (replySection) {
+                    var replyID = $(this).data('reply-id');
+                    var replySender = $(this).data('reply-sender');
+                    var replyText = $(this).data('reply-text');
+
+                    var replyParagraphTag;
+                    switch (messageType){
+                        case 'text':
+                            replyATag = `<a href="#message-timestamp-${replyID}" class="btn p-0"><p class="small text-truncate m-0">${replyText}</p></a>`;
+                            break;
+
+                        case 'image':
+                            replyATag = `<a href="#message-timestamp-${replyID}" class="btn p-0"><p class="small text-truncate m-0">Image</p></a>`;
+                            break;
+
+                        case 'video':
+                            replyATag = `<a href="#message-timestamp-${replyID}" class="btn p-0"><p class="small text-truncate m-0">Video</p></a>`;
+                            break;
+
+                        case 'audio':
+                            replyATag = `<a href="#message-timestamp-${replyID}" class="btn p-0"><p class="small text-truncate m-0">Audio</p></a>`;
+                            break;
+                    }
+
+                    var replySectionHtml = `
+                        <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="${messageID}" id="message-reply-container-${messageID}">
+                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%; z-index: 1; position: relative;">
+                                <div class="card-header" style="border-bottom: none;">
+                                    <a href="#message-timestamp-${replyID}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ${replySender}</p></a>
+                                    ` + replyATag + `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    replySection.html('');
+                    replySection.html(replySectionHtml);
+                }
+
+
+                var editPromptHtml;
+                // get old text to aid with editing.
+                switch (messageType){
+                    
+                    case 'text':
+                        editPromptHtml = `
+                            <textarea rows="4" cols="50" class="edit-text-box" placeholder="${}" data-message-id="${messageID}"></textarea>
+                        `;
+                        break;
+
+                    case 'image':
+                        // make the image prompt
+                        break;
+
+                    case 'video':
+                        // make the video prompt
+                        break;
+
+                    case 'audio':
+                        // make the audio prompt
+                        break;
+                }
+                var bodySectionHtml = `
+                    <div class="card text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                        <div class="card-header" style="border-bottom: none;">
+                            <div class="row">
+                                <div class="col">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+
+                // access message element and modify it for editing input
+                // - create a form to send over new text.
+                // - AJAX request to save the new text and change the message status to edited.
+
+                // success callback must show the new message and also modify other users messages via websockets
+            })
+            $('.options').on('click', '.delete-message', function () {
+                // need message-id
+                
+                // AJAX request to delete message, with os for file management
+
+                // success callback with websockets to find and remove the message. 
+            })
+            // built in event listener for editing text, image, and video messages
         });
     </script>
 </div>
