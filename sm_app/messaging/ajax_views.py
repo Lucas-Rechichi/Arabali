@@ -766,8 +766,8 @@ def edit_message(request):
         print(f'No message stored in database with id: {message_id}')
         return None
 
-
     if message_type == 'text':
+        content = request.POST.get('content')
         if content:
             try:
                 message.text = content
@@ -781,6 +781,7 @@ def edit_message(request):
             return None
         
     elif message_type == 'image':
+        content = request.FILES.get('content')
         if content:
             file_path = os.path.join(settings.MEDIA_ROOT, message.image.name)
             try:
@@ -805,6 +806,7 @@ def edit_message(request):
             print(f'Input content is undefined')
 
     elif message_type == 'video':
+        content = request.FILES.get('content')
         if content:
             file_path = os.path.join(settings.MEDIA_ROOT, message.video.name)
             try:
@@ -827,6 +829,7 @@ def edit_message(request):
         else:
             print(f'Input content is undefined')
     elif message_type == 'audio':
+        content = request.FILES.get('content')
         if content:
             file_path = os.path.join(settings.MEDIA_ROOT, message.audio.name)
             try:
