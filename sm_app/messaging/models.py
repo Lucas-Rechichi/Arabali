@@ -35,6 +35,7 @@ class Message(models.Model):
     sender = models.ForeignKey(UserStats, on_delete=models.CASCADE)
     room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
     reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    edited = models.BooleanField(default=False, null=False)
     text = models.TextField(null=True)
     image = models.ImageField(null=True, upload_to=get_image_upload_path_message)
     video = models.FileField(null=True, upload_to=get_video_upload_path_message)

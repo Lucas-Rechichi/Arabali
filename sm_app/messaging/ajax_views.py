@@ -755,3 +755,105 @@ def delete_chatroom(request):
         print('incorrect user. Only owners can access this setting.')
         return JsonResponse({})
     
+def edit_message(request):
+    message_id = request.POST.get('message_id')
+    message_type = request.POST.get('type')
+    content = request.POST.get('content')
+
+    try:
+        message = Message.objects.get(id=message_id)
+    except ObjectDoesNotExist as e:
+        print(f'No message stored in database with id: {message_id}')
+        return None
+
+
+    if message_type == 'text':
+        if content:
+            try:
+                message.text = content
+                message.edited = True
+                message.save()
+            except Exception as e:
+                print(f'An errror occured: {e}')
+
+        else:
+            print(f'Input content is undefined')
+            return None
+        
+    elif message_type == 'image':
+        if content:
+            file_path = os.path.join(settings.MEDIA_ROOT, message.image.name)
+            try:
+                os.remove(file_path)
+                print(f'OS removed file with path: {file_path}')
+            except OSError as e:
+                if not file_path:
+                    file_path = None
+
+                print(f'OS cannot find the file related to the path {file_path}')
+                return None
+            
+            try:
+                message.image = content
+                message.edited = True
+                message.save()
+            except Exception as e:
+                print(f'An error occured: {e}')
+                return None
+            
+        else:
+            print(f'Input content is undefined')
+
+    elif message_type == 'video':
+        if content:
+            file_path = os.path.join(settings.MEDIA_ROOT, message.video.name)
+            try:
+                os.remove(file_path)
+                print(f'OS removed file with path: {file_path}')
+            except OSError as e:
+                if not file_path:
+                    file_path = None
+                print(f'OS cannot find the file related to the path {file_path}')
+                return None
+            
+            try:
+                message.video = content
+                message.edited = True
+                message.save()
+            except Exception as e:
+                print(f'An error occured: {e}')
+                return None
+            
+        else:
+            print(f'Input content is undefined')
+    elif message_type == 'audio':
+        if content:
+            file_path = os.path.join(settings.MEDIA_ROOT, message.audio.name)
+            try:
+                os.remove(file_path)
+                print(f'OS removed file with path: {file_path}')
+            except OSError as e:
+                if not file_path:
+                    file_path = None
+                print(f'OS cannot find the file related to the path {file_path}')
+                return None
+            try:
+                message.audio = content
+                message.edited = True
+                message.save()
+
+            except Exception as e:
+                print(f'An error occured: {e}')
+                return None
+        else:
+            print(f'Input content is undefined')
+            return None
+    else:
+        print(f'Invalid message type to be editied: {message_type}')
+        return None
+
+
+    response = {
+        'message_id': message_id
+    }
+    return JsonResponse(response)

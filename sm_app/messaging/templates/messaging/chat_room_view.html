@@ -281,6 +281,10 @@
                                         <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card text-bg-success" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
+                                                    {% if message_dict.message.edited %}
+                                                        <p class="small text-light p-0 m-0"><em>(edited)</em></p>
+                                                    {% else %}
+                                                    {% endif %}
                                                     {% if message_dict.message.text %}
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
@@ -2275,6 +2279,12 @@
                     console.log('Error getting audio file.')
                 }
             })
+            $('#conversation-contents').on('input', '.edit-audio-upload', function (event) {
+                // get message ID
+                // get uploaded file (see above function)
+
+                // display new data.
+            })
 
             // Permission logic for voice messages
             var awaitingMicrophoneModal = new bootstrap.Modal(document.getElementById('awaiting-microphone-modal'), {
@@ -2439,6 +2449,8 @@
             // for editing audio messages
             $('#conversation-contents').on('click', '.edit-request-recording, .edit-recording-active, .confirm-audio-editing', function () {
                 // Check if the button has the class 'request-recording' to start recording
+                var messageID = $(this).data('message-id');
+
                 console.log('clicked')
                 if ($(this).hasClass('edit-request-recording')) {
                     awaitingMicrophoneModal.show();
@@ -2479,11 +2491,11 @@
                                     audioHtml = `
                                         <audio class="edit-recording-preview-controls p-2" src="${audioURL}" controls></audio>
                                         <div class="d-flex justify-content-center">
-                                            <button type="button" class="btn edit-recording-preview-controls confirm-audio-editing"><i class="bi bi-check-lg" style="color: #ffffff;"></i></button>
+                                            <button type="button" class="btn edit-recording-preview-controls confirm-editing" data-message-id="${messageID}" data-type="audio"><i class="bi bi-check-lg" style="color: #ffffff;"></i></button>
                                             <button type="button" class="btn edit-recording-preview-controls deny-editing"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
                                             <button class="btn edit-request-recording" type="button"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
                                             <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
-                                            <input type="file" class="audio-upload edit-upload-element" id="edit-audio-upload-field" style="display: none;">
+                                            <input type="file" class="edit-audio-upload edit-upload-element" id="edit-audio-upload-field" style="display: none;">
                                         </div>
                                     `;
                                     $('#edit-recording-controls').html(audioHtml);
@@ -2725,8 +2737,9 @@
                     case 'text':
                         var oldText = $(this).data('text');
                         editPromptHtml = `
-                            <textarea class="edit-message edit-text" data-message-id="${messageID}">${oldText}</textarea>
+                            <textarea id="edit-text-box-${messageID}" class="edit-message edit-text" data-message-id="${messageID}">${oldText}</textarea>
                             <div class="d-flex justify-content-center">
+                                <button type="button" class="btn confirm-editing" data-message-id="${messageID}" data-type="text"><i class="bi bi-check2" style="color: #ffffff;"></i></button>
                                 <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
                             </div>
                         `;
@@ -2735,8 +2748,9 @@
                     case 'image':
                         editPromptHtml = `
                             <label for="image-file-field" class="form-label">Place image here</label>
-                            <input class="form-control edit-message edit-image" type="file">
+                            <input id="edit-image-${messageID}" class="form-control edit-message" type="file">
                             <div class="d-flex justify-content-center">
+                                <button type="button" class="btn confirm-editing" data-message-id="${messageID}" data-type="image"><i class="bi bi-check2" style="color: #ffffff;"></i></button>
                                 <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
                             </div>
                         `;
@@ -2745,8 +2759,9 @@
                     case 'video':
                         editPromptHtml = `
                             <label for="video-file-field" class="form-label">Place video here</label>
-                            <input class="form-control edit-mesage edit-video" type="file">
+                            <input id="edit-video-${messageID}" class="form-control edit-mesage " type="file">
                             <div class="d-flex justify-content-center">
+                                <button type="button" class="btn confirm-editing" data-message-id="${messageID}" data-type="video"><i class="bi bi-check2" style="color: #ffffff;"></i></button>
                                 <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
                             </div>
                         `;
@@ -2757,7 +2772,7 @@
                             <p class="small text-center" id="edit-voice-prompt-text">Press the microphone to start recording voice or upload an audio file.</p>
                             <div class="d-flex justify-content-center">
                                 <div id="edit-recording-controls">
-                                    <button class="btn edit-request-recording" type="button"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
+                                    <button class="btn edit-request-recording" type="button" data-message-id="${messageID}"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
                                     <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
                                     <button type="button" class="btn edit-recording-preview-controls cancel-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
                                     <input type="file" class="audio-upload edit-upload-element" id="edit-audio-upload-field" style="display: none;">
@@ -2790,6 +2805,43 @@
                 // success callback must show the new message and also modify other users messages via websockets
             })
             $('#conversation-contents').on('click', '.confirm-editing', function () {
+                var messageID = $(this).data('message-id');
+
+                var messageType = $(this).data('type');
+                
+                var content;
+                switch (messageType) {
+                    case 'text':
+                        content = $('#edit-text-box-' + messageID).text();
+                        break;
+
+                    case 'image':
+                        content = $('#edit-image-' + messageID)[0].files[0];       
+                        break;
+                    
+                    case 'video':
+                        content = $('#edit-video-' + messageID)[0].files[0];
+                        break;
+                }   
+
+            editMessageData = new FormData()
+
+            editMessageData.append('type', messageType);
+            editMessageData.append('content', content);
+            editMessageData.append('message_id', messageID);
+            editMessageData.append('csrfmiddlewaretoken', '{{csrf_token}}');
+
+            $.ajax({
+                type: 'POST',
+                url: '/chat/edit-message/',
+                processData: false, // Important!
+                contentType: false, // Important!
+                data: editMessageData,
+
+                success: function (response) {
+                    console.log('message edited');
+                }
+            })
                 // ajax and websockets to show new message and save it. notifications for editied messages?
             })
             $('#conversation-contents').on('click', '.deny-editing', function () {
