@@ -317,13 +317,40 @@
                                     <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         {% if message_dict.message.image %}
                                             <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% if message_dict.message.reply.text %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.image %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.video %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.audio %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% else %}
+                                            {% endif %}
                                         {% elif message_dict.message.video %}
                                             <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% if message_dict.message.reply.text %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.image %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.video %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.audio %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% else %}
+                                            {% endif %}
                                         {% elif message_dict.message.audio %}
                                             <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% if message_dict.message.reply.text %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.image %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.video %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.audio %}
+                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% else %}
+                                            {% endif %}
                                         {% else %}
                                         {% endif %}
                                         <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
@@ -331,7 +358,16 @@
                                 {% else %}
                                     <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button>
-                                        <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% if message_dict.message.reply.text %}
+                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% elif message_dict.message.reply.image %}
+                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="image" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% elif message_dict.message.reply.video %}
+                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="video" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% elif message_dict.message.reply.audio %}
+                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="audio" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                        {% else %}
+                                        {% endif %}
                                         <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
                                     </ul>
                                 {% endif %}
@@ -680,14 +716,10 @@
                                                 <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
                                             {% else %}
                                             {% endif %}
-                                            <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
                                         </ul>
                                     {% else %}
                                         <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                            <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button></li>
-                                            <li><button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-pencil-fill"></i> Edit</button></li>
-                                            <li><button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button></li>
+                                            <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button>
                                         </ul>
                                     {% endif %}
                                 {% endif %}
@@ -2140,7 +2172,7 @@
                                 <div class="card-header" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col d-flex justify-content-center">
-                                            <p id="voice-prompt-text">Press the microphone to start recroding voice or upload an audio file.</p>
+                                            <p id="voice-prompt-text">Press the microphone to start recording voice or upload an audio file.</p>
                                         </div>
                                     </div>
                                     <div class="row" id="voice-control-pannel">
@@ -2176,7 +2208,7 @@
                                 <div class="card-header" style="border-bottom: none;">
                                     <div class="row">
                                         <div class="col d-flex justify-content-center">
-                                            <p id="voice-prompt-text">Press the microphone to start recroding voice or upload an audio file.</p>
+                                            <p id="voice-prompt-text">Press the microphone to start recording voice or upload an audio file.</p>
                                         </div>
                                     </div>
                                     <div class="row" id="voice-control-pannel">
@@ -2266,19 +2298,17 @@
                                 audioStream = stream
                                 console.log('Microphone access granted.');
 
-                                
-
                                 // Change the look of the message div to tell the user that it has begun recording
                                 if ($('#recording-preview-controls')) {
                                     $('#recording-preview-controls').remove();
                                     $('.upload-element').remove();
-
                                 }
+                                
                                 $('.upload-element').remove();
                                 $('#mic-icon').removeClass('bi-mic').addClass('bi-mic-fill');
                                 $('#mic-icon').css('color', '#dc3545');
                                 $('#voice-prompt-text').text('Recording...');
-                                
+                    
                                 audioRecorder = new MediaRecorder(stream);
 
                                 // Logic for sending recorded audio and storing it  
@@ -2292,7 +2322,9 @@
                                 audioRecorder.onstop = function() {
                                     blob = new Blob(recordedChunks, { type: 'audio/webm' });
                                     const audioURL = URL.createObjectURL(blob);
-                                    var audioHtml = `
+                                    var audioHtml;
+                
+                                    audioHtml = `
                                         <div class="d-inline-flex" id="recording-preview-controls">
                                             <button type="button" class="btn confirm-recording"><i class="bi bi-check-lg"></i></button>
                                             <button type="button" class="btn deny-recording"><i class="bi bi-x-lg"></i></button>
@@ -2304,6 +2336,7 @@
                                     `;
                                     $('#recording-controls').html(audioHtml);
                                     $('#voice-prompt-text').text('Audio recording successful.');
+                                    
                                     recordedChunks = [];
                                     audioStream.getTracks().forEach(track => track.stop());
                                     audioStream = null; // Clear the stream reference
@@ -2313,7 +2346,7 @@
                                 // Start recording and change button state
                                 audioRecorder.start();
                                 $('.request-recording').removeClass('request-recording').addClass('recording-active');
-
+                                
                             })
                             .catch(function(err) {
                                 console.log('Microphone access denied: ' + err.message);
@@ -2339,7 +2372,7 @@
                     var isReply;
                     var replyMessageId;
                     let audioData = new FormData();
-                    
+                
                     if ($('#is-reply').val() === 'true') { // if the hidden input containing the state of replying is true
                         isReply = 'true' 
                         replyMessageId = $('#reply-information-holder').data('message-id'); // get the message ID of the message that this user is replying to.
@@ -2395,13 +2428,104 @@
                                     'is_reply': response.is_reply,
                                 }))
                             }
-
                         }
                     })
                 }
                 else if ($(this).hasClass('deny-recording')) {
                     $('#recording-preview-controls').remove();
                     $('#voice-prompt-text').text('Press the microphone to start recroding voice or upload an audio file.');
+                }
+            });
+            // for editing audio messages
+            $('#conversation-contents').on('click', '.edit-request-recording, .edit-recording-active, .confirm-audio-editing', function () {
+                // Check if the button has the class 'request-recording' to start recording
+                console.log('clicked')
+                if ($(this).hasClass('edit-request-recording')) {
+                    awaitingMicrophoneModal.show();
+
+                    setTimeout(function () {
+                        navigator.mediaDevices.getUserMedia({ audio: true })
+                            .then(function(stream) {
+                                awaitingMicrophoneModal.hide();
+                                audioStream = stream
+                                console.log('Microphone access granted.');
+
+                                // Change the look of the message div to tell the user that it has begun recording
+                                if ($('.edit-recording-preview-controls')) {
+                                    $('.edit-recording-preview-controls').remove();
+                                    $('.edit-upload-element').remove();
+                                }
+                                
+                                $('.edit.upload-element').remove();
+                                $('#edit-mic-icon').removeClass('bi-mic').addClass('bi-mic-fill');
+                                $('#edit-mic-icon').css('color', '#dc3545');
+                                $('#edit-voice-prompt-text').text('Recording...');
+                                
+                                audioRecorder = new MediaRecorder(stream);
+
+                                // Logic for sending recorded audio and storing it  
+                                audioRecorder.ondataavailable = function(event) {
+                                    if (event.data.size > 0) {
+                                        recordedChunks.push(event.data);
+                                    }
+                                };
+
+                                // When recording stops, store the audio in an audio tag
+                                audioRecorder.onstop = function() {
+                                    blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                                    const audioURL = URL.createObjectURL(blob);
+                                    var audioHtml;
+                                    
+                                    audioHtml = `
+                                        <audio class="edit-recording-preview-controls p-2" src="${audioURL}" controls></audio>
+                                        <div class="d-flex justify-content-center">
+                                            <button type="button" class="btn edit-recording-preview-controls confirm-audio-editing"><i class="bi bi-check-lg" style="color: #ffffff;"></i></button>
+                                            <button type="button" class="btn edit-recording-preview-controls deny-editing"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
+                                            <button class="btn edit-request-recording" type="button"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
+                                            <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
+                                            <input type="file" class="audio-upload edit-upload-element" id="edit-audio-upload-field" style="display: none;">
+                                        </div>
+                                    `;
+                                    $('#edit-recording-controls').html(audioHtml);
+                                    $('#edit-voice-prompt-text').text('Audio recording successful.');
+                                    
+                                    recordedChunks = [];
+                                    audioStream.getTracks().forEach(track => track.stop());
+                                    audioStream = null; // Clear the stream reference
+                                    console.log('Microphone access stopped.');
+                                };
+                                
+                                // Start recording and change button state
+                                audioRecorder.start();
+                                $('.edit-request-recording').removeClass('edit-request-recording').addClass('edit-recording-active');
+                                
+
+                            })
+                            .catch(function(err) {
+                                console.log('Microphone access denied: ' + err.message);
+
+                                awaitingMicrophoneModal.hide();
+
+                                setTimeout(function () {
+                                    var deniedMicrophoneModal = new bootstrap.Modal(document.getElementById('denied-microphone-access'), {
+                                        keyboard: false
+                                    });
+                                    deniedMicrophoneModal.show();
+                                }, 1000);  // Adjust the delay if needed
+                            });
+                    }, 1000)
+                }
+                // Check if the button has the class 'recording-active' to stop recording
+                else if ($(this).hasClass('edit-recording-active')) {
+                    if (audioRecorder && audioRecorder.state === 'recording') {
+                        audioRecorder.stop();
+                    }
+                }
+                else if ($(this).hasClass('confirm-audio-editing')) {
+                    var isReply;
+                    var replyMessageId;
+                    let audioData = new FormData();
+                    // editing messages logic goes here
                 }
             });
             // for polling
@@ -2539,7 +2663,7 @@
                     document.body.removeChild(a);
                 }
             })
-
+            var oldMessageStorage = {};
             $('.options').on('click', '.edit-message', function () {
                 var messageType = $(this).data('type');
                 var messageID = $(this).data('message-id');
@@ -2547,13 +2671,22 @@
                 var replySection = $('#message-reply-container-' + messageID);
                 var bodySection = $('#message-body-container-' + messageID);
 
+                // get old message and store it whilst editing
+                var oldMessageReply = replySection.children().detach()
+                var oldMessageBody = bodySection.children().detach()
+                oldMessageStorage[messageID] = {
+                    'reply': oldMessageReply,
+                    'body': oldMessageBody,
+                };
+
                 if (replySection) {
                     var replyID = $(this).data('reply-id');
+                    var replyType = $(this).data('reply-type');
                     var replySender = $(this).data('reply-sender');
                     var replyText = $(this).data('reply-text');
 
-                    var replyParagraphTag;
-                    switch (messageType){
+                    var replyATag;
+                    switch (replyType){
                         case 'text':
                             replyATag = `<a href="#message-timestamp-${replyID}" class="btn p-0"><p class="small text-truncate m-0">${replyText}</p></a>`;
                             break;
@@ -2587,25 +2720,51 @@
 
 
                 var editPromptHtml;
-                // get old text to aid with editing.
                 switch (messageType){
                     
                     case 'text':
+                        var oldText = $(this).data('text');
                         editPromptHtml = `
-                            <textarea rows="4" cols="50" class="edit-text-box" placeholder="${}" data-message-id="${messageID}"></textarea>
+                            <textarea class="edit-message edit-text" data-message-id="${messageID}">${oldText}</textarea>
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
+                            </div>
                         `;
                         break;
 
                     case 'image':
-                        // make the image prompt
+                        editPromptHtml = `
+                            <label for="image-file-field" class="form-label">Place image here</label>
+                            <input class="form-control edit-message edit-image" type="file">
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
+                            </div>
+                        `;
                         break;
 
                     case 'video':
-                        // make the video prompt
+                        editPromptHtml = `
+                            <label for="video-file-field" class="form-label">Place video here</label>
+                            <input class="form-control edit-mesage edit-video" type="file">
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
+                            </div>
+                        `;
                         break;
 
                     case 'audio':
-                        // make the audio prompt
+                        editPromptHtml = `
+                            <p class="small text-center" id="edit-voice-prompt-text">Press the microphone to start recording voice or upload an audio file.</p>
+                            <div class="d-flex justify-content-center">
+                                <div id="edit-recording-controls">
+                                    <button class="btn edit-request-recording" type="button"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
+                                    <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
+                                    <button type="button" class="btn edit-recording-preview-controls cancel-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
+                                    <input type="file" class="audio-upload edit-upload-element" id="edit-audio-upload-field" style="display: none;">
+                                </div>
+                            </div>
+                            
+                        `;
                         break;
                 }
                 var bodySectionHtml = `
@@ -2613,12 +2772,15 @@
                         <div class="card-header" style="border-bottom: none;">
                             <div class="row">
                                 <div class="col">
-                                    
+                                    ` + editPromptHtml + `
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
+
+                bodySection.html('');
+                bodySection.html(bodySectionHtml);
 
 
                 // access message element and modify it for editing input
@@ -2627,6 +2789,25 @@
 
                 // success callback must show the new message and also modify other users messages via websockets
             })
+            $('#conversation-contents').on('click', '.confirm-editing', function () {
+                // ajax and websockets to show new message and save it. notifications for editied messages?
+            })
+            $('#conversation-contents').on('click', '.deny-editing', function () {
+                var messageID = $(this).data('message-id');
+
+                var oldMessageReply = oldMessageStorage[messageID]['reply'];
+                var oldMessageBody = oldMessageStorage[messageID]['body'];
+
+                var replySection = $('#message-reply-container-' + messageID);
+                var bodySection = $('#message-body-container-' + messageID);
+
+                replySection.html('');
+                replySection.html(oldMessageReply);
+
+                bodySection.html('');
+                bodySection.html(oldMessageBody);
+
+            })
             $('.options').on('click', '.delete-message', function () {
                 // need message-id
                 
@@ -2634,6 +2815,7 @@
 
                 // success callback with websockets to find and remove the message. 
             })
+            
             // built in event listener for editing text, image, and video messages
         });
     </script>
