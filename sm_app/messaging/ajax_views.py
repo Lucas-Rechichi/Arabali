@@ -861,3 +861,59 @@ def edit_message(request):
         'message_type': message_type,
     }
     return JsonResponse(response)
+
+def delete_message(request):
+    message_id = request.POST.get('message_id')
+    message_type = request.POST.get('message_type')
+
+    if message_type and message_type == 'general':
+        try:
+            message = Message.objects.get(id=message_id)
+        except ObjectDoesNotExist or Exception as e:
+            print(f'Message with id: {message_id} does not exist.')
+            print(f'Error: {e}')
+            return None
+        
+        if message.image:
+            file_path = os.path.join(settings.MEDIA_ROOT, message.image.name)
+        elif message.video:
+            file_path = os.path.join(settings.MEDIA_ROOT, message.video.name)
+        elif message.audio:
+            file_path = os.path.join(settings.MEDIA_ROOT, message.audio.name)
+        else:
+            print(f'Message with id: {message.pk} has an invalid type.')
+        if message.text:
+            message.delete()
+        else:
+            try:
+                os.remove(file_path)
+                message.delete()
+            
+            except OSError as e:
+                print(f'OS could not delete the file at the path: {file_path}')
+                return None
+            
+            except Exception as e:
+                print(f'Error: {e}')
+                return None
+            
+    elif message_type and message_type == 'poll':
+        try:
+            message = PollMessage.objects.get(id=message_id)
+            message.delete()
+        except ObjectDoesNotExist as e:
+            print(f'Poll message with id: {message_id} does not exist.')
+            return None
+        
+        except Exception as e:
+            print(f'Error: {e}')
+            return None
+        
+    else:
+        print(f'Invalid message type: {message_type}')
+        return None
+    response = {
+        'message_id': message_id,
+        'message_type': message_type,
+    }
+    return JsonResponse()

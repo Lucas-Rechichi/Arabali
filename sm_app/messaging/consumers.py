@@ -54,51 +54,61 @@ class MessageConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         user = self.scope.get("user")  # Use get to safely get the user who is on the page
 
+        message_types = ['text', 'image', 'video', 'audio']
+
         # Getting universal data across all 4 message types
         message_type = text_data_json['message_type']
         message_id = text_data_json['message_id']
-        is_reply = text_data_json['is_reply']
-        is_editing = text_data_json['is_editing']
 
-        message = Message.objects.get(id=message_id)
+        if message_type in message_types:
+            is_reply = text_data_json['is_reply']
+            is_editing = text_data_json['is_editing']
 
-        # Getting specific data for message types
-        if message_type == 'text':
-            content = message.text
-        elif message_type == 'image':
-            content = message.image.url
-        elif message_type == 'video':
-            content = message.video.url
-        elif message_type == 'audio':
-            content = message.audio.url
-        else:
-            print('invalid message type')
-        
-        # Getting unique data for a reply message
-        if is_reply == 'true':
-            reply_id = text_data_json['reply_id']
-        else:
-            reply_id = None
+            message = Message.objects.get(id=message_id)
 
-        if not is_editing:
-            is_editing = 'false'
-        
+            # Getting specific data for message types
+            if message_type == 'text':
+                content = message.text
+            elif message_type == 'image':
+                content = message.image.url
+            elif message_type == 'video':
+                content = message.video.url
+            elif message_type == 'audio':
+                content = message.audio.url
+            else:
+                print('invalid message type')
+            
+            # Getting unique data for a reply message
+            if is_reply == 'true':
+                reply_id = text_data_json['reply_id']
+            else:
+                reply_id = None
 
-        if user and user.is_authenticated:
-            # Send the message to the group
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message_type': message_type,
-                    'content': content,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'reply_id': reply_id,
-                    'username': user.username,
-                }
-            )
+            if not is_editing:
+                is_editing = 'false'
+            
+
+            if user and user.is_authenticated:
+                # Send the message to the group
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message_type': message_type,
+                        'content': content,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'reply_id': reply_id,
+                        'username': user.username,
+                    }
+                )
+            elif message_type == 'general':
+                pass # for deleting general messages
+            elif message_type == 'poll':
+                pass # for deleting poll messages
+            else:
+                print(f'Invalid message type: {message_type}')
     
     def chat_message(self, event):
         # Accessing sent data
@@ -129,7 +139,7 @@ class MessageConsumer(WebsocketConsumer):
             reply_sender = None
         
 
-        delete_option = f'<button type="button" class="btn delete-message" data-message-id="{message_id}"><i class="bi bi-trash3-fill"></i> Delete</button>'
+        delete_option = f'<button type="button" class="btn delete-message" data-message-id="{message_id}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>'
         if message_type == 'text':
             reply_text = reply_message.text if is_reply == 'true' else None
             edit_option = f'<button type="button" class="btn edit-message" data-text="{content}" data-message-id="{message_id}" data-type="text" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-reply-text="{reply_text}"><i class="bi bi-pencil-fill"></i> Edit</button>'

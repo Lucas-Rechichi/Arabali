@@ -14,6 +14,7 @@ urlpatterns = [
     path('chat/message-sent-video/', ajax_views.message_sent_video, name='message_sent_video'),
     path('chat/message-sent-audio/', ajax_views.message_sent_audio, name='message_sent_audio'),
     path('chat/edit-message/', ajax_views.edit_message, name='edit_message'),
+    path('chat/delete-message/', ajax_views.delete_message, name='delete_message'),
 
     path('polls/create-poll/', ajax_views.create_poll, name='create_poll'),
     path('polls/vote-for-poll/', ajax_views.vote_for_poll, name='vote_for_poll'),

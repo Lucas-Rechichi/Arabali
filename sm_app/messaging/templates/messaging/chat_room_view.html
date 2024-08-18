@@ -357,7 +357,7 @@
                                             {% endif %}
                                         {% else %}
                                         {% endif %}
-                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
                                     </ul>
                                 {% else %}
                                     <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
@@ -372,7 +372,7 @@
                                             <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="audio" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
                                         {% else %}
                                         {% endif %}
-                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
                                     </ul>
                                 {% endif %}
                             {% else %}
@@ -390,6 +390,10 @@
                                         <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
+                                                    {% if message_dict.message.edited %}
+                                                        <p class="small text-light p-0 m-0"><em>(edited)</em></p>
+                                                    {% else %}
+                                                    {% endif %}
                                                     {% if message_dict.message.text %}
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
@@ -502,15 +506,19 @@
                                                 <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
                                             {% else %}
                                             {% endif %}
-                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
                                         </ul>
                                     {% else %}
                                         <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                             <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-type="text"><i class="bi bi-copy"></i> Copy</button>
                                             <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
                                         </ul>
                                     {% endif %}
+                                {% else %}
+                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="poll"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                    </ul>
                                 {% endif %}
                             {% endif %}
                         {% else %}
@@ -549,6 +557,10 @@
                                         <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
+                                                    {% if message_dict.message.edited %}
+                                                        <p class="small p-0 m-0"><em>(edited)</em></p>
+                                                    {% else %}
+                                                    {% endif %}
                                                     {% if message_dict.message.text %}
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
@@ -612,6 +624,10 @@
                                         <div class="col-10 hidden-options" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card" style="width: fit-content; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
+                                                    {% if message_dict.message.edited %}
+                                                        <p class="small p-0 m-0"><em>(edited)</em></p>
+                                                    {% else %}
+                                                    {% endif %}
                                                     {% if message_dict.message.text %}
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
@@ -970,7 +986,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>`;
+                                </div>
+                                <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    ${copyOption}
+                                    ${downloadOption}
+                                    ${editOption}
+                                    ${deleteOption}
+                                </ul>
+                                `;
                         } 
                         else { // other
                             var newMessageInHtml = `
@@ -1009,7 +1032,12 @@
                                         </div>
                                     <div class="col-6">
                                     </div>
-                                </div>`;
+                                </div>
+                                <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    ${copyOption}
+                                    ${downloadOption}
+                                </ul>
+                                `;
                         }
                     }
                     else if (data.type === 'incoming_reply_message') { // For replies
@@ -1058,7 +1086,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>`;
+                                </div>
+                                <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    ${copyOption}
+                                    ${downloadOption}
+                                    ${editOption}
+                                    ${deleteOption}
+                                </ul>
+                                `;
                             } else { // Other
                                 var newMessageInHtml = `
                                     <div class="message">
@@ -1107,7 +1142,12 @@
                                             <div class="col-6">
                                             </div>
                                         </div>
-                                    </div>`;
+                                    </div>
+                                    <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        ${copyOption}
+                                        ${downloadOption}
+                                    </ul>
+                                    `;
                             }
                     }
                     $('#conversation-contents').append(newMessageInHtml);
@@ -2928,9 +2968,26 @@
 
             })
             $('.options').on('click', '.delete-message', function () {
-                // need message-id
-                
-                // AJAX request to delete message, with os for file management
+                var messageID = $(this).data('message-id');
+                var messageType = $(this).data('type');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat/delete-message/',
+                    data: {
+                        'message_id': messageID,
+                        'message_type': messageType,
+                        'csrfmiddlewaretoken': '{{csrf_token}}'
+                    },
+                    success: function(response) {
+                        console.log('Message deleted.')
+
+                        messageSocket.send(JSON.stringify({
+                            'message_id': message_id
+                            
+                        }))
+                    }
+                })
 
                 // success callback with websockets to find and remove the message. 
             })
