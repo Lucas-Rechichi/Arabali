@@ -58,6 +58,7 @@ class MessageConsumer(WebsocketConsumer):
         message_type = text_data_json['message_type']
         message_id = text_data_json['message_id']
         is_reply = text_data_json['is_reply']
+        is_editing = text_data_json['is_editing']
 
         message = Message.objects.get(id=message_id)
 
@@ -78,6 +79,9 @@ class MessageConsumer(WebsocketConsumer):
             reply_id = text_data_json['reply_id']
         else:
             reply_id = None
+
+        if not is_editing:
+            is_editing = 'false'
         
 
         if user and user.is_authenticated:
@@ -90,6 +94,7 @@ class MessageConsumer(WebsocketConsumer):
                     'content': content,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'reply_id': reply_id,
                     'username': user.username,
                 }
@@ -101,6 +106,7 @@ class MessageConsumer(WebsocketConsumer):
         message_type = event['message_type']
         message_id = event['message_id']
         is_reply = event['is_reply']
+        is_editing = event['is_editing']
         reply_id = event['reply_id']
         username = event['username']
 
@@ -114,7 +120,46 @@ class MessageConsumer(WebsocketConsumer):
         local_datetime = Message.objects.latest('sent_at').sent_at.astimezone(local_timezone)
         formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
         formatted_datetime_capitalized = formatted_datetime.capitalize()
+
+        # options for right-click (edit, delete, copy, download)
+        if is_reply == 'true':
+            reply_message = Message.objects.get(id=reply_id)
+            reply_sender = reply_message.sender.user.username
+        else:
+            reply_sender = None
         
+
+        delete_option = f'<button type="button" class="btn delete-message" data-message-id="{message_id}"><i class="bi bi-trash3-fill"></i> Delete</button>'
+        if message_type == 'text':
+            reply_text = reply_message.text if is_reply == 'true' else None
+            edit_option = f'<button type="button" class="btn edit-message" data-text="{content}" data-message-id="{message_id}" data-type="text" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-reply-text="{reply_text}"><i class="bi bi-pencil-fill"></i> Edit</button>'
+            copy_option = f'<button type="button" class="btn copy-message" data-text="{content}" data-type="text"><i class="bi bi-copy"></i> Copy</button>'
+            download_option = ''
+
+        elif message_type == 'image':
+            edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>'
+            copy_option = ''
+            download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="image" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
+
+        elif message_type == 'video':
+            edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>'
+            copy_option = ''
+            download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="video" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
+
+        elif message_type == 'audio':
+            edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>'
+            copy_option = ''
+            download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="audio" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
+
+        else:
+            print('Invalid message type.')
+        
+        right_click_options = {
+            'copy_option': copy_option,
+            'download_option': download_option,
+            'edit_option': edit_option,
+            'delete_option': delete_option
+        }
         # Sending relevant data over
         if message_type == 'text':
             content_html = f'<p>{content}</p>'
@@ -138,11 +183,13 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing, 
                     'reply_message_user': reply_message.sender.user.username,
                     'reply_id': reply_message.pk,
                     'reply_html': reply_html,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -154,8 +201,10 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -182,11 +231,13 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'reply_message_user': reply_message.sender.user.username,
                     'reply_id': reply_message.pk,
                     'reply_html': reply_html,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -198,8 +249,10 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -226,11 +279,13 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'reply_message_user': reply_message.sender.user.username,
                     'reply_id': reply_message.pk,
                     'reply_html': reply_html,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -242,8 +297,10 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -271,11 +328,13 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'reply_message_user': reply_message.sender.user.username,
                     'reply_id': reply_message.pk,
                     'reply_html': reply_html,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url
@@ -287,8 +346,10 @@ class MessageConsumer(WebsocketConsumer):
                     'content_html':content_html,
                     'message_id': message_id,
                     'is_reply': is_reply,
+                    'is_editing': is_editing,
                     'self_reply_button_html': self_reply_button_html,
                     'other_reply_button_html': other_reply_button_html,
+                    'right_click_options': right_click_options,
                     'username': user.username,
                     'sent_at': formatted_datetime_capitalized,
                     'user_pfp_url': user_pfp_url

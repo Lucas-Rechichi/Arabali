@@ -857,6 +857,7 @@ def edit_message(request):
 
 
     response = {
-        'message_id': message_id
+        'message_id': message_id,
+        'message_type': message_type,
     }
     return JsonResponse(response)

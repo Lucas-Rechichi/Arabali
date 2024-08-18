@@ -393,9 +393,9 @@
                                                     {% if message_dict.message.text %}
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
-                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
+                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
                                                     {% elif message_dict.message.video %} 
-                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
                                                     {% elif message_dict.message.audio %}
                                                         <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
                                                     {% else %}
@@ -546,15 +546,15 @@
                                     <div class="row">
                                         <div class="col-2">
                                         </div>
-                                        <div class="col-10 hidden-options d-flex justify-content-start" id="message-body-container-{{message_dict.message.id}}">
+                                        <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
                                             <div class="card" style="width: 85%; border: none; opacity: 85%;">
                                                 <div class="card-header" style="border-bottom: none;">
                                                     {% if message_dict.message.text %}
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
-                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
+                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
                                                     {% elif message_dict.message.video %} 
-                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
                                                     {% elif message_dict.message.audio %}
                                                         <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
                                                     {% else %}
@@ -593,7 +593,7 @@
                                     </ul>
                                 {% else %}
                                     <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                        <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button></li>
+                                        <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button></li>
                                     </ul>
                                 {% endif %}
                             {% else %}
@@ -615,9 +615,9 @@
                                                     {% if message_dict.message.text %}
                                                         <p>{{message_dict.message.text}}</p>
                                                     {% elif message_dict.message.image %}
-                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">
+                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
                                                     {% elif message_dict.message.video %} 
-                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>
+                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
                                                     {% elif message_dict.message.audio %}
                                                         <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
                                                     {% else %}
@@ -877,135 +877,102 @@
                 var contentHtml = data.content_html;
                 var selfReplyButtonHtml = data.self_reply_button_html
                 var otherReplyButtonHtml = data.other_reply_button_html
-                if (data.type === 'incoming_message') { // If the message wasn't a reply
-                    if (data.username === '{{username}}') { // Self
-                        var newMessageInHtml = `
-                            <div class="message">
-                                <div class="row">
-                                    <div class="col">
-                                        <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                    </div>
-                                    <div class="col-6">
+                if (data.is_editing === 'true') {
+                    var bodySection = $('#message-body-container-' + data.message_id);
+                    if (data.type === 'incoming_message' || data.type === 'incoming_reply_message') {
+                        var copyOption = data.right_click_options['copy_option'];
+                        var downloadOption = data.right_click_options['download_option'];
+                        if (data.username === '{{username}}') {
+                            var editOption = data.right_click_options['edit_option'];
+                            var deleteOption = data.right_click_options['delete_option'];
+
+                            var newBodySectionHtml = `
+                                <div class="card text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                    <div class="card-header" style="border-bottom: none;">
+                                        <p class="small text-light p-0 m-0"><em>(edited)</em></p>
+                                        ${contentHtml}
                                         <div class="row">
-                                            <div class="col-11">
-                                                <p class="d-flex justify-content-end"><strong>You</strong></p>
-                                            </div>
-                                            <div class="col-1">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-10 d-flex justify-content-end">
-                                                <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
-                                                    <div class="card-header" style="border-bottom: none;">
-                                                        ` + contentHtml + `
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                ` + selfReplyButtonHtml + `
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-1">
-                                                <img src="` + data.user_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                            <div class="col">
+                                                ${selfReplyButtonHtml}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>`;
-                    } 
-                    else { // other
-                        var newMessageInHtml = `
-                            <div class="message">
-                                <div class="row">
-                                    <div class="col">
-                                        <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
+                                <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    ${copyOption}
+                                    ${downloadOption}
+                                    ${editOption}
+                                    ${deleteOption}
+                                </ul>
+                            `;
+                        } else {
+                            var newBodySectionHtml = `
+                                <div class="card text-bg-light" style="width: 85%; border: none; opacity: 85%;">
+                                    <div class="card-header" style="border-bottom: none;">
+                                        <p class="small text-light p-0 m-0"><em>(edited)</em></p>
+                                        ${contentHtml}
                                         <div class="row">
-                                            <div class="col-10">
-                                                <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
-                                            </div>
-                                            <div class="col-2">
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-2">
-                                                <img src="` + data.user_pfp_url + `" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
-                                            </div>
-                                            <div class="col-10">
-                                                <div class="card" style="width: fit-content; border: none; opacity: 85%;">
-                                                    <div class="card-header" style="border-bottom: none;">
-                                                        ` + contentHtml + `
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                ` + otherReplyButtonHtml + `
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <div class="col">
+                                                ${otherReplyButtonHtml}
                                             </div>
                                         </div>
                                     </div>
-                                <div class="col-6">
                                 </div>
-                            </div>`;
+                                <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    ${copyOption}
+                                    ${downloadOption}
+                                </ul>
+                            `;
+                        }
+                        bodySection.html('');
+                        bodySection.html(newBodySectionHtml)
+                    } else {
+                        console.log('Invalid message type.')
                     }
-                }
-                else if (data.type === 'incoming_reply_message') { // For replies
-                    var replyHtml = data.reply_html; // Get special html for a reply message
-                    if (data.username === '{{username}}') { // Self
-                        var newMessageInHtml = `
-                            <div class="message">
-                                <div class="row">
-                                    <div class="col">
-                                        <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
+                
+                } else {
+                    if (data.type === 'incoming_message') { // If the message wasn't a reply
+                        if (data.username === '{{username}}') { // Self
+                            var newMessageInHtml = `
+                                <div class="message">
+                                    <div class="row">
+                                        <div class="col">
+                                            <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-6">
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="row">
-                                            <div class="col-10 d-flex justify-content-end">
-                                                <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
-                                                    <div class="card-header" style="border-bottom: none;">
-                                                        <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
-                                                        ` + replyHtml + `
-                                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="row">
+                                                <div class="col-11">
+                                                    <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                                </div>
+                                                <div class="col-1">
                                                 </div>
                                             </div>
-                                            <div class="col-2">
-                                                <p class="d-flex justify-content-start"><strong>You</strong></p>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-10 d-flex justify-content-end">
-                                                <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
-                                                    <div class="card-header" style="border-bottom: none;">
-                                                        ` + contentHtml + `
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                ` + selfReplyButtonHtml + `
+                                            <div class="row">
+                                                <div class="col-10 d-flex justify-content-end">
+                                                    <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
+                                                        <div class="card-header" style="border-bottom: none;">
+                                                            ` + contentHtml + `
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    ` + selfReplyButtonHtml + `
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-1">
-                                                <img src="` + data.user_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                                <div class="col-1">
+                                                    <img src="` + data.user_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>`;
-                        } else { // Other
+                                </div>`;
+                        } 
+                        else { // other
                             var newMessageInHtml = `
                                 <div class="message">
                                     <div class="row">
@@ -1016,28 +983,18 @@
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="row">
-                                                <div class="col">
+                                                <div class="col-10">
                                                     <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
                                                 </div>
-                                            </div>
-                                            <div class="row">
                                                 <div class="col-2">
-                                                    <img src="` + data.user_pfp_url +`" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
-                                                </div>
-                                                <div class="col-10 d-flex justify-content-start">
-                                                    <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
-                                                        <div class="card-header" style="border-bottom: none;">
-                                                            <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
-                                                            ` + replyHtml + `
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-2">
+                                                    <img src="` + data.user_pfp_url + `" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                                 </div>
-                                                <div class="col-10 d-flex justify-content-start">
-                                                    <div class="card pb-0" style="width: 85%; border: none; opacity: 85%;">
+                                                <div class="col-10">
+                                                    <div class="card" style="width: fit-content; border: none; opacity: 85%;">
                                                         <div class="card-header" style="border-bottom: none;">
                                                             ` + contentHtml + `
                                                             <div class="row">
@@ -1050,29 +1007,126 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-6">
-                                        </div>
+                                    <div class="col-6">
                                     </div>
                                 </div>`;
                         }
-                }
-                $('#conversation-contents').append(newMessageInHtml);
-                setTimeout(scrollBarAtBottom(), 1000)
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/universal/remove-notification/',
-                    data: {
-                        'type': 'message_id',
-                        'message-id': data.message_id,
-                        'receiver': '{{username}}',
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        console.log('Notification removed')
                     }
-                });
+                    else if (data.type === 'incoming_reply_message') { // For replies
+                        var replyHtml = data.reply_html; // Get special html for a reply message
+                        if (data.username === '{{username}}') { // Self
+                            var newMessageInHtml = `
+                                <div class="message">
+                                    <div class="row">
+                                        <div class="col">
+                                            <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="row">
+                                                <div class="col-10 d-flex justify-content-end">
+                                                    <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                                        <div class="card-header" style="border-bottom: none;">
+                                                            <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
+                                                            ` + replyHtml + `
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-2">
+                                                    <p class="d-flex justify-content-start"><strong>You</strong></p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-10 d-flex justify-content-end">
+                                                    <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                                        <div class="card-header" style="border-bottom: none;">
+                                                            ` + contentHtml + `
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    ` + selfReplyButtonHtml + `
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <img src="` + data.user_pfp_url + `" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            } else { // Other
+                                var newMessageInHtml = `
+                                    <div class="message">
+                                        <div class="row">
+                                            <div class="col">
+                                                <p id="message-` + data.message_id + `" class="text-center"><em>` + data.sent_at + `</em></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <p class="d-flex justify-content-start"><strong>` + data.username + `</strong></p>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <img src="` + data.user_pfp_url +`" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                                    </div>
+                                                    <div class="col-10 d-flex justify-content-start">
+                                                        <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                                            <div class="card-header" style="border-bottom: none;">
+                                                                <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
+                                                                ` + replyHtml + `
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                    </div>
+                                                    <div class="col-10 d-flex justify-content-start">
+                                                        <div class="card pb-0" style="width: 85%; border: none; opacity: 85%;">
+                                                            <div class="card-header" style="border-bottom: none;">
+                                                                ` + contentHtml + `
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        ` + otherReplyButtonHtml + `
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                            </div>
+                                        </div>
+                                    </div>`;
+                            }
+                    }
+                    $('#conversation-contents').append(newMessageInHtml);
+                    setTimeout(scrollBarAtBottom(), 1000)
 
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'type': 'message_id',
+                            'message-id': data.message_id,
+                            'receiver': '{{username}}',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            console.log('Notification removed')
+                        }
+                    });
+                }
             };
             messageSocket.onclose = function (e) {
                 console.error('WebSocket closed unexpectedly:', e);
@@ -1793,6 +1847,7 @@
                                         'message_type': 'text',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
+                                        'is_editing': 'false',
                                         'reply_id': response.reply_id,
                                     }));
                                 } else {
@@ -1801,6 +1856,7 @@
                                         'message_type': 'text',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
+                                        'is_editing': 'false',
                                     }));
                                 }
                             }
@@ -1866,6 +1922,7 @@
                                         'message_type': 'image',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
+                                        'is_editing': 'false',
                                         'reply_id': response.reply_id,
                                     }))
                                 } else {
@@ -1873,6 +1930,7 @@
                                         'message_type': 'image',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
+                                        'is_editing': 'false',
                                     }))
                                 }
                             }
@@ -1939,6 +1997,7 @@
                                         'message_type': 'video',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
+                                        'is_editing': 'false',
                                         'reply_id': replyId,
                                     }))
                                 } else {
@@ -1946,6 +2005,7 @@
                                         'message_type': 'video',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
+                                        'is_editing': 'false',
                                     }))
                                 }
                             }
@@ -2840,9 +2900,16 @@
 
                 success: function (response) {
                     console.log('message edited');
+
+                    messageSocket.send(JSON.stringify({
+                        'message_type': response.message_type,
+                        'message_id': response.message_id,
+                        'is_reply': 'false', // dosen't matter
+                        'is_editing': 'true',
+                    }));
                 }
             })
-                // ajax and websockets to show new message and save it. notifications for editied messages?
+                
             })
             $('#conversation-contents').on('click', '.deny-editing', function () {
                 var messageID = $(this).data('message-id');
