@@ -376,6 +376,7 @@ def remove_notification(request):
     else:
         message_id = request.POST.get('message-id')
         message = Message.objects.get(id=message_id)
+        print(f'message: {message} for user: {receiver_userstats}.')
         notification = Notification.objects.get(relevant_message=message, user=receiver_userstats)
         notification_id = notification.pk
     notification.delete()

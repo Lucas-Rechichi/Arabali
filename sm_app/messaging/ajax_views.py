@@ -873,7 +873,8 @@ def delete_message(request):
             print(f'Message with id: {message_id} does not exist.')
             print(f'Error: {e}')
             return None
-        
+        if message.text:
+            message.delete()
         if message.image:
             file_path = os.path.join(settings.MEDIA_ROOT, message.image.name)
         elif message.video:
@@ -882,9 +883,7 @@ def delete_message(request):
             file_path = os.path.join(settings.MEDIA_ROOT, message.audio.name)
         else:
             print(f'Message with id: {message.pk} has an invalid type.')
-        if message.text:
-            message.delete()
-        else:
+        if not message.text:
             try:
                 os.remove(file_path)
                 message.delete()
@@ -916,4 +915,5 @@ def delete_message(request):
         'message_id': message_id,
         'message_type': message_type,
     }
-    return JsonResponse()
+    
+    return JsonResponse(response)

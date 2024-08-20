@@ -244,507 +244,509 @@
         <div class="card-img-overlay" style="overflow-y: auto; margin-top: 80px;" id="conversationFrame">
             <div class="card-body" id="conversation-contents">
                 {% for message_dict in messages %}
-                    <div class="row">
-                        <div class="col">
-                            <p id="message-timestamp-{{message_dict.message.id}}" class="text-center"><em>{{message_dict.message.sent_at}}</em></p>
+                    <div id="message-{{message_dict.message.id}}">
+                        <div class="row">
+                            <div class="col">
+                                <p id="message-timestamp-{{message_dict.message.id}}" class="text-center"><em>{{message_dict.message.sent_at}}</em></p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        {% if message_dict.message.sender.user.username == username %}
-                            {% if message_dict.message.reply != None %}
-                                <div class="col-6">
-                                </div>
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-reply-container-{{message_dict.message.id}}">
-                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%; z-index: 1; position: relative;">
-                                                <div class="card-header" style="border-bottom: none;">
-                                                    <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
-                                                    {% if message_dict.message.reply.text %}
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
-                                                    {% elif message_dict.message.reply.image %}
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
-                                                    {% elif message_dict.message.reply.video %} 
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
-                                                    {% elif message_dict.message.reply.audio %}
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
-                                                    {% else %}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-2">
-                                            <p id="message-timestamp-{{message_dict.message.id}}" class="d-flex justify-content-start"><strong>You</strong></p>
-                                        </div>
+                        <div class="row">
+                            {% if message_dict.message.sender.user.username == username %}
+                                {% if message_dict.message.reply != None %}
+                                    <div class="col-6">
                                     </div>
-                                    <div class="row">
-                                        <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
-                                            <div class="card text-bg-success" style="width: 85%; border: none; opacity: 85%;">
-                                                <div class="card-header" style="border-bottom: none;">
-                                                    {% if message_dict.message.edited %}
-                                                        <p class="small text-light p-0 m-0"><em>(edited)</em></p>
-                                                    {% else %}
-                                                    {% endif %}
-                                                    {% if message_dict.message.text %}
-                                                        <p>{{message_dict.message.text}}</p>
-                                                    {% elif message_dict.message.image %}
-                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
-                                                    {% elif message_dict.message.video %} 
-                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
-                                                    {% elif message_dict.message.audio %}
-                                                        <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
-                                                    {% else %}
-                                                    {% endif %}
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            {% if message_dict.message.text %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message_dict.message.image %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message_dict.message.video %} 
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message_dict.message.audio %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
-                                                            {% else %}
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-1">
-                                            <img src="{{message_dict.message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                    </div>
-                                </div>
-                                {% if not message_dict.message.text %}
-                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                        {% if message_dict.message.image %}
-                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            {% if message_dict.message.reply.text %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.image %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.video %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.audio %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% else %}
-                                            {% endif %}
-                                        {% elif message_dict.message.video %}
-                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            {% if message_dict.message.reply.text %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.image %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.video %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.audio %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% else %}
-                                            {% endif %}
-                                        {% elif message_dict.message.audio %}
-                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            {% if message_dict.message.reply.text %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.image %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.video %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% elif message_dict.message.reply.audio %}
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            {% else %}
-                                            {% endif %}
-                                        {% else %}
-                                        {% endif %}
-                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
-                                    </ul>
-                                {% else %}
-                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                        <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button>
-                                        {% if message_dict.message.reply.text %}
-                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                        {% elif message_dict.message.reply.image %}
-                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="image" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                        {% elif message_dict.message.reply.video %}
-                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="video" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                        {% elif message_dict.message.reply.audio %}
-                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="audio" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                        {% else %}
-                                        {% endif %}
-                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
-                                    </ul>
-                                {% endif %}
-                            {% else %}
-                                <div class="col-6">
-                                </div>
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-11">
-                                            <p class="d-flex justify-content-end"><strong>You</strong></p>
-                                        </div>
-                                        <div class="col-1">
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
-                                            <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
-                                                <div class="card-header" style="border-bottom: none;">
-                                                    {% if message_dict.message.edited %}
-                                                        <p class="small text-light p-0 m-0"><em>(edited)</em></p>
-                                                    {% else %}
-                                                    {% endif %}
-                                                    {% if message_dict.message.text %}
-                                                        <p>{{message_dict.message.text}}</p>
-                                                    {% elif message_dict.message.image %}
-                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
-                                                    {% elif message_dict.message.video %} 
-                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
-                                                    {% elif message_dict.message.audio %}
-                                                        <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
-                                                    {% else %}
-                                                        {% if message_dict.has_chosen %}
-                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="true">
-                                                                <p class="small text-center">Poll</p>
-                                                                <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
-                                                                {% for option_properties in message_dict.option_list %}
-                                                                    {% if option_properties.chosen_by_user %}
-                                                                        <div id="option-{{option_properties.option.id}}">
-                                                                            <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(255, 255, 255);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;" data-option-id="{{option_properties.option.id}}">
-                                                                                    <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                        <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                            <br>
-                                                                        </div>
-                                                                        <script text="text/javascript">
-                                                                            $(document).ready(function () {
-                                                                                const progressBar = $('#percent-bar-{{option_properties.option.id}}');
-                                                                                if ('{{option_properties.percent}}' <= 10) {
-                                                                                    progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
-                                                                                } else {
-                                                                                    progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
-                                                                                }
-                                                                            })
-                                                                        </script>
-                                                                    {% else %}
-                                                                        <div id="option-{{option_properties.option.id}}">
-                                                                            <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(255, 253, 253);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;" data-option-id="{{option_properties.option.id}}">
-                                                                                    <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                        <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                            <br>
-                                                                        </div>
-                                                                        <script text="text/javascript">
-                                                                            $(document).ready(function () {
-                                                                                const progressBar = $('#percent-bar-{{option_properties.option.id}}');
-                                                                                if ('{{option_properties.percent}}' <= 10) {
-                                                                                    progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
-                                                                                } else {
-                                                                                    progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
-                                                                                }
-                                                                            })
-                                                                        </script>
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            </div>
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-reply-container-{{message_dict.message.id}}">
+                                                <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%; z-index: 1; position: relative;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
+                                                        {% if message_dict.message.reply.text %}
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
+                                                        {% elif message_dict.message.reply.image %}
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
+                                                        {% elif message_dict.message.reply.video %} 
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
+                                                        {% elif message_dict.message.reply.audio %}
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
                                                         {% else %}
-                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
-                                                                <p class="small text-center">Poll</p>
-                                                                <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
-                                                                {% for option in message_dict.message.options.all %}
-                                                                    <div id="option-{{option.id}}">  
-                                                                        <button class="btn btn-light poll-option" id="poll-option-{{option.id}}" data-option-id="{{option.id}}" style="width: 100%;">
-                                                                            <p class="m-0 text-center" id="option-{{option.id}}-text">{{option.option}}</p>
-                                                                        </button>
-                                                                    </div>
-                                                                    <br>
-                                                                {% endfor %}
-                                                            </div>
                                                         {% endif %}
-                                                    {% endif %}
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            {% if message_dict.message.text %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message_dict.message.image %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message_dict.message.video %} 
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
-                                                            {% elif message_dict.message.audio %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
-                                                            {% else %}
-                                                            {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-2">
+                                                <p id="message-timestamp-{{message_dict.message.id}}" class="d-flex justify-content-start"><strong>You</strong></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
+                                                <div class="card text-bg-success" style="width: 85%; border: none; opacity: 85%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        {% if message_dict.message.edited %}
+                                                            <p class="small text-light p-0 m-0"><em>(edited)</em></p>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        {% if message_dict.message.text %}
+                                                            <p>{{message_dict.message.text}}</p>
+                                                        {% elif message_dict.message.image %}
+                                                            <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
+                                                        {% elif message_dict.message.video %} 
+                                                            <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
+                                                        {% elif message_dict.message.audio %}
+                                                            <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                {% if message_dict.message.text %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                {% elif message_dict.message.image %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                {% elif message_dict.message.video %} 
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                {% elif message_dict.message.audio %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
+                                                                {% else %}
+                                                                {% endif %}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-1">
-                                            <img src="{{message_dict.message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                            <div class="col-1">
+                                                <img src="{{message_dict.message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                {% if not message_dict.option_list %}
                                     {% if not message_dict.message.text %}
                                         <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                             {% if message_dict.message.image %}
                                                 <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% if message_dict.message.reply.text %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.image %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.video %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.audio %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% else %}
+                                                {% endif %}
                                             {% elif message_dict.message.video %}
                                                 <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% if message_dict.message.reply.text %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.image %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.video %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.audio %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% else %}
+                                                {% endif %}
                                             {% elif message_dict.message.audio %}
                                                 <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                                <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% if message_dict.message.reply.text %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="text"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.image %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.video %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.reply.audio %}
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio" data-reply-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% else %}
+                                                {% endif %}
                                             {% else %}
                                             {% endif %}
                                             <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
-                                        </ul>
-                                    {% else %}
-                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                            <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-type="text"><i class="bi bi-copy"></i> Copy</button>
-                                            <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
-                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
-                                        </ul>
-                                    {% endif %}
-                                {% else %}
-                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                        <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="poll"><i class="bi bi-trash3-fill"></i> Delete</button>
-                                    </ul>
-                                {% endif %}
-                            {% endif %}
-                        {% else %}
-                            {% if message_dict.message.reply != None %}
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col">
-                                            <p class="d-flex justify-content-start"><strong>{{message_dict.message.sender.user.username}}</strong></p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-2">
-                                            <img src="{{message_dict.message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                        <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="{{message_dict.message.id}}" id="message-reply-container-{{message_dict.message.id}}">
-                                            <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%; z-index: 1; position: relative;">
-                                                <div class="card-header" style="border-bottom: none;">
-                                                    <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
-                                                    {% if message_dict.message.reply.text %}
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
-                                                    {% elif message_dict.message.reply.image %}
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
-                                                    {% elif message_dict.message.reply.video %} 
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
-                                                    {% elif message_dict.message.reply.audio %}
-                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
-                                                    {% else %}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-2">
-                                        </div>
-                                        <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
-                                            <div class="card" style="width: 85%; border: none; opacity: 85%;">
-                                                <div class="card-header" style="border-bottom: none;">
-                                                    {% if message_dict.message.edited %}
-                                                        <p class="small p-0 m-0"><em>(edited)</em></p>
-                                                    {% else %}
-                                                    {% endif %}
-                                                    {% if message_dict.message.text %}
-                                                        <p>{{message_dict.message.text}}</p>
-                                                    {% elif message_dict.message.image %}
-                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
-                                                    {% elif message_dict.message.video %} 
-                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
-                                                    {% elif message_dict.message.audio %}
-                                                        <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
-                                                    {% else %}
-                                                    {% endif %}
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            {% if message_dict.message.text %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message_dict.message.image %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message_dict.message.video %} 
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message_dict.message.audio %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                        
-                                                            {% else %}
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                </div>
-                                {% if not message_dict.message.text %}
-                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                        {% if message_dict.message.image %}
-                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                        {% elif message_dict.message.video %}
-                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                        {% elif message_dict.message.audio %}
-                                            <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                        {% else %}
-                                        {% endif %}
-                                    </ul>
-                                {% else %}
-                                    <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                        <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button></li>
-                                    </ul>
-                                {% endif %}
-                            {% else %}
-                                <div class="col-6">
-                                    <div class="row">
-                                        <div class="col-10">
-                                            <p class="d-flex justify-content-start"><strong>{{message_dict.message.sender.user.username}}</strong></p>
-                                        </div>
-                                        <div class="col-2">
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-2">
-                                            <img src="{{message_dict.message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
-                                        </div>
-                                        <div class="col-10 hidden-options" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
-                                            <div class="card" style="width: fit-content; border: none; opacity: 85%;">
-                                                <div class="card-header" style="border-bottom: none;">
-                                                    {% if message_dict.message.edited %}
-                                                        <p class="small p-0 m-0"><em>(edited)</em></p>
-                                                    {% else %}
-                                                    {% endif %}
-                                                    {% if message_dict.message.text %}
-                                                        <p>{{message_dict.message.text}}</p>
-                                                    {% elif message_dict.message.image %}
-                                                        <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
-                                                    {% elif message_dict.message.video %} 
-                                                        <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
-                                                    {% elif message_dict.message.audio %}
-                                                        <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
-                                                    {% else %}
-                                                        {% if message_dict.has_chosen %}
-                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="true">
-                                                                <p class="small text-center">Poll</p>
-                                                                <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
-                                                                {% for option_properties in message_dict.option_list %}
-                                                                    {% if option_properties.chosen_by_user %}
-                                                                        <div id="option-{{option_properties.option.id}}">
-                                                                            <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(0, 0, 0);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;" data-option-id="{{option_properties.option.id}}">
-                                                                                    <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                        <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                            <br>
-                                                                        </div>
-                                                                        <script text="text/javascript">
-                                                                            $(document).ready(function () {
-                                                                                const progressBar = $('#percent-bar-{{option_properties.option.id}}');
-                                                                                if ('{{option_properties.percent}}' <= 10) {
-                                                                                    progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
-                                                                                } else {
-                                                                                    progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
-                                                                                }
-                                                                            })
-                                                                        </script>
-                                                                    {% else %}
-                                                                        <div id="option-{{option_properties.option.id}}">
-                                                                            <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(0, 0, 0);">{{option_properties.option.option}}</p>
-                                                                            <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                                                                <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;" data-option-id="{{option_properties.option.id}}">
-                                                                                    <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
-                                                                                        <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                            <br>
-                                                                        </div>
-                                                                        <script text="text/javascript">
-                                                                            $(document).ready(function () {
-                                                                                const progressBar = $('#percent-bar-{{option_properties.option.id}}');
-                                                                                if ('{{option_properties.percent}}' <= 10) {
-                                                                                    progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
-                                                                                } else {
-                                                                                    progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
-                                                                                }
-                                                                            })
-                                                                        </script>
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            </div>
-                                                        {% else %}
-                                                            <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
-                                                                <p class="small text-center">Poll</p>
-                                                                <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
-                                                                {% for option in message_dict.message.options.all %}
-                                                                    <div id="option-{{option.id}}">  
-                                                                        <button class="btn btn-dark poll-option" id="poll-option-{{option.id}}" data-option-id="{{option.id}}" style="width: 100%;">
-                                                                            <p class="m-0 text-center" id="option-{{option.id}}-text">{{option.option}}</p>
-                                                                        </button>
-                                                                    </div>
-                                                                    <br>
-                                                                {% endfor %}
-                                                            </div>
-                                                        {% endif %}
-                                                    {% endif %}
-                                                    <div class="row">
-                                                        <div class="col">
-                                                            {% if message_dict.message.text %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message_dict.message.image %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message_dict.message.video %} 
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
-                                                            {% elif message_dict.message.audio %}
-                                                                <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                        
-                                                            {% else %}
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                </div>
-                                {% if not message_dict.option_list %}
-                                    {% if not message_dict.message.text %}
-                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
-                                            {% if message_dict.message.image %}
-                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            {% elif message_dict.message.video %}
-                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            {% elif message_dict.message.audio %}
-                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
-                                            {% else %}
-                                            {% endif %}
                                         </ul>
                                     {% else %}
                                         <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                             <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button>
+                                            {% if message_dict.message.reply.text %}
+                                                <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.image %}
+                                                <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="image" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.video %}
+                                                <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="video" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% elif message_dict.message.reply.audio %}
+                                                <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-type="audio" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                            {% else %}
+                                            {% endif %}
+                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                        </ul>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="col-6">
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-11">
+                                                <p class="d-flex justify-content-end"><strong>You</strong></p>
+                                            </div>
+                                            <div class="col-1">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
+                                                <div class="card text-bg-success" style="width: fit-content; border: none; opacity: 85%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        {% if message_dict.message.edited %}
+                                                            <p class="small text-light p-0 m-0"><em>(edited)</em></p>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        {% if message_dict.message.text %}
+                                                            <p>{{message_dict.message.text}}</p>
+                                                        {% elif message_dict.message.image %}
+                                                            <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
+                                                        {% elif message_dict.message.video %} 
+                                                            <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
+                                                        {% elif message_dict.message.audio %}
+                                                            <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
+                                                        {% else %}
+                                                            {% if message_dict.has_chosen %}
+                                                                <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="true">
+                                                                    <p class="small text-center">Poll</p>
+                                                                    <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                                    {% for option_properties in message_dict.option_list %}
+                                                                        {% if option_properties.chosen_by_user %}
+                                                                            <div id="option-{{option_properties.option.id}}">
+                                                                                <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(255, 255, 255);">{{option_properties.option.option}}</p>
+                                                                                <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;" data-option-id="{{option_properties.option.id}}">
+                                                                                        <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
+                                                                                            <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <br>
+                                                                            </div>
+                                                                            <script text="text/javascript">
+                                                                                $(document).ready(function () {
+                                                                                    const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                                    if ('{{option_properties.percent}}' <= 10) {
+                                                                                        progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                                    } else {
+                                                                                        progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                                    }
+                                                                                })
+                                                                            </script>
+                                                                        {% else %}
+                                                                            <div id="option-{{option_properties.option.id}}">
+                                                                                <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(255, 253, 253);">{{option_properties.option.option}}</p>
+                                                                                <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;" data-option-id="{{option_properties.option.id}}">
+                                                                                        <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
+                                                                                            <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <br>
+                                                                            </div>
+                                                                            <script text="text/javascript">
+                                                                                $(document).ready(function () {
+                                                                                    const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                                    if ('{{option_properties.percent}}' <= 10) {
+                                                                                        progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                                    } else {
+                                                                                        progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                                    }
+                                                                                })
+                                                                            </script>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% else %}
+                                                                <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
+                                                                    <p class="small text-center">Poll</p>
+                                                                    <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                                    {% for option in message_dict.message.options.all %}
+                                                                        <div id="option-{{option.id}}">  
+                                                                            <button class="btn btn-light poll-option" id="poll-option-{{option.id}}" data-option-id="{{option.id}}" style="width: 100%;">
+                                                                                <p class="m-0 text-center" id="option-{{option.id}}-text">{{option.option}}</p>
+                                                                            </button>
+                                                                        </div>
+                                                                        <br>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                {% if message_dict.message.text %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                {% elif message_dict.message.image %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                {% elif message_dict.message.video %} 
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>
+                                                                {% elif message_dict.message.audio %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
+                                                                {% else %}
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1">
+                                                <img src="{{message_dict.message.sender.pfp.url}}" alt="" class="rounded-circle" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if not message_dict.option_list %}
+                                        {% if not message_dict.message.text %}
+                                            <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                                {% if message_dict.message.image %}
+                                                    <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.video %}
+                                                    <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% elif message_dict.message.audio %}
+                                                    <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                    <button type="button" class="btn edit-message" data-message-id="{{message_dict.message.id}}" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                {% else %}
+                                                {% endif %}
+                                                <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                            </ul>
+                                        {% else %}
+                                            <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                                <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-type="text"><i class="bi bi-copy"></i> Copy</button>
+                                                <button type="button" class="btn edit-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}" data-type="text" data-reply-id="{{message_dict.message.reply.id}}" data-reply-sender="{{message_dict.message.reply.sender}}" data-reply-text="{{message_dict.message.reply.text}}"><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
+                                            </ul>
+                                        {% endif %}
+                                    {% else %}
+                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="poll"><i class="bi bi-trash3-fill"></i> Delete</button>
                                         </ul>
                                     {% endif %}
                                 {% endif %}
+                            {% else %}
+                                {% if message_dict.message.reply != None %}
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col">
+                                                <p class="d-flex justify-content-start"><strong>{{message_dict.message.sender.user.username}}</strong></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <img src="{{message_dict.message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
+                                            <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="{{message_dict.message.id}}" id="message-reply-container-{{message_dict.message.id}}">
+                                                <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%; z-index: 1; position: relative;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small m-0"><em>REPLY:</em> {{message_dict.message.reply.sender}}</p></a>
+                                                        {% if message_dict.message.reply.text %}
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0">{{message_dict.message.reply.text}}</p></a>
+                                                        {% elif message_dict.message.reply.image %}
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>
+                                                        {% elif message_dict.message.reply.video %} 
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>
+                                                        {% elif message_dict.message.reply.audio %}
+                                                            <a href="#message-timestamp-{{message_dict.message.reply.id}}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>
+                                                        {% else %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-2">
+                                            </div>
+                                            <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
+                                                <div class="card" style="width: 85%; border: none; opacity: 85%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        {% if message_dict.message.edited %}
+                                                            <p class="small p-0 m-0"><em>(edited)</em></p>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        {% if message_dict.message.text %}
+                                                            <p>{{message_dict.message.text}}</p>
+                                                        {% elif message_dict.message.image %}
+                                                            <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
+                                                        {% elif message_dict.message.video %} 
+                                                            <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
+                                                        {% elif message_dict.message.audio %}
+                                                            <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                {% if message_dict.message.text %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                {% elif message_dict.message.image %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                {% elif message_dict.message.video %} 
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                {% elif message_dict.message.audio %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                        
+                                                                {% else %}
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                    </div>
+                                    {% if not message_dict.message.text %}
+                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            {% if message_dict.message.image %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            {% elif message_dict.message.video %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            {% elif message_dict.message.audio %}
+                                                <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                            {% else %}
+                                            {% endif %}
+                                        </ul>
+                                    {% else %}
+                                        <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button></li>
+                                        </ul>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="col-6">
+                                        <div class="row">
+                                            <div class="col-10">
+                                                <p class="d-flex justify-content-start"><strong>{{message_dict.message.sender.user.username}}</strong></p>
+                                            </div>
+                                            <div class="col-2">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <img src="{{message_dict.message.sender.pfp.url}}" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
+                                            </div>
+                                            <div class="col-10 hidden-options" data-message-id="{{message_dict.message.id}}" id="message-body-container-{{message_dict.message.id}}">
+                                                <div class="card" style="width: fit-content; border: none; opacity: 85%;">
+                                                    <div class="card-header" style="border-bottom: none;">
+                                                        {% if message_dict.message.edited %}
+                                                            <p class="small p-0 m-0"><em>(edited)</em></p>
+                                                        {% else %}
+                                                        {% endif %}
+                                                        {% if message_dict.message.text %}
+                                                            <p>{{message_dict.message.text}}</p>
+                                                        {% elif message_dict.message.image %}
+                                                            <img src="{{message_dict.message.image.url}}" alt="" class="mt-1" style="width: 100%; height:fit-content; border-radius: 5px;">
+                                                        {% elif message_dict.message.video %} 
+                                                            <video src="{{message_dict.message.video.url}}" controls class="mt-1" style="width: 100%; height: fit-content; border-radius: 5px;"></video>
+                                                        {% elif message_dict.message.audio %}
+                                                            <audio src="{{message_dict.message.audio.url}}" controls class="mt-1"></audio>
+                                                        {% else %}
+                                                            {% if message_dict.has_chosen %}
+                                                                <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;" data-graded-poll="true">
+                                                                    <p class="small text-center">Poll</p>
+                                                                    <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                                    {% for option_properties in message_dict.option_list %}
+                                                                        {% if option_properties.chosen_by_user %}
+                                                                            <div id="option-{{option_properties.option.id}}">
+                                                                                <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(0, 0, 0);">{{option_properties.option.option}}</p>
+                                                                                <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #1eff4b;" data-option-id="{{option_properties.option.id}}">
+                                                                                        <button type="button" class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
+                                                                                            <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <br>
+                                                                            </div>
+                                                                            <script text="text/javascript">
+                                                                                $(document).ready(function () {
+                                                                                    const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                                    if ('{{option_properties.percent}}' <= 10) {
+                                                                                        progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                                    } else {
+                                                                                        progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                                    }
+                                                                                })
+                                                                            </script>
+                                                                        {% else %}
+                                                                            <div id="option-{{option_properties.option.id}}">
+                                                                                <p class="m-0 text-start" id="option-{{option_properties.option.id}}-text" style="color: rgb(0, 0, 0);">{{option_properties.option.option}}</p>
+                                                                                <div id="option-disribution-{{option_properties.option.id}}" class="progress" role="progressbar" aria-label="Option: {{option_properties.option.option}}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                                    <div class="progress-bar poll-progress-bar" id="percent-bar-{{option_properties.option.id}}" style="width: 0%; background-color: #c3c3c3;" data-option-id="{{option_properties.option.id}}">
+                                                                                        <button class="m-0 p-0 btn poll-option" id="poll-option-{{option_properties.option.id}}" data-option-id="{{option_properties.option.id}}"  data-hidden-info="<div class='row' id='hidden-info-{{option_properties.option.id}}'><div class='col'>{{option_properties.percent}}% Voted {% for choice in option_properties.option.choices.all %}<div class='row'><div class='col'><i class='bi bi-arrow-right-short'></i>{{choice.voter}}</div></div>{% endfor %}</div></div>">
+                                                                                            <p class="m-0 text-start ps-2" id="option-{{option_properties.option.id}}-count" style="color: rgb(0, 0, 0);">{{option_properties.option_votes}}</p>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <br>
+                                                                            </div>
+                                                                            <script text="text/javascript">
+                                                                                $(document).ready(function () {
+                                                                                    const progressBar = $('#percent-bar-{{option_properties.option.id}}');
+                                                                                    if ('{{option_properties.percent}}' <= 10) {
+                                                                                        progressBar.animate({ width: '10%' }, 1000, "easeOutQuad");
+                                                                                    } else {
+                                                                                        progressBar.animate({ width: "{{option_properties.percent}}%" }, 1000, "easeOutQuad");
+                                                                                    }
+                                                                                })
+                                                                            </script>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% else %}
+                                                                <div id="poll-message-{{message_dict.message.id}}" style="width: 300px;">
+                                                                    <p class="small text-center">Poll</p>
+                                                                    <p id="poll-title-{{message_dict.message.id}}">{{message_dict.message.title}}</p>
+                                                                    {% for option in message_dict.message.options.all %}
+                                                                        <div id="option-{{option.id}}">  
+                                                                            <button class="btn btn-dark poll-option" id="poll-option-{{option.id}}" data-option-id="{{option.id}}" style="width: 100%;">
+                                                                                <p class="m-0 text-center" id="option-{{option.id}}-text">{{option.option}}</p>
+                                                                            </button>
+                                                                        </div>
+                                                                        <br>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                {% if message_dict.message.text %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="{{message_dict.message.text}}" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                {% elif message_dict.message.image %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Image" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                {% elif message_dict.message.video %} 
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Video" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>
+                                                                {% elif message_dict.message.audio %}
+                                                                    <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                        
+                                                                {% else %}
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                    </div>
+                                    {% if not message_dict.option_list %}
+                                        {% if not message_dict.message.text %}
+                                            <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                                {% if message_dict.message.image %}
+                                                    <button type="button" class="btn download-message" data-download-url="{{message_dict.message.image.url}}" data-type="image" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                {% elif message_dict.message.video %}
+                                                    <button type="button" class="btn download-message" data-download-url="{{message_dict.message.video.url}}" data-type="video" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                {% elif message_dict.message.audio %}
+                                                    <button type="button" class="btn download-message" data-download-url="{{message_dict.message.audio.url}}" data-type="audio" data-message-id="{{message_dict.message.id}}"><i class="bi bi-download"></i> Download</button>
+                                                {% else %}
+                                                {% endif %}
+                                            </ul>
+                                        {% else %}
+                                            <ul class="dropdown-menu options options-{{message_dict.message.id}} p-2 mb-1" style=" width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                                <button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}"><i class="bi bi-copy"></i> Copy</button>
+                                            </ul>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             </div>
@@ -890,10 +892,12 @@
             messageSocket.onmessage = function(e) {
                 const data = JSON.parse(e.data);
                 console.log(data);
-                var contentHtml = data.content_html;
-                var selfReplyButtonHtml = data.self_reply_button_html
-                var otherReplyButtonHtml = data.other_reply_button_html
+                
                 if (data.is_editing === 'true') {
+                    var contentHtml = data.content_html;
+                    var selfReplyButtonHtml = data.self_reply_button_html
+                    var otherReplyButtonHtml = data.other_reply_button_html
+
                     var bodySection = $('#message-body-container-' + data.message_id);
                     if (data.type === 'incoming_message' || data.type === 'incoming_reply_message') {
                         var copyOption = data.right_click_options['copy_option'];
@@ -946,9 +950,22 @@
                         console.log('Invalid message type.')
                     }
                 
+                } else if (data.type === 'deleting_message') {
+                    var message = $('#message-' + data.message_id);
+                    message.remove();
                 } else {
+                    var contentHtml = data.content_html;
+                    var selfReplyButtonHtml = data.self_reply_button_html
+                    var otherReplyButtonHtml = data.other_reply_button_html
+
+                    var copyOption = data.right_click_options['copy_option'];
+                    var downloadOption = data.right_click_options['download_option'];
+
                     if (data.type === 'incoming_message') { // If the message wasn't a reply
                         if (data.username === '{{username}}') { // Self
+                            var editOption = data.right_click_options['edit_option'];
+                            var deleteOption = data.right_click_options['delete_option'];
+
                             var newMessageInHtml = `
                                 <div class="message">
                                     <div class="row">
@@ -968,7 +985,7 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="col-10 d-flex justify-content-end">
+                                                <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="${data.message_id}">
                                                     <div class="card text-bg-success pb-0" style="width: fit-content; border: none; opacity: 85%;">
                                                         <div class="card-header" style="border-bottom: none;">
                                                             ` + contentHtml + `
@@ -1016,7 +1033,7 @@
                                                 <div class="col-2">
                                                     <img src="` + data.user_pfp_url + `" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                                 </div>
-                                                <div class="col-10">
+                                                <div class="col-10 hidden-options" data-message-id="${data.message_id}">
                                                     <div class="card" style="width: fit-content; border: none; opacity: 85%;">
                                                         <div class="card-header" style="border-bottom: none;">
                                                             ` + contentHtml + `
@@ -1043,6 +1060,9 @@
                     else if (data.type === 'incoming_reply_message') { // For replies
                         var replyHtml = data.reply_html; // Get special html for a reply message
                         if (data.username === '{{username}}') { // Self
+                            var editOption = data.right_click_options['edit_option'];
+                            var deleteOption = data.right_click_options['delete_option'];
+
                             var newMessageInHtml = `
                                 <div class="message">
                                     <div class="row">
@@ -1055,7 +1075,7 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="row">
-                                                <div class="col-10 d-flex justify-content-end">
+                                                <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="${data.message_id}>
                                                     <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
                                                         <div class="card-header" style="border-bottom: none;">
                                                             <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
@@ -1068,7 +1088,7 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="col-10 d-flex justify-content-end">
+                                                <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="${data.message_id}">
                                                     <div class="card pb-0 text-bg-success" style="width: 85%; border: none; opacity: 85%;">
                                                         <div class="card-header" style="border-bottom: none;">
                                                             ` + contentHtml + `
@@ -1113,7 +1133,7 @@
                                                     <div class="col-2">
                                                         <img src="` + data.user_pfp_url +`" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                                     </div>
-                                                    <div class="col-10 d-flex justify-content-start">
+                                                    <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="${data.message_id}">
                                                         <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
                                                             <div class="card-header" style="border-bottom: none;">
                                                                 <a href="#message-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
@@ -1157,7 +1177,7 @@
                         type: 'POST',
                         url: '/universal/remove-notification/',
                         data: {
-                            'type': 'message_id',
+                            'type': 'message-id',
                             'message-id': data.message_id,
                             'receiver': '{{username}}',
                             'csrfmiddlewaretoken': '{{ csrf_token }}'
@@ -1885,6 +1905,7 @@
                                     messageSocket.send(JSON.stringify({
                                         'text': message,
                                         'message_type': 'text',
+                                        'action': 'create_message',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
                                         'is_editing': 'false',
@@ -1894,6 +1915,7 @@
                                     messageSocket.send(JSON.stringify({
                                         'text': message,
                                         'message_type': 'text',
+                                        'action': 'create_message',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
                                         'is_editing': 'false',
@@ -1960,6 +1982,7 @@
                                 if (response.is_reply === 'true') {
                                     messageSocket.send(JSON.stringify({
                                         'message_type': 'image',
+                                        'action': 'create_message',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
                                         'is_editing': 'false',
@@ -1968,6 +1991,7 @@
                                 } else {
                                     messageSocket.send(JSON.stringify({
                                         'message_type': 'image',
+                                        'action': 'create_message',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
                                         'is_editing': 'false',
@@ -2035,6 +2059,7 @@
                                 if (response.is_reply === 'true') {
                                     messageSocket.send(JSON.stringify({
                                         'message_type': 'video',
+                                        'action': 'create_message',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
                                         'is_editing': 'false',
@@ -2043,6 +2068,7 @@
                                 } else {
                                     messageSocket.send(JSON.stringify({
                                         'message_type': 'video',
+                                        'action': 'create_message',
                                         'message_id': response.message_id,
                                         'is_reply': response.is_reply,
                                         'is_editing': 'false',
@@ -2747,7 +2773,7 @@
                 }, 300)
                 
             });
-            $('.options').on('click', '.copy-message', function () {
+            $('#conversation-contents').on('click', '.copy-message', function () {
                 var text = $(this).data('text')
                 console.log(text)
                 if (text) {
@@ -2763,7 +2789,7 @@
                 }
             })
 
-            $('.options').on('click', '.download-message', function () {
+            $('#conversation-contents').on('click', '.download-message', function () {
                 var url = $(this).data('download-url');
                 var messageType = $(this).data('type');
                 if (url && messageType) {
@@ -2776,7 +2802,7 @@
                 }
             })
             var oldMessageStorage = {};
-            $('.options').on('click', '.edit-message', function () {
+            $('#conversation-contents').on('click', '.edit-message', function () {
                 var messageType = $(this).data('type');
                 var messageID = $(this).data('message-id');
 
@@ -2837,7 +2863,9 @@
                     case 'text':
                         var oldText = $(this).data('text');
                         editPromptHtml = `
-                            <textarea id="edit-text-box-${messageID}" class="edit-message edit-text" data-message-id="${messageID}">${oldText}</textarea>
+                            <div class="d-flex justify-content-center">
+                                <textarea id="edit-text-box-${messageID}" class="edit-text" data-message-id="${messageID}">${oldText}</textarea>
+                            </div>
                             <div class="d-flex justify-content-center">
                                 <button type="button" class="btn confirm-editing" data-message-id="${messageID}" data-type="text"><i class="bi bi-check2" style="color: #ffffff;"></i></button>
                                 <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
@@ -2848,7 +2876,7 @@
                     case 'image':
                         editPromptHtml = `
                             <label for="image-file-field" class="form-label">Place image here</label>
-                            <input id="edit-image-${messageID}" class="form-control edit-message" type="file">
+                            <input id="edit-image-${messageID}" class="form-control" type="file">
                             <div class="d-flex justify-content-center">
                                 <button type="button" class="btn confirm-editing" data-message-id="${messageID}" data-type="image"><i class="bi bi-check2" style="color: #ffffff;"></i></button>
                                 <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
@@ -2859,7 +2887,7 @@
                     case 'video':
                         editPromptHtml = `
                             <label for="video-file-field" class="form-label">Place video here</label>
-                            <input id="edit-video-${messageID}" class="form-control edit-mesage " type="file">
+                            <input id="edit-video-${messageID}" class="form-control" type="file">
                             <div class="d-flex justify-content-center">
                                 <button type="button" class="btn confirm-editing" data-message-id="${messageID}" data-type="video"><i class="bi bi-check2" style="color: #ffffff;"></i></button>
                                 <button type="button" class="btn deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
@@ -2943,6 +2971,7 @@
 
                     messageSocket.send(JSON.stringify({
                         'message_type': response.message_type,
+                        'action': 'edit_message',
                         'message_id': response.message_id,
                         'is_reply': 'false', // dosen't matter
                         'is_editing': 'true',
@@ -2983,8 +3012,8 @@
                         console.log('Message deleted.')
 
                         messageSocket.send(JSON.stringify({
-                            'message_id': message_id
-                            
+                            'message_id': response.message_id,
+                            'action': 'delete_message',
                         }))
                     }
                 })

@@ -54,15 +54,15 @@ class MessageConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         user = self.scope.get("user")  # Use get to safely get the user who is on the page
 
-        message_types = ['text', 'image', 'video', 'audio']
 
         # Getting universal data across all 4 message types
-        message_type = text_data_json['message_type']
+        action = text_data_json['action']
         message_id = text_data_json['message_id']
 
-        if message_type in message_types:
+        if action == 'create_message' or action == 'edit_message':
             is_reply = text_data_json['is_reply']
             is_editing = text_data_json['is_editing']
+            message_type = text_data_json['message_type']
 
             message = Message.objects.get(id=message_id)
 
@@ -94,6 +94,7 @@ class MessageConsumer(WebsocketConsumer):
                     self.room_group_name,
                     {
                         'type': 'chat_message',
+                        'action': action,
                         'message_type': message_type,
                         'content': content,
                         'message_id': message_id,
@@ -103,269 +104,286 @@ class MessageConsumer(WebsocketConsumer):
                         'username': user.username,
                     }
                 )
-            elif message_type == 'general':
-                pass # for deleting general messages
-            elif message_type == 'poll':
-                pass # for deleting poll messages
-            else:
-                print(f'Invalid message type: {message_type}')
+        elif action == 'delete_message':
+            async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'action': action,
+                        'message_id': message_id,
+                        'username': user.username,
+                    }
+                )
     
     def chat_message(self, event):
-        # Accessing sent data
-        content = event['content']
-        message_type = event['message_type']
+        # Accessing sent data that is universal
+        action = event['action']
         message_id = event['message_id']
-        is_reply = event['is_reply']
-        is_editing = event['is_editing']
-        reply_id = event['reply_id']
-        username = event['username']
 
-        # Getting relevant database objects
-        user = User.objects.get(username=username)
-        user_stats = UserStats.objects.get(user=user)
-        user_pfp_url = user_stats.pfp.url
-        
-        # Formatting of the timezone when message is displayed on the screen
-        local_timezone = pytz.timezone("Australia/Sydney")
-        local_datetime = Message.objects.latest('sent_at').sent_at.astimezone(local_timezone)
-        formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
-        formatted_datetime_capitalized = formatted_datetime.capitalize()
+        if action == 'create_message' or action == 'edit_message':
+            # Accessing specific data for editing messages or creating messages 
+            content = event['content']
+            message_type = event['message_type']
+            
+            is_reply = event['is_reply']
+            is_editing = event['is_editing']
+            reply_id = event['reply_id']
+            username = event['username']
 
-        # options for right-click (edit, delete, copy, download)
-        if is_reply == 'true':
-            reply_message = Message.objects.get(id=reply_id)
-            reply_sender = reply_message.sender.user.username
+            # Getting relevant database objects
+            user = User.objects.get(username=username)
+            user_stats = UserStats.objects.get(user=user)
+            user_pfp_url = user_stats.pfp.url
+            
+            # Formatting of the timezone when message is displayed on the screen
+            local_timezone = pytz.timezone("Australia/Sydney")
+            local_datetime = Message.objects.latest('sent_at').sent_at.astimezone(local_timezone)
+            formatted_datetime = local_datetime.strftime("%B %d, %Y, %I:%M %p").lower().replace('am', 'a.m.').replace('pm', 'p.m.')
+            formatted_datetime_capitalized = formatted_datetime.capitalize()
+
+            # options for right-click (edit, delete, copy, download)
+            if is_reply == 'true':
+                reply_message = Message.objects.get(id=reply_id)
+                reply_sender = reply_message.sender.user.username
+            else:
+                reply_sender = None
+            
+
+            delete_option = f'<button type="button" class="btn delete-message" data-message-id="{message_id}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>'
+            if message_type == 'text':
+                reply_text = reply_message.text if is_reply == 'true' else None
+                edit_option = f'<button type="button" class="btn edit-message" data-text="{content}" data-message-id="{message_id}" data-type="text" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-reply-text="{reply_text}"><i class="bi bi-pencil-fill"></i> Edit</button>'
+                copy_option = f'<button type="button" class="btn copy-message" data-text="{content}" data-type="text"><i class="bi bi-copy"></i> Copy</button>'
+                download_option = ''
+
+            elif message_type == 'image':
+                edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>'
+                copy_option = ''
+                download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="image" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
+
+            elif message_type == 'video':
+                edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>'
+                copy_option = ''
+                download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="video" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
+
+            elif message_type == 'audio':
+                edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>'
+                copy_option = ''
+                download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="audio" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
+
+            else:
+                print('Invalid message type.')
+            
+            right_click_options = {
+                'copy_option': copy_option,
+                'download_option': download_option,
+                'edit_option': edit_option,
+                'delete_option': delete_option
+            }
+            # Sending relevant data over
+            if message_type == 'text':
+                content_html = f'<p>{content}</p>'
+                self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+                other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
+                if is_reply == 'true':
+                    reply_message = Message.objects.get(id=reply_id)
+                    if reply_message.text:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                    elif reply_message.image:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                    elif reply_message.video:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                    elif reply_message.audio:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                    else:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_reply_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing, 
+                        'reply_message_user': reply_message.sender.user.username,
+                        'reply_id': reply_message.pk,
+                        'reply_html': reply_html,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+                else:
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+            elif message_type == 'image':
+                content_html = f'<img src="{content}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">'
+                self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Image" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+                other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Image" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
+                if is_reply == 'true':
+                    reply_message = Message.objects.get(id=reply_id)
+                    if reply_message.text:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                    elif reply_message.image:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                    elif reply_message.video:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                    elif reply_message.audio:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                    else:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_reply_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'reply_message_user': reply_message.sender.user.username,
+                        'reply_id': reply_message.pk,
+                        'reply_html': reply_html,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+                else:
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+            elif message_type == 'video':
+                content_html = f'<video src="{content}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>'
+                self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+                other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
+                if is_reply == 'true':
+                    reply_message = Message.objects.get(id=reply_id)
+                    if reply_message.text:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                    elif reply_message.image:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                    elif reply_message.video:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                    elif reply_message.audio:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                    else:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_reply_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'reply_message_user': reply_message.sender.user.username,
+                        'reply_id': reply_message.pk,
+                        'reply_html': reply_html,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+                else:
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+
+            elif message_type == 'audio':
+                content_html = f'<audio src="{content}" controls class="mt-1"></audio>'
+                self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Audio" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
+                other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Audio" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
+                if is_reply == 'true':
+                    reply_message = Message.objects.get(id=reply_id)
+                    if reply_message.text:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
+                    elif reply_message.image:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
+                    elif reply_message.video:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
+                    elif reply_message.audio:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
+                    else:
+                        reply_html = f'<a href="#message-timestamp-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_reply_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'reply_message_user': reply_message.sender.user.username,
+                        'reply_id': reply_message.pk,
+                        'reply_html': reply_html,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+                else:
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_message',
+                        'message_type': message_type,
+                        'content_html':content_html,
+                        'message_id': message_id,
+                        'is_reply': is_reply,
+                        'is_editing': is_editing,
+                        'self_reply_button_html': self_reply_button_html,
+                        'other_reply_button_html': other_reply_button_html,
+                        'right_click_options': right_click_options,
+                        'username': user.username,
+                        'sent_at': formatted_datetime_capitalized,
+                        'user_pfp_url': user_pfp_url
+                    }))
+            else:
+                print('Invalid message type.')
+        elif action == 'delete_message':
+            # Send over data to delete messages
+            self.send(text_data=json.dumps({
+                'type': 'deleting_message',
+                'message_id': message_id
+            }))
         else:
-            reply_sender = None
-        
-
-        delete_option = f'<button type="button" class="btn delete-message" data-message-id="{message_id}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>'
-        if message_type == 'text':
-            reply_text = reply_message.text if is_reply == 'true' else None
-            edit_option = f'<button type="button" class="btn edit-message" data-text="{content}" data-message-id="{message_id}" data-type="text" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-reply-text="{reply_text}"><i class="bi bi-pencil-fill"></i> Edit</button>'
-            copy_option = f'<button type="button" class="btn copy-message" data-text="{content}" data-type="text"><i class="bi bi-copy"></i> Copy</button>'
-            download_option = ''
-
-        elif message_type == 'image':
-            edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="image"><i class="bi bi-pencil-fill"></i> Edit</button>'
-            copy_option = ''
-            download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="image" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
-
-        elif message_type == 'video':
-            edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="video"><i class="bi bi-pencil-fill"></i> Edit</button>'
-            copy_option = ''
-            download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="video" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
-
-        elif message_type == 'audio':
-            edit_option = f'<button type="button" class="btn edit-message" data-message-id="{message_id}" data-reply-id="{reply_id}" data-reply-sender="{reply_sender}" data-type="audio"><i class="bi bi-pencil-fill"></i> Edit</button>'
-            copy_option = ''
-            download_option = f'<button type="button" class="btn download-message" data-download-url="{content}" data-type="audio" data-message-id="{message_id}"><i class="bi bi-download"></i> Download</button>'
-
-        else:
-            print('Invalid message type.')
-        
-        right_click_options = {
-            'copy_option': copy_option,
-            'download_option': download_option,
-            'edit_option': edit_option,
-            'delete_option': delete_option
-        }
-        # Sending relevant data over
-        if message_type == 'text':
-            content_html = f'<p>{content}</p>'
-            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
-            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
-            if is_reply == 'true':
-                reply_message = Message.objects.get(id=reply_id)
-                if reply_message.text:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
-                elif reply_message.image:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                elif reply_message.video:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
-                elif reply_message.audio:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
-                else:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_reply_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing, 
-                    'reply_message_user': reply_message.sender.user.username,
-                    'reply_id': reply_message.pk,
-                    'reply_html': reply_html,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-            else:
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-        elif message_type == 'image':
-            content_html = f'<img src="{content}" alt="" class="mt-1" style="width: 100%; height:88%; border-radius: 5px;">'
-            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Image" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
-            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Image" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
-            if is_reply == 'true':
-                reply_message = Message.objects.get(id=reply_id)
-                if reply_message.text:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
-                elif reply_message.image:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                elif reply_message.video:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
-                elif reply_message.audio:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
-                else:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_reply_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'reply_message_user': reply_message.sender.user.username,
-                    'reply_id': reply_message.pk,
-                    'reply_html': reply_html,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-            else:
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-        elif message_type == 'video':
-            content_html = f'<video src="{content}" controls class="mt-1" style="width: 100%; height:88%; border-radius: 5px;"></video>'
-            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
-            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Video" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
-            if is_reply == 'true':
-                reply_message = Message.objects.get(id=reply_id)
-                if reply_message.text:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
-                elif reply_message.image:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                elif reply_message.video:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
-                elif reply_message.audio:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
-                else:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_reply_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'reply_message_user': reply_message.sender.user.username,
-                    'reply_id': reply_message.pk,
-                    'reply_html': reply_html,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-            else:
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-
-        elif message_type == 'audio':
-            content_html = f'<audio src="{content}" controls class="mt-1"></audio>'
-            self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Audio" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
-            other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="Audio" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
-            if is_reply == 'true':
-                reply_message = Message.objects.get(id=reply_id)
-                if reply_message.text:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{reply_message.text}</p></a>'
-                elif reply_message.image:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Image</strong></p></a>'
-                elif reply_message.video:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Video</strong></p></a>'
-                elif reply_message.audio:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Audio</strong></p></a>'
-                else:
-                    reply_html = f'<a href="#message-{reply_message.pk}" class="btn p-0"><p class="small text-truncate m-0"><strong>Unknown</strong></p></a>'
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_reply_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'reply_message_user': reply_message.sender.user.username,
-                    'reply_id': reply_message.pk,
-                    'reply_html': reply_html,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-            else:
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_message',
-                    'message_type': message_type,
-                    'content_html':content_html,
-                    'message_id': message_id,
-                    'is_reply': is_reply,
-                    'is_editing': is_editing,
-                    'self_reply_button_html': self_reply_button_html,
-                    'other_reply_button_html': other_reply_button_html,
-                    'right_click_options': right_click_options,
-                    'username': user.username,
-                    'sent_at': formatted_datetime_capitalized,
-                    'user_pfp_url': user_pfp_url
-                }))
-        else:
-            print('Invalid message type.')
+            print(f'Invalid action: {action}')
 
 class NotificationConsumer(WebsocketConsumer):
     connected_users = {}
