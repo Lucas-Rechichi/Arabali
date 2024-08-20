@@ -2568,6 +2568,7 @@
                             if (response.is_reply === 'true') {
                                 messageSocket.send(JSON.stringify({
                                     'message_type': 'audio',
+                                    'action': 'create_message',
                                     'message_id': response.message_id,
                                     'is_reply': response.is_reply,
                                     'reply_id': response.reply_id,
@@ -2632,8 +2633,8 @@
                                     audioHtml = `
                                         <audio class="edit-recording-preview-controls p-2" src="${audioURL}" controls></audio>
                                         <div class="d-flex justify-content-center">
-                                            <button type="button" class="btn edit-recording-preview-controls confirm-editing" data-message-id="${messageID}" data-type="audio"><i class="bi bi-check-lg" style="color: #ffffff;"></i></button>
-                                            <button type="button" class="btn edit-recording-preview-controls deny-editing"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
+                                            <button type="button" class="btn edit-recording-preview-controls confirm-audio-editing" data-message-id="${messageID}" data-audio-file="${blob}" data-type="audio"><i class="bi bi-check-lg" style="color: #ffffff;"></i></button>
+                                            <button type="button" class="btn edit-recording-preview-controls deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
                                             <button class="btn edit-request-recording" type="button"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
                                             <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
                                             <input type="file" class="edit-audio-upload edit-upload-element" data-message-id="${messageID}" id="edit-audio-upload-field" style="display: none;">
@@ -2675,10 +2676,15 @@
                     }
                 }
                 else if ($(this).hasClass('confirm-audio-editing')) {
-                    var isReply;
-                    var replyMessageId;
+                    var messageID = $(this).data('message-id');
+                    var messageType = $(this).data('type');
+                    var content = $(this).data('audio-file');
+
                     let audioData = new FormData();
-                    // editing messages logic goes here
+
+                    // fill in audio data, ajax and websockets.
+
+                    
                 }
             });
             // for polling
@@ -2828,6 +2834,7 @@
                 var oldMessageReply = replySection.children().detach()
                 var oldMessageBody = bodySection.children().detach()
                 oldMessageStorage[messageID] = {
+                    'is_reply': replySection.length,
                     'reply': oldMessageReply,
                     'body': oldMessageBody,
                 };
@@ -2917,7 +2924,7 @@
                                 <div id="edit-recording-controls">
                                     <button class="btn edit-request-recording" type="button" data-message-id="${messageID}"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
                                     <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
-                                    <button type="button" class="btn edit-recording-preview-controls cancel-editing"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
+                                    <button type="button" class="btn edit-recording-preview-controls deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
                                     <input type="file" class="audio-upload edit-upload-element" data-message-id="${messageID}" id="edit-audio-upload-field" style="display: none;">
                                 </div>
                             </div>
@@ -2998,14 +3005,21 @@
             $('#conversation-contents').on('click', '.deny-editing', function () {
                 var messageID = $(this).data('message-id');
 
-                var oldMessageReply = oldMessageStorage[messageID]['reply'];
+                console.log(messageID);
+
+                console.log(oldMessageStorage);
+
+                if (oldMessageStorage[messageID]['is_reply'] !== 0) {
+                    var oldMessageReply = oldMessageStorage[messageID]['reply'];
+                    var replySection = $('#message-reply-container-' + messageID);
+
+                    replySection.html('');
+                    replySection.html(oldMessageReply);
+
+                }
+                
                 var oldMessageBody = oldMessageStorage[messageID]['body'];
-
-                var replySection = $('#message-reply-container-' + messageID);
                 var bodySection = $('#message-body-container-' + messageID);
-
-                replySection.html('');
-                replySection.html(oldMessageReply);
 
                 bodySection.html('');
                 bodySection.html(oldMessageBody);
