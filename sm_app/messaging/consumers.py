@@ -185,6 +185,22 @@ class MessageConsumer(WebsocketConsumer):
                 content_html = f'<p>{content}</p>'
                 self_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply" style="color: #ffffff;"></i></button>'
                 other_reply_button_html = f'<button type="button" class="btn reply" data-message-id="{message_id}" data-message="{content}" data-message-sender="{username}""><i class="bi bi-reply"></i></button>'
+
+                # For messages that have replied to this message (editing)
+                message = Message.objects.get(id=message_id)
+                chat_room = message.room
+                replied_to_messages = Message.objects.filter(room=chat_room, reply=message)
+                replied_to_changes = {}
+                for a, replied_to_message in enumerate(replied_to_messages):
+                    changed_reply_html = f'<a href="#message-timestamp-{replied_to_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{content}</p></a>'
+                    replied_to_changes[a + 1] = {
+                        'id': replied_to_message.pk,
+                        'user': message.sender.user.username,
+                        'html': changed_reply_html,
+                    }
+                replied_to_message_count = a + 1
+
+                # Rest of sending relevant data over
                 if is_reply == 'true':
                     reply_message = Message.objects.get(id=reply_id)
                     if reply_message.text:
@@ -207,6 +223,8 @@ class MessageConsumer(WebsocketConsumer):
                         'reply_message_user': reply_message.sender.user.username,
                         'reply_id': reply_message.pk,
                         'reply_html': reply_html,
+                        'replied_to_changes': replied_to_changes,
+                        'replied_to_message_count':replied_to_message_count,
                         'self_reply_button_html': self_reply_button_html,
                         'other_reply_button_html': other_reply_button_html,
                         'right_click_options': right_click_options,
@@ -222,6 +240,8 @@ class MessageConsumer(WebsocketConsumer):
                         'message_id': message_id,
                         'is_reply': is_reply,
                         'is_editing': is_editing,
+                        'replied_to_changes': replied_to_changes,
+                        'replied_to_message_count':replied_to_message_count,
                         'self_reply_button_html': self_reply_button_html,
                         'other_reply_button_html': other_reply_button_html,
                         'right_click_options': right_click_options,

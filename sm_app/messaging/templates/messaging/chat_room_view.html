@@ -944,8 +944,30 @@
                                 </ul>
                             `;
                         }
+
                         bodySection.html('');
                         bodySection.html(newBodySectionHtml)
+
+                        
+
+                        if (data.replied_to_message_count > 0) {
+                            for (let i = 1; i < data.replied_to_message_count + 1; i++ ) {
+                                var replySection = $('#message-reply-container-' + data.replied_to_changes[i]['id'])
+                                var replySectionHtml = `
+                                    <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
+                                        <div class="card-header" style="border-bottom: none;">
+                                            <a href="#message-timestamp-` + data.message_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.replied_to_changes[i]['user'] + `</p></a>
+                                            ` + data.replied_to_changes[i]['html'] + `
+                                        </div>
+                                    </div>
+                                `;
+
+                                console.log(replySectionHtml)
+
+                                replySection.html('')
+                                replySection.html(replySectionHtml)
+                            }
+                        }
                     } else {
                         console.log('Invalid message type.')
                     }
@@ -1133,7 +1155,7 @@
                                                     <div class="col-2">
                                                         <img src="` + data.user_pfp_url +`" class="rounded-circle" alt="" style="max-width: 2rem; max-height: 2rem;">
                                                     </div>
-                                                    <div class="col-10 hidden-options d-flex justify-content-end" data-message-id="${data.message_id}" id="message-reply-container-${data.message_id}">
+                                                    <div class="col-10 hidden-options d-flex justify-content-start" data-message-id="${data.message_id}" id="message-reply-container-${data.message_id}">
                                                         <div class="card p-0 pb-0 text-bg-light" style="width: 85%; border: none; opacity: 70%;">
                                                             <div class="card-header" style="border-bottom: none;">
                                                                 <a href="#message-timestamp-` + data.reply_id + `" class="btn p-0"><p class="small m-0"><em>REPLY:</em> ` + data.reply_message_user + `</p></a>
@@ -2588,6 +2610,7 @@
                             } else {
                                 messageSocket.send(JSON.stringify({
                                     'message_type': 'audio',
+                                    'action': 'create_message',
                                     'message_id': response.message_id,
                                     'is_reply': response.is_reply,
                                 }))
