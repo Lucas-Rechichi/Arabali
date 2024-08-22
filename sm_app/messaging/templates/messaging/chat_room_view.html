@@ -948,8 +948,6 @@
                         bodySection.html('');
                         bodySection.html(newBodySectionHtml)
 
-                        
-
                         if (data.replied_to_message_count > 0) {
                             for (let i = 1; i < data.replied_to_message_count + 1; i++ ) {
                                 var replySection = $('#message-reply-container-' + data.replied_to_changes[i]['id'])
@@ -961,8 +959,6 @@
                                         </div>
                                     </div>
                                 `;
-
-                                console.log(replySectionHtml)
 
                                 replySection.html('')
                                 replySection.html(replySectionHtml)
