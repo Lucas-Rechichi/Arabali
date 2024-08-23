@@ -899,6 +899,7 @@
                     var otherReplyButtonHtml = data.other_reply_button_html
 
                     var bodySection = $('#message-body-container-' + data.message_id);
+                    var extraSection = $('.options-' + data.message_id)
                     if (data.type === 'incoming_message' || data.type === 'incoming_reply_message') {
                         var copyOption = data.right_click_options['copy_option'];
                         var downloadOption = data.right_click_options['download_option'];
@@ -944,6 +945,7 @@
                                 </ul>
                             `;
                         }
+                        extraSection.remove();
 
                         bodySection.html('');
                         bodySection.html(newBodySectionHtml)
@@ -2436,13 +2438,14 @@
                             <div class="card-header" style="border-bottom: none;">
                                 <div class="row">
                                     <div class="col">
+                                        <p class="small text-center" id="edit-voice-prompt-text">Upload successful.</p>
                                         <div class="d-flex justify-content-center">
                                             <audio class="edit-recording-preview-controls p-2" src="${audioURL}" controls></audio>
                                         </div>
                                         <div class="d-flex justify-content-center">
                                             <button type="button" class="btn edit-recording-preview-controls confirm-editing" data-message-id="${messageID}" data-type="audio"><i class="bi bi-check-lg" style="color: #ffffff;"></i></button>
                                             <button type="button" class="btn edit-recording-preview-controls deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
-                                            <button class="btn edit-request-recording" type="button"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
+                                            <button class="btn edit-request-recording" type="button" data-message-id="${messageID}"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
                                             <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
                                             <input type="file" class="edit-audio-upload edit-upload-element" data-message-id="${messageID}" id="edit-audio-upload-field" style="display: none;">
                                         </div>
@@ -2666,7 +2669,7 @@
                                         <div class="d-flex justify-content-center">
                                             <button type="button" class="btn edit-recording-preview-controls confirm-audio-editing" data-message-id="${messageID}" data-type="audio"><i class="bi bi-check-lg" style="color: #ffffff;"></i></button>
                                             <button type="button" class="btn edit-recording-preview-controls deny-editing" data-message-id="${messageID}"><i class="bi bi-x-lg" style="color: #ffffff;"></i></button>
-                                            <button class="btn edit-request-recording" type="button"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
+                                            <button class="btn edit-request-recording" type="button" data-message-id="${messageID}"><i id="edit-mic-icon" class="bi bi-mic" style="color: #ffffff;"></i></button>
                                             <button type="button" class="btn edit-upload-element" onclick="document.getElementById('edit-audio-upload-field').click();"><i class="bi bi-upload" style="color: #ffffff;"></i></button>
                                             <input type="file" class="edit-audio-upload edit-upload-element" data-message-id="${messageID}" id="edit-audio-upload-field" style="display: none;">
                                         </div>
@@ -2831,9 +2834,6 @@
                 console.log(messageID)
                 var optionsPage = $('.options-' + messageID);
 
-                if (optionsPage.css('display') === 'block') {
-                    $('.options').fadeOut(200);
-                }
                 setTimeout(function () {
                     optionsPage.css({
                         display: "block",
@@ -2998,12 +2998,6 @@
                 bodySection.html('');
                 bodySection.html(bodySectionHtml);
 
-
-                // access message element and modify it for editing input
-                // - create a form to send over new text.
-                // - AJAX request to save the new text and change the message status to edited.
-
-                // success callback must show the new message and also modify other users messages via websockets
             })
             $('#conversation-contents').on('click', '.confirm-editing', function () {
                 var messageID = $(this).data('message-id');

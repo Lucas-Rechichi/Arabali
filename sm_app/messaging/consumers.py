@@ -192,7 +192,7 @@ class MessageConsumer(WebsocketConsumer):
                 replied_to_messages = Message.objects.filter(room=chat_room, reply=message)
                 replied_to_changes = {}
                 for a, replied_to_message in enumerate(replied_to_messages):
-                    changed_reply_html = f'<a href="#message-timestamp-{replied_to_message.pk}" class="btn p-0"><p class="small text-truncate m-0">{content}</p></a>'
+                    changed_reply_html = f'<a href="#message-timestamp-{message_id}" class="btn p-0"><p class="small text-truncate m-0">{content}</p></a>'
                     replied_to_changes[a + 1] = {
                         'id': replied_to_message.pk,
                         'user': message.sender.user.username,

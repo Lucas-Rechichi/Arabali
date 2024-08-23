@@ -758,7 +758,6 @@ def delete_chatroom(request):
 def edit_message(request):
     message_id = request.POST.get('message_id')
     message_type = request.POST.get('type')
-    content = request.POST.get('content')
 
     try:
         message = Message.objects.get(id=message_id)
@@ -775,6 +774,7 @@ def edit_message(request):
                 message.save()
             except Exception as e:
                 print(f'An errror occured: {e}')
+                return None
 
         else:
             print(f'Input content is undefined')
@@ -873,6 +873,7 @@ def delete_message(request):
             print(f'Message with id: {message_id} does not exist.')
             print(f'Error: {e}')
             return None
+        
         if message.text:
             message.delete()
         if message.image:
