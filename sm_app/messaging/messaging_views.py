@@ -4,7 +4,7 @@ from main.models import Following, UserStats
 from messaging.models import ChatRoom, Message, PollMessage, PollingChoice, MessageNotificationSetting
 from messaging.templatetags import filters
 from messaging.forms import CreateChatRoom
-from messaging.extras import get_chat_rooms
+from messaging.extras import get_chat_rooms, emoticons_dict
 from main.extras import initialize_page
 
 from django.contrib.auth.models import User
@@ -92,7 +92,7 @@ def chat_room_view(request, room, room_id):
         'chat_rooms': chat_rooms,
         'room': chat_room,
         'messages': sorted_all_messages,
-        'poll_messages': poll_messages,
+        'emoticon_dict': emoticons_dict,
         'username': init['username'],
         'search_bar': init['search_bar'],
         'notifications': init['notification_list'],

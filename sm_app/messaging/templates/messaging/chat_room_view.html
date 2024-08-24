@@ -1,5 +1,6 @@
 {% extends 'messaging/template.html' %}
 {% load crispy_forms_tags %}
+{% load filters %}
 {% block title %} Messaging {% endblock %}
 {% block profile %}
     <li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
@@ -145,7 +146,7 @@
                     <img src="{{room.icon.url}}" alt="" class="p-2 rounded-circle" style="max-height: 4rem; max-width: 4rem;">
                 </div>
                 <div class="col-10">
-                    <p class="lead text-start mt-3">{{room.name}}</p>
+                    <p class="lead text-start mt-3">{{room.name}} {{ "zzz"|emoticon|safe }}</p>
                 </div>
                 <div class="col-1">
                     <button type="button" class="btn mt-2" style="font-size: 2rem;" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
@@ -308,6 +309,9 @@
                                                                     <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply" style="color: #ffffff;"></i></button>                                                        
                                                                 {% else %}
                                                                 {% endif %}
+                                                            </div>
+                                                            <div class="col d-flex justify-content-end">
+                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -484,6 +488,9 @@
                                                                 {% else %}
                                                                 {% endif %}
                                                             </div>
+                                                            <div class="col d-flex justify-content-end">
+                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -584,6 +591,9 @@
                                                                     <button type="button" class="btn reply" data-message-id="{{message_dict.message.id}}" data-message="Audio" data-message-sender="{{message_dict.message.sender.user.username}}" id="reply-button-{{message_dict.message.id}}"><i class="bi bi-reply"></i></button>                                                        
                                                                 {% else %}
                                                                 {% endif %}
+                                                            </div>
+                                                            <div class="col d-flex justify-content-end">
+                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -718,6 +728,9 @@
                                                                 {% else %}
                                                                 {% endif %}
                                                             </div>
+                                                            <div class="col d-flex justify-content-end">
+                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill"></i></button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -792,6 +805,12 @@
             </div>
         </div>
     </form>
+    <ul id="reactions" class="dropdown-menu p-2 mb-1" style=" width:300px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+        <p class="lead text-center">Reactions</p>
+        <div class="d-inline-flex justify-content-center">
+            <input type="text" class="form-control popup-clickable" id="reactions-search">
+        </div>
+    </ul>
     <!-- Websocket for sending messages -->
     <script type="text/javascript">
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
@@ -2820,8 +2839,13 @@
                 }
             })
             // Deactivation of the context-menu when a left-click is registered.
-            $(document).on("click", function() {
+            $(document).on("click", function(e) {
                 $('.options').fadeOut(200);
+                if (e.target.classList.contains('popup-clickable')) {
+                    console.log('clickable')
+                } else {
+                    $('#reactions').fadeOut(200);
+                }
             });
 
             // For activating the context-menu, so that a user can edit, delete, download, or copy a message.
@@ -2829,6 +2853,7 @@
                 e.preventDefault();
 
                 $('.options').fadeOut(200);
+                $('#reactions').fadeOut(200);
 
                 var messageID = $(this).data('message-id');
                 console.log(messageID)
@@ -3092,10 +3117,27 @@
                     }
                 })
 
-                // success callback with websockets to find and remove the message. 
             })
-            
-            // built in event listener for editing text, image, and video messages
+            $('#conversation-contents').on('click', '.react-button', function (e) {
+                var reactions = $('#reactions');
+
+                $('.options').fadeOut(200);
+                reactions.fadeOut(200);
+
+                setTimeout(function () {
+                    reactions.css({
+                        display: "block",
+                        position: "fixed",
+                        zIndex: 9000,
+                        left: e.pageX - 150,
+                        top: e.pageY + 10,
+                    });
+                }, 300)
+            })
+            $('.container').on('click', '#reactions', function (e) {
+                
+                
+            })
         });
     </script>
 </div>

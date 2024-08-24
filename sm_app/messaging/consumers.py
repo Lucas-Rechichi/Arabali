@@ -198,7 +198,7 @@ class MessageConsumer(WebsocketConsumer):
                         'user': message.sender.user.username,
                         'html': changed_reply_html,
                     }
-                replied_to_message_count = a + 1
+                replied_to_message_count = a + 1 if a else 0
 
                 # Rest of sending relevant data over
                 if is_reply == 'true':
