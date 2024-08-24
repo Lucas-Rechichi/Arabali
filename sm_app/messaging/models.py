@@ -75,6 +75,6 @@ class PollingChoice(models.Model):
 
 # Reactions
 class Reaction(models.Model):
-    user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False)
-    message = models.ForeignKey(Message, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False, related_name='reactions')
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, null=False, related_name='reactions')
     reaction = models.CharField(max_length=10, null=False)

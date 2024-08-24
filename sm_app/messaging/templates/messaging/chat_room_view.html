@@ -805,10 +805,21 @@
             </div>
         </div>
     </form>
-    <ul id="reactions" class="dropdown-menu p-2 mb-1" style=" width:300px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+    <!-- Reactions popup -->
+    <ul id="reactions" class="dropdown-menu p-2 mb-1" style=" width:300px; height:300px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
         <p class="lead text-center">Reactions</p>
-        <div class="d-inline-flex justify-content-center">
-            <input type="text" class="form-control popup-clickable" id="reactions-search">
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                <input type="text" class="form-control popup-clickable" id="reaction-search">
+            </div>
+        </div>
+        <br>
+        <div id="emoticons-list" class="row">
+            {% for emoticon in emoticon_dict.keys %}
+                <div class="col d-flex justify-content-start">
+                    <button type="button" class="btn emoticon" data-emoticon="{{emoticon}}">{{ emoticon|emoticon|safe }}</button>
+                </div>
+            {% endfor %}
         </div>
     </ul>
     <!-- Websocket for sending messages -->
@@ -3134,8 +3145,38 @@
                     });
                 }, 300)
             })
-            $('.container').on('click', '#reactions', function (e) {
-                
+            $('#reaction-search').on('input', function () {
+                var query = $(this).val();
+                if (query !== '') {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/realtime-suggestions-manager/',
+                        data: {
+                            'query': query,
+                            'type': 'search',
+                            'answer_catergory': 'Emoticons',
+                            'csrfmiddlewaretoken': '{{csrf_token}}'
+                        },
+                        success: function (response) {
+                            var suggestionsHtml = '';
+                            var suggestionHtml;
+                            for (let i = 0; i < response.solutions.length; i++) {
+                                suggestionHtml = `
+                                    <div class="col d-flex justify-content-start">
+                                        <button type="button" class="btn emoticon" data-emoticon="${response.solutions[i]['name']}">${response.solutions[i]['unicode']}</button>
+                                    </div>
+                                `;
+                                suggestionsHtml += suggestionHtml
+                            }
+                            $('#emoticons-list').html('')
+                            $('#emoticons-list').html(suggestionsHtml)
+                        } 
+                    })
+                } else {
+                    var suggestionsHTML = `
+                    
+                    `; // HTML for when the query is empty (all emoticons).
+                }
                 
             })
         });
