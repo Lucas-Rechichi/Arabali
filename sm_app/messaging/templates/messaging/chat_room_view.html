@@ -311,7 +311,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -489,7 +489,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -593,7 +593,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -729,7 +729,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button"><i class="bi bi-emoji-smile-fill"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2850,12 +2850,14 @@
                 }
             })
             // Deactivation of the context-menu when a left-click is registered.
+            var reactionMessageID;
             $(document).on("click", function(e) {
                 $('.options').fadeOut(200);
                 if (e.target.classList.contains('popup-clickable')) {
                     console.log('clickable')
                 } else {
                     $('#reactions').fadeOut(200);
+                    reactionMessageID = null
                 }
             });
 
@@ -3129,8 +3131,11 @@
                 })
 
             })
+            
             $('#conversation-contents').on('click', '.react-button', function (e) {
                 var reactions = $('#reactions');
+
+                reactionMessageID = $(this).data('message-id');
 
                 $('.options').fadeOut(200);
                 reactions.fadeOut(200);
@@ -3173,11 +3178,22 @@
                         } 
                     })
                 } else {
-                    var suggestionsHTML = `
-                    
-                    `; // HTML for when the query is empty (all emoticons).
+                    var suggestionsHtml = `
+                        {% for emoticon in emoticon_dict.keys %}
+                            <div class="col d-flex justify-content-start">
+                                <button type="button" class="btn emoticon" data-emoticon="{{emoticon}}">{{ emoticon|emoticon|safe }}</button>
+                            </div>
+                        {% endfor %}
+                    `;
+
+                    $('#emoticons-list').html('')
+                    $('#emoticons-list').html(suggestionsHtml)
                 }
                 
+            })
+            $('#reactions').on('click', '.emoticon', function () {
+                var emoticon = $(this).data(emoticon)
+                var messageID = reactionMessageID;
             })
         });
     </script>
