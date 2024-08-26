@@ -42,6 +42,8 @@ class Message(models.Model):
     audio = models.FileField(null=True, upload_to=get_audio_upload_path_message)
     sent_at = models.DateTimeField(auto_now_add=True)
 
+    def has_reacted(self, user):
+        return Reaction.objects.filter(message=self, user=user).exists()
 
 # To let users choose what messages give them a notifitation
 class MessageNotificationSetting(models.Model):
@@ -78,3 +80,6 @@ class Reaction(models.Model):
     user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False, related_name='reactions')
     message = models.ForeignKey(Message, on_delete=models.CASCADE, null=False, related_name='reactions')
     reaction = models.CharField(max_length=10, null=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+
+    

@@ -3194,6 +3194,21 @@
             $('#reactions').on('click', '.emoticon', function () {
                 var emoticon = $(this).data(emoticon)
                 var messageID = reactionMessageID;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat/reactions/',
+                    data: {
+                        'emoticon': emoticon,
+                        'message_id': messageID,
+                        'csrfmiddlewaretoken': '{{csrf_token}}'
+                    },
+                    success: function (response) {
+                        console.log('reacted to message')
+
+                        
+                    }
+                })
             })
         });
     </script>

@@ -11,8 +11,8 @@ from django.core.exceptions import SuspiciousFileOperation
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
-from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting
-from messaging.extras import change_user_directory
+from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting, Reaction
+from messaging.extras import change_user_directory, emoticons_dict
 from sm_app import settings
 
 
@@ -917,4 +917,53 @@ def delete_message(request):
         'message_type': message_type,
     }
     
+    return JsonResponse(response)
+
+def reactions(request):
+    # Get relevant data
+    message_id = request.POST.get('message_id')
+    emoticon = request.POST.get('emoticon')
+    user = request.user
+
+    try:
+        # Get relevant database objects
+        message = Message.objects.get(id=message_id)
+        user_stats = UserStats.objects.get(user=user)
+
+        # Check to see if the reaction sent is a valid reaction
+        if emoticon in emoticons_dict.keys():
+            if message.has_reacted(user=user_stats): # if the user has reacted beforehand
+                reaction_obj = Reaction.objects.get(user=user_stats, message=message)
+                if message.reactions.filter(user=user_stats, reaction=emoticon).exists(): # if the reaction reacted with was the same reaction as beforhand, deletes reaction
+                    reaction_obj.delete()
+                    reaction_result = 'remove'
+                else: # replaces a reaction 
+                    reaction_obj.reaction = emoticon
+                    reaction_obj.save()
+                    reaction_result = 'replace'
+            else: # creates a reaction
+                new_reaction = Reaction(message=message, user=user_stats, reaction=emoticon)
+                new_reaction.save()
+                reaction_result = 'new_reaction'
+        else:
+            print('Reaction is not supported by Arabali.')
+            return None
+
+    # Exceptions
+    except ObjectDoesNotExist as e:
+        if not message.objects.filter(id=message_id).exists():
+            print(f'Message with ID: {message_id} does not exist in the database.')
+            print(f'An error occured: {e}')
+            return None
+        else:
+            print(f'Object does not exist.')
+            print(f'An error occured: {e}')
+            return None
+        
+    # Response
+    response = {
+        'reaction_result': reaction_result,
+        'message_id': message_id,
+        'reaction': emoticon,
+    }
     return JsonResponse(response)

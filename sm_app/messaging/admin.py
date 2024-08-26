@@ -1,5 +1,5 @@
 from django.contrib import admin
-from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting
+from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting, Reaction
 # Register your models here.
 class ExtraShow(admin.ModelAdmin):
     readonly_fields =('id', 'created_at_formatted')
@@ -15,3 +15,4 @@ admin.site.register(MessageNotificationSetting, ExtraShow)
 admin.site.register(PollMessage, ExtraShow)
 admin.site.register(PollOption, ExtraShow)
 admin.site.register(PollingChoice, ExtraShow)
+admin.site.register(Reaction, ExtraShow)
