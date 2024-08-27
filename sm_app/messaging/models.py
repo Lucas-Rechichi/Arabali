@@ -44,6 +44,7 @@ class Message(models.Model):
 
     def has_reacted(self, user):
         return Reaction.objects.filter(message=self, user=user).exists()
+    
 
 # To let users choose what messages give them a notifitation
 class MessageNotificationSetting(models.Model):

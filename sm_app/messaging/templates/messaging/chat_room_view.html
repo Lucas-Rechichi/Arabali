@@ -311,7 +311,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -489,7 +489,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -593,7 +593,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -729,7 +729,7 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i></button>
+                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2857,7 +2857,6 @@
                     console.log('clickable')
                 } else {
                     $('#reactions').fadeOut(200);
-                    reactionMessageID = null
                 }
             });
 
@@ -3131,11 +3130,13 @@
                 })
 
             })
-            
+            // Reactions: Single click
             $('#conversation-contents').on('click', '.react-button', function (e) {
                 var reactions = $('#reactions');
 
                 reactionMessageID = $(this).data('message-id');
+
+                console.log(reactionMessageID)
 
                 $('.options').fadeOut(200);
                 reactions.fadeOut(200);
@@ -3192,7 +3193,7 @@
                 
             })
             $('#reactions').on('click', '.emoticon', function () {
-                var emoticon = $(this).data(emoticon)
+                var emoticon = $(this).data('emoticon')
                 var messageID = reactionMessageID;
 
                 $.ajax({
@@ -3205,10 +3206,17 @@
                     },
                     success: function (response) {
                         console.log('reacted to message')
-
-                        
+                    
                     }
                 })
+            })
+            // Reactions: Double click
+            $('#conversation-contents').on('dblclick', '.react-button', function () {
+                // Show the users and what they have reacted with
+            })
+            // Reactions: Hold
+            $('#conversation-contents').on('mousedown', '.react-button', function () {
+                // Show reations 
             })
         });
     </script>

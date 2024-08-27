@@ -17,3 +17,10 @@ def emoticon(name):
     elif name not in emoticons_dict:
         return 'Invalid'
     return emoticons_dict[name]
+
+@register.filter
+def number_of_reactions(message):
+    no_of_reactions = 0
+    for _ in message.reactions.all():
+        no_of_reactions += 1
+    return no_of_reactions
