@@ -380,6 +380,24 @@
                                             <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="general"><i class="bi bi-trash3-fill"></i> Delete</button>
                                         </ul>
                                     {% endif %}
+                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <p class="lead text-center"><strong>Reactions</strong></p>
+                                        {% for reaction in message_dict.message.reactions.all %}
+                                            <button type="button" class="btn">
+                                                <div class="row d-flex justify-content-center">
+                                                    <div class="col-2">
+                                                        <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <p class="mt-2 ms-2 text-center">{{reaction.user.user.username}}</p>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <p class="mt-2">{{reaction.reaction|emoticon|safe}}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        {% endfor %}
+                                    </ul>
                                 {% else %}
                                     <div class="col-6">
                                     </div>
@@ -528,6 +546,16 @@
                                             <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="poll"><i class="bi bi-trash3-fill"></i> Delete</button>
                                         </ul>
                                     {% endif %}
+                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" style=" width:300px; height:300px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <p class="lead text-center"><strong>Reactions</strong></p>
+                                        {% for reaction in message_dict.message.reactions.all %}
+                                            <div class="d-inline-flex justify-content-evenly">
+                                                <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
+                                                <p class="lead text-center">{{reaction.user.user.username}}</p>
+                                                <p>{{reaction.reaction|emoticon|safe}}</p>
+                                            </div>
+                                        {% endfor %}
+                                    </ul>
                                 {% endif %}
                             {% else %}
                                 {% if message_dict.message.reply != None %}
@@ -619,6 +647,16 @@
                                             <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button></li>
                                         </ul>
                                     {% endif %}
+                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" style=" width:300px; height:300px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <p class="lead text-center"><strong>Reactions</strong></p>
+                                        {% for reaction in message_dict.message.reactions.all %}
+                                            <div class="d-inline-flex justify-content-evenly">
+                                                <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
+                                                <p class="lead text-center">{{reaction.user.user.username}}</p>
+                                                <p>{{reaction.reaction|emoticon|safe}}</p>
+                                            </div>
+                                        {% endfor %}
+                                    </ul>
                                 {% else %}
                                     <div class="col-6">
                                         <div class="row">
@@ -757,6 +795,16 @@
                                             </ul>
                                         {% endif %}
                                     {% endif %}
+                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" style=" width:300px; height:300px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <p class="lead text-center"><strong>Reactions</strong></p>
+                                        {% for reaction in message_dict.message.reactions.all %}
+                                            <div class="d-inline-flex justify-content-evenly">
+                                                <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
+                                                <p class="lead text-center">{{reaction.user.user.username}}</p>
+                                                <p>{{reaction.reaction|emoticon|safe}}</p>
+                                            </div>
+                                        {% endfor %}
+                                    </ul>
                                 {% endif %}
                             {% endif %}
                         </div>
@@ -3134,22 +3182,28 @@
             $('#conversation-contents').on('click', '.react-button', function (e) {
                 var reactions = $('#reactions');
 
-                reactionMessageID = $(this).data('message-id');
+                if ($('.reacions').hasClass('show')) {
+                    console.log('Reaction popup prevented.')
+                } else {
+                    reactionMessageID = $(this).data('message-id');
 
-                console.log(reactionMessageID)
+                    console.log(reactionMessageID)
 
-                $('.options').fadeOut(200);
-                reactions.fadeOut(200);
+                    $('.options').fadeOut(200);
+                    reactions.fadeOut(200);
 
-                setTimeout(function () {
-                    reactions.css({
-                        display: "block",
-                        position: "fixed",
-                        zIndex: 9000,
-                        left: e.pageX - 150,
-                        top: e.pageY + 10,
-                    });
-                }, 300)
+                    setTimeout(function () {
+                        reactions.css({
+                            display: "block",
+                            position: "fixed",
+                            zIndex: 9000,
+                            left: e.pageX - 150,
+                            top: e.pageY + 10,
+                        });
+                    }, 300)
+                }
+
+                
             })
             $('#reaction-search').on('input', function () {
                 var query = $(this).val();
@@ -3210,9 +3264,32 @@
                     }
                 })
             })
-            // Reactions: Double click
-            $('#conversation-contents').on('dblclick', '.react-button', function () {
+            // Reactions: Hover
+            $('#conversation-contents').on('mouseenter', '.react-button', function (e) {
                 // Show the users and what they have reacted with
+                var messageID = $(this).data('message-id');
+
+                var reactionResponsePopup = $('#reaction-response-' + messageID);
+                
+                setTimeout(function () {
+                    reactionResponsePopup.css({
+                        display: "block",
+                        position: "fixed",
+                        zIndex: 9000,
+                        left: e.pageX - 150,
+                        top: e.pageY + 10,
+                    });
+                }, 500);
+            })
+            $('.reaction-response').on('mouseleave', function (e) {
+                var messageID = $(this).data('message-id');
+                var reactionResponsePopup = $('#reaction-response-' + messageID);
+
+                console.log(messageID)
+                console.log(reactionResponsePopup)
+
+                reactionResponsePopup.hide()
+
             })
             // Reactions: Hold
             $('#conversation-contents').on('mousedown', '.react-button', function () {
