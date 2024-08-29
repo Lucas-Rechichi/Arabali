@@ -383,7 +383,7 @@
                                     <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <button type="button" class="btn">
+                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
                                                 <div class="row d-flex justify-content-center">
                                                     <div class="col-2">
                                                         <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
@@ -507,7 +507,9 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% if not message_dict.option_list %}
+                                                                    <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -546,14 +548,22 @@
                                             <button type="button" class="btn delete-message" data-message-id="{{message_dict.message.id}}" data-type="poll"><i class="bi bi-trash3-fill"></i> Delete</button>
                                         </ul>
                                     {% endif %}
-                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" style=" width:300px; height:300px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <div class="d-inline-flex justify-content-evenly">
-                                                <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
-                                                <p class="lead text-center">{{reaction.user.user.username}}</p>
-                                                <p>{{reaction.reaction|emoticon|safe}}</p>
-                                            </div>
+                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
+                                                <div class="row d-flex justify-content-center">
+                                                    <div class="col-2">
+                                                        <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <p class="mt-2 ms-2 text-center">{{reaction.user.user.username}}</p>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <p class="mt-2">{{reaction.reaction|emoticon|safe}}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -647,14 +657,22 @@
                                             <li><button type="button" class="btn copy-message" data-text="{{message_dict.message.text}}" data-message-id="{{message_dict.message.id}}"><i class="bi bi-copy"></i> Copy</button></li>
                                         </ul>
                                     {% endif %}
-                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" style=" width:300px; height:300px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <div class="d-inline-flex justify-content-evenly">
-                                                <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
-                                                <p class="lead text-center">{{reaction.user.user.username}}</p>
-                                                <p>{{reaction.reaction|emoticon|safe}}</p>
-                                            </div>
+                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
+                                                <div class="row d-flex justify-content-center">
+                                                    <div class="col-2">
+                                                        <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <p class="mt-2 ms-2 text-center">{{reaction.user.user.username}}</p>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <p class="mt-2">{{reaction.reaction|emoticon|safe}}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
                                         {% endfor %}
                                     </ul>
                                 {% else %}
@@ -767,7 +785,9 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% if not message_dict.option_list %}
+                                                                    <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -795,14 +815,22 @@
                                             </ul>
                                         {% endif %}
                                     {% endif %}
-                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" style=" width:300px; height:300px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                    <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <div class="d-inline-flex justify-content-evenly">
-                                                <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
-                                                <p class="lead text-center">{{reaction.user.user.username}}</p>
-                                                <p>{{reaction.reaction|emoticon|safe}}</p>
-                                            </div>
+                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
+                                                <div class="row d-flex justify-content-center">
+                                                    <div class="col-2">
+                                                        <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <p class="mt-2 ms-2 text-center">{{reaction.user.user.username}}</p>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <p class="mt-2">{{reaction.reaction|emoticon|safe}}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
@@ -2905,6 +2933,7 @@
                     console.log('clickable')
                 } else {
                     $('#reactions').fadeOut(200);
+                    $('.reaction-response').fadeOut(200);
                 }
             });
 
@@ -3182,26 +3211,24 @@
             $('#conversation-contents').on('click', '.react-button', function (e) {
                 var reactions = $('#reactions');
 
-                if ($('.reacions').hasClass('show')) {
-                    console.log('Reaction popup prevented.')
-                } else {
-                    reactionMessageID = $(this).data('message-id');
+                
+                reactionMessageID = $(this).data('message-id');
 
-                    console.log(reactionMessageID)
+                console.log(reactionMessageID)
 
-                    $('.options').fadeOut(200);
-                    reactions.fadeOut(200);
+                $('.options').fadeOut(200);
+                reactions.fadeOut(200);
 
-                    setTimeout(function () {
-                        reactions.css({
-                            display: "block",
-                            position: "fixed",
-                            zIndex: 9000,
-                            left: e.pageX - 150,
-                            top: e.pageY + 10,
-                        });
-                    }, 300)
-                }
+                setTimeout(function () {
+                    reactions.css({
+                        display: "block",
+                        position: "fixed",
+                        zIndex: 9000,
+                        left: e.pageX - 150,
+                        top: e.pageY + 10,
+                    });
+                }, 300)
+                
 
                 
             })
@@ -3270,16 +3297,34 @@
                 var messageID = $(this).data('message-id');
 
                 var reactionResponsePopup = $('#reaction-response-' + messageID);
-                
-                setTimeout(function () {
-                    reactionResponsePopup.css({
-                        display: "block",
-                        position: "fixed",
-                        zIndex: 9000,
-                        left: e.pageX - 150,
-                        top: e.pageY + 10,
-                    });
+                var begunHovering = true
+                intervalId = setInterval(function() {
+                    if (begunHovering) {
+                        begunHovering = false
+                        setTimeout(function () {
+                            reactionResponsePopup.css({
+                                display: "block",
+                                position: "fixed",
+                                zIndex: 9000,
+                                left: e.pageX - 150,
+                                top: e.pageY + 10,
+                            });
+                        }, 500);
+                    }
                 }, 500);
+                
+            })
+            $('#conversation-contents').on('mouseleave', '.react-button', function (e) {
+                var messageID = $(this).data('message-id');
+                var reactionResponsePopup = $('#reaction-response-' + messageID);
+
+                clearInterval(intervalId)
+                // conbditional for if i am hovering over the reaction response popup
+                    // true, dont clear
+                    // false, clear
+                reactionResponsePopup.fadeOut(200)
+
+                
             })
             $('.reaction-response').on('mouseleave', function (e) {
                 var messageID = $(this).data('message-id');
@@ -3288,7 +3333,7 @@
                 console.log(messageID)
                 console.log(reactionResponsePopup)
 
-                reactionResponsePopup.hide()
+                reactionResponsePopup.fadeOut(200)
 
             })
             // Reactions: Hold
