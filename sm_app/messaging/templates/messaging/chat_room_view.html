@@ -311,7 +311,15 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% if message_dict.message.reactions.exists %}
+                                                                    {% if message_dict.has_reacted %}
+                                                                        <button type="button" class="btn react-button border-light" data-message-id="{{message_dict.message.id}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% else %}
+                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -508,7 +516,15 @@
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
                                                                 {% if not message_dict.option_list %}
-                                                                    <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% if message_dict.message.reactions.exists %}
+                                                                        {% if message_dict.has_reacted %}
+                                                                            <button type="button" class="btn react-button border-light" data-message-id="{{message_dict.message.id}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                        {% else %}
+                                                                            <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% endif %}
                                                                 {% endif %}
                                                             </div>
                                                         </div>
@@ -631,7 +647,15 @@
                                                                 {% endif %}
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
-                                                                <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% if message_dict.message.reactions.exists %}
+                                                                    {% if message_dict.has_reacted %}
+                                                                        <button type="button" class="btn react-button border-dark" data-message-id="{{message_dict.message.id}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% else %}
+                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -786,7 +810,15 @@
                                                             </div>
                                                             <div class="col d-flex justify-content-end">
                                                                 {% if not message_dict.option_list %}
-                                                                    <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% if message_dict.message.reactions.exists %}
+                                                                        {% if message_dict.has_reacted %}
+                                                                            <button type="button" class="btn react-button border-dark" data-message-id="{{message_dict.message.id}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                        {% else %}
+                                                                            <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                    {% endif %}
                                                                 {% endif %}
                                                             </div>
                                                         </div>

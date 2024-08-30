@@ -7,6 +7,7 @@ from messaging.forms import CreateChatRoom
 from messaging.extras import get_chat_rooms, emoticons_dict
 from main.extras import initialize_page
 
+from django.db.models import Count
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -51,6 +52,8 @@ def chat_room_view(request, room, room_id):
     for message in messages:
         all_messages.append({
             'message': message,
+            'has_reacted': message.has_reacted(user=user_stats),
+            'user_reaction': message.reactions.get(user=user_stats).reaction if message.has_reacted(user=user_stats) else None,
             'has_chosen': None,
             'option_list': None,
         })

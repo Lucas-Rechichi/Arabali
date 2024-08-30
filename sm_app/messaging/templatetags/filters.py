@@ -1,7 +1,9 @@
-from django import template
-from messaging.extras import emoticons_dict
+
 import json
 
+from django import template
+from django.db.models import Count
+from messaging.extras import emoticons_dict
 register = template.Library()
 
 @register.filter
@@ -24,3 +26,9 @@ def number_of_reactions(message):
     for _ in message.reactions.all():
         no_of_reactions += 1
     return no_of_reactions
+
+@register.filter
+def most_popular_reaction(message):
+    mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
+    return emoticons_dict[mode_reaction['reaction']]
+    

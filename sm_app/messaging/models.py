@@ -1,26 +1,23 @@
 import os
 
 from django.db import models
+from django.db.models import Count
 from django.contrib.auth.models import User
 from main.models import UserStats
+
 # Create your models here.
 
 # To direct the images from user imput into their respective folders.
 def get_image_upload_path_room(instance, filename):
-    
-    # Return the full upload path
     return os.path.join('Rooms/', instance.name, 'room_images/' , filename)
 
 def get_image_upload_path_message(instance, filename):
-
     return os.path.join('Rooms/', instance.room.name , 'message_images/' , instance.sender.user.username , filename)
 
 def get_video_upload_path_message(instance, filename):
-
     return os.path.join('Rooms/', instance.room.name , 'message_videos/' , instance.sender.user.username , filename)
 
 def get_audio_upload_path_message(instance, filename):
-
     return os.path.join('Rooms/', instance.room.name , 'message_audio_recordings/' , instance.sender.user.username , filename)
 
 class ChatRoom(models.Model):
@@ -30,7 +27,7 @@ class ChatRoom(models.Model):
     users = models.ManyToManyField(UserStats)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
 
-
+from messaging.extras import emoticons_dict # here due to circular import issues with 'ChatRoom'
 class Message(models.Model):
     sender = models.ForeignKey(UserStats, on_delete=models.CASCADE)
     room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
@@ -45,6 +42,7 @@ class Message(models.Model):
     def has_reacted(self, user):
         return Reaction.objects.filter(message=self, user=user).exists()
     
+
 
 # To let users choose what messages give them a notifitation
 class MessageNotificationSetting(models.Model):
