@@ -3292,10 +3292,14 @@
                 })
             })
             // Reactions: Hover
+            var reactionHoverIntervalID;
+            var reactionHoverBool = false;
+            $('.reaction-response').on('mouseenter', function () {
+                reactionHoverBool = true
+            })
             $('#conversation-contents').on('mouseenter', '.react-button', function (e) {
                 // Show the users and what they have reacted with
                 var messageID = $(this).data('message-id');
-
                 var reactionResponsePopup = $('#reaction-response-' + messageID);
                 var begunHovering = true
                 intervalId = setInterval(function() {
@@ -3317,14 +3321,15 @@
             $('#conversation-contents').on('mouseleave', '.react-button', function (e) {
                 var messageID = $(this).data('message-id');
                 var reactionResponsePopup = $('#reaction-response-' + messageID);
-
-                clearInterval(intervalId)
-                // conbditional for if i am hovering over the reaction response popup
-                    // true, dont clear
-                    // false, clear
-                reactionResponsePopup.fadeOut(200)
-
                 
+                clearInterval(intervalId)
+                setTimeout(function () {
+                    if (!(reactionHoverBool)) {
+                        reactionResponsePopup.fadeOut(200)
+                    }
+                    reactionHoverBool = false
+                }, 500)
+
             })
             $('.reaction-response').on('mouseleave', function (e) {
                 var messageID = $(this).data('message-id');
