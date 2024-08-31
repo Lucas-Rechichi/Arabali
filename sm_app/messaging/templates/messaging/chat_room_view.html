@@ -310,7 +310,7 @@
                                                                 {% else %}
                                                                 {% endif %}
                                                             </div>
-                                                            <div class="col d-flex justify-content-end">
+                                                            <div id="reaction-button-col-{{message_dict.message.id}}" class="col d-flex justify-content-end">
                                                                 {% if message_dict.message.reactions.exists %}
                                                                     {% if message_dict.has_reacted %}
                                                                         <button type="button" class="btn has-reacted react-button border-light" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-emoticon="{{message_dict.user_reaction}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
@@ -514,7 +514,7 @@
                                                                 {% else %}
                                                                 {% endif %}
                                                             </div>
-                                                            <div class="col d-flex justify-content-end">
+                                                            <div id="reaction-button-col-{{message_dict.message.id}}" class="col d-flex justify-content-end">
                                                                 {% if not message_dict.option_list %}
                                                                     {% if message_dict.message.reactions.exists %}
                                                                         {% if message_dict.has_reacted %}
@@ -646,7 +646,7 @@
                                                                 {% else %}
                                                                 {% endif %}
                                                             </div>
-                                                            <div class="col d-flex justify-content-end">
+                                                            <div id="reaction-button-col-{{message_dict.message.id}}" class="col d-flex justify-content-end">
                                                                 {% if message_dict.message.reactions.exists %}
                                                                     {% if message_dict.has_reacted %}
                                                                         <button type="button" class="btn has-reacted react-button border-dark" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-emoticon="{{message_dict.user_reaction}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
@@ -808,7 +808,7 @@
                                                                 {% else %}
                                                                 {% endif %}
                                                             </div>
-                                                            <div class="col d-flex justify-content-end">
+                                                            <div id="reaction-button-col-{{message_dict.message.id}}" class="col d-flex justify-content-end">
                                                                 {% if not message_dict.option_list %}
                                                                     {% if message_dict.message.reactions.exists %}
                                                                         {% if message_dict.has_reacted %}
@@ -1111,6 +1111,65 @@
                 } else if (data.type === 'deleting_message') {
                     var message = $('#message-' + data.message_id);
                     message.remove();
+
+                } else if (data.type === 'incoming_new_reaction') {
+                    var reaction = data.reaction;
+                    var reactionUnicode = data.reaction_unicode;
+                    var reactionCount = data.reaction_count;
+                    var reactor = data.reactor;
+                    var messageID = data.message_id;
+
+                    var reactionButtonWrapper = $('#reaction-button-col-' + messageID);
+
+                    var newReactionButtonHtml;
+                    if (reactor === '{{username}}') { // if we reacted
+                        newReactionButtonHtml = `
+                            <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
+                                ${reactionUnicode}
+                                <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                            </button>
+                        `;
+                    } else { // someone else reacted
+                        var userHasReacted = data.user_has_reacted;
+                        var userReaction = data.user_reaction;
+                        var userReactionUnicode = data.user_reaction_unicode;
+                        if (userHasReacted) { // if the user on the website has already reacted to this message
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                    ${userReactionUnicode}
+                                    <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        } else { // no reaction on this message by the user on the website 
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                    ${reactionUnicode}
+                                    <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        }
+                    }
+
+                    reactionButtonWrapper.html('')
+                    reactionButtonWrapper.html(newReactionButtonHtml);
+                    // add in a conditional for if the reaction is from a message the user on the website sent or a mess age that someone else sent
+                    // add user that has reacted into the reaction response list.
+                        // need username, user profile picture, and their emoticon they reacted with.
+                    // reaction things for new messages as well.
+                    
+
+                } else if (data.type === 'incoming_replace_reaction') {
+                    // replace the current reaction with the new reaction
+                        // if the user reacted, make the icon their reaction
+                        // if someone else reaced, make it the most common reaction for that message
+
+                } else if (data.type === 'incoming_remove_reaction') {
+                    // remove the reaction and add the icon for reactions instead if there are no reactions left
+                        // if the user reacted, make the icon their reaction
+                        // if someone else reaced, make it the most common reaction for that message
+                    
+                    // update the reaction count
+
                 } else {
                     var contentHtml = data.content_html;
                     var selfReplyButtonHtml = data.self_reply_button_html

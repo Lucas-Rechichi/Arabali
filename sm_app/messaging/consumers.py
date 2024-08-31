@@ -8,8 +8,9 @@ import pytz
 from main.models import UserStats, Notification
 from main.extras import remove_until_character
 from messaging.extras import replace_spaces, emoticons_dict
-from messaging.models import ChatRoom, Message, PollMessage, PollOption
+from messaging.models import ChatRoom, Message, Reaction, PollMessage, PollOption
 
+from django.db.models import Count
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
@@ -119,6 +120,7 @@ class MessageConsumer(WebsocketConsumer):
         elif action == 'reaction':
             sub_action = text_data_json['sub_action']
             reaction = text_data_json['reaction']
+            reaction_id = text_data_json['reaction_id']
             async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name,
                     {
@@ -127,6 +129,7 @@ class MessageConsumer(WebsocketConsumer):
                         'sub_action': sub_action,
                         'reaction': reaction,
                         'message_id': message_id,
+                        'reaction_id': reaction_id,
                         'username': user.username,
                     }
                 )
@@ -420,36 +423,69 @@ class MessageConsumer(WebsocketConsumer):
             }))
         elif action == 'reaction':
             sub_action = event['sub_action']
+            reaction = event['reaction']
+            reaction_id = event['reaction_id']
+            username = event['username']
+
+            user_obj = User.objects.get(username=username)
+            user_stats = UserStats.objects.get(user=user_obj)
+
+            message = Message.objects.get(id=message_id)
+            reaction = Reaction.objects.get(id=reaction_id)
+
+            # If the user on the website reacted to this message
+            user_has_reacted = message.has_reacted(user=user_stats)
+            if user_has_reacted:
+                user_reaction = message.reactions.get(user=user_stats).reaction
+                user_reaction_unicode = emoticons_dict[user_reaction]
+
+            reaction_unicode = emoticons_dict[reaction]
+            mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
+
+            all_reactions = message.reactions.all()
+            reaction_count = 0
+            for reaction in all_reactions:
+                reaction_count += 1
+
             if sub_action == 'new_reaction':
-                reaction = event['reaction']
-                try:
-                    message = Message.objects.get(id=message_id)
-
-                    all_reactions = message.reactions.all()
-                    reaction_count = 0
-                    for reaction in all_reactions:
-                        reaction_count += 1
-                    
-                    reaction_unicode = emoticons_dict[reaction]
-                    self.send(text_data=json.dumps({
-                        'type': 'incoming_reaction',
-                        'reaction_unicode': reaction_unicode,
-                        'message_id': message_id,
-                        
-
-                    }))
-                except ObjectDoesNotExist:
-                    print(f'Message with ID: {message_id} does not exist in the database.')
-                    return None
-                
-                except Exception as e:
-                    print(f'An error occured: {e}')
-                    return None
-
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_new_reaction',
+                    'is_editing': 'false',
+                    'reaction_unicode': reaction_unicode,
+                    'reaction_count': reaction_count,
+                    'user_has_reacted': user_has_reacted,
+                    'reactor': reaction.user.user.username,
+                    'user_reaction': user_reaction if user_reaction else None,
+                    'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
+                    'mode_reaction': mode_reaction['reaction'],
+                    'message_id': message_id,
+                }))
             elif sub_action == 'replace':
-                pass
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_replace_reaction',
+                    'is_editing': 'false',
+                    'reaction_unicode': reaction_unicode,
+                    'reaction_count': reaction_count,
+                    'user_has_reacted': user_has_reacted,
+                    'reactor': reaction.user.user.username,
+                    'user_reaction': user_reaction if user_reaction else None,
+                    'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
+                    'mode_reaction': mode_reaction['reaction'],
+                    'message_id': message_id,
+                }))
             else: # sub_action == 'remove'
-                pass
+                self.send(text_data=json.dumps({
+                    'type': 'incoming_remove_reaction',
+                    'is_editing': 'false',
+                    'reaction_unicode': reaction_unicode,
+                    'reaction_count': reaction_count,
+                    'user_has_reacted': user_has_reacted,
+                    'reactor': reaction.user.user.username,
+                    'user_reaction': user_reaction if user_reaction else None,
+                    'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
+                    'mode_reaction': mode_reaction['reaction'],
+                    'message_id': message_id,
+                }))
         else:
             print(f'Invalid action: {action}')
 
