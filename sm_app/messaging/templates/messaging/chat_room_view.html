@@ -2958,16 +2958,9 @@
                 }
             })
             // Deactivation of the context-menu when a left-click is registered.
-            var reactionMessageID;
-            let mouseInReactions = false;
+            
             $(document).on("click", function(e) {
                 $('.options').fadeOut(200);
-                if (e.target.classList.contains('popup-clickable')) {
-                    console.log('clickable')
-                } else {
-                    $('.reaction-response').fadeOut(200);
-                    // make is so that the reactions popup only goes away if we are not hovering over it
-                }
             });
 
             // For activating the context-menu, so that a user can edit, delete, download, or copy a message.
@@ -3241,13 +3234,13 @@
             })
 
             // Reactions: Single click
-            var reactButtonHoldID;
+            var reactionMessageID;
             $('#conversation-contents').on('click', '.react-button', function (e) {
                 var numberOfReactions = $(this).data('number-of-reactions');
                 reactionMessageID = $(this).data('message-id');
                 
                 $('.options').fadeOut(200);
-                
+                console.log(numberOfReactions)
                 if (numberOfReactions == 0) {
                     var reactions = $('#reactions');
                     reactions.fadeOut(200);
@@ -3258,7 +3251,7 @@
                             position: "fixed",
                             zIndex: 9000,
                             left: e.pageX - 150,
-                            top: e.pageY + 10,
+                            top: e.pageY + 20,
                         });
                     }, 300)
                 } else {
@@ -3278,7 +3271,14 @@
                             },
                             success: function (response) {
                                 console.log('reacted to message')
-                            
+                                
+                                messageSocket.send(JSON.stringify({
+                                    'action': 'reaction',
+                                    'sub-action': response.reaction_result,
+                                    'reaction': response.reaction,
+                                    'reaction_id': response.reaction_id,
+                                    'message_id': response.message_id,
+                                }))
                             }
                         })
                     } else {
@@ -3295,7 +3295,14 @@
                             },
                             success: function (response) {
                                 console.log('reacted to message')
-                            
+                                
+                                messageSocket.send(JSON.stringify({
+                                    'action': 'reaction',
+                                    'sub-action': response.reaction_result,
+                                    'reaction': response.reaction,
+                                    'reaction_id': response.reaction_id,
+                                    'message_id': response.message_id,
+                                }))
                             }
                         })
                     }
@@ -3356,22 +3363,29 @@
                     },
                     success: function (response) {
                         console.log('reacted to message')
-                    
+                        // send data over to message socket
+                        messageSocket.send(JSON.stringify({
+                            'action': 'reaction',
+                            'sub-action': response.reaction_result,
+                            'reaction': response.reaction,
+                            'reaction_id': response.reaction_id,
+                            'message_id': response.message_id,
+                        }))
                     }
                 })
             })
             // Reactions: Hover
             var reactionHoverIntervalID;
-            var reactionHoverBool = false;
-            $('.reaction-response').on('mouseenter', function () {
-                reactionHoverBool = true
+            var reactionHoverTimer;
+            $('.reaction-response').on('mouseenter', function () { // stops the removal of the reaction response popup
+                clearTimeout(reactionHoverTimer)
             })
-            $('#conversation-contents').on('mouseenter', '.react-button', function (e) {
+            $('#conversation-contents').on('mouseenter', '.react-button', function (e) { // initiates the reaction responce popup
                 // Show the users and what they have reacted with
                 var messageID = $(this).data('message-id');
                 var reactionResponsePopup = $('#reaction-response-' + messageID);
                 var begunHovering = true
-                intervalId = setInterval(function() {
+                reactionHoverIntervalID = setInterval(function() {
                     if (begunHovering) {
                         begunHovering = false
                         setTimeout(function () {
@@ -3380,23 +3394,20 @@
                                 position: "fixed",
                                 zIndex: 9000,
                                 left: e.pageX - 150,
-                                top: e.pageY + 10,
+                                top: e.pageY + 20,
                             });
                         }, 500);
                     }
                 }, 500);
                 
             })
-            $('#conversation-contents').on('mouseleave', '.react-button', function (e) {
+            $('#conversation-contents').on('mouseleave', '.react-button', function (e) { // begins to remove the reaction response popup. can be interupted if hovered over
                 var messageID = $(this).data('message-id');
                 var reactionResponsePopup = $('#reaction-response-' + messageID);
                 
-                clearInterval(intervalId)
-                setTimeout(function () {
-                    if (!(reactionHoverBool)) {
-                        reactionResponsePopup.fadeOut(200)
-                    }
-                    reactionHoverBool = false
+                clearInterval(reactionHoverIntervalID)
+                reactionHoverTimer = setTimeout(function () {
+                    reactionResponsePopup.fadeOut(200)
                 }, 500)
 
             })
@@ -3404,17 +3415,15 @@
                 var messageID = $(this).data('message-id');
                 var reactionResponsePopup = $('#reaction-response-' + messageID);
 
-                console.log(messageID)
-                console.log(reactionResponsePopup)
-
                 reactionResponsePopup.fadeOut(200)
 
             })
             // Reactions: Hold
-            $('#conversation-contents').on('mousedown', '.react-button', function (e) {
+            var reactionHoldTimer
+            $('#conversation-contents').on('mousedown', '.react-button', function (e) { // initiates the reactions popup on a hold
                 var reactions = $('#reactions');
                 
-                setTimeout(function () {
+                reactionHoldTimer = setTimeout(function () {
                     reactions.css({
                         display: "block",
                         position: "fixed",
@@ -3426,10 +3435,23 @@
                 
             })
             $('#conversation-contents').on('mouseup', '.react-button', function () {
+                clearTimeout(reactionHoldTimer)
+            })
+            var reactionRemovalTimer;
+            $('#reactions').on('mouseenter', function () { // interupts the removal of the reactioms popup
+                clearTimeout(reactionRemovalTimer)
+            })
+            $('#reactions').on('mouseleave', function () { // begins to remove the reaction popup, stops if the popup is hovered over
                 var reactions = $('#reactions');
-                if (!mouseInReactions) {
+                reactionRemovalTimer = setTimeout(function () {
                     reactions.fadeOut(200);
-                } 
+                }, 300)
+            })
+            $('#conversation-contents').on('mouseleave', '.react-button', function () {
+                var reactions = $('#reactions');
+                reactionRemovalTimer = setTimeout(function () {
+                    reactions.fadeOut(200);
+                }, 300)
             })
         });
     </script>

@@ -7,8 +7,10 @@ import json
 import pytz
 from main.models import UserStats, Notification
 from main.extras import remove_until_character
-from messaging.extras import replace_spaces
-from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice
+from messaging.extras import replace_spaces, emoticons_dict
+from messaging.models import ChatRoom, Message, PollMessage, PollOption
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
 from channels.generic.websocket import WebsocketConsumer
@@ -110,6 +112,20 @@ class MessageConsumer(WebsocketConsumer):
                     {
                         'type': 'chat_message',
                         'action': action,
+                        'message_id': message_id,
+                        'username': user.username,
+                    }
+                )
+        elif action == 'reaction':
+            sub_action = text_data_json['sub_action']
+            reaction = text_data_json['reaction']
+            async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'action': action,
+                        'sub_action': sub_action,
+                        'reaction': reaction,
                         'message_id': message_id,
                         'username': user.username,
                     }
@@ -402,6 +418,38 @@ class MessageConsumer(WebsocketConsumer):
                 'type': 'deleting_message',
                 'message_id': message_id
             }))
+        elif action == 'reaction':
+            sub_action = event['sub_action']
+            if sub_action == 'new_reaction':
+                reaction = event['reaction']
+                try:
+                    message = Message.objects.get(id=message_id)
+
+                    all_reactions = message.reactions.all()
+                    reaction_count = 0
+                    for reaction in all_reactions:
+                        reaction_count += 1
+                    
+                    reaction_unicode = emoticons_dict[reaction]
+                    self.send(text_data=json.dumps({
+                        'type': 'incoming_reaction',
+                        'reaction_unicode': reaction_unicode,
+                        'message_id': message_id,
+                        
+
+                    }))
+                except ObjectDoesNotExist:
+                    print(f'Message with ID: {message_id} does not exist in the database.')
+                    return None
+                
+                except Exception as e:
+                    print(f'An error occured: {e}')
+                    return None
+
+            elif sub_action == 'replace':
+                pass
+            else: # sub_action == 'remove'
+                pass
         else:
             print(f'Invalid action: {action}')
 

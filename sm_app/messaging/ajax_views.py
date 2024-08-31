@@ -7,7 +7,6 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.core.files.storage import default_storage
-from django.core.exceptions import SuspiciousFileOperation
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
@@ -940,10 +939,12 @@ def reactions(request):
                 else: # replaces a reaction 
                     reaction_obj.reaction = emoticon
                     reaction_obj.save()
+                    reaction_id = reaction_obj.pk
                     reaction_result = 'replace'
             else: # creates a reaction
                 new_reaction = Reaction(message=message, user=user_stats, reaction=emoticon)
                 new_reaction.save()
+                reaction_id = new_reaction.pk
                 reaction_result = 'new_reaction'
         else:
             print('Reaction is not supported by Arabali.')
@@ -965,5 +966,6 @@ def reactions(request):
         'reaction_result': reaction_result,
         'message_id': message_id,
         'reaction': emoticon,
+        'reaction_id': reaction_id if reaction_id else None
     }
     return JsonResponse(response)
