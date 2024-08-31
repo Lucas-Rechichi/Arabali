@@ -2959,13 +2959,14 @@
             })
             // Deactivation of the context-menu when a left-click is registered.
             var reactionMessageID;
+            let mouseInReactions = false;
             $(document).on("click", function(e) {
                 $('.options').fadeOut(200);
                 if (e.target.classList.contains('popup-clickable')) {
                     console.log('clickable')
                 } else {
-                    $('#reactions').fadeOut(200);
                     $('.reaction-response').fadeOut(200);
+                    // make is so that the reactions popup only goes away if we are not hovering over it
                 }
             });
 
@@ -2974,7 +2975,6 @@
                 e.preventDefault();
 
                 $('.options').fadeOut(200);
-                $('#reactions').fadeOut(200);
 
                 var messageID = $(this).data('message-id');
                 console.log(messageID)
@@ -3250,7 +3250,6 @@
                 
                 if (numberOfReactions == 0) {
                     var reactions = $('#reactions');
-                    
                     reactions.fadeOut(200);
 
                     setTimeout(function () {
@@ -3301,8 +3300,6 @@
                         })
                     }
                 }
-                
-                
             })
             $('#reaction-search').on('input', function () {
                 var query = $(this).val();
@@ -3414,28 +3411,21 @@
 
             })
             // Reactions: Hold
-            var mouseInReactions;
             $('#conversation-contents').on('mousedown', '.react-button', function (e) {
                 var reactions = $('#reactions');
-                reactions.fadeOut(200);
-                reactButtonHoldID = setInterval(function () {
-                    setTimeout(function () {
-                        reactions.css({
-                            display: "block",
-                            position: "fixed",
-                            zIndex: 9000,
-                            left: e.pageX - 150,
-                            top: e.pageY + 10,
-                        });
-                    }, 200)
+                
+                setTimeout(function () {
+                    reactions.css({
+                        display: "block",
+                        position: "fixed",
+                        zIndex: 9000,
+                        left: e.pageX - 150,
+                        top: e.pageY + 10,
+                    });
                 }, 300)
                 
             })
-            $('#conversation-contents').on('mouseenter', '#reactions', function () {
-                mouseInReactions = true
-            })
             $('#conversation-contents').on('mouseup', '.react-button', function () {
-                clearInterval(reactButtonHoldID)
                 var reactions = $('#reactions');
                 if (!mouseInReactions) {
                     reactions.fadeOut(200);
