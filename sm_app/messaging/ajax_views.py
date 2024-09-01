@@ -935,6 +935,7 @@ def reactions(request):
                 reaction_obj = Reaction.objects.get(user=user_stats, message=message)
                 if message.reactions.filter(user=user_stats, reaction=emoticon).exists(): # if the reaction reacted with was the same reaction as beforhand, deletes reaction
                     reaction_obj.delete()
+                    reaction_id = None
                     reaction_result = 'remove'
                 else: # replaces a reaction 
                     reaction_obj.reaction = emoticon

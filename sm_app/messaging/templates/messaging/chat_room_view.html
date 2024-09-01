@@ -1145,14 +1145,14 @@
                         var userReactionUnicode = data.user_reaction_unicode;
                         if (userHasReacted) { // if the user on the website has already reacted to this message
                             newReactionButtonHtml = `
-                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
                                     ${userReactionUnicode}
                                     <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
                                 </button>
                             `;
                         } else { // no reaction on this message by the user on the website 
                             newReactionButtonHtml = `
-                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
                                     ${reactionUnicode}
                                     <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
                                 </button>
@@ -1168,12 +1168,72 @@
                     // reaction things for new messages as well.
                     
 
-                } else if (data.type === 'incoming_replace_reaction') {
-                    // replace the current reaction with the new reaction
-                        // if the user reacted, make the icon their reaction
-                        // if someone else reaced, make it the most common reaction for that message
-
                 } else if (data.type === 'incoming_remove_reaction') {
+                    var reaction = data.reaction;
+                    var reactionUnicode = data.reaction_unicode;
+                    var reactionCount = data.reaction_count;
+                    var reactor = data.reactor;
+                    var messageID = data.message_id;
+                    var messageUser = data.message_user;
+
+                    var reactionButtonWrapper = $('#reaction-button-col-' + messageID);
+
+                    var newReactionButtonHtml;
+                    if (reactionCount === 0) { // no reactions left
+                        if (messageUser === '{{username}}') {
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}">
+                                    <i class="bi bi-emoji-smile-fill" style="color:#ffffff;"></i>
+                                    <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        } else {
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}">
+                                    <i class="bi bi-emoji-smile-fill"></i>
+                                    <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        }
+                    } else { // are reactions left
+                        if (reactor === '{{username}}') {
+                            // remove border, put in most popular reaction
+                            if (messageUser === '{{username}}') {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${reactionUnicode}
+                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            } else {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${reactionUnicode}
+                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            }
+                        } else {
+                            // keep your reaction, update the conter
+                            if (messageUser === '{{username}}') {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${reactionUnicode}
+                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            } else {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${reactionUnicode}
+                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            }
+                        }
+                    }
+                    reactionButtonWrapper.html('')
+                    reactionButtonWrapper.html(newReactionButtonHtml);
                     // remove the reaction and add the icon for reactions instead if there are no reactions left
                         // if the user reacted, make the icon their reaction
                         // if someone else reaced, make it the most common reaction for that message

@@ -431,39 +431,26 @@ class MessageConsumer(WebsocketConsumer):
             user_stats = UserStats.objects.get(user=user_obj)
 
             message = Message.objects.get(id=message_id)
-            reaction = Reaction.objects.get(id=reaction_id)
-
-            # If the user on the website reacted to this message
-            user_has_reacted = message.has_reacted(user=user_stats)
-            if user_has_reacted:
-                user_reaction = message.reactions.get(user=user_stats).reaction
-                user_reaction_unicode = emoticons_dict[user_reaction]
-
-            reaction_unicode = emoticons_dict[reaction.reaction]
-            mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
 
             all_reactions = message.reactions.all()
             reaction_count = 0
             for reaction in all_reactions:
                 reaction_count += 1
 
-            if sub_action == 'new_reaction':
+            if sub_action == 'new_reaction' or sub_action == 'replace':
+                reaction = Reaction.objects.get(id=reaction_id)
+
+                # If the user on the website reacted to this message
+                user_has_reacted = message.has_reacted(user=user_stats)
+                if user_has_reacted:
+                    user_reaction = message.reactions.get(user=user_stats).reaction
+                    user_reaction_unicode = emoticons_dict[user_reaction]
+
+                reaction_unicode = emoticons_dict[reaction.reaction]
+                mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
+
                 self.send(text_data=json.dumps({
                     'type': 'incoming_new_reaction',
-                    'is_editing': 'false',
-                    'reaction_unicode': reaction_unicode,
-                    'reaction_count': reaction_count,
-                    'user_has_reacted': user_has_reacted,
-                    'reactor': reaction.user.user.username,
-                    'user_reaction': user_reaction if user_reaction else None,
-                    'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
-                    'mode_reaction': mode_reaction['reaction'],
-                    'message_id': message_id,
-                    'message_user':message.sender.user.username,
-                }))
-            elif sub_action == 'replace':
-                self.send(text_data=json.dumps({
-                    'type': 'incoming_replace_reaction',
                     'is_editing': 'false',
                     'reaction_unicode': reaction_unicode,
                     'reaction_count': reaction_count,
@@ -479,10 +466,8 @@ class MessageConsumer(WebsocketConsumer):
                 self.send(text_data=json.dumps({
                     'type': 'incoming_remove_reaction',
                     'is_editing': 'false',
-                    'reaction_unicode': reaction_unicode,
                     'reaction_count': reaction_count,
-                    'user_has_reacted': user_has_reacted,
-                    'reactor': reaction.user.user.username,
+                    'reactor': reaction.user.user.username, # pass though manually
                     'user_reaction': user_reaction if user_reaction else None,
                     'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
                     'mode_reaction': mode_reaction['reaction'],
