@@ -1112,23 +1112,33 @@
                     var message = $('#message-' + data.message_id);
                     message.remove();
 
-                } else if (data.type === 'incoming_new_reaction') {
+                } else if (data.type === 'incoming_new_reaction' || data.type === 'incomeing_replace_reaction') {
                     var reaction = data.reaction;
                     var reactionUnicode = data.reaction_unicode;
                     var reactionCount = data.reaction_count;
                     var reactor = data.reactor;
                     var messageID = data.message_id;
+                    var messageUser = data.message_user;
 
                     var reactionButtonWrapper = $('#reaction-button-col-' + messageID);
 
                     var newReactionButtonHtml;
                     if (reactor === '{{username}}') { // if we reacted
-                        newReactionButtonHtml = `
-                            <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
-                                ${reactionUnicode}
-                                <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                            </button>
-                        `;
+                        if (messageUser === '{{username}}') {// if we reacted to ouw own message
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
+                                    ${reactionUnicode}
+                                    <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        } else { // if we reacted to another message
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn has-reacted react-button border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
+                                    ${reactionUnicode}
+                                    <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        } 
                     } else { // someone else reacted
                         var userHasReacted = data.user_has_reacted;
                         var userReaction = data.user_reaction;
@@ -3333,7 +3343,7 @@
                                 
                                 messageSocket.send(JSON.stringify({
                                     'action': 'reaction',
-                                    'sub-action': response.reaction_result,
+                                    'sub_action': response.reaction_result,
                                     'reaction': response.reaction,
                                     'reaction_id': response.reaction_id,
                                     'message_id': response.message_id,
@@ -3357,7 +3367,7 @@
                                 
                                 messageSocket.send(JSON.stringify({
                                     'action': 'reaction',
-                                    'sub-action': response.reaction_result,
+                                    'sub_action': response.reaction_result,
                                     'reaction': response.reaction,
                                     'reaction_id': response.reaction_id,
                                     'message_id': response.message_id,
@@ -3425,7 +3435,7 @@
                         // send data over to message socket
                         messageSocket.send(JSON.stringify({
                             'action': 'reaction',
-                            'sub-action': response.reaction_result,
+                            'sub_action': response.reaction_result,
                             'reaction': response.reaction,
                             'reaction_id': response.reaction_id,
                             'message_id': response.message_id,

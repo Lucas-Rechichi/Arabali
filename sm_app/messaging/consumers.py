@@ -439,7 +439,7 @@ class MessageConsumer(WebsocketConsumer):
                 user_reaction = message.reactions.get(user=user_stats).reaction
                 user_reaction_unicode = emoticons_dict[user_reaction]
 
-            reaction_unicode = emoticons_dict[reaction]
+            reaction_unicode = emoticons_dict[reaction.reaction]
             mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
 
             all_reactions = message.reactions.all()
@@ -459,6 +459,7 @@ class MessageConsumer(WebsocketConsumer):
                     'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
                     'mode_reaction': mode_reaction['reaction'],
                     'message_id': message_id,
+                    'message_user':message.sender.user.username,
                 }))
             elif sub_action == 'replace':
                 self.send(text_data=json.dumps({
@@ -472,6 +473,7 @@ class MessageConsumer(WebsocketConsumer):
                     'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
                     'mode_reaction': mode_reaction['reaction'],
                     'message_id': message_id,
+                    'message_user':message.sender.user.username,
                 }))
             else: # sub_action == 'remove'
                 self.send(text_data=json.dumps({
@@ -485,6 +487,7 @@ class MessageConsumer(WebsocketConsumer):
                     'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
                     'mode_reaction': mode_reaction['reaction'],
                     'message_id': message_id,
+                    'message_user':message.sender.user.username,
                 }))
         else:
             print(f'Invalid action: {action}')
