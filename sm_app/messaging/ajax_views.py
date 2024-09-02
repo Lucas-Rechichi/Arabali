@@ -948,7 +948,7 @@ def reactions(request):
                 reaction_id = new_reaction.pk
                 reaction_result = 'new_reaction'
         else:
-            print('Reaction is not supported by Arabali.')
+            print(f'Reaction: {emoticon} is not supported by Arabali.')
             return None
 
     # Exceptions
@@ -967,6 +967,7 @@ def reactions(request):
         'reaction_result': reaction_result,
         'message_id': message_id,
         'reaction': emoticon,
+        'reactor': user.username,
         'reaction_id': reaction_id if reaction_id else None
     }
     return JsonResponse(response)

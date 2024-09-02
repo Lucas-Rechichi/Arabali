@@ -121,6 +121,7 @@ class MessageConsumer(WebsocketConsumer):
             sub_action = text_data_json['sub_action']
             reaction = text_data_json['reaction']
             reaction_id = text_data_json['reaction_id']
+            reactor = text_data_json['reactor']
             async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name,
                     {
@@ -128,6 +129,7 @@ class MessageConsumer(WebsocketConsumer):
                         'action': action,
                         'sub_action': sub_action,
                         'reaction': reaction,
+                        'reactor': reactor,
                         'message_id': message_id,
                         'reaction_id': reaction_id,
                         'username': user.username,
@@ -437,40 +439,56 @@ class MessageConsumer(WebsocketConsumer):
             for reaction in all_reactions:
                 reaction_count += 1
 
+            # If the user on the website reacted to this message
+            user_has_reacted = message.has_reacted(user=user_stats)
+            if user_has_reacted:
+                user_reaction = message.reactions.get(user=user_stats).reaction
+                user_reaction_unicode = emoticons_dict[user_reaction]
+            else:
+                user_has_reacted = False
+                user_reaction = None
+                user_reaction_unicode = None
+            
+            mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
+            if mode_reaction:
+                popular_reaction = mode_reaction['reaction']
+                popular_reaction_unicode = emoticons_dict[popular_reaction]
+            else:
+                popular_reaction = None
+                popular_reaction_unicode = None
+
             if sub_action == 'new_reaction' or sub_action == 'replace':
                 reaction = Reaction.objects.get(id=reaction_id)
-
-                # If the user on the website reacted to this message
-                user_has_reacted = message.has_reacted(user=user_stats)
-                if user_has_reacted:
-                    user_reaction = message.reactions.get(user=user_stats).reaction
-                    user_reaction_unicode = emoticons_dict[user_reaction]
-
                 reaction_unicode = emoticons_dict[reaction.reaction]
-                mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
+
+                reactor_pfp = reaction.user.pfp.url
 
                 self.send(text_data=json.dumps({
                     'type': 'incoming_new_reaction',
                     'is_editing': 'false',
+                    'reaction': reaction.reaction,
                     'reaction_unicode': reaction_unicode,
                     'reaction_count': reaction_count,
                     'user_has_reacted': user_has_reacted,
                     'reactor': reaction.user.user.username,
-                    'user_reaction': user_reaction if user_reaction else None,
-                    'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
-                    'mode_reaction': mode_reaction['reaction'],
+                    'reactor_pfp': reactor_pfp,
+                    'user_reaction': user_reaction,
+                    'user_reaction_unicode': user_reaction_unicode,
+                    'mode_reaction': popular_reaction,
                     'message_id': message_id,
                     'message_user':message.sender.user.username,
                 }))
             else: # sub_action == 'remove'
+                reactor = event['reactor']
                 self.send(text_data=json.dumps({
                     'type': 'incoming_remove_reaction',
                     'is_editing': 'false',
                     'reaction_count': reaction_count,
-                    'reactor': reaction.user.user.username, # pass though manually
-                    'user_reaction': user_reaction if user_reaction else None,
-                    'user_reaction_unicode': user_reaction_unicode if user_reaction_unicode else None,
-                    'mode_reaction': mode_reaction['reaction'],
+                    'reactor': reactor,
+                    'user_reaction': user_reaction,
+                    'user_reaction_unicode': user_reaction_unicode,
+                    'mode_reaction': popular_reaction,
+                    'mode_reaction_unicode': popular_reaction_unicode,
                     'message_id': message_id,
                     'message_user':message.sender.user.username,
                 }))

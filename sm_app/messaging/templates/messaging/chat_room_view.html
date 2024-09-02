@@ -146,7 +146,7 @@
                     <img src="{{room.icon.url}}" alt="" class="p-2 rounded-circle" style="max-height: 4rem; max-width: 4rem;">
                 </div>
                 <div class="col-10">
-                    <p class="lead text-start mt-3">{{room.name}} {{ "zzz"|emoticon|safe }}</p>
+                    <p class="lead text-start mt-3">{{room.name}}</p>
                 </div>
                 <div class="col-1">
                     <button type="button" class="btn mt-2" style="font-size: 2rem;" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
@@ -1169,8 +1169,8 @@
                     
 
                 } else if (data.type === 'incoming_remove_reaction') {
-                    var reaction = data.reaction;
-                    var reactionUnicode = data.reaction_unicode;
+                    var modeReactionUnicode = data.mode_reaction_unicode;
+                    var userReactionUnicode = data.user_reaction_unicode;
                     var reactionCount = data.reaction_count;
                     var reactor = data.reactor;
                     var messageID = data.message_id;
@@ -1201,31 +1201,31 @@
                             if (messageUser === '{{username}}') {
                                 newReactionButtonHtml = `
                                     <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${reactionUnicode}
+                                        ${modeReactionUnicode}
                                         <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
                                     </button>
                                 `;
                             } else {
                                 newReactionButtonHtml = `
                                     <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${reactionUnicode}
+                                        ${modeReactionUnicode}
                                         <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
                                     </button>
                                 `;
                             }
                         } else {
-                            // keep your reaction, update the conter
+                            // keep your reaction, update the counter
                             if (messageUser === '{{username}}') {
                                 newReactionButtonHtml = `
                                     <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${reactionUnicode}
+                                        ${userReactionUnicode}
                                         <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
                                     </button>
                                 `;
                             } else {
                                 newReactionButtonHtml = `
                                     <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${reactionUnicode}
+                                        ${userReactionUnicode}
                                         <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
                                     </button>
                                 `;
@@ -1234,11 +1234,7 @@
                     }
                     reactionButtonWrapper.html('')
                     reactionButtonWrapper.html(newReactionButtonHtml);
-                    // remove the reaction and add the icon for reactions instead if there are no reactions left
-                        // if the user reacted, make the icon their reaction
-                        // if someone else reaced, make it the most common reaction for that message
-                    
-                    // update the reaction count
+                    // Add users/remove users from the reaction response list.
 
                 } else {
                     var contentHtml = data.content_html;
@@ -3405,6 +3401,7 @@
                                     'action': 'reaction',
                                     'sub_action': response.reaction_result,
                                     'reaction': response.reaction,
+                                    'reactor': response.reactor,
                                     'reaction_id': response.reaction_id,
                                     'message_id': response.message_id,
                                 }))
@@ -3429,6 +3426,7 @@
                                     'action': 'reaction',
                                     'sub_action': response.reaction_result,
                                     'reaction': response.reaction,
+                                    'reactor': response.reactor,
                                     'reaction_id': response.reaction_id,
                                     'message_id': response.message_id,
                                 }))
@@ -3497,6 +3495,7 @@
                             'action': 'reaction',
                             'sub_action': response.reaction_result,
                             'reaction': response.reaction,
+                            'reactor': response.reactor,
                             'reaction_id': response.reaction_id,
                             'message_id': response.message_id,
                         }))
