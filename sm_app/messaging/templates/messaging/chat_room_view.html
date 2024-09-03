@@ -391,7 +391,7 @@
                                     <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
+                                            <button id="user-reaction-button-{{reaction.user.id}}" type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
                                                 <div class="row d-flex justify-content-center">
                                                     <div class="col-2">
                                                         <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
@@ -567,7 +567,7 @@
                                     <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
+                                            <button id="user-reaction-button-{{reaction.user.id}}" type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
                                                 <div class="row d-flex justify-content-center">
                                                     <div class="col-2">
                                                         <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
@@ -684,7 +684,7 @@
                                     <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
+                                            <button id="user-reaction-button-{{reaction.user.id}}" type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
                                                 <div class="row d-flex justify-content-center">
                                                     <div class="col-2">
                                                         <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
@@ -850,7 +850,7 @@
                                     <ul id="reaction-response-{{message_dict.message.id}}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="{{message_dict.message.id}}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         <p class="lead text-center"><strong>Reactions</strong></p>
                                         {% for reaction in message_dict.message.reactions.all %}
-                                            <button type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
+                                            <button id="user-reaction-button-{{reaction.user.id}}" type="button" class="btn" onclick="location.href='/profile/{{reaction.user.user.username}}'">
                                                 <div class="row d-flex justify-content-center">
                                                     <div class="col-2">
                                                         <img src="{{reaction.user.pfp.url}}" alt="" style="height: 40px; width: 40px; border-radius: 20px;">
@@ -1117,10 +1117,13 @@
                     var reactionUnicode = data.reaction_unicode;
                     var reactionCount = data.reaction_count;
                     var reactor = data.reactor;
+                    var reactorPFP = data.reactor_pfp;
+                    var reactorID = data.reactor_id;
                     var messageID = data.message_id;
                     var messageUser = data.message_user;
 
                     var reactionButtonWrapper = $('#reaction-button-col-' + messageID);
+                    var reactionResponseWrapper = $('#reaction-response-' + messageID);
 
                     var newReactionButtonHtml;
                     if (reactor === '{{username}}') { // if we reacted
@@ -1162,21 +1165,35 @@
 
                     reactionButtonWrapper.html('')
                     reactionButtonWrapper.html(newReactionButtonHtml);
-                    // add in a conditional for if the reaction is from a message the user on the website sent or a mess age that someone else sent
-                    // add user that has reacted into the reaction response list.
-                        // need username, user profile picture, and their emoticon they reacted with.
-                    // reaction things for new messages as well.
                     
+                    var reactionResponseButtonHtml = `
+                        <button id="user-reaction-button-${reactorID}" type="button" class="btn" onclick="location.href='/profile/${reactor}'">
+                            <div class="row d-flex justify-content-center">
+                                <div class="col-2">
+                                    <img src="${reactorPFP}" alt="${reactor}'s Profile Picture" style="height: 40px; width: 40px; border-radius: 20px;">
+                                </div>
+                                <div class="col-8">
+                                    <p class="mt-2 ms-2 text-center">${reactor}</p>
+                                </div>
+                                <div class="col-2">
+                                    <p class="mt-2">${reactionUnicode}</p>
+                                </div>
+                            </div>
+                        </button>
+                    `;
+                    reactionResponseWrapper.append(reactionResponseButtonHtml);
 
                 } else if (data.type === 'incoming_remove_reaction') {
                     var modeReactionUnicode = data.mode_reaction_unicode;
                     var userReactionUnicode = data.user_reaction_unicode;
                     var reactionCount = data.reaction_count;
                     var reactor = data.reactor;
+                    var reactorID = data.reactor_id;
                     var messageID = data.message_id;
                     var messageUser = data.message_user;
 
                     var reactionButtonWrapper = $('#reaction-button-col-' + messageID);
+                    var reactedButton = $('#user-reaction-button-' + reactorID);
 
                     var newReactionButtonHtml;
                     if (reactionCount === 0) { // no reactions left
@@ -1234,6 +1251,8 @@
                     }
                     reactionButtonWrapper.html('')
                     reactionButtonWrapper.html(newReactionButtonHtml);
+
+                    reactedButton.remove()
                     // Add users/remove users from the reaction response list.
 
                 } else {

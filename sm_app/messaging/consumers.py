@@ -463,6 +463,8 @@ class MessageConsumer(WebsocketConsumer):
 
                 reactor_pfp = reaction.user.pfp.url
 
+                reactor_id = reaction.user.pk
+
                 self.send(text_data=json.dumps({
                     'type': 'incoming_new_reaction',
                     'is_editing': 'false',
@@ -472,6 +474,7 @@ class MessageConsumer(WebsocketConsumer):
                     'user_has_reacted': user_has_reacted,
                     'reactor': reaction.user.user.username,
                     'reactor_pfp': reactor_pfp,
+                    'reactor_id': reactor_id,
                     'user_reaction': user_reaction,
                     'user_reaction_unicode': user_reaction_unicode,
                     'mode_reaction': popular_reaction,
@@ -480,11 +483,17 @@ class MessageConsumer(WebsocketConsumer):
                 }))
             else: # sub_action == 'remove'
                 reactor = event['reactor']
+
+                reactor_user = User.objects.get(username=reactor)
+                reactor_userstats = UserStats.objects.get(user=reactor_user)
+                reactor_id = reactor_userstats.pk
+
                 self.send(text_data=json.dumps({
                     'type': 'incoming_remove_reaction',
                     'is_editing': 'false',
                     'reaction_count': reaction_count,
                     'reactor': reactor,
+                    'reactor_id': reactor_id,
                     'user_reaction': user_reaction,
                     'user_reaction_unicode': user_reaction_unicode,
                     'mode_reaction': popular_reaction,
