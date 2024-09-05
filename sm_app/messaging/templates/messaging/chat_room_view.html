@@ -1116,6 +1116,7 @@
                     var reaction = data.reaction;
                     var reactionUnicode = data.reaction_unicode;
                     var reactionCount = data.reaction_count;
+                    var modeReaction = data.mode_reaction;
                     var reactor = data.reactor;
                     var reactorPFP = data.reactor_pfp;
                     var reactorID = data.reactor_id;
@@ -1129,37 +1130,55 @@
                     if (reactor === '{{username}}') { // if we reacted
                         if (messageUser === '{{username}}') {// if we reacted to ouw own message
                             newReactionButtonHtml = `
-                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
+                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
                                     ${reactionUnicode}
                                     <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
                                 </button>
                             `;
                         } else { // if we reacted to another message
                             newReactionButtonHtml = `
-                                <button type="button" class="btn has-reacted react-button border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
+                                <button type="button" class="btn has-reacted react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
                                     ${reactionUnicode}
                                     <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
                                 </button>
                             `;
                         } 
                     } else { // someone else reacted
-                        var userHasReacted = data.user_has_reacted;
                         var userReaction = data.user_reaction;
                         var userReactionUnicode = data.user_reaction_unicode;
-                        if (userHasReacted) { // if the user on the website has already reacted to this message
-                            newReactionButtonHtml = `
-                                <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                    ${userReactionUnicode}
-                                    <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                                </button>
-                            `;
+                        if (reactor === '{{username}}') { // if the user on the website has already reacted to this message
+                            if (messageUser === '{{username}}') {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${userReactionUnicode}
+                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            } else {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${userReactionUnicode}
+                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            }
+                            
                         } else { // no reaction on this message by the user on the website 
-                            newReactionButtonHtml = `
-                                <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                    ${reactionUnicode}
-                                    <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                                </button>
-                            `;
+                            if (messageUser === '{{username}}') {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${userReactionUnicode}
+                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            } else {
+                                newReactionButtonHtml = `
+                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        ${userReactionUnicode}
+                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                    </button>
+                                `;
+                            }
                         }
                     }
 
@@ -1186,6 +1205,7 @@
                 } else if (data.type === 'incoming_remove_reaction') {
                     var modeReactionUnicode = data.mode_reaction_unicode;
                     var userReactionUnicode = data.user_reaction_unicode;
+                    var modeReaction = data.mode_reaction;
                     var reactionCount = data.reaction_count;
                     var reactor = data.reactor;
                     var reactorID = data.reactor_id;
@@ -1253,7 +1273,6 @@
                     reactionButtonWrapper.html(newReactionButtonHtml);
 
                     reactedButton.remove()
-                    // Add users/remove users from the reaction response list.
 
                 } else {
                     var contentHtml = data.content_html;
@@ -1295,6 +1314,9 @@
                                                                 <div class="col">
                                                                     ` + selfReplyButtonHtml + `
                                                                 </div>
+                                                                <div id="reaction-button-col-${data.message_id}" class="col d-flex justify-content-end">
+                                                                    <button type="button" class="btn react-button" data-message-id="${data.message_id}" data-number-of-reactions="0"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">0</p></button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1310,6 +1332,9 @@
                                         ${downloadOption}
                                         ${editOption}
                                         ${deleteOption}
+                                    </ul>
+                                    <ul id="reaction-response-${data.message_id}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="${data.message_id}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <p class="lead text-center"><strong>Reactions</strong></p>
                                     </ul>
                                 </div>
                                 `;
@@ -1343,6 +1368,9 @@
                                                                 <div class="col">
                                                                     ` + otherReplyButtonHtml + `
                                                                 </div>
+                                                                <div id="reaction-button-col-${data.message_id}" class="col d-flex justify-content-end">
+                                                                    <button type="button" class="btn react-button" data-message-id="${data.message_id}" data-number-of-reactions="0"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 text-light d-inline-flex">0</p></button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1354,6 +1382,9 @@
                                     <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                         ${copyOption}
                                         ${downloadOption}
+                                    </ul>
+                                    <ul id="reaction-response-${data.message_id}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="${data.message_id}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <p class="lead text-center"><strong>Reactions</strong></p>
                                     </ul>
                                 </div>
                                 `;
@@ -1398,6 +1429,9 @@
                                                                 <div class="col">
                                                                     ` + selfReplyButtonHtml + `
                                                                 </div>
+                                                                <div id="reaction-button-col-${data.message_id}" class="col d-flex justify-content-end">
+                                                                    <button type="button" class="btn react-button" data-message-id="${data.message_id}" data-number-of-reactions="0"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 d-inline-flex">0</p></button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1413,6 +1447,9 @@
                                         ${downloadOption}
                                         ${editOption}
                                         ${deleteOption}
+                                    </ul>
+                                    <ul id="reaction-response-${data.message_id}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="${data.message_id}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                        <p class="lead text-center"><strong>Reactions</strong></p>
                                     </ul>
                                 </div>
                                 `;
@@ -1455,6 +1492,9 @@
                                                                     <div class="col">
                                                                         ` + otherReplyButtonHtml + `
                                                                     </div>
+                                                                    <div id="reaction-button-col-${data.message_id}" class="col d-flex justify-content-end">
+                                                                        <button type="button" class="btn react-button" data-message-id="${data.message_id}" data-number-of-reactions="0"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">0</p></button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1467,6 +1507,9 @@
                                         <ul class="dropdown-menu options options-${data.message_id} p-2 mb-1" style="width:100px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
                                             ${copyOption}
                                             ${downloadOption}
+                                        </ul>
+                                        <ul id="reaction-response-${data.message_id}" class="reaction-response dropdown-menu p-2 mb-1" data-message-id="${data.message_id}" style=" width:300px; height:100px; overflow-y: auto; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none;">
+                                            <p class="lead text-center"><strong>Reactions</strong></p>
                                         </ul>
                                     </div>
                                     `;

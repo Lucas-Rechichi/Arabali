@@ -212,6 +212,8 @@ class MessageConsumer(WebsocketConsumer):
                 chat_room = message.room
                 replied_to_messages = Message.objects.filter(room=chat_room, reply=message)
                 replied_to_changes = {}
+                
+                a = 0
                 for a, replied_to_message in enumerate(replied_to_messages):
                     changed_reply_html = f'<a href="#message-timestamp-{message_id}" class="btn p-0"><p class="small text-truncate m-0">{content}</p></a>'
                     replied_to_changes[a + 1] = {
@@ -219,7 +221,7 @@ class MessageConsumer(WebsocketConsumer):
                         'user': message.sender.user.username,
                         'html': changed_reply_html,
                     }
-                replied_to_message_count = a + 1 if a else 0
+                replied_to_message_count = a + 1
 
                 # Rest of sending relevant data over
                 if is_reply == 'true':
@@ -440,14 +442,6 @@ class MessageConsumer(WebsocketConsumer):
                 reaction_count += 1
 
             # If the user on the website reacted to this message
-            user_has_reacted = message.has_reacted(user=user_stats)
-            if user_has_reacted:
-                user_reaction = message.reactions.get(user=user_stats).reaction
-                user_reaction_unicode = emoticons_dict[user_reaction]
-            else:
-                user_has_reacted = False
-                user_reaction = None
-                user_reaction_unicode = None
             
             mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
             if mode_reaction:
@@ -461,8 +455,16 @@ class MessageConsumer(WebsocketConsumer):
                 reaction = Reaction.objects.get(id=reaction_id)
                 reaction_unicode = emoticons_dict[reaction.reaction]
 
-                reactor_pfp = reaction.user.pfp.url
+                user_has_reacted = message.has_reacted(user=reaction.user)
+                if user_has_reacted:
+                    user_reaction = message.reactions.get(user=reaction.user).reaction
+                    user_reaction_unicode = emoticons_dict[user_reaction]
+                else:
+                    user_has_reacted = False
+                    user_reaction = None
+                    user_reaction_unicode = None
 
+                reactor_pfp = reaction.user.pfp.url
                 reactor_id = reaction.user.pk
 
                 self.send(text_data=json.dumps({
@@ -471,7 +473,6 @@ class MessageConsumer(WebsocketConsumer):
                     'reaction': reaction.reaction,
                     'reaction_unicode': reaction_unicode,
                     'reaction_count': reaction_count,
-                    'user_has_reacted': user_has_reacted,
                     'reactor': reaction.user.user.username,
                     'reactor_pfp': reactor_pfp,
                     'reactor_id': reactor_id,
@@ -487,6 +488,15 @@ class MessageConsumer(WebsocketConsumer):
                 reactor_user = User.objects.get(username=reactor)
                 reactor_userstats = UserStats.objects.get(user=reactor_user)
                 reactor_id = reactor_userstats.pk
+
+                user_has_reacted = message.has_reacted(user=reactor_userstats)
+                if user_has_reacted:
+                    user_reaction = message.reactions.get(user=reactor_userstats).reaction
+                    user_reaction_unicode = emoticons_dict[user_reaction]
+                else:
+                    user_has_reacted = False
+                    user_reaction = None
+                    user_reaction_unicode = None
 
                 self.send(text_data=json.dumps({
                     'type': 'incoming_remove_reaction',
