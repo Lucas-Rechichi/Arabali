@@ -315,7 +315,7 @@
                                                                     {% if message_dict.has_reacted %}
                                                                         <button type="button" class="btn has-reacted react-button border-light" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-emoticon="{{message_dict.user_reaction}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                     {% else %}
-                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction:"unicode"|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                     {% endif %}
                                                                 {% else %}
                                                                     <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
@@ -520,7 +520,7 @@
                                                                         {% if message_dict.has_reacted %}
                                                                             <button type="button" class="btn has-reacted react-button border-light" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-emoticon="{{message_dict.user_reaction}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                         {% else %}
-                                                                            <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                            <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction:"unicode"|safe}} <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                         {% endif %}
                                                                     {% else %}
                                                                         <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}"><i class="bi bi-emoji-smile-fill" style="color: #ffffff;"></i> <p class="m-0 p-0 text-light d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
@@ -651,7 +651,7 @@
                                                                     {% if message_dict.has_reacted %}
                                                                         <button type="button" class="btn has-reacted react-button border-dark" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-emoticon="{{message_dict.user_reaction}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                     {% else %}
-                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                        <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction:"unicode"|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                     {% endif %}
                                                                 {% else %}
                                                                     <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
@@ -814,7 +814,7 @@
                                                                         {% if message_dict.has_reacted %}
                                                                             <button type="button" class="btn has-reacted react-button border-dark" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-emoticon="{{message_dict.user_reaction}}">{{message_dict.user_reaction|emoticon|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                         {% else %}
-                                                                            <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
+                                                                            <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}" data-popular-reaction="{{message_dict.message|most_popular_reaction}}">{{message_dict.message|most_popular_reaction:"unicode"|safe}} <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
                                                                         {% endif %}
                                                                     {% else %}
                                                                         <button type="button" class="btn react-button" data-message-id="{{message_dict.message.id}}" data-number-of-reactions="{{message_dict.message|number_of_reactions}}"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">{{message_dict.message|number_of_reactions}}</p></button>
@@ -1117,6 +1117,7 @@
                     var reactionUnicode = data.reaction_unicode;
                     var reactionCount = data.reaction_count;
                     var modeReaction = data.mode_reaction;
+                    var modeReactionUnicode = data.mode_reaction_unicode;
                     var reactor = data.reactor;
                     var reactorPFP = data.reactor_pfp;
                     var reactorID = data.reactor_id;
@@ -1144,40 +1145,45 @@
                             `;
                         } 
                     } else { // someone else reacted
-                        var userReaction = data.user_reaction;
-                        var userReactionUnicode = data.user_reaction_unicode;
-                        if (reactor === '{{username}}') { // if the user on the website has already reacted to this message
-                            if (messageUser === '{{username}}') {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${userReactionUnicode}
-                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
+                        var reactorsList = data.reactors_list;
+                        var reactorsDict = data.reactors_dict;
+                        var reactorsCount = data.reactors_count;
+                        for (let i=0; i < reactorsCount; i++) { // loops though everyone who has reacted to this message
+                            console.log(reactorsList)
+                            if (reactorsList[i] === '{{username}}') {
+                                var userReaction = reactorsDict[reactorsList[i]]['reaction'];
+                                var userReactionUnicode = reactorsDict[reactorsList[i]]['reaction_unicode'];
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
                             } else {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${userReactionUnicode}
-                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
-                            }
-                            
-                        } else { // no reaction on this message by the user on the website 
-                            if (messageUser === '{{username}}') {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${userReactionUnicode}
-                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
-                            } else {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${userReactionUnicode}
-                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
                             }
                         }
                     }
@@ -1203,8 +1209,6 @@
                     reactionResponseWrapper.append(reactionResponseButtonHtml);
 
                 } else if (data.type === 'incoming_remove_reaction') {
-                    var modeReactionUnicode = data.mode_reaction_unicode;
-                    var userReactionUnicode = data.user_reaction_unicode;
                     var modeReaction = data.mode_reaction;
                     var reactionCount = data.reaction_count;
                     var reactor = data.reactor;

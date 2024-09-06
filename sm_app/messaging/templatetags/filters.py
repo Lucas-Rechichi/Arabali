@@ -28,7 +28,9 @@ def number_of_reactions(message):
     return no_of_reactions
 
 @register.filter
-def most_popular_reaction(message):
+def most_popular_reaction(message, type=None):
     mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
-    return emoticons_dict[mode_reaction['reaction']]
-    
+    if type == 'unicode': 
+        return emoticons_dict[mode_reaction['reaction']]
+    else:
+        return mode_reaction['reaction']

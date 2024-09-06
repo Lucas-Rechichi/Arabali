@@ -455,14 +455,14 @@ class MessageConsumer(WebsocketConsumer):
                 reaction = Reaction.objects.get(id=reaction_id)
                 reaction_unicode = emoticons_dict[reaction.reaction]
 
-                user_has_reacted = message.has_reacted(user=reaction.user)
-                if user_has_reacted:
-                    user_reaction = message.reactions.get(user=reaction.user).reaction
-                    user_reaction_unicode = emoticons_dict[user_reaction]
-                else:
-                    user_has_reacted = False
-                    user_reaction = None
-                    user_reaction_unicode = None
+                reactors_dict = {}
+                reactors_list = []
+                for reactor_obj in message.reactions.all():
+                    reactors_list.append(reactor_obj.user.user.username)
+                    reactors_dict[reactor_obj.user.user.username] = {
+                        'reaction': message.reactions.get(user=reaction.user).reaction,
+                        'reaction_unicode': emoticons_dict[message.reactions.get(user=reaction.user).reaction] 
+                    }
 
                 reactor_pfp = reaction.user.pfp.url
                 reactor_id = reaction.user.pk
@@ -476,9 +476,11 @@ class MessageConsumer(WebsocketConsumer):
                     'reactor': reaction.user.user.username,
                     'reactor_pfp': reactor_pfp,
                     'reactor_id': reactor_id,
-                    'user_reaction': user_reaction,
-                    'user_reaction_unicode': user_reaction_unicode,
+                    'reactors_dict': reactors_dict,
+                    'reactors_list': reactors_list,
+                    'reactors_count': len(reactors_list),
                     'mode_reaction': popular_reaction,
+                    'mode_reaction_unicode': popular_reaction_unicode,
                     'message_id': message_id,
                     'message_user':message.sender.user.username,
                 }))
@@ -489,14 +491,14 @@ class MessageConsumer(WebsocketConsumer):
                 reactor_userstats = UserStats.objects.get(user=reactor_user)
                 reactor_id = reactor_userstats.pk
 
-                user_has_reacted = message.has_reacted(user=reactor_userstats)
-                if user_has_reacted:
-                    user_reaction = message.reactions.get(user=reactor_userstats).reaction
-                    user_reaction_unicode = emoticons_dict[user_reaction]
-                else:
-                    user_has_reacted = False
-                    user_reaction = None
-                    user_reaction_unicode = None
+                reactors_dict = {}
+                reactors_list = []
+                for reactor_obj in message.reactions.all():
+                    reactors_list.append(reactor_obj.user.user.username)
+                    reactors_dict[reactor_obj.user.user.username] = {
+                        'reaction': message.reactions.get(user=reaction.user).reaction,
+                        'reaction_unicode': emoticons_dict[message.reactions.get(user=reaction.user).reaction] 
+                    }
 
                 self.send(text_data=json.dumps({
                     'type': 'incoming_remove_reaction',
@@ -504,8 +506,9 @@ class MessageConsumer(WebsocketConsumer):
                     'reaction_count': reaction_count,
                     'reactor': reactor,
                     'reactor_id': reactor_id,
-                    'user_reaction': user_reaction,
-                    'user_reaction_unicode': user_reaction_unicode,
+                    'reactors_dict': reactors_dict,
+                    'reactors_list': reactors_list,
+                    'reactors_count': len(reactors_list),
                     'mode_reaction': popular_reaction,
                     'mode_reaction_unicode': popular_reaction_unicode,
                     'message_id': message_id,
