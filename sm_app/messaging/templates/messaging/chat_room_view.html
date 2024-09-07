@@ -1149,7 +1149,6 @@
                         var reactorsDict = data.reactors_dict;
                         var reactorsCount = data.reactors_count;
                         for (let i=0; i < reactorsCount; i++) { // loops though everyone who has reacted to this message
-                            console.log(reactorsList)
                             if (reactorsList[i] === '{{username}}') {
                                 var userReaction = reactorsDict[reactorsList[i]]['reaction'];
                                 var userReactionUnicode = reactorsDict[reactorsList[i]]['reaction_unicode'];
@@ -1168,28 +1167,13 @@
                                         </button>
                                     `;
                                 }
-                            } else {
-                                if (messageUser === '{{username}}') {
-                                    newReactionButtonHtml = `
-                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
-                                            ${userReactionUnicode}
-                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                                        </button>
-                                    `;
-                                } else {
-                                    newReactionButtonHtml = `
-                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
-                                            ${userReactionUnicode}
-                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
-                                        </button>
-                                    `;
-                                }
                             }
                         }
                     }
 
-                    reactionButtonWrapper.html('')
-                    reactionButtonWrapper.html(newReactionButtonHtml);
+                    if (newReactionButtonHtml) {
+                        reactionButtonWrapper.html(newReactionButtonHtml);
+                    }
                     
                     var reactionResponseButtonHtml = `
                         <button id="user-reaction-button-${reactorID}" type="button" class="btn" onclick="location.href='/profile/${reactor}'">
@@ -1210,9 +1194,15 @@
 
                 } else if (data.type === 'incoming_remove_reaction') {
                     var modeReaction = data.mode_reaction;
+                    var modeReactionUnicode = data.mode_reaction_unicode;
+
                     var reactionCount = data.reaction_count;
                     var reactor = data.reactor;
                     var reactorID = data.reactor_id;
+                    var reactorsList = data.reactors_list;
+                    var reactorsDict = data.reactors_dict;
+                    var reactorsCount = data.reactors_count;
+
                     var messageID = data.message_id;
                     var messageUser = data.message_user;
 
@@ -1237,46 +1227,64 @@
                             `;
                         }
                     } else { // are reactions left
-                        if (reactor === '{{username}}') {
-                            // remove border, put in most popular reaction
-                            if (messageUser === '{{username}}') {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${modeReactionUnicode}
-                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
-                            } else {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${modeReactionUnicode}
-                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
-                            }
-                        } else {
-                            // keep your reaction, update the counter
-                            if (messageUser === '{{username}}') {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${userReactionUnicode}
-                                        <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
-                            } else {
-                                newReactionButtonHtml = `
-                                    <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
-                                        ${userReactionUnicode}
-                                        <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
-                                    </button>
-                                `;
+                        for (let i=0; i < reactorsCount; i++) {
+                            var userReaction = reactorsDict[reactorsList[i]]['reaction'];
+                            var userReactionUnicode = reactorsDict[reactorsList[i]]['reaction_unicode'];
+                            if (reactor === '{{username}}') { // you removed the reaction
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
+                            } else if (reactorsList[i] === '{{username}}') { // reacted, didn't delete their reaction
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
+                            } else { // didn't react at all
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
                             }
                         }
                     }
-                    reactionButtonWrapper.html('')
-                    reactionButtonWrapper.html(newReactionButtonHtml);
-
-                    reactedButton.remove()
+                    if (newReactionButtonHtml) {
+                        reactionButtonWrapper.html(newReactionButtonHtml);
+                        reactedButton.remove()
+                    }
 
                 } else {
                     var contentHtml = data.content_html;
@@ -2934,6 +2942,7 @@
                                     'action': 'create_message',
                                     'message_id': response.message_id,
                                     'is_reply': response.is_reply,
+                                    'is_editing': 'false',
                                     'reply_id': response.reply_id,
                                 }))
                             } else {
@@ -2942,6 +2951,7 @@
                                     'action': 'create_message',
                                     'message_id': response.message_id,
                                     'is_reply': response.is_reply,
+                                    'is_editing': 'false',
                                 }))
                             }
                         }
@@ -3405,6 +3415,7 @@
                 var messageID = $(this).data('message-id');
                 var messageType = $(this).data('type');
 
+                console.log(messageID)
                 $.ajax({
                     type: 'POST',
                     url: '/chat/delete-message/',
