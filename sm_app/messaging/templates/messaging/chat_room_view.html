@@ -1129,7 +1129,7 @@
 
                     var newReactionButtonHtml;
                     if (reactor === '{{username}}') { // if we reacted
-                        if (messageUser === '{{username}}') {// if we reacted to ouw own message
+                        if (messageUser === '{{username}}') {// if we reacted to our own message
                             newReactionButtonHtml = `
                                 <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
                                     ${reactionUnicode}
@@ -1149,9 +1149,9 @@
                         var reactorsDict = data.reactors_dict;
                         var reactorsCount = data.reactors_count;
                         for (let i=0; i < reactorsCount; i++) { // loops though everyone who has reacted to this message
-                            if (reactorsList[i] === '{{username}}') {
-                                var userReaction = reactorsDict[reactorsList[i]]['reaction'];
-                                var userReactionUnicode = reactorsDict[reactorsList[i]]['reaction_unicode'];
+                            var userReaction = reactorsDict[reactorsList[i]]['reaction'];
+                            var userReactionUnicode = reactorsDict[reactorsList[i]]['reaction_unicode'];
+                            if (reactorsList[i] === '{{username}}') { // if this user has reacted before
                                 if (messageUser === '{{username}}') {
                                     newReactionButtonHtml = `
                                         <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
@@ -1163,6 +1163,22 @@
                                     newReactionButtonHtml = `
                                         <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
                                             ${userReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
+                            } else { // if this user hasn't reacted before
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
                                             <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
                                         </button>
                                     `;
