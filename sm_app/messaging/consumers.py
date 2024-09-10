@@ -460,8 +460,8 @@ class MessageConsumer(WebsocketConsumer):
                 for reactor_obj in message.reactions.all():
                     reactors_list.append(reactor_obj.user.user.username)
                     reactors_dict[reactor_obj.user.user.username] = {
-                        'reaction': message.reactions.get(user=reaction.user).reaction,
-                        'reaction_unicode': emoticons_dict[message.reactions.get(user=reaction.user).reaction] 
+                        'reaction': reactor_obj.reaction,
+                        'reaction_unicode': emoticons_dict[reactor_obj.reaction] 
                     }
 
                 reactor_pfp = reaction.user.pfp.url
@@ -496,8 +496,8 @@ class MessageConsumer(WebsocketConsumer):
                 for reactor_obj in message.reactions.all():
                     reactors_list.append(reactor_obj.user.user.username)
                     reactors_dict[reactor_obj.user.user.username] = {
-                        'reaction': message.reactions.get(user=reaction.user).reaction,
-                        'reaction_unicode': emoticons_dict[message.reactions.get(user=reaction.user).reaction] 
+                        'reaction': reactor_obj.reaction,
+                        'reaction_unicode': emoticons_dict[reactor_obj.reaction] 
                     }
 
                 self.send(text_data=json.dumps({

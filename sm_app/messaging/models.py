@@ -81,4 +81,3 @@ class Reaction(models.Model):
     reaction = models.CharField(max_length=10, null=False)
     created_at = models.DateTimeField(auto_now_add=True, null=False)
 
-    

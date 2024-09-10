@@ -1112,7 +1112,7 @@
                     var message = $('#message-' + data.message_id);
                     message.remove();
 
-                } else if (data.type === 'incoming_new_reaction' || data.type === 'incomeing_replace_reaction') {
+                } else if (data.type === 'incoming_new_reaction') {
                     var reaction = data.reaction;
                     var reactionUnicode = data.reaction_unicode;
                     var reactionCount = data.reaction_count;
@@ -1173,24 +1173,134 @@
 
                     if (newReactionButtonHtml) {
                         reactionButtonWrapper.html(newReactionButtonHtml);
+                        var reactionResponseButtonHtml = `
+                            <button id="user-reaction-button-${reactorID}" type="button" class="btn" onclick="location.href='/profile/${reactor}'">
+                                <div class="row d-flex justify-content-center">
+                                    <div class="col-2">
+                                        <img src="${reactorPFP}" alt="${reactor}'s Profile Picture" style="height: 40px; width: 40px; border-radius: 20px;">
+                                    </div>
+                                    <div class="col-8">
+                                        <p class="mt-2 ms-2 text-center">${reactor}</p>
+                                    </div>
+                                    <div class="col-2">
+                                        <p class="mt-2">${reactionUnicode}</p>
+                                    </div>
+                                </div>
+                            </button>
+                        `;
+                        reactionResponseWrapper.append(reactionResponseButtonHtml);
                     }
-                    
-                    var reactionResponseButtonHtml = `
-                        <button id="user-reaction-button-${reactorID}" type="button" class="btn" onclick="location.href='/profile/${reactor}'">
-                            <div class="row d-flex justify-content-center">
-                                <div class="col-2">
-                                    <img src="${reactorPFP}" alt="${reactor}'s Profile Picture" style="height: 40px; width: 40px; border-radius: 20px;">
+
+                } else if (data.type === 'incoming_replace_reaction') {
+                    // change reaction button accordingly, remove and add new button contaning a new emoticon for that users reaction.
+                    var reaction = data.reaction;
+                    var reactionUnicode = data.reaction_unicode;
+                    var reactionCount = data.reaction_count;
+                    var modeReaction = data.mode_reaction;
+                    var modeReactionUnicode = data.mode_reaction_unicode;
+                    var reactor = data.reactor;
+                    var reactorPFP = data.reactor_pfp;
+                    var reactorID = data.reactor_id;
+                    var messageID = data.message_id;
+                    var messageUser = data.message_user;
+
+                    var reactionButtonWrapper = $('#reaction-button-col-' + messageID);
+                    var reactionResponseWrapper = $('#reaction-response-' + messageID);
+
+                    var newReactionButtonHtml;
+                    if (reactor === '{{username}}') { // our replacement of the emoticon
+                        if (messageUser === '{{username}}') { // if we reacted to ouw own message
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
+                                    ${reactionUnicode}
+                                    <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        } else { // if we reacted to another message
+                            newReactionButtonHtml = `
+                                <button type="button" class="btn has-reacted react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${reaction}">
+                                    ${reactionUnicode}
+                                    <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                </button>
+                            `;
+                        } 
+                    } else { // someone else's replacement
+                        console.log(reactorsDict)
+                        for (let i=0; i < reactorsCount; i++) {
+                            var userReaction = reactorsDict[reactorsList[i]]['reaction'];
+                            var userReactionUnicode = reactorsDict[reactorsList[i]]['reaction_unicode'];
+                            if (reactor === '{{username}}') { // you removed the reaction
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
+                            } else if (reactorsList[i] === '{{username}}') { // reacted, didn't change their reaction
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button has-reacted border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button has-reacted border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                            ${userReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
+                            } else { // didn't react at all
+                                if (messageUser === '{{username}}') {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                } else {
+                                    newReactionButtonHtml = `
+                                        <button type="button" class="btn react-button" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${modeReaction}">
+                                            ${modeReactionUnicode}
+                                            <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
+                                        </button>
+                                    `;
+                                }
+                            }
+                        }
+                    }
+
+                    if (newReactionButtonHtml) {
+                        reactionButtonWrapper.html(newReactionButtonHtml);
+                        reactedButton.remove()
+                        var reactionResponseButtonHtml = `
+                            <button id="user-reaction-button-${reactorID}" type="button" class="btn" onclick="location.href='/profile/${reactor}'">
+                                <div class="row d-flex justify-content-center">
+                                    <div class="col-2">
+                                        <img src="${reactorPFP}" alt="${reactor}'s Profile Picture" style="height: 40px; width: 40px; border-radius: 20px;">
+                                    </div>
+                                    <div class="col-8">
+                                        <p class="mt-2 ms-2 text-center">${reactor}</p>
+                                    </div>
+                                    <div class="col-2">
+                                        <p class="mt-2">${reactionUnicode}</p>
+                                    </div>
                                 </div>
-                                <div class="col-8">
-                                    <p class="mt-2 ms-2 text-center">${reactor}</p>
-                                </div>
-                                <div class="col-2">
-                                    <p class="mt-2">${reactionUnicode}</p>
-                                </div>
-                            </div>
-                        </button>
-                    `;
-                    reactionResponseWrapper.append(reactionResponseButtonHtml);
+                            </button>
+                        `;
+                        reactionResponseWrapper.append(reactionResponseButtonHtml);
+                    }
 
                 } else if (data.type === 'incoming_remove_reaction') {
                     var modeReaction = data.mode_reaction;
@@ -1249,14 +1359,14 @@
                             } else if (reactorsList[i] === '{{username}}') { // reacted, didn't delete their reaction
                                 if (messageUser === '{{username}}') {
                                     newReactionButtonHtml = `
-                                        <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        <button type="button" class="btn react-button has-reacted border-light" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
                                             ${userReactionUnicode}
                                             <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
                                         </button>
                                     `;
                                 } else {
                                     newReactionButtonHtml = `
-                                        <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        <button type="button" class="btn react-button has-reacted border-dark" data-message-id="${messageID}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
                                             ${userReactionUnicode}
                                             <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
                                         </button>
@@ -3411,7 +3521,7 @@
                 bodySection.html(oldMessageBody);
 
             })
-            $('.options').on('click', '.delete-message', function () {
+            $('#conversation-contents').on('click', '.delete-message', function () {
                 var messageID = $(this).data('message-id');
                 var messageType = $(this).data('type');
 
@@ -3628,6 +3738,7 @@
             var reactionHoldTimer
             $('#conversation-contents').on('mousedown', '.react-button', function (e) { // initiates the reactions popup on a hold
                 var reactions = $('#reactions');
+                reactionMessageID = $(this).data('message-id');
                 
                 reactionHoldTimer = setTimeout(function () {
                     reactions.css({
