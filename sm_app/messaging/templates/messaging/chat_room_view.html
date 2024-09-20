@@ -1154,14 +1154,14 @@
                             if (reactorsList[i] === '{{username}}') { // if this user has reacted before
                                 if (messageUser === '{{username}}') {
                                     newReactionButtonHtml = `
-                                        <button type="button" class="btn react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        <button type="button" class="btn has-reacted react-button border-light" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
                                             ${userReactionUnicode}
                                             <p class="m-0 p-0 text-light d-inline-flex">${reactionCount}</p>
                                         </button>
                                     `;
                                 } else {
                                     newReactionButtonHtml = `
-                                        <button type="button" class="btn react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
+                                        <button type="button" class="btn has-reacted react-button border-dark" data-message-id="${messageID}" data-popular-reaction="${modeReaction}" data-number-of-reactions="${reactionCount}" data-emoticon="${userReaction}">
                                             ${userReactionUnicode}
                                             <p class="m-0 p-0 d-inline-flex">${reactionCount}</p>
                                         </button>

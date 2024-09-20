@@ -4,6 +4,8 @@ import os
 import shutil
 import json
 
+import pandas as pd
+
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.core.files.storage import default_storage
@@ -40,6 +42,38 @@ def message_sent_text(request):
         else:
             new_message = Message(sender=user_stats, room=chat_room, text=text_message)
             new_message.save()
+
+        # updating the csv file when a new message is created.
+        csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
+        
+        if os.path.exists(csv_path):
+            pass
+        else:
+            os.mkdir(csv_path)
+        recent_messages = chat_room.messages.all().order_by('-sent_at')[:5]
+        message_dataframe = pd.DataFrame({})
+        for message in recent_messages:
+            if is_reply == 'true':
+                df_is_reply = True
+                # reply_to_id is already given a value
+            else:
+                df_is_reply = False
+                reply_to_id = None
+            
+            new_data = pd.DataFrame({
+                'Message ID': message.pk,
+                'Message Sender': message.sender.user.username,
+                'Replied?': df_is_reply,
+                'Reply Message ID': reply_to_id,
+                'Message Text': message.text,
+                'Message Image': message.image.url if message.image else None,
+                'Message Video': message.video.url if message.video else None,
+                'Message Audio': message.audio.url if message.audio else None,
+                'Sent At': message.sent_at
+            }, index=[message_dataframe.shape[0]])
+            message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=True)
+
+            message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
         receivers = chat_room.users.exclude(user=user_stats.user)
         notification_ids = []

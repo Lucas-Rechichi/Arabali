@@ -58,7 +58,7 @@ class MessageConsumer(WebsocketConsumer):
         user = self.scope.get("user")  # Use get to safely get the user who is on the page
 
 
-        # Getting universal data across all 4 message types
+        # Getting universal data
         action = text_data_json['action']
         message_id = text_data_json['message_id']
 
@@ -440,8 +440,6 @@ class MessageConsumer(WebsocketConsumer):
             reaction_count = 0
             for reaction in all_reactions:
                 reaction_count += 1
-
-            # If the user on the website reacted to this message
             
             mode_reaction = message.reactions.values('reaction').annotate(entry_count=Count('reaction')).order_by('-entry_count').first()
             if mode_reaction:

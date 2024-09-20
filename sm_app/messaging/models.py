@@ -30,7 +30,7 @@ class ChatRoom(models.Model):
 from messaging.extras import emoticons_dict # here due to circular import issues with 'ChatRoom'
 class Message(models.Model):
     sender = models.ForeignKey(UserStats, on_delete=models.CASCADE)
-    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')
     reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     edited = models.BooleanField(default=False, null=False)
     text = models.TextField(null=True)
