@@ -905,6 +905,11 @@
                 <input type="hidden" id="is-video" value="false">
                 <input type="hidden" id="is-voice" value="false">
                 <input type="text" id="message" class="form-control pb-3 p-4">
+                <div class="card" id="suggested-response-card" style="display: none; max-height: 167px; overflow-y: auto;">
+                    <div class="card-body">
+                        <ul id="suggested-response" class="list-group mt-2"></ul>
+                    </div>
+                </div>
             </div>
             <div class="col-1">
                 <div class="card">
@@ -3785,6 +3790,71 @@
                 reactionRemovalTimer = setTimeout(function () {
                     reactions.fadeOut(200);
                 }, 300)
+            })
+            $('#message').focus(function () {
+                var suggestedResponseCard = $('#suggested-response-card');
+                var suggestedResponseList = $('#suggested-response');
+
+                if (suggestedResponseCard.css('display') === 'none') {
+                    suggestedResponseCard.css('display', 'block');
+
+                    var suggestedResponseHtml = `
+                        <p class="lead text-center">Awaiting Suggested Response...</p>
+                        <div class="d-flex justify-content-center">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                    `;
+                    suggestedResponseList.html(suggestedResponseHtml);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/chat/message-suggestions/',
+                        data: {
+                            'username': '{{username}}',
+                            'chatroom-id': '{{room.id}}',
+                            'csrfmiddlewaretoken': '{{csrf_token}}'
+                        },
+                        success: function (response) {
+                            var suggestions = response.responses;
+                            console.log(suggestions)
+
+                            var suggestionsHtml = '';
+                            var suggestionHtml;
+                            for (let i = 0; i < suggestions.length; i++) {
+                                suggestionHtml = `
+                                    <div class="col d-flex justify-content-center">
+                                        <button type="button" class="btn btn-light rounded-pill"><p class="text-center text-success m-0 p-0">${suggestions[i]}</p></button>
+                                    </div>
+                                `;
+                                suggestionsHtml += suggestionHtml
+                            }
+                            
+                            var suggestedResponseHtml = `
+                                <div class="row">
+                                    <p class="lead text-center">Recommendations</p>
+                                </div>
+                                <div class="row">
+                                    ${suggestionsHtml}
+                                </div>
+                            `;
+
+                            $('#suggested-response').html('');
+                            $('#suggested-response').html(suggestedResponseHtml);
+                        }
+                    })
+                }
+
+                // #suggested-response-card, #suggested-response
+                // popup the suggested response, await ai recommendation
+            })
+            $('#message').blur(function () {
+                var suggestedResponseCard = $('#suggested-response-card');
+                if (suggestedResponseCard.css('display') === 'block') {
+                    setTimeout(function () {
+                        suggestedResponseCard.fadeOut(300);
+                    }, 400)
+                    // don't remove suggested response, until new message has been sent.
+                }
             })
         });
     </script>

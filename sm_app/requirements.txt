@@ -6,8 +6,11 @@ crispy-bootstrap5==2024.2
 pillow==10.3.0
 moviepy==1.0.3
 pytz==2024.1
-dotenv
-pandas==2.2.2
+pandas
+python-dotenv
 llama-index
-ollama
+llama-index-llms-ollama
+llama-index-llms-gemini
+llama_parse
 huggingface_hub
+google-generativeai

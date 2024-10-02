@@ -1,19 +1,29 @@
 
 import pytz
 import os
+import csv
 import shutil
 import json
 
 import pandas as pd
+import google.generativeai as genai
+
+from dotenv import load_dotenv
+from llama_index.core.embeddings import resolve_embed_model
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.llms.ollama import Ollama
+from llama_index.core.memory.chat_memory_buffer import ChatMemoryBuffer
+from llama_index.core.agent import ReActAgent
+from llama_index.core.settings import Settings
+from llama_parse import LlamaParse
 
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.core.files.storage import default_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from main.models import UserStats, Notification
 from messaging.models import ChatRoom, Message, PollMessage, PollOption, PollingChoice, MessageNotificationSetting, Reaction
 from messaging.extras import change_user_directory, emoticons_dict
+
 from sm_app import settings
 
 
@@ -65,7 +75,7 @@ def message_sent_text(request):
                 'Message Sender': message.sender.user.username,
                 'Replied?': df_is_reply,
                 'Reply Message ID': reply_to_id,
-                'Message Text': message.text,
+                'Message Text': message.text if message.text else None,
                 'Message Image': message.image.url if message.image else None,
                 'Message Video': message.video.url if message.video else None,
                 'Message Audio': message.audio.url if message.audio else None,
@@ -151,6 +161,39 @@ def message_sent_image(request):
     sender_userstats = UserStats.objects.get(user=User.objects.get(username=sender))
     chat_room = ChatRoom.objects.get(id=chat_room_id)
     receivers = chat_room.users.exclude(user=sender_userstats.user)
+
+    # updating the csv file when a new message is created.
+    csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
+    
+    if os.path.exists(csv_path):
+        pass
+    else:
+        os.mkdir(csv_path)
+    recent_messages = chat_room.messages.all().order_by('-sent_at')[:5]
+    message_dataframe = pd.DataFrame({})
+    for message in recent_messages:
+        if is_reply == 'true':
+            df_is_reply = True
+            # reply_to_id is already given a value
+        else:
+            df_is_reply = False
+            reply_to_id = None
+        
+        new_data = pd.DataFrame({
+            'Message ID': message.pk,
+            'Message Sender': message.sender.user.username,
+            'Replied?': df_is_reply,
+            'Reply Message ID': reply_to_id,
+            'Message Text': message.text if message.text else None,
+            'Message Image': message.image.url if message.image else None,
+            'Message Video': message.video.url if message.video else None,
+            'Message Audio': message.audio.url if message.audio else None,
+            'Sent At': message.sent_at
+        }, index=[message_dataframe.shape[0]])
+        message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=True)
+
+        message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
+
     
     notification_ids = []
     if is_reply == 'true':
@@ -224,6 +267,38 @@ def message_sent_video(request):
     sender_userstats = UserStats.objects.get(user=User.objects.get(username=sender))
     chat_room = ChatRoom.objects.get(id=chat_room_id)
     receivers = chat_room.users.exclude(user=sender_userstats.user)
+
+    # updating the csv file when a new message is created.
+    csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
+    
+    if os.path.exists(csv_path):
+        pass
+    else:
+        os.mkdir(csv_path)
+    recent_messages = chat_room.messages.all().order_by('-sent_at')[:5]
+    message_dataframe = pd.DataFrame({})
+    for message in recent_messages:
+        if is_reply == 'true':
+            df_is_reply = True
+            # reply_to_id is already given a value
+        else:
+            df_is_reply = False
+            reply_to_id = None
+        
+        new_data = pd.DataFrame({
+            'Message ID': message.pk,
+            'Message Sender': message.sender.user.username,
+            'Replied?': df_is_reply,
+            'Reply Message ID': reply_to_id,
+            'Message Text': message.text if message.text else None,
+            'Message Image': message.image.url if message.image else None,
+            'Message Video': message.video.url if message.video else None,
+            'Message Audio': message.audio.url if message.audio else None,
+            'Sent At': message.sent_at
+        }, index=[message_dataframe.shape[0]])
+        message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=True)
+
+        message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
     notification_ids = []
     if is_reply == 'true':
@@ -309,6 +384,38 @@ def message_sent_audio(request):
     sender_userstats = UserStats.objects.get(user=User.objects.get(username=sender))
     chat_room = ChatRoom.objects.get(id=chat_room_id)
     receivers = chat_room.users.exclude(user=sender_userstats.user)
+
+    # updating the csv file when a new message is created.
+    csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
+    
+    if os.path.exists(csv_path):
+        pass
+    else:
+        os.mkdir(csv_path)
+    recent_messages = chat_room.messages.all().order_by('-sent_at')[:5]
+    message_dataframe = pd.DataFrame({})
+    for message in recent_messages:
+        if is_reply == 'true':
+            df_is_reply = True
+            # reply_to_id is already given a value
+        else:
+            df_is_reply = False
+            reply_to_id = None
+        
+        new_data = pd.DataFrame({
+            'Message ID': message.pk,
+            'Message Sender': message.sender.user.username,
+            'Replied?': df_is_reply,
+            'Reply Message ID': reply_to_id,
+            'Message Text': message.text if message.text else None,
+            'Message Image': message.image.url if message.image else None,
+            'Message Video': message.video.url if message.video else None,
+            'Message Audio': message.audio.url if message.audio else None,
+            'Sent At': message.sent_at
+        }, index=[message_dataframe.shape[0]])
+        message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=True)
+
+        message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
     notification_ids = []
     if is_reply == 'true':
@@ -1005,3 +1112,41 @@ def reactions(request):
         'reaction_id': reaction_id if reaction_id else None
     }
     return JsonResponse(response)
+
+def message_suggestions(request):
+    username = request.POST.get('username')
+    chatroom_id = request.POST.get('chatroom-id')
+
+    chatroom = ChatRoom.objects.get(id=chatroom_id)
+
+    load_dotenv()
+
+    google_gemini_api_key = os.getenv('GOOGLE_GEMINI_API_KEY')
+
+    genai.configure(api_key=google_gemini_api_key)
+    
+    def get_last_five_messages(csv_file_path):
+        messages = []
+        with open(csv_file_path, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                messages.append(row)  # Assuming each row is a message
+        return messages[-5:]  # Get the last 5 messages
+    
+    data_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chatroom.name, 'message_memory', 'conversation.csv')
+
+    last_five_messages = get_last_five_messages(data_path)
+    formatted_messages = '\n'.join([' - '.join(message) for message in last_five_messages]) 
+
+    model = genai.GenerativeModel(model_name='gemini-1.5-flash')
+
+    responses = model.generate_content(contents=f"I'm {username} in a chatroom. Here are the last five messages in the chat: {formatted_messages}. Please provide three appropriate responses that {username} could say next based on this conversation context. Give them in a python list format only including the suggestions in your response.")
+
+    stripped_responses = responses.text.strip('```python')
+
+    fixed_responses = eval(stripped_responses)
+
+    callback = {
+        'responses': fixed_responses
+    }
+    return JsonResponse(callback)
