@@ -3823,7 +3823,7 @@
                             for (let i = 0; i < suggestions.length; i++) {
                                 suggestionHtml = `
                                     <div class="col d-flex justify-content-center">
-                                        <button type="button" class="btn btn-light rounded-pill"><p class="text-center text-success m-0 p-0">${suggestions[i]}</p></button>
+                                        <button type="button" class="btn btn-light rounded-pill suggested-response-button" data-response-text="${suggestions[i]}"><p class="text-center text-success m-0 p-0">${suggestions[i]}</p></button>
                                     </div>
                                 `;
                                 suggestionsHtml += suggestionHtml
@@ -3847,14 +3847,60 @@
                 // #suggested-response-card, #suggested-response
                 // popup the suggested response, await ai recommendation
             })
-            $('#message').blur(function () {
+            $('#message').blur(function (e) {
                 var suggestedResponseCard = $('#suggested-response-card');
+                console.log(e.target)
                 if (suggestedResponseCard.css('display') === 'block') {
                     setTimeout(function () {
                         suggestedResponseCard.fadeOut(300);
                     }, 400)
                     // don't remove suggested response, until new message has been sent.
                 }
+            })
+            // For clickking on a suggestion
+            $('.suggested-response-button').on('mousedown', function () {
+                var suggestedResponse = $(this).data('response-text');
+                // Message sending for our suggested response
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/chat/message-sent-text/',
+                    data: {
+                        'chat-room-name': '{{room.name}}',
+                        'chat-room-id': '{{room.id}}',
+                        'text-message': suggestedResponse,
+                        'is-reply': 'false',
+                        'replying-to-id': null,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    },
+                    success: function(response) {
+                        $('#message').val('');
+                        if ($('#reply-prompt')) { // remove reply prompt if the user was replying
+                            $('#reply-prompt').remove();
+                            $('#is-reply').val('false');
+                        }
+                        notificationSocket.send(JSON.stringify({
+                            'notification_ids': response.notification_ids,
+                        }));
+                        if (response.is_reply === 'true') { // Send over specific data for the case of a reply.
+                            var replyId = response.reply_id;
+                            messageSocket.send(JSON.stringify({
+                                'text': suggestedResponse,
+                                'message_type': 'text',
+                                'message_id': response.message_id,
+                                'is_reply': response.is_reply,
+                                'reply_id': response.reply_id,
+                            }));
+                        } else {
+                            messageSocket.send(JSON.stringify({
+                                'text': suggestedResponse,
+                                'message_type': 'text',
+                                'message_id': response.message_id,
+                                'is_reply': response.is_reply,
+                            }));
+                        }
+                    }
+                })
             })
         });
     </script>
