@@ -9,13 +9,6 @@ import pandas as pd
 import google.generativeai as genai
 
 from dotenv import load_dotenv
-from llama_index.core.embeddings import resolve_embed_model
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
-from llama_index.llms.ollama import Ollama
-from llama_index.core.memory.chat_memory_buffer import ChatMemoryBuffer
-from llama_index.core.agent import ReActAgent
-from llama_index.core.settings import Settings
-from llama_parse import LlamaParse
 
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -61,6 +54,14 @@ def message_sent_text(request):
         else:
             os.mkdir(csv_path)
         recent_messages = chat_room.messages.all().order_by('-sent_at')[:20]
+
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
+
+        # for rating generation
+        genai.configure(api_key=os.getenv('GOOGLE_GEMINI_API_KEY'))
+        model = genai.GenerativeModel(model_name='gemini-1.5-flash')
+        
         message_dataframe = pd.DataFrame({})
         for message in recent_messages:
             if is_reply == 'true':
@@ -83,6 +84,14 @@ def message_sent_text(request):
             message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=False)
 
         message_dataframe.index.name = 'Index (message id)'
+
+        # add rating
+        rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be natural numbers between 1 and 10. Organise these in 2 python lists dictionary, with one being the Message ID (index), and your rating being the second one. Only include the lists in your response, with no python variables or comments either.")
+        rating_dict = dict(rating.text)
+
+        message_dataframe['Relevance Score'] = [score for score in rating_dict.values()]
+        print(message_dataframe)
+
         message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
         receivers = chat_room.users.exclude(user=user_stats.user)
@@ -1133,17 +1142,17 @@ def message_suggestions(request):
 
     genai.configure(api_key=google_gemini_api_key)
     
-    def get_last_five_messages(csv_file_path):
+    def get_latest_messages(csv_file_path):
         messages = []
         with open(csv_file_path, 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                messages.append(row)  # Assuming each row is a message
-        return messages[-20:]  # Get the last 20 messages
+                messages.append(row)  
+        return messages[-20:]  
     
     data_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chatroom.name, 'message_memory', 'conversation.csv')
 
-    last_five_messages = get_last_five_messages(data_path)
+    last_five_messages = get_latest_messages(data_path)
     formatted_messages = '\n'.join([' - '.join(message) for message in last_five_messages]) 
 
     model = genai.GenerativeModel(model_name='gemini-1.5-flash')

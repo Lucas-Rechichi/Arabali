@@ -2163,19 +2163,22 @@
                     for (let i = 0; i < suggestions.length; i++) {
                         suggestionHtml = `
                             <div class="col d-flex justify-content-center">
-                                <button type="button" class="btn btn-light rounded-pill suggested-response-button" data-response-text="${suggestions[i]}"><p class="text-center text-success m-0 p-0">${suggestions[i]}</p></button>
+                                <button type="button" class="btn btn-light rounded-pill suggested-response-button suggested-response-clickable" data-response-text="${suggestions[i]}"><p class="text-center text-success m-0 p-0">${suggestions[i]}</p></button>
                             </div>
                         `;
                         suggestionsHtml += suggestionHtml
                     }
                     
                     var suggestedResponseHtml = `
-                        <div class="row">
-                            <div class="col d-flex justify-content-center">
+                        <div class="row justify-content-evenly">
+                            <div class="col">
+                                
+                            </div>
+                            <div class="col">
                                 <p class="lead text-center">Recommendations</p>
                             </div>
-                            <div class="col d-flex justify-content-center">
-                                <button type="button" id="regenerate-response" class="btn btn-success suggested-response-button mb-2">Regenerate <i class="bi bi-arrow-repeat"></i></button>
+                            <div class="col">
+                                <button type="button" class="btn btn-success suggested-response-clickable regenerate-response mb-2"><i class="bi bi-arrow-repeat"></i></button>
                             </div>
                         </div>
                         <div class="row">
@@ -3861,13 +3864,13 @@
                 }, 300)
             })
             $('#message').focus(function () {generateResponses()});
-            $('#regenerate-response').click(function () {
+            $('#message-div').on('click', '.regenerate-response', function () {
                 console.log('regenerating')
                 generateResponses()
             });
             $('#message').blur(function (e) {
                 var suggestedResponseCard = $('#suggested-response-card');
-                if (!(e.relatedTarget.classList.contains('suggested-response-button'))) {
+                if (!(e.relatedTarget.classList.contains('suggested-response-clickable'))) {
                     if (suggestedResponseCard.css('display') === 'block') {
                         setTimeout(function () {
                             suggestedResponseCard.fadeOut(300);
