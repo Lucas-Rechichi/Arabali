@@ -85,15 +85,20 @@ def message_sent_text(request):
 
         message_dataframe.index.name = 'Index (message id)'
 
+        if message_dataframe.shape[0] == 0:
+            conversation = 'No current messages in this chatroom.'
+        else:
+            conversation = message_dataframe
+
         # add rating
-        rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+        rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
         processed_rating = rating.text.strip('```json')
         processed_rating = eval(processed_rating)
-        print(message_dataframe.shape[0], message_dataframe)
+
         message_dataframe['Current Conversation Relevance'] = None
 
         dropped_indexes = []
-        for row_index in range(0, message_dataframe.shape[0] + 1):
+        for row_index in range(0, message_dataframe.shape[0]):
             relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
             message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
 
@@ -220,17 +225,22 @@ def message_sent_image(request):
 
     message_dataframe.index.name = 'Index (message id)'
 
+    if message_dataframe.shape[0] == 0:
+        conversation = 'No current messages in this chatroom.'
+    else:
+        conversation = message_dataframe
+
     # add rating
-    rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+    rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
     processed_rating = rating.text.strip('```json')
     processed_rating = eval(processed_rating)
-
+    
     message_dataframe['Current Conversation Relevance'] = None
 
     dropped_indexes = []
-    for row_index in range(0, message_dataframe.shape[0] + 1):
-        relevance =  processed_rating[f'{message_dataframe.index[row_index]}']
-        message_dataframe.loc[message_dataframe.index[row_index], 'Current Conversation Relevance'] = relevance
+    for row_index in range(0, message_dataframe.shape[0]):
+        relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
+        message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
 
         if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
             print('below requrement')
@@ -313,6 +323,7 @@ def message_sent_video(request):
     chat_room = ChatRoom.objects.get(id=chat_room_id)
     receivers = chat_room.users.exclude(user=sender_userstats.user)
 
+    # formatting of the csv file
     csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
     
     if os.path.exists(csv_path):
@@ -351,17 +362,22 @@ def message_sent_video(request):
 
     message_dataframe.index.name = 'Index (message id)'
 
+    if message_dataframe.shape[0] == 0:
+        conversation = 'No current messages in this chatroom.'
+    else:
+        conversation = message_dataframe
+
     # add rating
-    rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+    rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
     processed_rating = rating.text.strip('```json')
     processed_rating = eval(processed_rating)
-
+    
     message_dataframe['Current Conversation Relevance'] = None
 
     dropped_indexes = []
-    for row_index in range(0, message_dataframe.shape[0] + 1):
-        relevance =  processed_rating[f'{message_dataframe.index[row_index]}']
-        message_dataframe.loc[message_dataframe.index[row_index], 'Current Conversation Relevance'] = relevance
+    for row_index in range(0, message_dataframe.shape[0]):
+        relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
+        message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
 
         if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
             print('below requrement')
@@ -1217,17 +1233,17 @@ def message_suggestions(request):
                     messages.append(row)  
             return messages[-20:]
         else:
-            messages.append('No messages in chatroom')
+            messages.append('No messages inside the chatroom')
             return messages
     
     data_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chatroom.name, 'message_memory', 'conversation.csv')
 
-    last_five_messages = get_latest_messages(data_path)
-    formatted_messages = '\n'.join([' - '.join(message) for message in last_five_messages]) 
+    lastest_messages = get_latest_messages(data_path)
+    formatted_messages = '\n'.join([' - '.join(message) for message in lastest_messages])
 
     model = genai.GenerativeModel(model_name='gemini-1.5-flash')
 
-    responses = model.generate_content(contents=f"I'm {username} in a chatroom. Here are the lastest messages in the chat, ordered from the newest to the oldest: {formatted_messages}. Please provide three appropriate responses that {username} could say next based on this conversation context. Give them in a python list format, using double quotes for any string content. Only include the suggestions in your response.")
+    responses = model.generate_content(contents=f"I'm {username} in a chatroom. Here are the lastest messages in the chat, ordered from the newest to the oldest: {formatted_messages}. Please provide three appropriate responses that {username} could say next based on this conversation context. If there are 'No messages inside the chatroom', provide three conversation starters instead. Give them in a python list format, using double quotes for any string content. Only include the suggestions in your response.")
 
     stripped_responses = responses.text.strip('```python')
 
