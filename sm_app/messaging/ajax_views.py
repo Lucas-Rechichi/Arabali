@@ -86,12 +86,22 @@ def message_sent_text(request):
         message_dataframe.index.name = 'Index (message id)'
 
         # add rating
-        rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be natural numbers between 1 and 10. Organise these in 2 python lists dictionary, with one being the Message ID (index), and your rating being the second one. Only include the lists in your response, with no python variables or comments either.")
-        rating_dict = dict(rating.text)
+        rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+        processed_rating = rating.text.strip('```json')
+        processed_rating = eval(processed_rating)
+        print(message_dataframe.shape[0], message_dataframe)
+        message_dataframe['Current Conversation Relevance'] = None
 
-        message_dataframe['Relevance Score'] = [score for score in rating_dict.values()]
-        print(message_dataframe)
+        dropped_indexes = []
+        for row_index in range(0, message_dataframe.shape[0] + 1):
+            relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
+            message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
 
+            if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
+                print('below requrement')
+                dropped_indexes.append(relevance)
+
+        message_dataframe = message_dataframe.drop(index=dropped_indexes)
         message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
         receivers = chat_room.users.exclude(user=user_stats.user)
@@ -179,6 +189,14 @@ def message_sent_image(request):
     else:
         os.mkdir(csv_path)
     recent_messages = chat_room.messages.all().order_by('-sent_at')[:20]
+
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+
+    # for rating generation
+    genai.configure(api_key=os.getenv('GOOGLE_GEMINI_API_KEY'))
+    model = genai.GenerativeModel(model_name='gemini-1.5-flash')
+    
     message_dataframe = pd.DataFrame({})
     for message in recent_messages:
         if is_reply == 'true':
@@ -201,6 +219,24 @@ def message_sent_image(request):
         message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=False)
 
     message_dataframe.index.name = 'Index (message id)'
+
+    # add rating
+    rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+    processed_rating = rating.text.strip('```json')
+    processed_rating = eval(processed_rating)
+
+    message_dataframe['Current Conversation Relevance'] = None
+
+    dropped_indexes = []
+    for row_index in range(0, message_dataframe.shape[0] + 1):
+        relevance =  processed_rating[f'{message_dataframe.index[row_index]}']
+        message_dataframe.loc[message_dataframe.index[row_index], 'Current Conversation Relevance'] = relevance
+
+        if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
+            print('below requrement')
+            dropped_indexes.append(relevance)
+
+    message_dataframe = message_dataframe.drop(index=dropped_indexes)
     message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
     
@@ -277,7 +313,6 @@ def message_sent_video(request):
     chat_room = ChatRoom.objects.get(id=chat_room_id)
     receivers = chat_room.users.exclude(user=sender_userstats.user)
 
-    # updating the csv file when a new message is created.
     csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
     
     if os.path.exists(csv_path):
@@ -285,6 +320,14 @@ def message_sent_video(request):
     else:
         os.mkdir(csv_path)
     recent_messages = chat_room.messages.all().order_by('-sent_at')[:20]
+
+    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
+
+    # for rating generation
+    genai.configure(api_key=os.getenv('GOOGLE_GEMINI_API_KEY'))
+    model = genai.GenerativeModel(model_name='gemini-1.5-flash')
+    
     message_dataframe = pd.DataFrame({})
     for message in recent_messages:
         if is_reply == 'true':
@@ -307,6 +350,24 @@ def message_sent_video(request):
         message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=False)
 
     message_dataframe.index.name = 'Index (message id)'
+
+    # add rating
+    rating = model.generate_content(contents=f"Here is the relevant conversation: {message_dataframe}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+    processed_rating = rating.text.strip('```json')
+    processed_rating = eval(processed_rating)
+
+    message_dataframe['Current Conversation Relevance'] = None
+
+    dropped_indexes = []
+    for row_index in range(0, message_dataframe.shape[0] + 1):
+        relevance =  processed_rating[f'{message_dataframe.index[row_index]}']
+        message_dataframe.loc[message_dataframe.index[row_index], 'Current Conversation Relevance'] = relevance
+
+        if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
+            print('below requrement')
+            dropped_indexes.append(relevance)
+
+    message_dataframe = message_dataframe.drop(index=dropped_indexes)
     message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
     notification_ids = []
@@ -1021,10 +1082,15 @@ def delete_message(request):
 
             # Update conversation.csv file
             path = os.path.join(settings.MEDIA_ROOT, 'Rooms', message.room.name, 'message_memory', 'conversation.csv')
-            dataframe = pd.read_csv(filepath_or_buffer=path, sep=',', index_col=0)
 
-            new_dataframe = dataframe.drop(index=int(message_id))
-            new_dataframe.to_csv(path_or_buf=path, sep=',', na_rep='None')
+            if os.path.isfile(path): # checks to see if the file exists.
+                dataframe = pd.read_csv(filepath_or_buffer=path, sep=',', index_col=0)
+
+                if message_id in dataframe.index:
+                    new_dataframe = dataframe.drop(index=int(message_id))
+                else:
+                    new_dataframe = dataframe
+                new_dataframe.to_csv(path_or_buf=path, sep=',', na_rep='None')
 
         except ObjectDoesNotExist or Exception as e:
             print(f'Message with id: {message_id} does not exist.')
@@ -1144,11 +1210,15 @@ def message_suggestions(request):
     
     def get_latest_messages(csv_file_path):
         messages = []
-        with open(csv_file_path, 'r') as csvfile:
-            reader = csv.reader(csvfile)
-            for row in reader:
-                messages.append(row)  
-        return messages[-20:]  
+        if os.path.isfile(csv_file_path):
+            with open(csv_file_path, 'r') as csvfile:
+                reader = csv.reader(csvfile)
+                for row in reader:
+                    messages.append(row)  
+            return messages[-20:]
+        else:
+            messages.append('No messages in chatroom')
+            return messages
     
     data_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chatroom.name, 'message_memory', 'conversation.csv')
 
