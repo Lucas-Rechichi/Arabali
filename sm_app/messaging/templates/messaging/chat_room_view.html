@@ -1512,7 +1512,7 @@
                                                                     ` + otherReplyButtonHtml + `
                                                                 </div>
                                                                 <div id="reaction-button-col-${data.message_id}" class="col d-flex justify-content-end">
-                                                                    <button type="button" class="btn react-button" data-message-id="${data.message_id}" data-number-of-reactions="0"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 text-light d-inline-flex">0</p></button>
+                                                                    <button type="button" class="btn react-button" data-message-id="${data.message_id}" data-number-of-reactions="0"><i class="bi bi-emoji-smile-fill"></i> <p class="m-0 p-0 d-inline-flex">0</p></button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2135,7 +2135,9 @@
             var suggestedResponseList = $('#suggested-response');
 
             if (suggestedResponseCard.css('display') === 'none') {
-                suggestedResponseCard.css('display', 'block');
+                setTimeout(function () {
+                    suggestedResponseCard.css('display', 'block');
+                }, 300)
             }
 
             var suggestedResponseHtml = `
@@ -3366,6 +3368,19 @@
             
             $(document).on("click", function(e) {
                 $('.options').fadeOut(200);
+                var suggestedResponseCard = $('#suggested-response-card');
+                console.log(e.target.parentElement.classList)
+                if (e.target.parentElement !== null) {
+                    if (!(e.target.parentElement.classList.contains('suggested-response-clickable')) && !8(e.target.classList.contains('suggested-response-clickable'))) {
+                        if (suggestedResponseCard.css('display') === 'block') {
+                            suggestedResponseCard.fadeOut(300);
+                        }
+                    }
+                } else {
+                    if (suggestedResponseCard.css('display') === 'block') {
+                        suggestedResponseCard.fadeOut(300);
+                    }
+                }
             });
 
             // For activating the context-menu, so that a user can edit, delete, download, or copy a message.
@@ -3870,13 +3885,21 @@
             });
             $('#message').blur(function (e) {
                 var suggestedResponseCard = $('#suggested-response-card');
-                if (!(e.relatedTarget.classList.contains('suggested-response-clickable'))) {
+                if (e.relatedTarget !== null) {
+                    if (!(e.relatedTarget.classList.contains('suggested-response-clickable'))) {
+                        if (suggestedResponseCard.css('display') === 'block') {
+                            setTimeout(function () {
+                                suggestedResponseCard.fadeOut(300);
+                            }, 400)
+                        }
+                    }
+                } else {
                     if (suggestedResponseCard.css('display') === 'block') {
                         setTimeout(function () {
                             suggestedResponseCard.fadeOut(300);
                         }, 400)
                     }
-                } 
+                }
             })
             // For clickking on a suggestion
             $('#suggested-response-card').on('click', '.suggested-response-button', function () {

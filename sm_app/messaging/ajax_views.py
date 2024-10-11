@@ -1238,8 +1238,8 @@ def message_suggestions(request):
     
     data_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chatroom.name, 'message_memory', 'conversation.csv')
 
-    lastest_messages = get_latest_messages(data_path)
-    formatted_messages = '\n'.join([' - '.join(message) for message in lastest_messages])
+    latest_messages = get_latest_messages(data_path)
+    formatted_messages = '\n'.join([' - '.join(message) for message in latest_messages])
 
     model = genai.GenerativeModel(model_name='gemini-1.5-flash')
 
