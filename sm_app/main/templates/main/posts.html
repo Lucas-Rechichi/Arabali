@@ -304,7 +304,10 @@
         <br>
         <br>
         <div class="row">
-            <div class="col-12">
+            <div class="col-4">
+
+            </div>
+            <div class="col-4">
                 <div class="card m-5">
                     <div class="row">
                         <div class="col m-2">
@@ -318,7 +321,7 @@
                     </div>
                     <div class="row">
                         <div class="col m-2">
-                            <img src="{{post.media.url}}" alt="{{post.id}}'s Media" style="height: 248px; width: 100%;">
+                            <img src="{{post.media.url}}" alt="{{post.id}}'s Media" style="height: 248px; width: 100%; border-radius: 20px;">
                         </div>
                     </div>
                     <div class="row m-2">
@@ -338,133 +341,35 @@
                         <div class="col-6 d-flex justify-content-end">
                             <form action="" id="post-form" method="post">
                                 {% if user_liked_by in post.liked_by.all %}
-                                <button type="submit" id="like{{post.id}}" class="btn btn-success border border-success page-like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
-                                    <div class="row align-items-center">
-                                        <div class="col mt-1 d-flex justify-content-end">
-                                            <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{post.id}}" style="color: #ffffff;"></i>
+                                    <button type="submit" id="like{{post.id}}" class="btn btn-success border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px; min-width: 50px">
+                                        <div class="row align-items-center">
+                                            <div class="col mt-1 d-flex justify-content-end">
+                                                <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{post.id}}" style="color: #ffffff;"></i>
+                                            </div>
+                                            <div class="col mt-4">
+                                                <p class="text-white" id="page-like-text-{{post.id}}">{{post.likes}}</p>
+                                            </div>
                                         </div>
-                                        <div class="col mt-4">
-                                            <p class="text-white" id="page-like-text-{{post.id}}">{{post.likes}}</p>
-                                        </div>
-                                    </div>
-                                </button>
+                                    </button>
                                 {% else %}
-                                <button type="submit" id="like{{post.id}}" class="btn border border-success page-like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
-                                    <div class="row align-items-center">
-                                        <div class="col mt-1 d-flex justify-content-end">
-                                            <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{post.id}}" style="color: #198754;"></i>
+                                    <button type="submit" id="like{{post.id}}" class="btn border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
+                                        <div class="row align-items-center">
+                                            <div class="col mt-1 d-flex justify-content-end">
+                                                <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{post.id}}" style="color: #198754;"></i>
+                                            </div>
+                                            <div class="col mt-4">
+                                                <p class="text-success" id="page-like-text-{{post.id}}">{{post.likes}}</p>
+                                            </div>
                                         </div>
-                                        <div class="col mt-4">
-                                            <p class="text-success" id="page-like-text-{{post.id}}">{{post.likes}}</p>
-                                        </div>
-                                    </div>
-                                </button>
+                                    </button>
                                 {% endif %}
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        $('.page-like-button-{{post.id}}').click(function() { // When the button is pressed
-                                            console.log('clicked');
-                                            var postId = $(this).data('post-id'); // Get Post ID
-                                            console.log('Post ID:', postId);
-                                        
-                                            // Defining variables
-                                            var modalClickedButton = $('.modal-like-button-{{post.id}}'); 
-                                            var pageClickedButton = $('.page-like-button-{{post.id}}');
-                                            var isLiked
-                                            var modalLikeCounter
-                                            var pageLikeCounter
-                                            var modalLikeIcon
-                                            var pageLikeIcon
-                                            console.log('defined');
-                                            console.log(isLiked)
-
-                                            // AJAX request
-                                            $.ajax({
-                                                type: 'POST',
-                                                url: '/page/liked/',
-                                                data: {
-                                                    'post_id': postId,
-                                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                                },
-                                                
-                                                // If the request was successful
-                                                success: function(response) {
-                                                    console.log('success');
-
-                                                    // Getting relevent elements
-                                                    modalLikeCounter = $('#modal-like-text-{{post.id}}');
-                                                    pageLikeCounter = $('#page-like-text-{{post.id}}')
-                                                    modalLikeIcon = $('#modal-like-icon-{{post.id}}');
-                                                    pageLikeIcon = $('#page-like-icon-{{post.id}}')
-
-                                                    // Changing text
-                                                    modalLikeCounter.text(response.likes);
-                                                    pageLikeCounter.text(response.likes);
-                                                    
-                                                    // Different style changes for different like statuses
-                                                    if (response.isLiked) {
-                                                        console.log('like');
-
-                                                        
-                                                        // Change classes for dislike state
-                                                        modalLikeCounter.removeClass('text-success').addClass('text-white');
-                                                        modalLikeIcon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
-                                                        modalClickedButton.removeClass('liked-button').addClass('btn-success');
-                                                        
-                                                        pageLikeCounter.removeClass('text-success').addClass('text-white');
-                                                        pageLikeIcon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
-                                                        pageClickedButton.removeClass('liked-button').addClass('btn-success');
-
-                                                        // Color change
-                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{post.id}}')
-                                                        modalLikeIcon.style.color = '#ffffff'
-                                                        
-                                                        pageLikeIcon = document.getElementById('page-like-icon-{{post.id}}')
-                                                        pageLikeIcon.style.color = '#ffffff'
-
-                                                    } else {
-                                                        console.log('dislike');
-
-                                                        // Change classes for like state
-                                                        modalLikeCounter.removeClass('text-white').addClass('text-success');
-                                                        modalLikeIcon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
-                                                        modalClickedButton.removeClass('btn-success').addClass('liked-button');
-                                                        
-                                                        pageLikeCounter.removeClass('text-white').addClass('text-success');
-                                                        pageLikeIcon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
-                                                        pageClickedButton.removeClass('btn-success').addClass('liked-button');
-
-
-                                                        // Color change
-                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{post.id}}')
-                                                        modalLikeIcon.style.color = '#198754'
-                                                        pageLikeIcon = document.getElementById('page-like-icon-{{post.id}}')
-                                                        pageLikeIcon.style.color = '#198754'
-                                                    }
-                                                },
-                                                error: function(xhr, errmsg, err) {
-                                                    console.log('Error:', xhr.ststus, xhr.statusText);
-                                                },
-                                                beforeSend: function(xhr, settings) {
-                                                    console.log('Before send:', settings);
-                                                    console.log('i.hasContent:', settings.hasContent);
-                                                    console.log('i.data:', settings.data);
-                                                }
-                                            });
-                                        });
-                                        $(document).on('submit', '#post-form', function(e) {
-                                            e.preventDefault(); // Prevents reloading of the website
-                                            console.log('prevented');
-                                        });
-                                    });
-                                </script>
                             </form>    
                         </div>
                     </div>    
                 </div>
                 <!-- modal -->
                 <div id="expand-{{post.id}}" class="modal fade">
-                    <div class="modal-dialog" style="max-width: 56%;">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                         <div class="modal-content">
                             <div class="modal-header">
                                 Post
@@ -488,7 +393,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col m-2">
-                                        <img src="{{post.media.url}}" alt="{{post.id}}'s Media" style="height: 248px; width: 100%;">
+                                        <img src="{{post.media.url}}" alt="{{post.id}}'s Media" style="height: 248px; width: 100%; border-radius: 20px;">
                                     </div>
                                 </div>
                                 <div class="row m-2">
@@ -508,7 +413,7 @@
                                     <div class="col-8 d-flex justify-content-end">
                                         <form action="" id="post-form" method="post">
                                             {% if user_liked_by in post.liked_by.all %}
-                                                <button type="submit" id="like{{post.id}}" class="btn btn-success border border-success modal-like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
+                                                <button type="submit" id="like{{post.id}}" class="btn btn-success border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
                                                     <div class="row align-items-center">
                                                         <div class="col mt-1 d-flex justify-content-end">
                                                             <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{post.id}}" style="color: #ffffff;"></i>
@@ -518,8 +423,8 @@
                                                         </div>
                                                     </div>
                                                 </button>
-                                                {% else %}
-                                                <button type="submit" id="like{{post.id}}" class="btn border border-success modal-like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
+                                            {% else %}
+                                                <button type="submit" id="like{{post.id}}" class="btn border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
                                                     <div class="row align-items-center">
                                                         <div class="col mt-1 d-flex justify-content-end">
                                                             <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{post.id}}" style="color: #198754;"></i>
@@ -529,250 +434,160 @@
                                                         </div>
                                                     </div>
                                                 </button>
-                                                {% endif %}
-                                                <script>
-                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                        $('.modal-like-button-{{post.id}}').click(function() { // When the button is pressed
-                                                            console.log('clicked');
-                                                            var postId = $(this).data('post-id'); // Get Post ID
-                                                            console.log('Post ID:', postId);
-                                                            
-                                                            // Defining variables
-                                                            var modalClickedButton = $('.modal-like-button-{{post.id}}'); 
-                                                            var pageClickedButton = $('.page-like-button-{{post.id}}');
-                                                            var isLiked
-                                                            var modalLikeCounter
-                                                            var pageLikeCounter
-                                                            var modalLikeIcon
-                                                            var pageLikeIcon
-                                                            console.log('defined');
-                        
-                                                            // AJAX request
-                                                            $.ajax({
-                                                                type: 'POST',
-                                                                url: '/page/liked/',
-                                                                data: {
-                                                                    'post_id': postId,
-                                                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                                                },
-                                                                
-                                                                // If the request was successful
-                                                                success: function(response) {
-                                                                    console.log('success');
-                        
-                                                                    // Getting relevent elements
-                                                                    modalLikeCounter = $('#modal-like-text-{{post.id}}');
-                                                                    pageLikeCounter = $('#page-like-text-{{post.id}}')
-                                                                    modalLikeIcon = $('#modal-like-icon-{{post.id}}');
-                                                                    pageLikeIcon = $('#page-like-icon-{{post.id}}')
-                        
-                                                                    // Changing text
-                                                                    modalLikeCounter.text(response.likes);
-                                                                    pageLikeCounter.text(response.likes);
-                                                                    
-                                                                    // Different style changes for different like statuses
-                                                                    if (response.isLiked) {
-                                                                        console.log('like');
-                        
-                                                                        
-                                                                        // Change classes for dislike state
-                                                                        modalLikeCounter.removeClass('text-success').addClass('text-white');
-                                                                        modalLikeIcon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
-                                                                        modalClickedButton.removeClass('liked-button').addClass('btn-success');
-                                                                        
-                                                                        pageLikeCounter.removeClass('text-success').addClass('text-white');
-                                                                        pageLikeIcon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
-                                                                        pageClickedButton.removeClass('liked-button').addClass('btn-success');
-                        
-                                                                        // Color change
-                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{post.id}}')
-                                                                        modalLikeIcon.style.color = '#ffffff'
-                                                                        
-                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{post.id}}')
-                                                                        pageLikeIcon.style.color = '#ffffff'
-                        
-                                                                    } else {
-                                                                        console.log('dislike');
-                        
-                                                                        // Change classes for like state
-                                                                        modalLikeCounter.removeClass('text-white').addClass('text-success');
-                                                                        modalLikeIcon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
-                                                                        modalClickedButton.removeClass('btn-success').addClass('liked-button');
-                                                                        
-                                                                        pageLikeCounter.removeClass('text-white').addClass('text-success');
-                                                                        pageLikeIcon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
-                                                                        pageClickedButton.removeClass('btn-success').addClass('liked-button');
-                        
-                        
-                                                                        // Color change
-                                                                        modalLikeIcon = document.getElementById('modal-like-icon-{{post.id}}')
-                                                                        modalLikeIcon.style.color = '#198754'
-                                                                        pageLikeIcon = document.getElementById('page-like-icon-{{post.id}}')
-                                                                        pageLikeIcon.style.color = '#198754'
-                                                                    }
-                                                                },
-                                                                error: function(xhr, errmsg, err) {
-                                                                    console.log('Error:', xhr.ststus, xhr.statusText);
-                                                                },
-                                                                beforeSend: function(xhr, settings) {
-                                                                    console.log('Before send:', settings);
-                                                                    console.log('i.hasContent:', settings.hasContent);
-                                                                    console.log('i.data:', settings.data);
-                                                                }
-                                                            });
-                                                        });
-                                                        $(document).on('submit', '#post-form', function(e) {
-                                                            e.preventDefault(); // Prevents reloading of the website
-                                                            console.log('prevented');
-                                                        });
-                                                    });
-                                                </script>
-                                            </form>
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="collapse card m-1" id="liked-by-{{post.id}}">
+                                            <ul class="list-group list-group-flush">
+                                                {% for likedby in post.liked_by.all %}
+                                                    <li class="list-group-item"> > {{ likedby }}</li>
+                                                {% endfor %}
+                                            </ul>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="collapse card m-1" id="liked-by-{{post.id}}">
-                                                <ul class="list-group list-group-flush">
-                                                    {% for likedby in post.liked_by.all %}
-                                                        <li class="list-group-item"> > {{ likedby }}</li>
-                                                    {% endfor %}
-                                                </ul>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        <p class="lead">Date Created: {{post.created_at}}</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="lead text-center">Comments:</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col d-flex justify-content-center">
+                                        <!-- Comments form -->
+                                        <form method="post" id="comment-form-{{post.id}}">
+                                            <div class="row">
+                                                <div class="col-8">
+                                                    {% csrf_token %}
+                                                    {{comment_form | crispy}}   
+                                                </div>
+                                                <div class="col-4">
+                                                    <br>
+                                                    <button type="button" id="add-comment-{{post.id}}" class="btn btn-success mt-2 ms-5" data-post-id="{{post.id}}">Add</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col text-center">
-                                            <p class="lead">Date Created: {{post.created_at}}</p>
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <div class="row">
-                                        <div class="col">
-                                            <p class="lead text-center">Comments:</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col d-flex justify-content-center">
-                                            <!-- Comments form -->
-                                            <form method="post" id="comment-form-{{post.id}}">
-                                                {% csrf_token %}
-                                                {{comment_form | crispy}}
-                                                <button type="button" id="add-comment-{{post.id}}" class="btn btn-success" data-post-id="{{post.id}}">Add</button>
-                                            </form>
-                                            <!-- Script gets items from form, creates the comment, then displays it inside of the relevent post. -->
-                                            <script>
-                                                document.addEventListener('DOMContentLoaded', function() {
-                                                    document.getElementById('add-comment-{{post.id}}').addEventListener('click', function() {
-                                                        var postId = $(this).data('post-id');
-                                                        var text = $('#comment-form-{{post.id}} #comment_text').val();
-                                                        console.log(postId, text)
-                                                        $.ajax({
-                                                            type: 'POST',
-                                                            url: '/page/new_comment/',
-                                                            data: {
-                                                                'post_id': postId,
-                                                                'text': text,
-                                                                'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                                            },
+                                        </form>
+                                        <!-- Script gets items from form, creates the comment, then displays it inside of the relevent post. -->
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                document.getElementById('add-comment-{{post.id}}').addEventListener('click', function() {
+                                                    var postId = $(this).data('post-id');
+                                                    var text = $('#comment-form-{{post.id}} #comment_text').val();
+                                                    console.log(postId, text)
+                                                    $.ajax({
+                                                        type: 'POST',
+                                                        url: '/page/new-comment/',
+                                                        data: {
+                                                            'post_id': postId,
+                                                            'text': text,
+                                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                                        },
 
-                                                            success: function(response) {
-                                                                console.log('success')
-                                                                $('#comments-container-{{post.id}}').prepend(
-                                                                    '<div class="row">' +
-                                                                        '<div class="col">' +
-                                                                            '<div class="card p-3 m-2">' +
-                                                                                '<div class="row">' +
-                                                                                    '<div class="col">' +
-                                                                                        '<img class="border border-success" src="'+ response.pfp + '" alt="" style="height:20px; width: 20px; border-radius: 10px;">' +
-                                                                                        '<strong> ' + response.user + '</strong>' +
+                                                        success: function(response) {
+                                                            console.log('success')
+                                                            $('#comments-container-{{post.id}}').prepend(
+                                                                '<div class="row">' +
+                                                                    '<div class="col">' +
+                                                                        '<div class="card p-3 m-2">' +
+                                                                            '<div class="row">' +
+                                                                                '<div class="col">' +
+                                                                                    '<img class="border border-success" src="'+ response.pfp + '" alt="" style="height:20px; width: 20px; border-radius: 10px;">' +
+                                                                                    '<strong> ' + response.user + '</strong>' +
+                                                                                '</div>' +
+                                                                            '</div>' +
+                                                                            '<div class="row">' +
+                                                                                '<div class="col">' +
+                                                                                    response.text +
+                                                                                '</div>' +
+                                                                            '</div>' +
+                                                                            '<div class="row">' +
+                                                                                '<div class="col-10">' +
+                                                                                    '<a href="#nested-comments-' + response.id + '" data-bs-toggle="collapse" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Replies</a>' +
+                                                                                    '<div class="collapse" id="nested-comments-'+ response.id +'">' +
+                                                                                        '<br>' +
                                                                                     '</div>' +
                                                                                 '</div>' +
-                                                                                '<div class="row">' +
-                                                                                    '<div class="col">' +
-                                                                                        response.text +
-                                                                                    '</div>' +
-                                                                                '</div>' +
-                                                                                '<div class="row">' +
-                                                                                    '<div class="col-10">' +
-                                                                                        '<a href="#nested-comments-' + response.id + '" data-bs-toggle="collapse" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Replies</a>' +
-                                                                                        '<div class="collapse" id="nested-comments-'+ response.id +'">' +
-                                                                                            '<br>' +
-                                                                                        '</div>' +
-                                                                                    '</div>' +
-                                                                                    '<div class="col d-flex justify-content-end">' +
-                                                                                        '<button type="submit" id="like'+ response.id +'" class="btn border border-success comment-like-button-'+ response.id +' d-flex align-items-center pb-3 pt-2" data-comment-id="'+ response.id +'" style="height: 25px;">' +
-                                                                                            '<div class="row align-items-center">' +
-                                                                                                '<div class="col mt-1 d-flex justify-content-end">' +
-                                                                                                    '<i class="bi bi-hand-thumbs-up" id="comment-like-icon-'+ response.id +'" style="color: #198754;"></i>' +
-                                                                                                '</div>' +
-                                                                                                '<div class="col mt-4">' +
-                                                                                                    '<p class="text-success" id="comment-like-text-'+ response.id +'">'+ response.likes +'</p>' +
-                                                                                                '</div>' +
+                                                                                '<div class="col d-flex justify-content-end">' +
+                                                                                    '<button type="submit" id="like'+ response.id +'" class="btn border border-success comment-like-button-'+ response.id +' d-flex align-items-center pb-3 pt-2" data-comment-id="'+ response.id +'" style="height: 25px;">' +
+                                                                                        '<div class="row align-items-center">' +
+                                                                                            '<div class="col mt-1 d-flex justify-content-end">' +
+                                                                                                '<i class="bi bi-hand-thumbs-up" id="comment-like-icon-'+ response.id +'" style="color: #198754;"></i>' +
                                                                                             '</div>' +
-                                                                                        '</button>' +
+                                                                                            '<div class="col mt-4">' +
+                                                                                                '<p class="text-success" id="comment-like-text-'+ response.id +'">'+ response.likes +'</p>' +
+                                                                                            '</div>' +
                                                                                         '</div>' +
-                                                                                    '<br>' +
-                                                                                '</div>' +
+                                                                                    '</button>' +
+                                                                                    '</div>' +
+                                                                                '<br>' +
                                                                             '</div>' +
                                                                         '</div>' +
                                                                     '</div>' +
-                                                                '<script>' +
-                                                                    '$(document).ready( function() {\n\n' +
-                                                                        '$(\'.comment-like-button-'+ response.id +'\').click(function() {\n\n' +
-                                                                            'console.log(\'clicked\');\n\n' +
-                                                                            'var commentId = $(this).data(\'comment-id\');\n\n' +
-                                                                            'console.log(\'Comment ID:\', commentId);\n\n' +
-                                                                            'var button = $(\'.comment-like-button-'+ response.id +'\');\n\n' +
-                                                                            'var counter;\n\n' +
-                                                                            'var icon;\n\n' +
-                                                                            '$.ajax({\n\n' +
-                                                                                'type: \'POST\',\n\n' +
-                                                                                'url: \'/page/comment-liked/\',\n\n' +
-                                                                                'data: {' +
-                                                                                    '\'comment_id\': commentId,\n\n' +
-                                                                                    '\'comment_type\': \'comment\',\n\n' +
-                                                                                    '\'csrfmiddlewaretoken\': \'{{ csrf_token }}\'\n\n' +
-                                                                                '},\n\n' +
-                                                                                'success: function(response) {\n\n' +
-                                                                                    'console.log(\'success\');\n\n' +
-                                                                                    'counter = $(\'#comment-like-text-'+ response.id +'\');\n\n' +
-                                                                                    'icon = $(\'#comment-like-icon-'+ response.id +'\');\n\n' +
-                                                                                    'counter.text(response.likes);\n\n' +
-                                                                                    'if (response.isLiked) {\n\n' +
-                                                                                        'console.log(\'like\');\n\n' +
-                                                                                        'counter.removeClass(\'text-success\').addClass(\'text-white\');\n\n' +
-                                                                                        'icon.removeClass(\'bi-hand-thumbs-up\').addClass(\'bi-hand-thumbs-up-fill\');\n\n' +
-                                                                                        'button.removeClass(\'liked-button\').addClass(\'btn-success\');\n\n' +
-                                                                                        'icon = document.getElementById(\'comment-like-icon-'+ response.id +'\');\n\n' +
-                                                                                        'icon.style.color = \'#ffffff\';\n\n' +
-                                                                                    '} else {\n\n' +
-                                                                                        'console.log(\'dislike\');\n\n' +
-                                                                                        'counter.removeClass(\'text-white\').addClass(\'text-success\');\n\n' +
-                                                                                        'icon.removeClass(\'bi-hand-thumbs-up-fill\').addClass(\'bi-hand-thumbs-up\');\n\n' +
-                                                                                        'button.removeClass(\'btn-success\').addClass(\'liked-button\');\n\n' +
-                                                                                        'icon = document.getElementById(\'comment-like-icon-'+ response.id +'\');\n\n' +
-                                                                                        'icon.style.color = \'#198754\';\n\n' +
-                                                                                    '}\n\n' +
-                                                                                '},\n\n' +
-                                                                                'error: function(xhr, errmsg, err) {\n\n' +
-                                                                                    'console.log(\'Error:\', xhr.status, xhr.statusText);\n\n' +
-                                                                                '},\n\n' +
-                                                                                'beforeSend: function(xhr, settings) {\n\n' +
-                                                                                    'console.log(\'Before send:\', settings);\n\n' +
-                                                                                    'console.log(\'i.hasContent:\', settings.hasContent);\n\n' +
-                                                                                    'console.log(\'i.data:\', settings.data);\n\n' +
+                                                                '</div>' +
+                                                            '<script>' +
+                                                                '$(document).ready( function() {\n\n' +
+                                                                    '$(\'.comment-like-button-'+ response.id +'\').click(function() {\n\n' +
+                                                                        'console.log(\'clicked\');\n\n' +
+                                                                        'var commentId = $(this).data(\'comment-id\');\n\n' +
+                                                                        'console.log(\'Comment ID:\', commentId);\n\n' +
+                                                                        'var button = $(\'.comment-like-button-'+ response.id +'\');\n\n' +
+                                                                        'var counter;\n\n' +
+                                                                        'var icon;\n\n' +
+                                                                        '$.ajax({\n\n' +
+                                                                            'type: \'POST\',\n\n' +
+                                                                            'url: \'/page/comment-liked/\',\n\n' +
+                                                                            'data: {' +
+                                                                                '\'comment_id\': commentId,\n\n' +
+                                                                                '\'comment_type\': \'comment\',\n\n' +
+                                                                                '\'csrfmiddlewaretoken\': \'{{ csrf_token }}\'\n\n' +
+                                                                            '},\n\n' +
+                                                                            'success: function(response) {\n\n' +
+                                                                                'console.log(\'success\');\n\n' +
+                                                                                'counter = $(\'#comment-like-text-'+ response.id +'\');\n\n' +
+                                                                                'icon = $(\'#comment-like-icon-'+ response.id +'\');\n\n' +
+                                                                                'counter.text(response.likes);\n\n' +
+                                                                                'if (response.isLiked) {\n\n' +
+                                                                                    'console.log(\'like\');\n\n' +
+                                                                                    'counter.removeClass(\'text-success\').addClass(\'text-white\');\n\n' +
+                                                                                    'icon.removeClass(\'bi-hand-thumbs-up\').addClass(\'bi-hand-thumbs-up-fill\');\n\n' +
+                                                                                    'button.removeClass(\'liked-button\').addClass(\'btn-success\');\n\n' +
+                                                                                    'icon = document.getElementById(\'comment-like-icon-'+ response.id +'\');\n\n' +
+                                                                                    'icon.style.color = \'#ffffff\';\n\n' +
+                                                                                '} else {\n\n' +
+                                                                                    'console.log(\'dislike\');\n\n' +
+                                                                                    'counter.removeClass(\'text-white\').addClass(\'text-success\');\n\n' +
+                                                                                    'icon.removeClass(\'bi-hand-thumbs-up-fill\').addClass(\'bi-hand-thumbs-up\');\n\n' +
+                                                                                    'button.removeClass(\'btn-success\').addClass(\'liked-button\');\n\n' +
+                                                                                    'icon = document.getElementById(\'comment-like-icon-'+ response.id +'\');\n\n' +
+                                                                                    'icon.style.color = \'#198754\';\n\n' +
                                                                                 '}\n\n' +
-                                                                            '});\n\n' +
+                                                                            '},\n\n' +
+                                                                            'error: function(xhr, errmsg, err) {\n\n' +
+                                                                                'console.log(\'Error:\', xhr.status, xhr.statusText);\n\n' +
+                                                                            '},\n\n' +
+                                                                            'beforeSend: function(xhr, settings) {\n\n' +
+                                                                                'console.log(\'Before send:\', settings);\n\n' +
+                                                                                'console.log(\'i.hasContent:\', settings.hasContent);\n\n' +
+                                                                                'console.log(\'i.data:\', settings.data);\n\n' +
+                                                                            '}\n\n' +
                                                                         '});\n\n' +
-                                                                    '});\n\n' 
-                                                                );
-                                                            },
-                                                        });
+                                                                    '});\n\n' +
+                                                                '});\n\n' 
+                                                            );
+                                                        },
                                                     });
                                                 });
-                                            </script>
-                                        </div>
+                                            });
+                                        </script>
                                     </div>
                                 </div>
                                 <!-- comments -->
@@ -1136,6 +951,102 @@
                                 </div>
                             </div> 
                         </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                $('.like-button').click(function() { // When the button is pressed
+                                    console.log('clicked');
+                                    var postId = $(this).data('post-id'); // Get Post ID
+                                    console.log('Post ID:', postId);
+                                
+                                    // Defining variables
+                                    var clickedButton = $('.like-button-' + postId); 
+                                    var isLiked
+                                    var modalLikeCounter
+                                    var pageLikeCounter
+                                    var modalLikeIcon
+                                    var pageLikeIcon
+                                    console.log('defined');
+                                    console.log(isLiked)
+
+                                    // AJAX request
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/page/liked/',
+                                        data: {
+                                            'post_id': postId,
+                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                        },
+                                        
+                                        // If the request was successful
+                                        success: function(response) {
+                                            console.log('success');
+
+                                            // Getting relevent elements
+                                            modalLikeCounter = $('#modal-like-text-' + postId);
+                                            pageLikeCounter = $('#page-like-text-' + postId)
+                                            modalLikeIcon = $('#modal-like-icon-' + postId);
+                                            pageLikeIcon = $('#page-like-icon-' + postId)
+
+                                            // Changing text
+                                            modalLikeCounter.text(response.likes);
+                                            pageLikeCounter.text(response.likes);
+                                            
+                                            // Different style changes for different like statuses
+                                            if (response.isLiked) {
+                                                console.log('like');
+
+                                                
+                                                // Change classes for dislike state
+                                                modalLikeCounter.removeClass('text-success').addClass('text-white');
+                                                modalLikeIcon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
+                                                
+                                                pageLikeCounter.removeClass('text-success').addClass('text-white');
+                                                pageLikeIcon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
+
+                                                clickedButton.removeClass('liked-button').addClass('btn-success');
+
+                                                // Color change
+                                                modalLikeIcon = document.getElementById('modal-like-icon-' + postId)
+                                                modalLikeIcon.style.color = '#ffffff'
+                                                
+                                                pageLikeIcon = document.getElementById('page-like-icon-' + postId)
+                                                pageLikeIcon.style.color = '#ffffff'
+
+                                            } else {
+                                                console.log('dislike');
+
+                                                // Change classes for like state
+                                                modalLikeCounter.removeClass('text-white').addClass('text-success');
+                                                modalLikeIcon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
+                                                
+                                                pageLikeCounter.removeClass('text-white').addClass('text-success');
+                                                pageLikeIcon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
+
+                                                clickedButton.removeClass('btn-success').addClass('liked-button');
+
+                                                // Color change
+                                                modalLikeIcon = document.getElementById('modal-like-icon-' + postId)
+                                                modalLikeIcon.style.color = '#198754'
+                                                pageLikeIcon = document.getElementById('page-like-icon-' + postId)
+                                                pageLikeIcon.style.color = '#198754'
+                                            }
+                                        },
+                                        error: function(xhr, errmsg, err) {
+                                            console.log('Error:', xhr.ststus, xhr.statusText);
+                                        },
+                                        beforeSend: function(xhr, settings) {
+                                            console.log('Before send:', settings);
+                                            console.log('i.hasContent:', settings.hasContent);
+                                            console.log('i.data:', settings.data);
+                                        }
+                                    });
+                                });
+                                $(document).on('submit', '#post-form', function(e) {
+                                    e.preventDefault(); // Prevents reloading of the website
+                                    console.log('prevented');
+                                });
+                            });
+                        </script>
                         <!-- Websockets for recieving notifications -->
                         <script type="text/javascript">
                             let notificationSocket;
@@ -1255,7 +1166,11 @@
 
                             connectNotificationSocket(); // connect to the relevant websocket
                         </script>
-                        <!-- To store notifications -->
-                        <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+                <!-- To store notifications -->
+                <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 
-                        </div>
+                </div>
+            </div>
+            <div class="col-4">
+
+            </div>

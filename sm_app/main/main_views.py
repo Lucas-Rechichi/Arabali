@@ -464,12 +464,20 @@ def post_view(request, post_id):
             'created_at':comment.created_at               
         }
     post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
+
+    # Comment Form
+    if request.method == 'POST':
+        comment_form = AddComment(request.POST)
+    else:
+        comment_form = AddComment()
+
     variables = {
         "post": post, 
         "user_stats": user_stats, 
         "user_liked_by": user_liked_by,
         "post_comments": post_comments,
         "post_replies" : post_replies,
+        "comment_form" : comment_form,
         "search_bar" : init['search_bar'],
         "username": init['username'],
         "post_users": post_users,
