@@ -478,28 +478,7 @@
                                             </div>
                                         </div>
                                         <!-- Script gets items from form, creates the comment, then displays it inside of the relevent post. -->
-                                        <script>
-                                            $(document).ready(function () {
-                                                $('.add-comment').click(function () {
-                                                    var postId = $(this).data('post-id');
-                                                    var text = $('#comment-text-' + postId).val();
-                                                    console.log(postId, text)
-                                                    $.ajax({
-                                                        type: 'POST',
-                                                        url: '/page/new-comment/',
-                                                        data: {
-                                                            'post_id': postId,
-                                                            'text': text,
-                                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                                        },
-
-                                                        success: function(response) {
-                                                            console.log('success', response)
-                                                        },
-                                                    })
-                                                })
-                                            })
-                                        </script>
+                                        
                                     </div>
                                 </div>
                                 <!-- comments -->
@@ -530,85 +509,16 @@
                                                             </div>
                                                             <div class="col-4 d-flex justify-content-end">
                                                                 {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                    <button type="submit" id="like{{commentPk}}" class="btn btn-success border border-success comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
+                                                                    <button type="submit" id="like{{commentPk}}" class="btn btn-success border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
                                                                         <p class="text-white mb-0 ms-2" id="comment-like-text-{{commentPk}}" style="max-height: 20px;">{{commentData.likes}}</p>
                                                                         <i class="bi bi-hand-thumbs-up-fill ms-2" id="comment-like-icon-{{commentPk}}" style="color: #ffffff;"></i>
                                                                     </button>
                                                                 {% else %}
-                                                                    <button type="submit" id="like{{commentPk}}" class="btn border border-success comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
+                                                                    <button type="submit" id="like{{commentPk}}" class="btn border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
                                                                         <p class="text-success mb-0 ms-2" id="comment-like-text-{{commentPk}}" style="max-height: 20px;">{{commentData.likes}}</p>
                                                                         <i class="bi bi-hand-thumbs-up ms-2" id="comment-like-icon-{{commentPk}}" style="color: #198754;"></i>
                                                                     </button>
                                                                 {% endif %}
-                                                                <script>
-                                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                                        $('.comment-like-button-{{commentPk}}').click(function() { // When the button is pressed
-                                                                            console.log('clicked');
-                                                                            var commentId = $(this).data('comment-id');
-                                                                            console.log('Comment ID:', commentId)
-
-                                                                            // Defining variables
-                                                                            var button = $('.comment-like-button-{{commentPk}}');
-                                                                            var counter
-                                                                            var icon
-
-                                                                            // AJAX
-                                                                            $.ajax({
-                                                                                type: 'POST',
-                                                                                url: '/page/comment-liked/',
-                                                                                data: {
-                                                                                    'comment_id': commentId,
-                                                                                    'comment_type': 'comment',
-                                                                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                                                                },
-                                                                                success: function(response) {
-                                                                                    console.log('success');
-
-                                                                                    // Getting relevent elements
-                                                                                    counter = $('#comment-like-text-{{commentPk}}');
-                                                                                    icon = $('#comment-like-icon-{{commentPk}}');
-
-                                                                                    console.log(counter.html())
-                                                                                    // Changing text
-                                                                                    newText = `
-
-                                                                                    `;
-                                                                                    counter.html(response.likes);
-
-                                                                                    // Different styles for in the comment was liked of not
-                                                                                    if (response.isLiked) {
-                                                                                        console.log('like');
-
-                                                                                        // Change classes for like state
-                                                                                        counter.removeClass('text-success').addClass('text-white');
-                                                                                        icon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
-                                                                                        button.removeClass('liked-button').addClass('btn-success');
-
-                                                                                        icon.css('color', '#ffffff');
-
-                                                                                    } else {
-                                                                                        console.log('dislike');
-
-                                                                                        // Change classes for dislike state
-                                                                                        counter.removeClass('text-white').addClass('text-success');
-                                                                                        icon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
-                                                                                        button.removeClass('btn-success').addClass('liked-button');
-
-                                                                                        icon.css('color', '#198754');                                                                     
-                                                                                    }
-                                                                                },
-                                                                                error: function(xhr, errmsg, err) {
-                                                                                    console.log('Error:', xhr.ststus, xhr.statusText);
-                                                                                },
-                                                                                beforeSend: function(xhr, settings) {
-                                                                                    console.log('Before send:', settings);
-                                                                                    console.log('i.hasContent:', settings.hasContent);
-                                                                                    console.log('i.data:', settings.data);
-                                                                                }
-                                                                            })
-                                                                        });
-                                                                    })
-                                                                </script>
                                                             </div>
                                                         </div>
                                                         <div class="row">
@@ -747,7 +657,7 @@
                                                                                         </div>
                                                                                         <div class="col d-flex justify-content-end">
                                                                                             {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                                                <button type="submit" id="like{{subCommentPk}}" class="btn btn-success border border-success nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                <button type="submit" id="like{{subCommentPk}}" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
                                                                                                     <div class="row align-items-center">
                                                                                                         <div class="col mt-1 d-flex justify-content-end">
                                                                                                             <i class="bi bi-hand-thumbs-up-fill" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #ffffff;"></i>
@@ -758,7 +668,7 @@
                                                                                                     </div>
                                                                                                 </button>
                                                                                             {% else %}
-                                                                                                <button type="submit" id="like{{subCommentPk}}"  class="btn border border-success nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                <button type="submit" id="like{{subCommentPk}}"  class="btn border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
                                                                                                     <div class="row align-items-center">
                                                                                                         <div class="col mt-1 d-flex justify-content-end">
                                                                                                             <i class="bi bi-hand-thumbs-up" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #198754;"></i>
@@ -769,73 +679,6 @@
                                                                                                     </div>
                                                                                                 </button>
                                                                                             {% endif %}
-                                                                                            <script>
-                                                                                                $(document).ready( function() {
-                                                                                                    $('.nested-comment-like-button-{{subCommentPk}}').click(function() { // When the button is pressed
-                                                                                                        console.log('clicked');
-                                                                                                        var commentId = $(this).data('comment-id');
-                                                                                                        console.log('Comment ID:', commentId);
-
-                                                                                                        // Defining variables
-                                                                                                        var button = $('.nested-comment-like-button-{{subCommentPk}}');
-                                                                                                        var counter;
-                                                                                                        var icon;
-
-                                                                                                        // AJAX
-                                                                                                        $.ajax({
-                                                                                                            type: 'POST',
-                                                                                                            url: '/page/comment-liked/',
-                                                                                                            data: {
-                                                                                                                'comment_id': commentId,
-                                                                                                                'comment_type': 'nested-comment',
-                                                                                                                'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                                                                                            },
-                                                                                                            success: function(response) {
-                                                                                                                console.log('success');
-
-                                                                                                                // Getting relevant elements
-                                                                                                                counter = $('#nested-comment-like-text-{{subCommentPk}}');
-                                                                                                                icon = $('#nested-comment-like-icon-{{subCommentPk}}');
-
-                                                                                                                // Changing text
-                                                                                                                counter.text(response.likes);
-
-                                                                                                                // Different styles for if the comment was liked or not
-                                                                                                                if (response.isLiked) {
-                                                                                                                    console.log('like');
-
-                                                                                                                    // Change classes for dislike state
-                                                                                                                    counter.removeClass('text-success').addClass('text-white');
-                                                                                                                    icon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
-                                                                                                                    button.removeClass('liked-button').addClass('btn-success');
-
-                                                                                                                    // Color change
-                                                                                                                    icon.css('color', '#ffffff');
-
-                                                                                                                } else {
-                                                                                                                    console.log('dislike');
-
-                                                                                                                    // Change classes for dislike state
-                                                                                                                    counter.removeClass('text-white').addClass('text-success');
-                                                                                                                    icon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
-                                                                                                                    button.removeClass('btn-success').addClass('liked-button');
-
-                                                                                                                    // Color change
-                                                                                                                    icon.css('color', '#198754');                                                                      
-                                                                                                                }
-                                                                                                            },
-                                                                                                            error: function(xhr, errmsg, err) {
-                                                                                                                console.log('Error:', xhr.status, xhr.statusText);
-                                                                                                            },
-                                                                                                            beforeSend: function(xhr, settings) {
-                                                                                                                console.log('Before send:', settings);
-                                                                                                                console.log('i.hasContent:', settings.hasContent);
-                                                                                                                console.log('i.data:', settings.data);
-                                                                                                            }
-                                                                                                        });
-                                                                                                    });
-                                                                                                });
-                                                                                            </script>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -854,7 +697,7 @@
                             </div> 
                         </div>
                         <script>
-                            document.addEventListener('DOMContentLoaded', function() {
+                            $(document).ready(function () {
                                 $('.like-button').click(function() { // When the button is pressed
                                     console.log('clicked');
                                     var postId = $(this).data('post-id'); // Get Post ID
@@ -947,12 +790,196 @@
                                     e.preventDefault(); // Prevents reloading of the website
                                     console.log('prevented');
                                 });
-                            });
+                                $('.comment-like-button').click(function() { // When the button is pressed
+                                    console.log('clicked');
+                                    var commentId = $(this).data('comment-id');
+                                    console.log('Comment ID:', commentId)
+
+                                    // Defining variables
+                                    var button = $('.comment-like-button-' + commentId);
+                                    var counter
+                                    var icon
+
+                                    // AJAX
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/page/comment-liked/',
+                                        data: {
+                                            'comment_id': commentId,
+                                            'comment_type': 'comment',
+                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                        },
+                                        success: function(response) {
+                                            console.log('success');
+
+                                            // Getting relevent elements
+                                            counter = $('#comment-like-text-' + commentId);
+                                            icon = $('#comment-like-icon-' + commentId);
+
+                                            // Changing text
+                                            counter.html(response.likes);
+
+                                            // Different styles for in the comment was liked of not
+                                            if (response.isLiked) {
+                                                console.log('like');
+
+                                                // Change classes for like state
+                                                counter.removeClass('text-success').addClass('text-white');
+                                                icon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
+                                                button.removeClass('liked-button').addClass('btn-success');
+
+                                                icon.css('color', '#ffffff');
+
+                                            } else {
+                                                console.log('dislike');
+
+                                                // Change classes for dislike state
+                                                counter.removeClass('text-white').addClass('text-success');
+                                                icon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
+                                                button.removeClass('btn-success').addClass('liked-button');
+
+                                                icon.css('color', '#198754');                                                                     
+                                            }
+                                        },
+                                        error: function(xhr, errmsg, err) {
+                                            console.log('Error:', xhr.ststus, xhr.statusText);
+                                        },
+                                        beforeSend: function(xhr, settings) {
+                                            console.log('Before send:', settings);
+                                            console.log('i.hasContent:', settings.hasContent);
+                                            console.log('i.data:', settings.data);
+                                        }
+                                    })
+                                });
+                                $('.nested-comment-like-button').click(function() { // When the button is pressed
+                                    console.log('clicked');
+                                    var commentId = $(this).data('comment-id');
+                                    console.log('Comment ID:', commentId);
+
+                                    // Defining variables
+                                    var button = $('.nested-comment-like-button-' + commentId);
+                                    var counter;
+                                    var icon;
+
+                                    // AJAX
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/page/comment-liked/',
+                                        data: {
+                                            'comment_id': commentId,
+                                            'comment_type': 'nested-comment',
+                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                        },
+                                        success: function(response) {
+                                            console.log('success');
+
+                                            // Getting relevant elements
+                                            counter = $('#nested-comment-like-text-' + commentId);
+                                            icon = $('#nested-comment-like-icon-' + commentId);
+
+                                            // Changing text
+                                            counter.text(response.likes);
+
+                                            // Different styles for if the comment was liked or not
+                                            if (response.isLiked) {
+                                                console.log('like');
+
+                                                // Change classes for dislike state
+                                                counter.removeClass('text-success').addClass('text-white');
+                                                icon.removeClass('bi-hand-thumbs-up').addClass('bi-hand-thumbs-up-fill');
+                                                button.removeClass('liked-button').addClass('btn-success');
+
+                                                // Color change
+                                                icon.css('color', '#ffffff');
+
+                                            } else {
+                                                console.log('dislike');
+
+                                                // Change classes for dislike state
+                                                counter.removeClass('text-white').addClass('text-success');
+                                                icon.removeClass('bi-hand-thumbs-up-fill').addClass('bi-hand-thumbs-up');
+                                                button.removeClass('btn-success').addClass('liked-button');
+
+                                                // Color change
+                                                icon.css('color', '#198754');                                                                      
+                                            }
+                                        },
+                                        error: function(xhr, errmsg, err) {
+                                            console.log('Error:', xhr.status, xhr.statusText);
+                                        },
+                                        beforeSend: function(xhr, settings) {
+                                            console.log('Before send:', settings);
+                                            console.log('i.hasContent:', settings.hasContent);
+                                            console.log('i.data:', settings.data);
+                                        }
+                                    });
+                                });
+                                $('.add-comment').click(function () {
+                                    var postId = $(this).data('post-id');
+                                    var text = $('#comment-text-' + postId).val();
+                                    console.log(postId, text)
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/page/new-comment/',
+                                        data: {
+                                            'post_id': postId,
+                                            'text': text,
+                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                        },
+
+                                        success: function(response) {
+                                            console.log('success', response)
+
+                                        },
+                                    })
+                                })
+
+                            })
                         </script>
+
+                        <!-- WEBSOCKETS -->
+
+                        <script>
+                            let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
+                        </script>   
+
+                        <!-- Websockets for updating posts -->
+
+                        <script>
+                            let postSocket;
+
+                            function connectPostSocket() {
+                                postSocket = new WebSocket(
+                                    'ws://' + window.location.host + '/ws/posts/'
+                                );
+
+                                postSocket.onopen = function(e) {
+                                    console.log('connected', e);
+                                };
+
+                                postSocket.onmessage = function(e) { // when the consumer class sends a message through
+                                    console.log('Message coming through!');
+                                    const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
+                                    console.log(data)
+                                };
+
+                                postSocket.onerror = function(e) {
+                                    console.error('WebSocket encountered an error:', e);
+                                };
+
+                                postSocket.onclose = function(e) {
+                                    console.error('WebSocket closed unexpectedly:', e);
+                                    setTimeout(connectPostSocket, reconnectionTime); // attempt a reconnection to this websocket
+                                };
+                            }
+
+                            connectPostSocket()
+                        </script>
+
                         <!-- Websockets for recieving notifications -->
+
                         <script type="text/javascript">
                             let notificationSocket;
-                            let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
 
                             function connectNotificationSocket() { // function for connecting to the websocket.
                                 notificationSocket = new WebSocket(
@@ -1072,7 +1099,4 @@
                 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 
                 </div>
-            </div>
-            <div class="col-4">
-
             </div>

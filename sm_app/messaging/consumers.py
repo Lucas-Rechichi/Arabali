@@ -108,33 +108,35 @@ class MessageConsumer(WebsocketConsumer):
                     }
                 )
         elif action == 'delete_message':
-            async_to_sync(self.channel_layer.group_send)(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_message',
-                        'action': action,
-                        'message_id': message_id,
-                        'username': user.username,
-                    }
-                )
+            if user and user.is_authenticated:
+                async_to_sync(self.channel_layer.group_send)(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'action': action,
+                            'message_id': message_id,
+                            'username': user.username,
+                        }
+                    )
         elif action == 'reaction':
-            sub_action = text_data_json['sub_action']
-            reaction = text_data_json['reaction']
-            reaction_id = text_data_json['reaction_id']
-            reactor = text_data_json['reactor']
-            async_to_sync(self.channel_layer.group_send)(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_message',
-                        'action': action,
-                        'sub_action': sub_action,
-                        'reaction': reaction,
-                        'reactor': reactor,
-                        'message_id': message_id,
-                        'reaction_id': reaction_id,
-                        'username': user.username,
-                    }
-                )
+            if user and user.is_authenticated:
+                sub_action = text_data_json['sub_action']
+                reaction = text_data_json['reaction']
+                reaction_id = text_data_json['reaction_id']
+                reactor = text_data_json['reactor']
+                async_to_sync(self.channel_layer.group_send)(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'action': action,
+                            'sub_action': sub_action,
+                            'reaction': reaction,
+                            'reactor': reactor,
+                            'message_id': message_id,
+                            'reaction_id': reaction_id,
+                            'username': user.username,
+                        }
+                    )
     
     def chat_message(self, event):
         # Accessing sent data that is universal
