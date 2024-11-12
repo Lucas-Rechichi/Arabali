@@ -8,9 +8,4 @@ moviepy==1.0.3
 pytz==2024.1
 pandas
 python-dotenv
-llama-index
-llama-index-llms-ollama
-llama-index-llms-gemini
-llama_parse
-huggingface_hub
 google-generativeai

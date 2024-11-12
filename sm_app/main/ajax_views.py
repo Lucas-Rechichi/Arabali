@@ -89,6 +89,7 @@ def liked(request):
 
 def comment_liked(request):
     if request.method == 'POST':
+        print(request.POST)
         # Getting relevent data
         username = request.user.username
         comment_id = request.POST.get('comment_id')
@@ -158,21 +159,10 @@ def comment_liked(request):
             
             comment.liked_by.remove(liked_by)
             isLiked = False
+            comment.save()
         else:
             liked_by = LikedBy.objects.get(name=username)
-            comment.likes +=1
-
-            # If the user has liked a comment
-            if request.POST.get('comment_type') == 'comment':
-                comment = Comment.objects.get(id=comment_id)
-                tag = PostTag.objects.get(post=comment.post)
-                type = 'comment'
-
-            # If the user has liked a reply
-            else:
-                comment = NestedComment.objects.get(id=comment_id)
-                tag = PostTag.objects.get(post=comment.comment.post)
-                type = 'reply'
+            comment.likes += 1
             
             # Logic for comments
             if type == 'comment':
@@ -208,7 +198,7 @@ def comment_liked(request):
 
             comment.liked_by.add(liked_by)
             isLiked = True
-        comment.save()
+            comment.save()
 
         # Altering of the algorithum
         Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
@@ -299,12 +289,20 @@ def new_reply(request):
                 comment = Comment.objects.get(id=comment_id)
                 reply = NestedComment(user=user, comment=comment, likes=0, created_at=datetime.now(), text=request.POST.get('text'))
                 tag.value += 4
-                tag.current_increace += 4
                 interest.value += 1
-                interest.current_increace += 1
                 tag.save()
                 interest.save()
                 reply.save()
+
+                # Keeping a record of the interactions
+                post_interaction = PostInteraction(tag=tag, value=4, type='current')
+                post_interaction.save()
+                interest_interaction = InterestInteraction(interest=interest, value=1, type='current')
+                interest_interaction.save()
+                
+                # Altering of the algorithum
+                Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
+                Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
 
                 # Sending the comments data over to the HTML document so that it can be displayed inside of the comment
                 responce = {
