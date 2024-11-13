@@ -465,19 +465,12 @@ def post_view(request, post_id):
         }
     post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
 
-    # Comment Form
-    if request.method == 'POST':
-        comment_form = AddComment(request.POST)
-    else:
-        comment_form = AddComment()
-
     variables = {
         "post": post, 
         "user_stats": user_stats, 
-        "user_liked_by": user_liked_by,
+        "user_liked_by": user_liked_by, # for the post, not comments
         "post_comments": post_comments,
         "post_replies" : post_replies,
-        "comment_form" : comment_form,
         "search_bar" : init['search_bar'],
         "username": init['username'],
         "post_users": post_users,
@@ -489,11 +482,10 @@ def post_view(request, post_id):
 @login_required
 def config(request, name):
     init = initialize_page(request)
-    # Checking that the right user is acessing this page.
-
+    
     if UserStats.objects.get(user=request.user).is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
-    
+    # Checking that the right user is acessing this page.
     username = request.user.username
     if name != username:
         return render(request, 'main/error.html', {'issue': 'Cannot access this users profile'})

@@ -3878,7 +3878,7 @@
                     reactions.fadeOut(200);
                 }, 300)
             })
-            $('#message').focus(function () {generateResponses()});
+            $('#message-div').on('focus', '#message', function () {generateResponses()});
             $('#message-div').on('click', '.regenerate-response', function () {
                 console.log('regenerating')
                 generateResponses()

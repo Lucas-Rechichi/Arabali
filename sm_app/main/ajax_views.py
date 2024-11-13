@@ -25,7 +25,7 @@ def liked(request):
                 interest = Interest.objects.get(user=request.user, name=tag.name)
             else:
                 # making the new interest, it's function, and the initial interaction.
-                new_interest = Interest(user=request.user, name=tag.name, value=0, current_increace=0, previous_increace=0, date_of_change=date.today())
+                new_interest = Interest(user=request.user, name=tag.name, value=0)
                 new_interest.save()
                 new_interest_function = ICF(a=1, k=1, interest=new_interest, form='Parabolic Truncus')
                 new_interest_function.save()
@@ -248,7 +248,7 @@ def new_comment(request):
                 Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
 
                 # Sending the comments data over to the HTML document so that it can be displayed inside of the post
-                responce = {
+                response = {
                     'user':comment.user.username,
                     'post':comment.post.pk,
                     'text':comment.text,
@@ -256,9 +256,9 @@ def new_comment(request):
                     'created_at':comment.created_at,
                     'liked__by': list(comment.liked_by.all()),
                     'pfp':user_stats.pfp.url,
-                    'id':comment.pk
+                    'comment_id':comment.pk
                 }
-                return JsonResponse(responce)
+                return JsonResponse(response)
             else:
                 return JsonResponse({'error': 'Invalid request method'}, status=405)
         else:

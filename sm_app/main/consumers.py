@@ -1,6 +1,6 @@
 import json
 
-from main.models import Post, Comment, NestedComment
+from main.models import UserStats, Post, Comment, NestedComment
 from channels.generic.websocket import WebsocketConsumer
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -22,7 +22,7 @@ class PostConsumer(WebsocketConsumer):
         # Accept the WebSocket connection
         self.accept()
     
-    def disconnect(self):
+    def disconnect(self, close_code):
         # Remove the WebSocket from the group
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
@@ -64,28 +64,37 @@ class PostConsumer(WebsocketConsumer):
                 print(f'Comment with id: {comment_id} does not exist.')
             except Exception as e:
                 print(f'An error occured: {e}')
-            
-            comment_text = comment.text
+
+            user_stats = UserStats.objects.get(user=comment.user)
 
             data = {
-                'text': comment_text
+                'text': comment.text,
+                'post_id': comment.post.pk,
+                'comment_id': comment.pk,
+                'username': comment.user.username,
+                'user_pfp_url': user_stats.pfp.url
             }
 
-        elif request_type == 'create_replies':
-            comment_id = event['object_id']
+        elif request_type == 'create_reply':
+            reply_id = event['object_id']
 
             try:
-                comment = NestedComment.objects.get(id=comment_id)
+                reply = NestedComment.objects.get(id=reply_id)
             except ObjectDoesNotExist:
                 print(f'Comment with id: {comment_id} does not exist.')
             except Exception as e:
                 print(f'An error occured: {e}')
-            comment_text = comment.text
+
+            user_stats = UserStats.objects.get(user=reply.user)
 
             data = {
-                'text': comment_text
+                'text': reply.text,
+                'comment_id': reply.comment.pk,
+                'reply_id': reply.pk,
+                'username': reply.user.username,
+                'user_pfp_url': user_stats.pfp.url
             }
-            
+
         elif request_type == 'update_post_likes':
             post_id = event['object_id']
 
