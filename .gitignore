@@ -156,6 +156,10 @@ cython_debug/
 # App specific:
 arabali_users/
 
+# Certificates and keys:
+localhost.crt
+localhost.key
+
 # Other
 .DS_Store
 sm_app/clipboard.txt
