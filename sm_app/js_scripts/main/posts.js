@@ -20,7 +20,7 @@ $(document).ready(function () {
             url: '/page/liked/',
             data: {
                 'post_id': postId,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                'csrfmiddlewaretoken': csrfToken
             },
             
             // If the request was successful
@@ -108,7 +108,7 @@ $(document).ready(function () {
             data: {
                 'comment_id': commentId,
                 'comment_type': 'comment',
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                'csrfmiddlewaretoken': csrfToken
             },
             success: function(response) {
                 console.log('success');
@@ -169,7 +169,7 @@ $(document).ready(function () {
             data: {
                 'comment_id': commentId,
                 'comment_type': 'nested-comment',
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                'csrfmiddlewaretoken': csrfToken
             },
             success: function(response) {
                 console.log('success');
@@ -225,7 +225,7 @@ $(document).ready(function () {
             data: {
                 'post_id': postId,
                 'text': text,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                'csrfmiddlewaretoken': csrfToken
             },
 
             success: function(response) {
@@ -247,7 +247,7 @@ $(document).ready(function () {
             data: {
                 'comment_id': commentId,
                 'text': text,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                'csrfmiddlewaretoken': csrfToken
             },
             success: function(response) {
                 console.log('success')

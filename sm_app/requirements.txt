@@ -1,4 +1,5 @@
 django==5.0.6
+django-extensions
 channels==4.1.0
 daphne==4.1.2
 django-crispy-forms==2.1
@@ -6,6 +7,7 @@ crispy-bootstrap5==2024.2
 pillow==10.3.0
 moviepy==1.0.3
 pytz==2024.1
+Werkzeug # For testing https connections
 pandas
 python-dotenv
 google-generativeai
