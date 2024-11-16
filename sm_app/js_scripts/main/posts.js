@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
     $('.like-button').click(function() { // When the button is pressed
         console.log('clicked');
         var postId = $(this).data('post-id'); // Get Post ID

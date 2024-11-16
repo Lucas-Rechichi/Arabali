@@ -1,128 +1,25 @@
 {% load crispy_forms_tags %}
-<style>
-    .heading{
-    display: flex;
-    margin: auto;
-}
-    ul{
-        list-style-type: none;
-        padding-left: 40px;
-}
-    .custom-icon {
-    position: relative;
-    padding-left: 30px;
-}
-    .custom-icon i {
-    position: absolute;
-    left: 0;
-}
-    .topbar{
-    width: 100%;
-    height: 85px;
-    background-color: rgb(186, 186, 186);
-}
-.logo-button{
-    background-color: rgb(186, 186, 186);
-    border: none;
-    size: 60px;
-    padding-left: 30px;
-    padding-top: 15px;
-}
-
-.contents{
-    padding: 30px;
-    width: 70%;
-    height: 70%;
-    margin: auto;
-    position: absolute;
-    top: 50%;
-    margin-top: 20px;
-    text-align: center;
-}
-.add{
-    width: 10%;
-    margin: auto;
-    position: absolute;
-}
-.profile{
-    text-align: center;
-    padding: 10px;
-    margin: auto;
-    position: absolute;
-    width: 85%;
-    height: 85%;
-    margin-top: 25px;
-}
-.like {
-    width: 10%;
-    height: 10%;
-    margin-left: 90%;
-}
-.pfp_image{
-    width: 30px;
-    height: 30px;
-    border-radius:15px;
-}
-.pfp_button{
-    height: 35px;
-    width: 35px;
-    background-color: #fff;
-    border-radius: 17.5px;
-    border-color: green;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.follow{
-    width: 100px;
-    left: 50%;
-}
-.profile-row-one{
-    text-align: center;
-}
-.profile-pfp{
-    height: 100px;
-    width: 100px;
-}
-.sideopener{
-    position: absolute;
-    right: 10px;
-    top: 20px;
-}
-.user-profile{
-    position: absolute;
-    height: 54px;
-    width: 54px;
-    right: 80px;
-    top: 15px;
-}
-.user-image{
-    position: absolute;
-    right: 0px;
-    bottom: 0px;
-    height: 50px;
-    width: 50px;
-    border-radius: 25px;
-}
-.minipost{
-    width: 300px;
-    height: 100px;                          
-}
-.invis{
-    border: none;
-    background-color: #fff;
-
-}
-</style>
+{% load static %}
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token }}">
+        <meta name="username" content="{{ username }}">
+        <meta name="notification-count" content="{{ notification_count }}">
         <title>Feed | Arabali</title>
+        <!-- CDN's -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- SCRIPTS -->
+        <script type="text/javascript" src="{% static 'main/posts.js' %}"></script>
+        <script type="text/javascript" src="{% static 'algorithum/scrolled_by.js'%}"></script>
+        <script type="text/javascript" src="{% static 'websockets/post_socket.js' %}"></script>
+        <script type="text/javascript" src="{% static 'websockets/notification_socket.js' %}"></script>
+        <!-- STYLES -->
+        <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -394,7 +291,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col m-2">
-                                            <img src="{{posts.media.url}}" alt="{{posts.id}}'s Media" class="post-no-{{posts.id}}" style="height: 248px; width: 100%;" id="post-{{posts.id}}" data-post-id="{{posts.id}}">
+                                            <img src="{{posts.media.url}}" alt="{{posts.id}}'s Media" class="post-checkpoint post-no-{{posts.id}}" style="height: 248px; width: 100%;" data-post-id="{{posts.id}}">
                                         </div>
                                     </div>
                                     <div class="row m-2">
@@ -1213,52 +1110,7 @@
                                             </div>
                                     </div> 
                                 </div>
-                                <script>
-                                    $(document).ready(function() {
-                                        var triggerPoints = $('.post-no-{{posts.id}}'); // Assuming all posts have a class 'post'
-                                        var hasTriggered = {};
-
-                                        triggerPoints.each(function() {
-                                            var triggerPoint = $(this);
-                                            var postId = triggerPoint.data('post-id');
-                                            hasTriggered[postId] = false; // Initialize the trigger flag for each post
-
-                                            $(window).on('scroll', function() {
-                                                if (hasTriggered[postId]) return; // Exit if action has already been triggered for this post
-
-                                                var scrollTop = $(window).scrollTop();
-                                                var windowHeight = window.innerHeight;
-                                                var elementOffsetTop = triggerPoint.offset().top;
-                                                var elementHeight = triggerPoint.outerHeight();
-
-                                                // Check if the element is in the viewport
-                                                if ((scrollTop + windowHeight) >= elementOffsetTop && scrollTop <= (elementOffsetTop + elementHeight)) {
-                                                    // Your JavaScript code to execute
-                                                    console.log('Target element is in view!');
-                                                    console.log('Conditional 1: ' + scrollTop + '+' +  windowHeight + '(' + (scrollTop + windowHeight) + ')' + '>='  + elementOffsetTop);
-                                                    console.log('Conditional 2: ' + scrollTop + '<='  + elementOffsetTop + '+' + elementHeight + '(' + (scrollTop + windowHeight) + ')' );
-                                                    // Perform other actions here
-
-                                                    // Set the flag to true to prevent further triggering
-                                                    hasTriggered[postId] = true;
-
-                                                    $.ajax({
-                                                        type: 'POST',
-                                                        url: '/page/scrolled-by/',
-                                                        data: {
-                                                            'post_id': postId,
-                                                            'csrfmiddlewaretoken': '{{ csrf_token }}'
-                                                        },
-                                                        success: function(response) {
-                                                            console.log(response.post_id + ' was passed successfully!')
-                                                        }
-                                                    });
-                                                }
-                                            });
-                                        });
-                                    });
-                                </script> 
-                        </div>
+                            </div>
                         {% endfor %}
                         <div class="col d-flex justify-content-center">
                             {% if increment.previous == 0 %}
@@ -1271,125 +1123,7 @@
                         </div>
                         <br>   
                     </div>
-                    <!-- Websockets for recieving notifications -->
-                    <script type="text/javascript">
-                        let notificationSocket;
-                        let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
-
-                        function connectNotificationSocket() { // function for connecting to the websocket.
-                            notificationSocket = new WebSocket(
-                                'ws://' + window.location.host + '/ws/brordcast-message/'
-                            ); // connect to the relevant consumer class: NotificationConsumer
-
-                            notificationSocket.onopen = function(e) {
-                                console.log('connected', e);
-                            };
-
-                            notificationSocket.onmessage = function(e) { // when the consumer class sends a message through
-                                console.log('Message coming through!');
-                                const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
-
-                                if (data.receiver === '{{username}}') { // if the data belongs to this specific user
-                                    $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
-                                    $('#notification-inbox').prepend(data.stored_html_notification); // adds HTML to the notification div that houses the notifications in the off-canvas
-                                    
-                                    // Update notification count
-                                    var notificationCounter = $('#notification-counter');
-                                    var newCount = parseInt(notificationCounter.text()) || 0;
-                                    notificationCounter.text(newCount + 1).show();
-                                    
-                                    if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
-                                        $('#bell-icon').removeClass('bi-bell');
-                                        $('#bell-icon').addClass('bi-bell-fill');
-                                    }
-
-                                    var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
-
-                                    if (notificationElement) {
-                                        var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
-                                        // Show the toast
-                                        notification.show();
-                                    } else {
-                                        console.error('Notification element not found:', 'notification-' + data.notification_id);
-                                    }
-
-                                    // Attach event handlers to the newly added notification
-                                    attachNotificationEventHandlers(data.notification_id, data.receiver);
-                                } else {
-                                    console.log('incorrect user');
-                                }
-                            };
-
-                            notificationSocket.onerror = function(e) {
-                                console.error('WebSocket encountered an error:', e);
-                            };
-
-                            notificationSocket.onclose = function(e) {
-                                console.error('WebSocket closed unexpectedly:', e);
-                                setTimeout(connectNotificationSocket, reconnectionTime); // attempt a reconnection to this websocket
-                            };
-                        }
-
-                        function attachNotificationEventHandlers(notificationId, receiver) {
-                            $(`#close-notification-${notificationId}`).click(function() {
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/universal/remove-notification/',
-                                    data: {
-                                        'receiver': receiver,
-                                        'type': 'notification-id',
-                                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                                        'notification_id': notificationId,
-                                    },
-                                    success: function(response) {
-                                        console.log(response.message);
-                                        var notification = $(`#stored-notification-${notificationId}`);
-                                        notification.remove();
-                                        var notificationCounter = $('#notification-counter');
-                                        var newCount = parseInt(notificationCounter.text()) - 1;
-
-                                        if (newCount <= 0) {
-                                            notificationCounter.text('').hide();
-                                            $('#bell-icon').removeClass('bi-bell-fill').addClass('bi-bell');
-                                        } else {
-                                            notificationCounter.text(newCount);
-                                        }
-                                    }
-                                });
-                            });
-
-                            $(`#read-notification-${notificationId}`).click(function() {
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/universal/remove-notification/',
-                                    data: {
-                                        'receiver': receiver,
-                                        'type': 'notification-id',
-                                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                                        'notification_id': notificationId,
-                                    },
-                                    success: function(response) {
-                                        console.log(response.message);
-                                    }
-                                });
-                            });
-                        }
-
-                        $(document).ready(function() {
-                            if ('{{ notification_count }}' == '0') {
-                                var notification_counter = $('#notification-counter');
-                                notification_counter.text('').hide();
-                                var notification_bell = $('#bell-icon');
-                                notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
-                            } else {
-                                var notificationCounter = $('#notification-counter');
-                                notificationCounter.text('{{ notification_count }}').show();
-                                $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
-                            }
-                        });
-
-                        connectNotificationSocket(); // connect to the relevant websocket
-                    </script>
+                    
                     <!-- To store notifications -->
                     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 
