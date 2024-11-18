@@ -3371,7 +3371,7 @@
                 var suggestedResponseCard = $('#suggested-response-card');
                 console.log(e.target.parentElement.classList)
                 if (e.target.parentElement !== null) {
-                    if (!(e.target.parentElement.classList.contains('suggested-response-clickable')) && !8(e.target.classList.contains('suggested-response-clickable'))) {
+                    if (!(e.target.parentElement.classList.contains('suggested-response-clickable')) && !(e.target.classList.contains('suggested-response-clickable'))) {
                         if (suggestedResponseCard.css('display') === 'block') {
                             suggestedResponseCard.fadeOut(300);
                         }

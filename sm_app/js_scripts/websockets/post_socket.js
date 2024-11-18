@@ -116,7 +116,7 @@ function connectPostSocket() {
 
     postSocket.onclose = function(e) {
         console.error('WebSocket closed unexpectedly:', e);
-        setTimeout(connectPostSocket, reconnectionTime); // attempt a reconnection to this websocket
+        setTimeout(connectPostSocket, 5000); // attempt a reconnection to this websocket
     };
 }
 

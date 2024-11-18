@@ -15,8 +15,9 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <!-- SCRIPTS -->
         <script type="text/javascript" src="{% static 'main/posts.js' %}"></script>
-        <script type="text/javascript" src="{% static 'websockets/post_socket.js' %}"></script>
+        <script type="text/javascript" src="{% static 'universal/notifications.js'%}"></script>
         <script type="text/javascript" src="{% static 'websockets/notification_socket.js' %}"></script>
+        <script type="text/javascript" src="{% static 'websockets/post_socket.js' %}"></script>
         <!-- STYLES -->
         <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
     </head>
@@ -34,7 +35,7 @@
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-3">
-            
+
                                         </div>
                                         <div class="col-6">
                                             {{search_bar|crispy}}
@@ -98,14 +99,14 @@
                     {% for notification in notifications.values %}
                     <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                         <div class="card-header">
-                            <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification-{{notification.notification_object.pk}}">
+                            <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification" data-notification-id="{{notification.notification_object.pk}}">
                                 <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
                             </button>
-                            <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification-{{notification.notification_object.pk}}">
+                            <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification" data-notification-id="{{notification.notification_object.pk}}">
                                 <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
                             </button>
                             <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
-                            <button type="button ms-2" class="btn-close" id="close-notification-{{notification.notification_object.pk}}" aria-label="Close"></button>
+                            <button type="button ms-2" class="btn-close" id="close-notification" aria-label="Close" data-notification-id="{{notification.notification_object.pk}}"></button>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -138,51 +139,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- script for removing notifications if a user dismisses the notification or chjecks out the notification. -->
-                    <script> 
-                        $(document).ready(function () {
-                            $('#close-notification-{{notification.notification_object.pk}}').click(function () {
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/universal/remove-notification/',
-                                    data: {
-                                        'receiver': '{{username}}',
-                                        'type': 'notification-id',
-                                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                                        'notification_id': '{{notification.notification_object.pk}}'
-                                    },
-                                    success: function(response) {
-                                        console.log(response.notification_count, response.notification_counter)
-                                        var notification = $("#notification-{{notification.notification_object.pk}}")
-                                        notification.remove();
-                                        $('#notification-counter').text('');
-                                        $('#notification-counter').text(response.notification_count);
-                                            if (response.notification_count == 0) {
-                                                $('#notification-counter').text(response.notification_count).hide();
-                                                $('#notification-counter').remove();
-                                                $('#bell-icon').removeClass('bi-bell-fill');
-                                                $('#bell-icon').addClass('bi-bell');
-                                            }
-                                    }
-                                })
-                            })
-                            $('#read-notification-{{notification.notification_object.pk}}').click(function () {
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/universal/remove-notification/',
-                                    data: {
-                                        'receiver': '{{username}}',
-                                        'type': 'notification-id',
-                                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                                        'notification_id': '{{notification.notification_object.pk}}'
-                                    },
-                                    success: function(response) {
-                                        console.log(response.message)
-                                    }
-                                })
-                            })
-                        })
-                    </script>
                 {% endfor %}
                 </div>
             </div>
@@ -224,31 +180,29 @@
                             <button type="button" class="btn" data-bs-target="#expand-{{post.id}}", data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
                         </div>
                         <div class="col-6 d-flex justify-content-end">
-                            <form action="" id="post-form" method="post">
-                                {% if user_liked_by in post.liked_by.all %}
-                                    <button type="submit" id="like{{post.id}}" class="btn btn-success border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px; min-width: 50px">
-                                        <div class="row align-items-center">
-                                            <div class="col mt-1 d-flex justify-content-end">
-                                                <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{post.id}}" style="color: #ffffff;"></i>
-                                            </div>
-                                            <div class="col mt-4">
-                                                <p class="text-white" id="page-like-text-{{post.id}}">{{post.likes}}</p>
-                                            </div>
+                            {% if user_liked_by in post.liked_by.all %}
+                                <button type="button" class="btn btn-success border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px; min-width: 50px">
+                                    <div class="row align-items-center">
+                                        <div class="col mt-1 d-flex justify-content-end">
+                                            <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{post.id}}" style="color: #ffffff;"></i>
                                         </div>
-                                    </button>
-                                {% else %}
-                                    <button type="submit" id="like{{post.id}}" class="btn border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
-                                        <div class="row align-items-center">
-                                            <div class="col mt-1 d-flex justify-content-end">
-                                                <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{post.id}}" style="color: #198754;"></i>
-                                            </div>
-                                            <div class="col mt-4">
-                                                <p class="text-success" id="page-like-text-{{post.id}}">{{post.likes}}</p>
-                                            </div>
+                                        <div class="col mt-4">
+                                            <p class="text-white" id="page-like-text-{{post.id}}">{{post.likes}}</p>
                                         </div>
-                                    </button>
-                                {% endif %}
-                            </form>    
+                                    </div>
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
+                                    <div class="row align-items-center">
+                                        <div class="col mt-1 d-flex justify-content-end">
+                                            <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{post.id}}" style="color: #198754;"></i>
+                                        </div>
+                                        <div class="col mt-4">
+                                            <p class="text-success" id="page-like-text-{{post.id}}">{{post.likes}}</p>
+                                        </div>
+                                    </div>
+                                </button>
+                            {% endif %}
                         </div>
                     </div>    
                 </div>
@@ -296,31 +250,29 @@
                                         <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-{{post.id}}" role="button" aria-expanded="false" aria-controls="liked-by-{{post.id}}">Liked By</a> 
                                     </div>
                                     <div class="col-8 d-flex justify-content-end">
-                                        <form action="" id="post-form" method="post">
-                                            {% if user_liked_by in post.liked_by.all %}
-                                                <button type="submit" id="like{{post.id}}" class="btn btn-success border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
-                                                    <div class="row align-items-center">
-                                                        <div class="col mt-1 d-flex justify-content-end">
-                                                            <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{post.id}}" style="color: #ffffff;"></i>
-                                                        </div>
-                                                        <div class="col mt-4">
-                                                            <p class="text-white" id="modal-like-text-{{post.id}}">{{post.likes}}</p>
-                                                        </div>
+                                        {% if user_liked_by in post.liked_by.all %}
+                                            <button type="button" class="btn btn-success border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
+                                                <div class="row align-items-center">
+                                                    <div class="col mt-1 d-flex justify-content-end">
+                                                        <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{post.id}}" style="color: #ffffff;"></i>
                                                     </div>
-                                                </button>
-                                            {% else %}
-                                                <button type="submit" id="like{{post.id}}" class="btn border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
-                                                    <div class="row align-items-center">
-                                                        <div class="col mt-1 d-flex justify-content-end">
-                                                            <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{post.id}}" style="color: #198754;"></i>
-                                                        </div>
-                                                        <div class="col mt-4">
-                                                            <p class="text-success" id="modal-like-text-{{post.id}}">{{post.likes}}</p>
-                                                        </div>
+                                                    <div class="col mt-4">
+                                                        <p class="text-white" id="modal-like-text-{{post.id}}">{{post.likes}}</p>
                                                     </div>
-                                                </button>
-                                            {% endif %}
-                                        </form>
+                                                </div>
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn border border-success like-button like-button-{{post.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.id}}" style="height: 25px;">
+                                                <div class="row align-items-center">
+                                                    <div class="col mt-1 d-flex justify-content-end">
+                                                        <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{post.id}}" style="color: #198754;"></i>
+                                                    </div>
+                                                    <div class="col mt-4">
+                                                        <p class="text-success" id="modal-like-text-{{post.id}}">{{post.likes}}</p>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -393,12 +345,12 @@
                                                                     </div>
                                                                     <div class="col-4 d-flex justify-content-end">
                                                                         {% if user_liked_by in commentData.liked__by.all %}
-                                                                            <button type="submit" id="like{{commentPk}}" class="btn btn-success border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
+                                                                            <button type="button" class="btn btn-success border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
                                                                                 <p class="text-white mb-0 ms-2" id="comment-like-text-{{commentPk}}" style="max-height: 20px;">{{commentData.likes}}</p>
                                                                                 <i class="bi bi-hand-thumbs-up-fill ms-2" id="comment-like-icon-{{commentPk}}" style="color: #ffffff;"></i>
                                                                             </button>
                                                                         {% else %}
-                                                                            <button type="submit" id="like{{commentPk}}" class="btn border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
+                                                                            <button type="button" class="btn border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center p-0" data-comment-id="{{commentPk}}" style="min-height: 30px; min-width: 50px">
                                                                                 <p class="text-success mb-0 ms-2" id="comment-like-text-{{commentPk}}" style="max-height: 20px;">{{commentData.likes}}</p>
                                                                                 <i class="bi bi-hand-thumbs-up ms-2" id="comment-like-icon-{{commentPk}}" style="color: #198754;"></i>
                                                                             </button>
@@ -408,6 +360,7 @@
                                                                 <div class="row">
                                                                     <div class="col">
                                                                         <div class="collapse" id="nested-comments-{{commentPk}}">
+                                                                            <!-- For replying -->
                                                                             <div class="row">
                                                                                 <div class="col-8">
                                                                                     <div class="mb-3">
@@ -441,7 +394,7 @@
                                                                                                 </div>
                                                                                                 <div class="col-3 d-flex justify-content-end">
                                                                                                     {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                                                        <button type="submit" id="like{{subCommentPk}}" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                        <button type="button" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
                                                                                                             <div class="row align-items-center">
                                                                                                                 <div class="col p-0 ps-2 mt-4">
                                                                                                                     <p class="text-white" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>
@@ -452,7 +405,7 @@
                                                                                                             </div>
                                                                                                         </button>
                                                                                                     {% else %}
-                                                                                                        <button type="submit" id="like{{subCommentPk}}"  class="btn border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                        <button type="button"  class="btn border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
                                                                                                             <div class="row align-items-center">
                                                                                                                 <div class="col p-0 ps-2 mt-4">
                                                                                                                     <p class="text-success" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>

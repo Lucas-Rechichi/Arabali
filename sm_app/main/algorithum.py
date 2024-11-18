@@ -126,7 +126,16 @@ class Algorithum:
                         
             return None
     class Core:
-        
+        def auto_post_loading(incrementing_factor, posts):
+            list = []
+            for i, post in enumerate(posts):
+                i += 1
+                print(post, i)
+                if (10 * (incrementing_factor - 1)) < i < ((10 * incrementing_factor) + 1):
+                    list.append(post)
+            return list
+
+
         # Uses the incrementing system to display only a number of posts at a time.
         def posts_per_page(incrementing_factor, posts):
             list = []

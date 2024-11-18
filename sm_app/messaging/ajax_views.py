@@ -85,17 +85,21 @@ def message_sent_text(request):
 
         message_dataframe.index.name = 'Index (message id)'
 
+        message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
+        message_dataframe = pd.read_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', index_col='Index (message id)')
+
         if message_dataframe.shape[0] == 0:
             conversation = 'No current messages in this chatroom.'
         else:
             conversation = message_dataframe
 
         # add rating
-        rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
-        processed_rating = rating.text.strip('```json')
+        rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. Make the keys of the rating the message_id and the values the rating. do not include anything else other than the json data in your response.")
+        processed_rating = rating.text.replace("```json", "").replace("```", "")
         processed_rating = eval(processed_rating)
 
         message_dataframe['Current Conversation Relevance'] = None
+        print(processed_rating)
 
         dropped_indexes = []
         for row_index in range(0, message_dataframe.shape[0]):
@@ -104,7 +108,7 @@ def message_sent_text(request):
 
             if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
                 print('below requrement')
-                dropped_indexes.append(relevance)
+                dropped_indexes.append(message_dataframe.index.values[row_index])
 
         message_dataframe = message_dataframe.drop(index=dropped_indexes)
         message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
@@ -1245,11 +1249,10 @@ def message_suggestions(request):
 
     responses = model.generate_content(contents=f"I'm {username} in a chatroom. Here are the lastest messages in the chat, ordered from the newest to the oldest: {formatted_messages}. Please provide three appropriate responses that {username} could say next based on this conversation context. If there are 'No messages inside the chatroom', provide three conversation starters instead. Give them in a python list format, using double quotes for any string content. Only include the suggestions in your response.")
 
-    stripped_responses = responses.text.strip('```python')
-
-    fixed_responses = eval(stripped_responses)
+    processed_responses = responses.text.replace("```python", "").replace("```", "")
+    processed_responses = eval(processed_responses)
 
     callback = {
-        'responses': fixed_responses
+        'responses': processed_responses
     }
     return JsonResponse(callback)

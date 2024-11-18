@@ -8,6 +8,17 @@ $(document).ready(function () {
     username = $('meta[name="username"]').attr('content');
     notificationCount = $('meta[name="notification-count"]').attr('content');
     csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+    if (notificationCount == '0') {
+        var notification_counter = $('#notification-counter');
+        notification_counter.text('').hide();
+        var notification_bell = $('#bell-icon');
+        notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
+    } else {
+        var notificationCounter = $('#notification-counter');
+        notificationCounter.text(notificationCount).show();
+        $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
+    }
 })
 
 function connectNotificationSocket() { // function for connecting to the websocket.
@@ -60,7 +71,7 @@ function connectNotificationSocket() { // function for connecting to the websock
 
     notificationSocket.onclose = function(e) {
         console.error('WebSocket closed unexpectedly:', e);
-        setTimeout(connectNotificationSocket, reconnectionTime); // attempt a reconnection to this websocket
+        setTimeout(connectNotificationSocket, 5000); // attempt a reconnection to this websocket
     };
 }
 
@@ -108,18 +119,5 @@ function attachNotificationEventHandlers(notificationId, receiver) {
         });
     });
 }
-
-$(document).ready(function() {
-    if (notificationCount == '0') {
-        var notification_counter = $('#notification-counter');
-        notification_counter.text('').hide();
-        var notification_bell = $('#bell-icon');
-        notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
-    } else {
-        var notificationCounter = $('#notification-counter');
-        notificationCounter.text(notificationCount).show();
-        $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
-    }
-});
 
 connectNotificationSocket(); // connect to the relevant websocket
