@@ -16,7 +16,7 @@
         <!-- SCRIPTS -->
         <script type="text/javascript" src="{% static 'main/posts.js' %}"></script>
         <script type="text/javascript" src="{% static 'algorithum/scrolled_by.js'%}"></script>
-        <script type="text/javascript" src="{% static 'algorithum/auto_post_loading.js'%}"></script>
+        <script type="text/javascript" src="{% static 'algorithum/load_posts.js'%}"></script>
         <script type="text/javascript" src="{% static 'universal/notifications.js'%}"></script>
         <script type="text/javascript" src="{% static 'websockets/post_socket.js' %}"></script>
         <script type="text/javascript" src="{% static 'websockets/notification_socket.js' %}"></script>
@@ -469,18 +469,13 @@
                                     </div>
                             {% endfor %}
                         </div>
-                        <div id="end-of-posts" data-increment="1"></div>
-                        <div class="row">
-                            <div class="col d-flex justify-content-center">
-                                {% if increment.previous == 0 %}
-                                    <button class="btn btn-outline-success" disabled><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% else %}
-                                    <button class="btn btn-outline-success" onclick='location.href = "/page/{{catagory}}/{{sub_catagory}}{{increment.previous}}"'><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% endif %}
-                                <p class="lead ps-2 pe-2 mt-2">Page No. {{increment.current}} </p>
-                                <button class="btn btn-outline-success" onclick='location.href = "/page/{{catagory}}/{{sub_catagory}}{{increment.next}}"'>Next <i class="bi bi-arrow-right-circle"></i></button>
-                            </div>
-                        </div>
+                        {% if type.popular %} 
+                            <div id="end-of-posts" data-increment="1" data-catergory="popular"></div>
+                        {% elif type.recommended %}
+                            <div id="end-of-posts" data-increment="1" data-catergory="recommended"></div>
+                        {% else %}
+                            <div id="end-of-posts" data-increment="1" data-catergory="all"></div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-6">

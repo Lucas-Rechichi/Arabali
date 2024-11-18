@@ -598,3 +598,33 @@ def realtime_suggestions_manager(request):
     else:
         print(f'invalid type of value {type}')
         return JsonResponse({})
+    
+def load_posts(request):
+    increment = request.POST.get('increment')
+    catergory = request.POST.get('catergory')
+    user = request.user
+
+    new_increment = int(increment) + 1
+
+    posts_to_append = Algorithum.Core.auto_post_loading(incrementing_factor=new_increment, catergory=catergory, user=user)
+    posts = {}
+    for i, post in enumerate(posts_to_append):
+        user_stats = UserStats.objects.get(user=post.user)
+        # do likedby, comments, replies in their own lists
+        posts[i] = {
+            'post_username': post.user.usename,
+            'post_user_pfp_url': user_stats.pfp.url,  
+            'post_title': post.title,
+            'post_contents': post.contents,
+            'post_likes': post.likes,
+            'post_media_url': post.media.url,
+            'created_at': post.created_at,
+        }
+
+    response = {
+        'new_increment': new_increment,
+        'posts_to_append': posts_to_append,
+        'catergory': catergory,
+    }
+
+    return JsonResponse(response)

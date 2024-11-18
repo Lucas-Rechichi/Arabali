@@ -126,14 +126,29 @@ class Algorithum:
                         
             return None
     class Core:
-        def auto_post_loading(incrementing_factor, posts):
-            list = []
+        def auto_post_loading(incrementing_factor, catergory, user):
+            if catergory == 'all':
+                posts = list(Post.objects.annotate(Count('created_at')).order_by('-created-at'))
+
+            elif catergory == 'popular':
+                post_tags = PostTag.objects.annotate(Count('value')).order_by('-value')
+                posts = []
+                for post_tag in post_tags:
+                    posts.append(post_tag.post)
+
+            else: # catergory is recommended
+                interests = list(user.interests.annotate(Count('value')).order_by('-value'))
+                best_interest = interests[0]
+                posts = list(PostTag.objects.get(name=best_interest.name).posts.all())
+
+            appending_posts = []
             for i, post in enumerate(posts):
                 i += 1
                 print(post, i)
                 if (10 * (incrementing_factor - 1)) < i < ((10 * incrementing_factor) + 1):
-                    list.append(post)
-            return list
+                    appending_posts.append(post)
+
+            return appending_posts
 
 
         # Uses the incrementing system to display only a number of posts at a time.

@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from main import main_views as main_v
 from main import ajax_views as ajax_v
 urlpatterns = [
@@ -22,6 +22,7 @@ urlpatterns = [
     path('page/new_reply/', ajax_v.new_reply, name="new_reply"),
     path('page/comment-liked/', ajax_v.comment_liked, name="comment_liked"),
     path('page/scrolled-by/', ajax_v.scrolled_by, name="scrolled_by"),
+    path('page/load-posts/', ajax_v.load_posts, name="load_posts"),
     path('page/error/', ajax_v.ajax_error, name="ajax_error"),
     path('page/save-location/', ajax_v.save_location, name='save_location'),
     path('universal/remove-notification/', ajax_v.remove_notification, name='remove_notification'),

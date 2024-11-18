@@ -59,15 +59,9 @@ def page(request, catagory, increment):
 
     # Forms
     if request.method == 'POST':
-        comment_form = AddComment(request.POST)
-        sub_comment_form = AddComment(request.POST)
         search_bar = Search(request.POST)
     else:
-        comment_form = AddComment()
-        sub_comment_form = AddComment()
         search_bar = Search()
-    
-
 
     # Comment and Reply Processing
     liked_by = {}
@@ -99,7 +93,7 @@ def page(request, catagory, increment):
                 'likes':comment.likes,
                 'created_at':comment.created_at               
             }
-    post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
+    # post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
 
     
     # Getting sub catagory
@@ -155,8 +149,6 @@ def page(request, catagory, increment):
         'user_liked_by': user_liked_by,
         'post_comments': post_comments,
         'post_replies':post_replies, 
-        'comment_form': comment_form,
-        'sub_comment_form': sub_comment_form,
         'search_bar': search_bar,
         'notifications': init['notification_list'],
         'notification_count': init['notification_count']
