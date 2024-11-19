@@ -280,7 +280,11 @@
                                         <div class="collapse card m-1" id="liked-by-{{post.id}}">
                                             <ul class="list-group list-group-flush">
                                                 {% for likedby in post.liked_by.all %}
-                                                    <li class="list-group-item"> > {{ likedby }}</li>
+                                                    <button type="button" class="btn mb-2 d-inline-flex">
+                                                        <!-- adding profile pictures -->
+                                                        <img src=""  style="width: 30px; height: 30px;">
+                                                        <p class="p-0 m-0 ms-2">{{ likedby }}</p>
+                                                    </button>
                                                 {% endfor %}
                                             </ul>
                                         </div>

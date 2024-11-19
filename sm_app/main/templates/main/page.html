@@ -150,7 +150,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-6">
-                    <div class="card">
+                    <div class="card" id="post-card">
                         <div class="row">
                             <div class="col-12 d-flex justify-content-evenly mt-4">
                                 <button class="btn mt-3" onclick='location.href = "/add/"' style="height: 40px; width: fit-content;"><div class="fs-2"><i class="bi bi-file-earmark-plus" style="color: #198754;"></i></div></button>
@@ -297,7 +297,11 @@
                                                                 <div class="collapse card m-1" id="liked-by-{{posts.id}}">
                                                                     <ul class="list-group list-group-flush">
                                                                         {% for likedby in posts.liked_by.all %}
-                                                                            <li class="list-group-item"> > {{ likedby }}</li>
+                                                                            <button type="button" class="btn mb-2 d-inline-flex">
+                                                                                <!-- adding profile pictures -->
+                                                                                <img src=""  style="width: 30px; height: 30px;">
+                                                                                <p class="p-0 m-0 ms-2">{{ likedby }}</p>
+                                                                            </button>
                                                                         {% endfor %}
                                                                     </ul>
                                                                 </div>
@@ -425,7 +429,7 @@
                                                                                                             </div>
                                                                                                             <div class="col d-flex justify-content-end">
                                                                                                                 {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                                                                    <button type="button" class="btn btn-success border border-success nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                                    <button type="button" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
                                                                                                                         <div class="row align-items-center">
                                                                                                                             <div class="col mt-1 d-flex justify-content-end">
                                                                                                                                 <i class="bi bi-hand-thumbs-up-fill" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #ffffff;"></i>
@@ -436,7 +440,7 @@
                                                                                                                         </div>
                                                                                                                     </button>
                                                                                                                 {% else %}
-                                                                                                                    <button type="button" class="btn border border-success nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                                    <button type="button" class="btn border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
                                                                                                                         <div class="row align-items-center">
                                                                                                                             <div class="col mt-1 d-flex justify-content-end">
                                                                                                                                 <i class="bi bi-hand-thumbs-up" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #198754;"></i>
@@ -470,11 +474,11 @@
                             {% endfor %}
                         </div>
                         {% if type.popular %} 
-                            <div id="end-of-posts" data-increment="1" data-catergory="popular"></div>
+                            <div class="end-of-posts" data-increment="1" data-catergory="popular"></div>
                         {% elif type.recommended %}
-                            <div id="end-of-posts" data-increment="1" data-catergory="recommended"></div>
+                            <div class="end-of-posts" data-increment="1" data-catergory="recommended"></div>
                         {% else %}
-                            <div id="end-of-posts" data-increment="1" data-catergory="all"></div>
+                            <div class="end-of-posts" data-increment="1" data-catergory="all"></div>
                         {% endif %}
                     </div>
                 </div>

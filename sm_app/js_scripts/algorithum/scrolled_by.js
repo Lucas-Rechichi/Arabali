@@ -19,11 +19,9 @@ $(document).ready(function() {
 
             // Check if the element is in the viewport
             if ((scrollTop + windowHeight) >= elementOffsetTop && scrollTop <= (elementOffsetTop + elementHeight)) {
-                // Your JavaScript code to execute
                 console.log('Target element is in view!');
                 console.log('Conditional 1: ' + scrollTop + '+' +  windowHeight + '(' + (scrollTop + windowHeight) + ')' + '>='  + elementOffsetTop);
                 console.log('Conditional 2: ' + scrollTop + '<='  + elementOffsetTop + '+' + elementHeight + '(' + (scrollTop + windowHeight) + ')' );
-                // Perform other actions here
 
                 // Set the flag to true to prevent further triggering
                 hasTriggered[postId] = true;

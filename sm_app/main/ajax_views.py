@@ -327,7 +327,14 @@ def scrolled_by(request):
     print(post_id)
     post = Post.objects.get(id=post_id)
     tag = PostTag.objects.get(post=post)
-    interest = Interest.objects.get(user=user, name=tag.name)
+    if Interest.objects.filter(user=user, name=tag.name):
+        interest = Interest.objects.get(user=user, name=tag.name)
+    else:
+        new_interest = Interest(user=user, name=tag.name, value=0)
+        new_interest.save()
+        new_interest_interaction = ICF(interest=new_interest, form='Parabolic Truncus', a=0, k=0.1)
+        new_interest_interaction.save()
+        interest = new_interest
     tag.value += 1
     interest.value += 1
     tag.save()
@@ -608,22 +615,25 @@ def load_posts(request):
 
     posts_to_append = Algorithum.Core.auto_post_loading(incrementing_factor=new_increment, catergory=catergory, user=user)
     posts = {}
+
     # Loops though all selected posts
     for i, post in enumerate(posts_to_append):
         user_stats = UserStats.objects.get(user=post.user)
         # gets the nested data within comments, liked_by and replies
+
         # setup
         post_liked_by = {}
         post_comments = {}
+        post_liked_by_users = list(post.liked_by.all())
 
-        for j, user_liked in post.liked_by.all(): # liked_by
+        for j in range(0, len(post_liked_by_users)): # liked_by
             # getting relevant data
-            user_liked_user_obj = User.objects.get(username=user_liked.name)
+            user_liked_user_obj = User.objects.get(username=post_liked_by_users[j].name)
             user_liked_userstats = UserStats.objects.get(user=user_liked_user_obj)
 
             # packaging data into a dictionary
             post_liked_by[j] = {
-                'username': user_liked.name,
+                'username': post_liked_by_users[j].name,
                 'user_pfp_url': user_liked_userstats.pfp.url,
             }
 
@@ -636,7 +646,7 @@ def load_posts(request):
                 reply_user_userstats = UserStats.objects.get(user=reply.user)
 
                 # if the user has liked this reply
-                liked_reply = reply.liked_by.filter(name=user.username).exists()
+                liked_reply = NestedComment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
 
                 # packaging data into a dictionary
                 post_comment_replies[l] = { 
@@ -651,7 +661,7 @@ def load_posts(request):
             comment_user_userstats = UserStats.objects.get(user=comment.user)
 
             # if the user has liked this comment
-            liked_comment = comment.liked_by.filter(name=user.username)
+            liked_comment = Comment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
 
             # packaging data into a dictionary
             post_comments[k] = {
@@ -665,12 +675,12 @@ def load_posts(request):
             }
 
         # if the user has liked the post
-        liked_post = post.objects.filter(name=user.username).exists()
+        liked_post = Post.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
 
         # packaging data into a dictionary
         posts[i] = {
             'post_id': post.pk,
-            'post_username': post.user.usename,
+            'post_username': post.user.username,
             'has_liked': liked_post,
             'post_user_pfp_url': user_stats.pfp.url, 
             'post_title': post.title,

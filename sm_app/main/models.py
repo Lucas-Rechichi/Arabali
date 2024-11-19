@@ -40,7 +40,7 @@ class Post(models.Model):
     contents = models.TextField()
     likes = models.IntegerField()
     media = models.ImageField(null=True, upload_to=get_image_upload_path_posts)
-    liked_by = models.ManyToManyField(LikedBy)
+    liked_by = models.ManyToManyField(LikedBy, related_name='post_liked_by')
     created_at = models.DateTimeField()
     day_of_creation = models.DateField()
     date_modified = models.DateTimeField(null=True, default=None)
@@ -83,12 +83,12 @@ class Notification(models.Model):
 
 # Comment Models   
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=600)
     likes = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    liked_by = models.ManyToManyField(LikedBy)
+    liked_by = models.ManyToManyField(LikedBy, related_name='comment_liked_by')
 
     def __str__(self):
         return f'Comment For {self.post} By {self.user}' 
@@ -99,7 +99,7 @@ class NestedComment(models.Model):
     text = models.CharField(max_length=600)
     likes = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    liked_by = models.ManyToManyField(LikedBy)
+    liked_by = models.ManyToManyField(LikedBy, related_name='reply_liked_by')
 
     def __str__(self):
         return f'Reply by {self.user} in {self.comment}' 
