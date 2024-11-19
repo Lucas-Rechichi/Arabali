@@ -608,22 +608,83 @@ def load_posts(request):
 
     posts_to_append = Algorithum.Core.auto_post_loading(incrementing_factor=new_increment, catergory=catergory, user=user)
     posts = {}
+    # Loops though all selected posts
     for i, post in enumerate(posts_to_append):
         user_stats = UserStats.objects.get(user=post.user)
-        # do likedby, comments, replies in their own lists
+        # gets the nested data within comments, liked_by and replies
+        # setup
+        post_liked_by = {}
+        post_comments = {}
+
+        for j, user_liked in post.liked_by.all(): # liked_by
+            # getting relevant data
+            user_liked_user_obj = User.objects.get(username=user_liked.name)
+            user_liked_userstats = UserStats.objects.get(user=user_liked_user_obj)
+
+            # packaging data into a dictionary
+            post_liked_by[j] = {
+                'username': user_liked.name,
+                'user_pfp_url': user_liked_userstats.pfp.url,
+            }
+
+        for k, comment in enumerate(post.comments.all()): # comments
+            # setup
+            post_comment_replies = {}
+
+            for l, reply in enumerate(comment.replies.all()): # replies
+                # getting relevant data
+                reply_user_userstats = UserStats.objects.get(user=reply.user)
+
+                # if the user has liked this reply
+                liked_reply = reply.liked_by.filter(name=user.username).exists()
+
+                # packaging data into a dictionary
+                post_comment_replies[l] = { 
+                    'reply_id': reply.pk,
+                    'reply_username': reply.user.username,
+                    'has_liked': liked_reply,
+                    'reply_user_pfp_url': reply_user_userstats.pfp.url,
+                    'reply_text': reply.text,
+                    'reply_likes': reply.likes,
+                }
+            # getting relevant data
+            comment_user_userstats = UserStats.objects.get(user=comment.user)
+
+            # if the user has liked this comment
+            liked_comment = comment.liked_by.filter(name=user.username)
+
+            # packaging data into a dictionary
+            post_comments[k] = {
+                'comment_id': comment.pk,
+                'comment_username': comment.user.username,
+                'has_liked': liked_comment,
+                'comment_user_pfp_url': comment_user_userstats.pfp.url,
+                'comment_text': comment.text,
+                'comment_likes': comment.likes,
+                'comment_replies': post_comment_replies
+            }
+
+        # if the user has liked the post
+        liked_post = post.objects.filter(name=user.username).exists()
+
+        # packaging data into a dictionary
         posts[i] = {
+            'post_id': post.pk,
             'post_username': post.user.usename,
-            'post_user_pfp_url': user_stats.pfp.url,  
+            'has_liked': liked_post,
+            'post_user_pfp_url': user_stats.pfp.url, 
             'post_title': post.title,
             'post_contents': post.contents,
             'post_likes': post.likes,
             'post_media_url': post.media.url,
             'created_at': post.created_at,
+            'post_liked_by': post_liked_by,
+            'post_comments': post_comments
         }
 
     response = {
         'new_increment': new_increment,
-        'posts_to_append': posts_to_append,
+        'posts_to_append': posts,
         'catergory': catergory,
     }
 

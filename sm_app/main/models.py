@@ -94,7 +94,7 @@ class Comment(models.Model):
         return f'Comment For {self.post} By {self.user}' 
 
 class NestedComment(models.Model):
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='replies')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=600)
     likes = models.IntegerField()

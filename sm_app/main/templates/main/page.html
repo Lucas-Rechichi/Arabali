@@ -413,7 +413,7 @@
                                                                                                             <div class="col">
                                                                                                                 {% for user_key, user_value in post_users.items %}
                                                                                                                     {% if user_key|stringformat:"%s%s" == subCommentData.user|stringformat:"%s%s" %}
-                                                                                                                        <img class="border border-success" src="{{user_value}}" alt="" style="height:20px; width: 20px; border-radius: 10px;">
+                                                                                                                        <img class="border border-success" src="{{user_value}}" alt="{{ subCommentData.user }}'s Profile Picture" style="height:20px; width: 20px; border-radius: 10px;">
                                                                                                                         <em>{{ subCommentData.user }}</em>
                                                                                                                     {% endif %}
                                                                                                                 {% endfor %}
