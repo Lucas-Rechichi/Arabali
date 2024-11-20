@@ -144,7 +144,6 @@ class Algorithum:
             appending_posts = []
             for i, post in enumerate(posts):
                 i += 1
-                print(post, i)
                 if (10 * (incrementing_factor - 1)) < i < ((10 * incrementing_factor) + 1):
                     appending_posts.append(post)
 

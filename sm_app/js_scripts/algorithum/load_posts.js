@@ -29,24 +29,11 @@ $(document).ready(function () {
                     },
                     success: function(response) {
 
-                        // Changing the increment tag for the next triggering of the function
-                        var newIncrement = response.new_increment
-                        var catergory = response.catergory
-                        var newEndMarkerHtml = `
-                            <div class="end-of-posts" data-increment="${newIncrement}" data-catergory="${catergory}"></div>
-                        `;
-
-                        // Add in the new end of posts marker into the HTML document
-                        postEndMarker.html('')
-                        $('#post-card').append(newEndMarkerHtml)
-
                         // Adding in the fetched posts
                         var postsToAppend = response.posts_to_append;
                         var fetchedPostsHtml = ``;
+                        var fetchedPostHtml;
                         for (let i=0; i <= postsToAppend.length; i++) {
-                            // if conditional for if the user las liked the post
-                                // yes, have it green with white text and logo
-                                // no, have it outlined in green with green text and green outlined icon
 
                             // for liked_by
                             var likedByDict = postsToAppend[i]['post_liked_by'];
@@ -210,8 +197,203 @@ $(document).ready(function () {
 
                                 commentsHtml += commentHtml
                             }
+                            // different like button for comments that have been liked or not
+                            var pageLikeButtonHtml;
+                            var modalLikeButtonHtml;
+                            if (postsToAppend[i]['has_liked']) { // yes
+                                pageLikeButtonHtml = `
+                                    <button type="submit" class="btn btn-success border border-success like-button like-button-${postsToAppend[i]['post_id']} d-flex align-items-center pb-3 pt-2" data-post-id="${postsToAppend[i]['post_id']}" style="height: 25px;">
+                                        <div class="row align-items-center">
+                                            <div class="col mt-1 d-flex justify-content-end">
+                                                <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-${postsToAppend[i]['post_id']}" style="color: #ffffff;"></i>
+                                            </div>
+                                            <div class="col mt-4">
+                                                <p class="text-white" id="page-like-text-${postsToAppend[i]['post_id']}">${postsToAppend[i]['post_likes']}</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                `;
+                                modalLikeButtonHtml = `
+                                    <button type="button" class="btn btn-success border border-success like-button like-button-${postsToAppend[i]['post_id']} d-flex align-items-center pb-3 pt-2" data-post-id="${postsToAppend[i]['post_id']}" style="height: 25px;">
+                                        <div class="row align-items-center">
+                                            <div class="col mt-1 d-flex justify-content-end">
+                                                <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-${postsToAppend[i]['post_id']}" style="color: #ffffff;"></i>
+                                            </div>
+                                            <div class="col mt-4">
+                                                <p class="text-white" id="modal-like-text-${postsToAppend[i]['post_id']}">${postsToAppend[i]['post_likes']}</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                `;
+                            } else { // no
+                                pageLikeButtonHtml = `
+                                    <button type="submit" class="btn border border-success like-button like-button-${postsToAppend[i]['post_id']} d-flex align-items-center pb-3 pt-2" data-post-id="${postsToAppend[i]['post_id']}" style="height: 25px;">
+                                        <div class="row align-items-center">
+                                            <div class="col mt-1 d-flex justify-content-end">
+                                                <i class="bi bi-hand-thumbs-up" id="page-like-icon-${postsToAppend[i]['post_id']}" style="color: #198754;"></i>
+                                            </div>
+                                            <div class="col mt-4">
+                                                <p class="text-success" id="page-like-text-${postsToAppend[i]['post_id']}">${postsToAppend[i]['post_likes']}</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                `;
+                                modalLikeButtonHtml = `
+                                    <button type="button" class="btn border border-success like-button like-button-${postsToAppend[i]['post_id']} d-flex align-items-center pb-3 pt-2" data-post-id="${postsToAppend[i]['post_id']}" style="height: 25px;">
+                                        <div class="row align-items-center">
+                                            <div class="col mt-1 d-flex justify-content-end">
+                                                <i class="bi bi-hand-thumbs-up" id="modal-like-icon-${postsToAppend[i]['post_id']}" style="color: #198754;"></i>
+                                            </div>
+                                            <div class="col mt-4">
+                                                <p class="text-success" id="modal-like-text-${postsToAppend[i]['post_id']}">${postsToAppend[i]['post_likes']}</p>
+                                            </div>
+                                        </div>
+                                    </button>
+                                `;
+                            }
 
+                            // post HTML
+                            fetchedPostHtml = `
+                                <div class="col-12">
+                                    <div class="card m-5">
+                                        <div class="row">
+                                            <div class="col m-2">
+                                                <button class="btn btn-light"><img src="${postsToAppend[i]['post_user_pfp_url']}", onclick='location.href = "/profile/${postsToAppend[i]['post_user_pfp_url']}"' style="width: 30px; height: 30px;"></button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col m-2">
+                                                <h6 class="display-6">${postsToAppend[i]['post_username']}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col m-2">
+                                                <img src="${postsToAppend[i]['post_media_url']}" alt="Post: ${postsToAppend[i]['post_title']}'s Media" class="post-checkpoint post-no-${postsToAppend[i]['post_id']}" style="height: 248px; width: 100%;" data-post-id="${postsToAppend[i]['post_media_url']}">
+                                            </div>
+                                        </div>
+                                        <div class="row m-2">
+                                            <div class="col">
+                                                <h3 class="display-6">${postsToAppend[i]['post_title']}</h3>
+                                            </div>
+                                        </div>
+                                        <div class="row m-1">
+                                            <div class="col">
+                                                <p class="lead">${postsToAppend[i]['post_contents']}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row m-1">
+                                            <div class="col-6 d-flex justify-content-start">
+                                                <button type="button" class="btn" data-bs-target="#expand-${postsToAppend[i]['post_id']}" data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
+                                            </div>
+                                            <div class="col-6 d-flex justify-content-end">
+                                                ${pageLikeButtonHtml}
+                                            </div>
+                                        </div>    
+                                    </div>
+                                    <div id="expand-${postsToAppend[i]['post_id']}" class="modal fade">
+                                        <div class="modal-dialog" style="max-width: 56%;">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    Post
+                                                    <button class="btn btn-close" data-bs-dismiss="modal" data-bs-target="#expand-${postsToAppend[i]['post_id']}"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col m-2">
+                                                            <button class="btn btn-light" style="border-radius: 15px; width: fit-content; height: fit-content;"><img src="${postsToAppend[i]['post_user_pfp_url']}", onclick='location.href = "/profile/${postsToAppend[i]['post_username']}"' style="width: 30px; height: 30px;"></button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col m-2">
+                                                            <h6 class="display-6">${postsToAppend[i]['post_username']}</h6>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col m-2">
+                                                            <img src="${postsToAppend[i]['post_media_url']}" alt="Post: ${postsToAppend[i]['post_title']}'s Media" style="height: 248px; width: 100%;">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row m-2">
+                                                        <div class="col">
+                                                            <h3 class="display-6">${postsToAppend[i]['post_title']}</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row m-1">
+                                                        <div class="col">
+                                                            <p class="lead">${postsToAppend[i]['post_id']}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-4">
+                                                            <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-${postsToAppend[i]['post_id']}" role="button" aria-expanded="false" aria-controls="liked-by-${postsToAppend[i]['post_id']}">Liked By</a> 
+                                                        </div>
+                                                        <div class="col-8 d-flex justify-content-end">
+                                                            ${modalLikeButtonHtml}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="collapse card m-1" id="liked-by-${postsToAppend[i]['post_id']}">
+                                                                <ul class="list-group list-group-flush">
+                                                                    ${likedBysHtml}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col text-center">
+                                                            <p class="lead">Date Created: ${postsToAppend[i]['post_created_at']}</p>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <p class="lead text-center">Comments:</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col d-flex justify-content-center">
+                                                            <!-- Comments form -->
+                                                            <div class="row">
+                                                                <div class="col-8">
+                                                                    <div class="mb-3">
+                                                                        <label for="comment-text-${postsToAppend[i]['post_id']}" class="form-label">Comment</label>
+                                                                        <input type="text" class="form-control" id="comment-text-${postsToAppend[i]['post_id']}" placeholder="Add Comment...">
+                                                                    </div>   
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <br>
+                                                                    <button type="button" class="btn btn-success mt-2 ms-5 add-comment" data-post-id="${postsToAppend[i]['post_id']}">Add</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="comments-container-{{posts.id}}">
+                                                    ${commentsHtml}
+                                                </div>
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </div>
+                            `;
+                            fetchedPostsHtml += fetchedPostHtml
                         }
+
+                        // Add in the fetched posts
+                        $('#post-card').append(fetchedPostsHtml)
+                        
+                        // Changing the increment tag for the next triggering of the function
+                        var newIncrement = response.new_increment
+                        var catergory = response.catergory
+                        var newEndMarkerHtml = `
+                            <div class="end-of-posts" data-increment="${newIncrement}" data-catergory="${catergory}"></div>
+                        `;
+
+                        // Add in the new end of posts marker into the HTML document
+                        postEndMarker.html('')
+                        $('#post-card').append(newEndMarkerHtml)
+
                         setTimeout(function () {
                             triggered = false
                         }, 400)

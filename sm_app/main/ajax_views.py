@@ -687,7 +687,7 @@ def load_posts(request):
             'post_contents': post.contents,
             'post_likes': post.likes,
             'post_media_url': post.media.url,
-            'created_at': post.created_at,
+            'post_created_at': post.created_at,
             'post_liked_by': post_liked_by,
             'post_comments': post_comments
         }
