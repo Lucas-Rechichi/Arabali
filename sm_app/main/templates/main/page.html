@@ -158,7 +158,8 @@
                                 <p></p>
                             </div>
                         </div>
-                        <br><div class="row">
+                        <br>
+                        <div class="row">
                             {% for posts in post %}
                                     <div class="col-12">
                                         <div class="card m-5">
@@ -225,7 +226,7 @@
                                         </div>
                                         <!-- modal -->
                                         <div id="expand-{{posts.id}}" class="modal fade">
-                                            <div class="modal-dialog" style="max-width: 56%;">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         Post
@@ -300,7 +301,7 @@
                                                                             <button type="button" class="btn mb-2 d-inline-flex">
                                                                                 <!-- adding profile pictures -->
                                                                                 <img src=""  style="width: 30px; height: 30px;">
-                                                                                <p class="p-0 m-0 ms-2">{{ ikedby}}</p>
+                                                                                <p class="p-0 m-0 ms-2">{{likedby}}</p>
                                                                             </button>
                                                                         {% endfor %}
                                                                     </ul>
@@ -335,137 +336,137 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <!-- comments -->
-                                                    <div id="comments-container-{{posts.id}}">
-                                                        {% for commentPk, commentData  in post_comments.items %}
-                                                            {% if commentData.post_id|stringformat:"%s%s" == posts.id|stringformat:"%s%s" %}
-                                                                <div class="row">
-                                                                    <div class="col">
-                                                                        <div class="card p-3 m-2">
-                                                                            <div class="row">
-                                                                                <div class="col">
-                                                                                    {% for user_key, user_value in post_users.items %}
-                                                                                        {% if user_key|stringformat:"%s%s" == commentData.user|stringformat:"%s%s" %}
-                                                                                            <img class="border border-success" src="{{user_value}}" alt="" style="height:20px; width: 20px; border-radius: 10px;">
-                                                                                            <strong>{{commentData.user}}</strong>
+                                                        <!-- comments -->
+                                                        <div id="comments-container-{{posts.id}}">
+                                                            {% for commentPk, commentData  in post_comments.items %}
+                                                                {% if commentData.post_id|stringformat:"%s%s" == posts.id|stringformat:"%s%s" %}
+                                                                    <div class="row">
+                                                                        <div class="col">
+                                                                            <div class="card p-3 m-2">
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        {% for user_key, user_value in post_users.items %}
+                                                                                            {% if user_key|stringformat:"%s%s" == commentData.user|stringformat:"%s%s" %}
+                                                                                                <img class="border border-success" src="{{user_value}}" alt="" style="height:20px; width: 20px; border-radius: 10px;">
+                                                                                                <strong>{{commentData.user}}</strong>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        {{ commentData.text }} 
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-4">
+                                                                                        <a href="#nested-comments-{{commentPk}}" data-bs-toggle="collapse" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Replies</a>
+                                                                                    </div>
+                                                                                    <div class="col-8 d-flex justify-content-end">
+                                                                                        {% if user_liked_by in subCommentData.liked__by.all %}
+                                                                                            <button type="button" class="btn btn-success border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{commentPk}}" style="height: 25px;">
+                                                                                                <div class="row align-items-center">
+                                                                                                    <div class="col mt-1 d-flex justify-content-end">
+                                                                                                        <i class="bi bi-hand-thumbs-up-fill" id="comment-like-icon-{{commentPk}}" style="color: #ffffff;"></i>
+                                                                                                    </div>
+                                                                                                    <div class="col mt-4">
+                                                                                                        <p class="text-white" id="comment-like-text-{{commentPk}}">{{commentData.likes}}</p>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </button>
+                                                                                        {% else %}
+                                                                                            <button type="button" class="btn border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{commentPk}}" style="height: 25px;">
+                                                                                                <div class="row align-items-center">
+                                                                                                    <div class="col mt-1 d-flex justify-content-end">
+                                                                                                        <i class="bi bi-hand-thumbs-up" id="comment-like-icon-{{commentPk}}" style="color: #198754;"></i>
+                                                                                                    </div>
+                                                                                                    <div class="col mt-4">
+                                                                                                        <p class="text-success" id="comment-like-text-{{commentPk}}">{{commentData.likes}}</p>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </button>
                                                                                         {% endif %}
-                                                                                    {% endfor %}
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col">
-                                                                                    {{ commentData.text }} 
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col-10">
-                                                                                    <a href="#nested-comments-{{commentPk}}" data-bs-toggle="collapse" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Replies</a>
-                                                                                </div>
-                                                                                <div class="col d-flex justify-content-end">
-                                                                                    {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                                        <button type="button" class="btn btn-success border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{commentPk}}" style="height: 25px;">
-                                                                                            <div class="row align-items-center">
-                                                                                                <div class="col mt-1 d-flex justify-content-end">
-                                                                                                    <i class="bi bi-hand-thumbs-up-fill" id="comment-like-icon-{{commentPk}}" style="color: #ffffff;"></i>
-                                                                                                </div>
-                                                                                                <div class="col mt-4">
-                                                                                                    <p class="text-white" id="comment-like-text-{{commentPk}}">{{commentData.likes}}</p>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </button>
-                                                                                    {% else %}
-                                                                                        <button type="button" class="btn border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{commentPk}}" style="height: 25px;">
-                                                                                            <div class="row align-items-center">
-                                                                                                <div class="col mt-1 d-flex justify-content-end">
-                                                                                                    <i class="bi bi-hand-thumbs-up" id="comment-like-icon-{{commentPk}}" style="color: #198754;"></i>
-                                                                                                </div>
-                                                                                                <div class="col mt-4">
-                                                                                                    <p class="text-success" id="comment-like-text-{{commentPk}}">{{commentData.likes}}</p>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </button>
-                                                                                    {% endif %}
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col">
-                                                                                    <div class="collapse" id="nested-comments-{{commentPk}}">
-                                                                                        <div class="row">
-                                                                                            <div class="col">
-                                                                                                <!-- For repling -->
-                                                                                                <div class="row">
-                                                                                                    <div class="col-8">
-                                                                                                        <div class="mb-3">
-                                                                                                            <label for="reply-text-{{commentPk}}" class="form-label">Reply</label>
-                                                                                                            <input type="text" class="form-control" id="reply-text-{{commentPk}}" placeholder="Add reply...">
-                                                                                                        </div>   
-                                                                                                    </div>
-                                                                                                    <div class="col-4">
-                                                                                                        <br>
-                                                                                                        <button type="button" class="btn btn-success mt-2 ms-5 add-reply" data-comment-id="{{commentPk}}">Reply</button>
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <div class="collapse" id="nested-comments-{{commentPk}}">
+                                                                                            <div class="row">
+                                                                                                <div class="col">
+                                                                                                    <!-- For repling -->
+                                                                                                    <div class="row">
+                                                                                                        <div class="col-8">
+                                                                                                            <div class="mb-3">
+                                                                                                                <label for="reply-text-{{commentPk}}" class="form-label">Reply</label>
+                                                                                                                <input type="text" class="form-control" id="reply-text-{{commentPk}}" placeholder="Add reply...">
+                                                                                                            </div>   
+                                                                                                        </div>
+                                                                                                        <div class="col-4">
+                                                                                                            <br>
+                                                                                                            <button type="button" class="btn btn-success mt-2 ms-5 add-reply" data-comment-id="{{commentPk}}">Reply</button>
+                                                                                                        </div>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                        <br>
-                                                                                        <div id="replies-container-{{commentPk}}">
-                                                                                            {% for subCommentPk, subCommentData in post_replies.items %} 
-                                                                                                {% if subCommentData.comment_id|stringformat:"%s%s" == commentData.id|stringformat:"%s%s" %}
-                                                                                                    <div class="card p-1">
-                                                                                                        <div class="row">
-                                                                                                            <div class="col">
-                                                                                                                {% for user_key, user_value in post_users.items %}
-                                                                                                                    {% if user_key|stringformat:"%s%s" == subCommentData.user|stringformat:"%s%s" %}
-                                                                                                                        <img class="border border-success" src="{{user_value}}" alt="{{ subCommentData.user }}'s Profile Picture" style="height:20px; width: 20px; border-radius: 10px;">
-                                                                                                                        <em>{{ subCommentData.user }}</em>
+                                                                                            <br>
+                                                                                            <div id="replies-container-{{commentPk}}">
+                                                                                                {% for subCommentPk, subCommentData in post_replies.items %} 
+                                                                                                    {% if subCommentData.comment_id|stringformat:"%s%s" == commentData.id|stringformat:"%s%s" %}
+                                                                                                        <div class="card p-1">
+                                                                                                            <div class="row">
+                                                                                                                <div class="col">
+                                                                                                                    {% for user_key, user_value in post_users.items %}
+                                                                                                                        {% if user_key|stringformat:"%s%s" == subCommentData.user|stringformat:"%s%s" %}
+                                                                                                                            <img class="border border-success" src="{{user_value}}" alt="{{ subCommentData.user }}'s Profile Picture" style="height:20px; width: 20px; border-radius: 10px;">
+                                                                                                                            <em>{{ subCommentData.user }}</em>
+                                                                                                                        {% endif %}
+                                                                                                                    {% endfor %}
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div class="row">
+                                                                                                                <div class="col">
+                                                                                                                    {{subCommentData.text}}
+                                                                                                                </div>
+                                                                                                                <div class="col d-flex justify-content-end">
+                                                                                                                    {% if user_liked_by in subCommentData.liked__by.all %}
+                                                                                                                        <button type="button" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                                            <div class="row align-items-center">
+                                                                                                                                <div class="col mt-1 d-flex justify-content-end">
+                                                                                                                                    <i class="bi bi-hand-thumbs-up-fill" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #ffffff;"></i>
+                                                                                                                                </div>
+                                                                                                                                <div class="col mt-4">
+                                                                                                                                    <p class="text-white" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </button>
+                                                                                                                    {% else %}
+                                                                                                                        <button type="button" class="btn border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
+                                                                                                                            <div class="row align-items-center">
+                                                                                                                                <div class="col mt-1 d-flex justify-content-end">
+                                                                                                                                    <i class="bi bi-hand-thumbs-up" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #198754;"></i>
+                                                                                                                                </div>
+                                                                                                                                <div class="col mt-4">
+                                                                                                                                    <p class="text-success" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </button>
                                                                                                                     {% endif %}
-                                                                                                                {% endfor %}
+                                                                                                                </div>
                                                                                                             </div>
                                                                                                         </div>
-                                                                                                        <div class="row">
-                                                                                                            <div class="col">
-                                                                                                                {{subCommentData.text}}
-                                                                                                            </div>
-                                                                                                            <div class="col d-flex justify-content-end">
-                                                                                                                {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                                                                    <button type="button" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
-                                                                                                                        <div class="row align-items-center">
-                                                                                                                            <div class="col mt-1 d-flex justify-content-end">
-                                                                                                                                <i class="bi bi-hand-thumbs-up-fill" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #ffffff;"></i>
-                                                                                                                            </div>
-                                                                                                                            <div class="col mt-4">
-                                                                                                                                <p class="text-white" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>
-                                                                                                                            </div>
-                                                                                                                        </div>
-                                                                                                                    </button>
-                                                                                                                {% else %}
-                                                                                                                    <button type="button" class="btn border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
-                                                                                                                        <div class="row align-items-center">
-                                                                                                                            <div class="col mt-1 d-flex justify-content-end">
-                                                                                                                                <i class="bi bi-hand-thumbs-up" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #198754;"></i>
-                                                                                                                            </div>
-                                                                                                                            <div class="col mt-4">
-                                                                                                                                <p class="text-success" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>
-                                                                                                                            </div>
-                                                                                                                        </div>
-                                                                                                                    </button>
-                                                                                                                {% endif %}
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                    <br>
-                                                                                                {% endif %}
-                                                                                            {% endfor %}
+                                                                                                        <br>
+                                                                                                    {% endif %}
+                                                                                                {% endfor %}
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                    </div>   
-                                                                </div>
-                                                            {% endif %} 
-                                                        {% endfor %}
+                                                                        </div>   
+                                                                    </div>
+                                                                {% endif %} 
+                                                            {% endfor %}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div> 
