@@ -1,29 +1,18 @@
-from main.extras import capitalize_plus
-from main.extras import initialize_page
-from main.algorithum import Algorithum
+
 from django.shortcuts import render, HttpResponseRedirect
-from django.http import JsonResponse
-from django.db.models import F
-from django.db.models import Count, Sum
 from django.utils import timezone
 from validate.forms import User
 from django.contrib.auth.decorators import login_required
+
 from main.models import Post
-from main.forms import AddPost, EditProfile, EditPost, AddComment, Search
+from main.extras import capitalize_plus, remove_until_character, initialize_page
+from main.algorithum import Algorithum
+from main.forms import AddPost, EditProfile, EditPost, Search
 from main.models import LikedBy, Following, DateAndOrTimeSave
 from main.models import UserStats, Comment, NestedComment, PostTag, PCF
 from validate.views import create_user_directory
-from main.errors import UsernameError
 from main.configure import Configure
-from datetime import datetime, date, timedelta
-
-# For removing string
-def remove_until_character(string, target_char):
-    index = string.find(target_char)
-    if index != -1:
-        return string[index:]
-    else:
-        return string
+from datetime import datetime, date
 
 # Create your views here.
 def home(request):
@@ -34,14 +23,14 @@ def home(request):
 def page(request, catagory, increment):
     # Getting relevent variables
     name = request.user.username
-    u = User.objects.get(username=name)
-    us = UserStats.objects.get(user=u)
-    p = Post.objects.all()
-    s = UserStats.objects.all()
+    user = User.objects.get(username=name)
+    user_stats = UserStats.objects.get(user=user)
+    posts = Post.objects.all()
+    users_stats = UserStats.objects.all()
     user_liked_by = LikedBy.objects.get(name=name)
     init = initialize_page(request)
 
-    if us.is_banned:
+    if user_stats.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     
     # Creating the day save for the interaction check function
@@ -53,7 +42,7 @@ def page(request, catagory, increment):
 
     # Getting Relelvent Profile Pictures
     post_users = {}
-    for user_stat in s:
+    for user_stat in users_stats:
         post_users[str(user_stat.user.username)] = user_stat.pfp.url
     
 
@@ -67,7 +56,7 @@ def page(request, catagory, increment):
     liked_by = {}
     post_comments = {}
     post_replies = {}
-    for post in p:
+    for post in posts:
         liked_by[f'{post.pk}'] = list(post.liked_by.all())
         comments_for_post = Comment.objects.filter(post=post)
         for comment in comments_for_post:
@@ -110,13 +99,13 @@ def page(request, catagory, increment):
 
     # Orders posts baced on catagory
     if 'popular' in catagory:
-        posts = Algorithum.Sorting.popular_sort(user=u, sub_catagory=sub_catagory)
+        posts = Algorithum.Sorting.popular_sort(user=user, sub_catagory=sub_catagory)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
         trend_categories = Algorithum.Core.trending_catagories(catagory_list=trend_categories, type='popular')
         popular_type = True
     elif 'recommended' in catagory:
-        posts = Algorithum.Sorting.recommended_sort(user=u, sub_catagory=sub_catagory)
+        posts = Algorithum.Sorting.recommended_sort(user=user, sub_catagory=sub_catagory)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
         trend_categories = Algorithum.Core.trending_catagories(catagory_list=trend_categories, type='recommended')
@@ -124,7 +113,7 @@ def page(request, catagory, increment):
     else:
         return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
 
-    # Only allows 10 posts to be displayed per page, as the increment increases, the post range will change to acompany the next 10 posts..
+    # Only allows 10 posts to be displayed per page, as the increment increases, the post range will change to acompany the next 10 posts.
     feed = Algorithum.Core.posts_per_page(incrementing_factor=increment, posts=posts)
     
     # Variables
@@ -142,8 +131,8 @@ def page(request, catagory, increment):
             "current": increment,
             "next": increment + 1 
         },
-        'user_stats':s, 
-        'user':us,
+        'user_stats':users_stats, 
+        'user':user_stats,
         'post_users': post_users,
         'liked_by': liked_by,
         'user_liked_by': user_liked_by,
@@ -158,25 +147,24 @@ def page(request, catagory, increment):
 @login_required
 def catch_up_page(request, increment):
     # Setup
-    us = UserStats.objects.get(user=request.user)
-    s = UserStats.objects.all()
-    p = Post.objects.all()
+    user_stats = UserStats.objects.get(user=request.user)
+    users_stats = UserStats.objects.all()
+    posts = Post.objects.all()
     init = initialize_page(request)
     user_liked_by = LikedBy.objects.get(name=request.user.username)
-    feed = []
+    follow = Following.objects.all()
 
-    if us.is_banned:
+    if user_stats.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
 
     # Code to prevent the constant pop up of the location permissions modal
     current_time = timezone.now()
-    last_recorded_location_time = us.last_recorded_location
+    last_recorded_location_time = user_stats.last_recorded_location
 
     if timezone.is_naive(last_recorded_location_time):
         last_recorded_location_time = timezone.make_aware(last_recorded_location_time)
 
     hour_difference = abs(last_recorded_location_time.hour - current_time.hour)
-    print(hour_difference)
     location_pop_up = 'allow'
     if hour_difference <= 2:
         location_pop_up = 'deny'
@@ -197,8 +185,6 @@ def catch_up_page(request, increment):
             'no': i, 
             'post': post
         }
-        
-    
     all_posts['all caught up'] = {
         'no': i + 1,
         'post':  '''<div class="row">
@@ -243,22 +229,22 @@ def catch_up_page(request, increment):
 
     # Getting Relelvent Profile Pictures
     post_users = {}
-    for user_stat in s:
-        post_users[str(user_stat.user.username)] = user_stat.pfp.url
-    
-    # Forms
-    if request.method == 'POST':
-        comment_form = AddComment(request.POST)
-        sub_comment_form = AddComment(request.POST)
-    else:
-        comment_form = AddComment()
-        sub_comment_form = AddComment()
+    for user_stat_obj in users_stats:
+        post_users[str(user_stat_obj.user.username)] = user_stat_obj.pfp.url
+
+    # Getting the users that follow the user acessing this page
+    followers = user_stats.following.all()
+    follower_userstats_list = []
+    for follower in followers:
+        follower_user = User.objects.get(username=follower.name)
+        follower_userstats = UserStats.objects.get(user=follower_user)
+        follower_userstats_list.append(follower_userstats)
     
     # Comment and Reply Processing
     liked_by = {}
     post_comments = {}
     post_replies = {}
-    for post in p:
+    for post in posts:
         liked_by[f'{post.pk}'] = list(post.liked_by.all())
         comments_for_post = Comment.objects.filter(post=post)
         for comment in comments_for_post:
@@ -297,15 +283,14 @@ def catch_up_page(request, increment):
             "current": increment,
             "next": increment + 1 
         },
-        'user_stats':s, 
-        'user':us,
+        'user_stats':users_stats, 
+        'user':user_stats,
         'post_users': post_users,
+        'user_followers': follower_userstats_list,
         'liked_by': liked_by,
         'user_liked_by': user_liked_by,
         'post_comments': post_comments,
-        'post_replies':post_replies, 
-        'comment_form': comment_form,
-        'sub_comment_form': sub_comment_form,
+        'post_replies':post_replies,
         'search_bar': init['search_bar'],
         'location_pop_up': location_pop_up,
         'notifications': init['notification_list'],
@@ -316,50 +301,25 @@ def catch_up_page(request, increment):
 
 @login_required
 def add_post(request):
+    # Getting relevant data
     init = initialize_page(request)
     user = request.user
     user_stats = UserStats.objects.get(user=user)
     if user_stats.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
-    if user_stats.can_post:
-        if request.method == "POST": # POST requests are encrypted, safer
-            f = AddPost(request.POST, request.FILES) # enables the form for POST request
-            print(request.POST, request.FILES)
-            print("valid")
+    
+    
+
+    variables = {
+        'user_stats': user_stats,
+        'username': init['username'], 
+        'search_bar': init['search_bar'],
+        'notifications': init['notification_list'],
+        'notification_count': init['notification_count']
+    }
 
 
-            # Getting relevant data
-            username = request.user.username
-            a = request.POST.get("title")
-            c = request.POST.get("content")
-            user = User.objects.get(username=username)
-            d = request.FILES.get("image")
-            create_user_directory(user=user, sub_directory='posts')
-            tag = request.POST.get("tag")
-            
-            # Checking to make sure that the tag is valid
-            if '|' in tag:
-                return render(request, 'main/error.html', {'issue': 'Tag cannot contain the vertical line symbol ( | )'})
-            
-            # Capitalization for consistancy and search functionality
-            tag = capitalize_plus(tag)
-
-            # Database Things
-            b = Post(user=user, title=a, contents=c, likes=0, media=d, created_at=datetime.now())
-            b.save()
-            base_value = Algorithum.AutoAlterations.base_value(catergory=tag)
-            t = PostTag(post=b, name=tag, value=base_value, current_increace=0, previous_increace=0, date_of_change=date.today())
-            t.save()
-            func = PCF(form='Parabolic Truncus', a=1, k=1, tag=t)
-            func.save()
-
-        
-            return HttpResponseRedirect("/page/popular|All/1")
-        else:
-            f = AddPost()
-    else:
-        return render(request, 'main/error.html', {'issue': 'Cannot Post.'})
-    return render(request, 'main/add_post.html', {"input_fields": f, 'username': init['username'], 'search_bar': init['search_bar'],'notifications': init['notification_list'],'notification_count': init['notification_count']})
+    return render(request, 'main/add_post.html', variables)
 
 
 @login_required
@@ -370,10 +330,10 @@ def profile(request, name):
     if us.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     
-    follow = Following.objects
+    follow = Following.objects.all()
     posts = Post.objects.filter(user=u)
     followed_userstats = []
-    for x in follow.all():
+    for x in follow:
         if us.following.filter(subscribers=x).exists():
             followed_userstats.append(UserStats.objects.filter(user=User.objects.get(username=follow.get(subscribers=x))))
     

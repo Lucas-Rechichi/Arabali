@@ -463,7 +463,7 @@ class Algorithum:
 
             # Setup
             user_stats = UserStats.objects.get(user=user.pk)
-            user_follower_object = Following.objects.get(subscribers=user_stats.user.username)
+            user_follower_object = Following.objects.get(name=user_stats.user.username)
             followers = UserStats.objects.filter(following=user_follower_object)
             distances = {}
 

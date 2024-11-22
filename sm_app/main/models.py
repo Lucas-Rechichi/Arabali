@@ -5,7 +5,12 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-# To direct the images from user imput into their respective folders.
+# To direct the media_objects from user imput into their respective folders.
+def get_media_upload_path_posts(instance, filename):
+    
+    # Return the full upload path
+    return os.path.join(instance.user.username, 'posts/', filename)
+
 def get_image_upload_path_posts(instance, filename):
     
     # Return the full upload path
@@ -27,19 +32,17 @@ class LikedBy(models.Model):
         return self.name
 
 class Following(models.Model):
-    subscribers = models.CharField(max_length=100, null=True)
+    name = models.CharField(max_length=100, null=True)
 
     def __str__(self):
-        return self.subscribers
-
+        return self.name
 
 # Main models
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    title = models.CharField(max_length=150)
+    title = models.CharField(max_length=100)
     contents = models.TextField()
     likes = models.IntegerField()
-    media = models.ImageField(null=True, upload_to=get_image_upload_path_posts)
     liked_by = models.ManyToManyField(LikedBy, related_name='post_liked_by')
     created_at = models.DateTimeField()
     day_of_creation = models.DateField()
@@ -65,6 +68,12 @@ class UserStats(models.Model):
         return self.user.username
 
 from messaging.models import ChatRoom, Message, PollMessage
+
+# Media sub-class for multible media files, not migrated into the database currently
+class Media(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name='post')
+    media_obj = models.FileField(null=True, upload_to=get_media_upload_path_posts)
+    caption = models.CharField(max_length=50)
 
 
 # Notifications

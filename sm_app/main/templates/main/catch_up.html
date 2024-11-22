@@ -833,29 +833,44 @@
                         </div> 
                     <div class="end-of-posts" data-increment="1" data-catergory="catch-up"></div>
                 </div>
-            </div>
-            <div class="col-6">
-                <div class="card">
-                    <div class="row">
-                        <div class="col">
-                            <h4 class="display-6 text-center">What do you want to look at?</h4>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col m-2">
-                            <div class="card">
-                                <a href="/page/popular|All/1" class="text-center link-success link-offset-2 link-underline-opacity-0">Popular</a>
+                <div class="col-6">
+                    <div class="card" style="position: fixed;">
+                        <div class="row">
+                            <div class="col">
+                                <h4 class="display-6 text-center">What do you want to look at?</h4>
                             </div>
                         </div>
-                        <div class="col m-2">
-                            <div class="card">
-                                <a href="/page/recommended|All/1" class="text-center link-success link-offset-2 link-underline-opacity-0">Recommended</a>
+                        <div class="row">
+                            <div class="col m-2">
+                                <div class="card">
+                                    <a href="/page/popular|All/1" class="text-center link-success link-offset-2 link-underline-opacity-0">Popular</a>
+                                </div>
+                            </div>
+                            <div class="col m-2">
+                                <div class="card">
+                                    <a href="/page/recommended|All/1" class="text-center link-success link-offset-2 link-underline-opacity-0">Recommended</a>
+                                </div>
+                            </div>
+                            <div class="col m-2">
+                                <div class="card">
+                                    <a href="/page/catch_up/1" class="text-center link-success link-offset-2 link-underline-opacity-0">Catch Up</a>
+                                </div>
                             </div>
                         </div>
-                        <div class="col m-2">
-                            <div class="card">
-                                <a href="/page/catch_up/1" class="text-center link-success link-offset-2 link-underline-opacity-0">Catch Up</a>
+                        <div class="row">
+                            <div class="col">
+                                <h6 class="display-6 text-center">Following:</h6>
                             </div>
+                        </div>
+                        <div class="row d-flex justify-content-center mb-5">
+                            {% for follower in user_followers %}
+                                <div class="col-4 d-flex justify-content-center">
+                                    <button type="button" class="btn mb-2 p-0" onclick="location.href='/profile/{{follower.user.username}}'" style="height:100px; width:100px;">
+                                        <img class="border border-success rounded-circle p-0" src="{{follower.pfp.url}}" alt="{{follower.user.username}}'s Profile Picture" style="height:100px; width:100px;">
+                                        <p class="lead text-center">{{follower.user.username}}</p>
+                                    </button>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

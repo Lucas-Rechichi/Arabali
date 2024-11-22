@@ -199,7 +199,7 @@
                                                 </div>
                                                 <div class="col-6 d-flex justify-content-end">
                                                     {% if user_liked_by in posts.liked_by.all %}
-                                                        <button type="submit" class="btn btn-success border border-success like-button like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                        <button type="button" class="btn btn-success border border-success like-button like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
                                                             <div class="row align-items-center">
                                                                 <div class="col mt-1 d-flex justify-content-end">
                                                                     <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{posts.id}}" style="color: #ffffff;"></i>
@@ -210,7 +210,7 @@
                                                             </div>
                                                         </button>
                                                     {% else %}
-                                                        <button type="submit" class="btn border border-success like-button like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
+                                                        <button type="button" class="btn border border-success like-button like-button-{{posts.id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{posts.id}}" style="height: 25px;">
                                                             <div class="row align-items-center">
                                                                 <div class="col mt-1 d-flex justify-content-end">
                                                                     <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{posts.id}}" style="color: #198754;"></i>
@@ -484,7 +484,7 @@
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="card">
+                    <div class="card" style="position: fixed;">
                         <div class="row">
                             <div class="col">
                                 <h4 class="display-6 text-center">What do you want to look at?</h4>
