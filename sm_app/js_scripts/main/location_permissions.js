@@ -35,7 +35,7 @@ $(document).ready(function () {
         else {
             $.ajax({
                 type: 'POST',
-                url: '/page/error/',
+                url: '/universal/error/',
                 date: {
                     'issue': 'Geolocation API Not Supported On Your Browser',
                     'csrfmiddlewaretoken': csrfToken
@@ -78,7 +78,7 @@ $(document).ready(function () {
         else {
             $.ajax({
                 type: 'POST',
-                url: '/page/error/',
+                url: '/universal/error/',
                 date: {
                     'issue': 'Geolocation API Not Supported On Your Browser',
                     'csrfmiddlewaretoken': csrfToken

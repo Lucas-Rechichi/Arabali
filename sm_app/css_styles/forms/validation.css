@@ -1,0 +1,9 @@
+/* For the file drop input field */
+.file-drop-input.valid-media {
+    border-color: #198754;
+}
+
+.file-drop-input.invalid-media {
+    border-color: #dc3545;
+    background-color: rgba(255, 201, 206, 0.777);
+}
