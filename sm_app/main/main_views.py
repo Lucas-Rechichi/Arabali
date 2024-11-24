@@ -20,7 +20,7 @@ def home(request):
 
 
 @login_required
-def page(request, catagory, increment):
+def page(request, catagory):
     # Getting relevent variables
     name = request.user.username
     user = User.objects.get(username=name)
@@ -82,8 +82,6 @@ def page(request, catagory, increment):
                 'likes':comment.likes,
                 'created_at':comment.created_at               
             }
-    # post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
-
     
     # Getting sub catagory
     catagory = str(catagory)
@@ -113,8 +111,8 @@ def page(request, catagory, increment):
     else:
         return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
 
-    # Only allows 10 posts to be displayed per page, as the increment increases, the post range will change to acompany the next 10 posts.
-    feed = Algorithum.Core.posts_per_page(incrementing_factor=increment, posts=posts)
+    # Only allows the top 10 posts to be displayed first.
+    feed = Algorithum.Core.posts_per_page(incrementing_factor=1, posts=posts)
     
     # Variables
     variables = {
@@ -125,11 +123,6 @@ def page(request, catagory, increment):
         "type": {
             "popular": popular_type,
             "recommended": recommended_type
-        },
-        "increment": {
-            "previous": increment - 1,
-            "current": increment,
-            "next": increment + 1 
         },
         'user_stats':users_stats, 
         'user':user_stats,
@@ -307,8 +300,6 @@ def add_post(request):
     user_stats = UserStats.objects.get(user=user)
     if user_stats.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
-    
-    
 
     variables = {
         'user_stats': user_stats,

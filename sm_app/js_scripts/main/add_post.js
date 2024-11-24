@@ -105,6 +105,14 @@ $(document).ready(function () {
         $(this).addClass('valid-media');
     })
 
+    // Visual modals 
+    var creatingPostModal = new bootstrap.Modal(document.getElementById('creating-post-modal'), {
+        keyboard: false
+    })
+    var postCreatedModal = new bootstrap.Modal(document.getElementById('post-created-modal'), {
+        keyboard: false
+    })
+
     // Post submission
     $('#create-post').click(function () {
         $(this).addClass('validated')
@@ -144,10 +152,12 @@ $(document).ready(function () {
                 $('#post-media-invalid').css('display', 'none');
             }
         } else {
-            // Getting relevant data
+            // getting relevant data
             var titleInput = $('#post-title').val();
             var contentsInput = $('#post-contents').val();
             var mediaInput = mediaFiles
+
+            creatingPostModal.show()
 
             formData = new FormData()
             formData.append('title', titleInput)
@@ -162,7 +172,10 @@ $(document).ready(function () {
                 contentType: false, 
                 data: formData,
                 success: function (response) {
-                    console.log('success')
+                    creatingPostModal.hide()
+                    setTimeout(function () {
+                        postCreatedModal.show()
+                    }, 300)
                 }
             })
         }

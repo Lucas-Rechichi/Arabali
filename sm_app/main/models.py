@@ -116,7 +116,7 @@ class NestedComment(models.Model):
 # Algorithum
 class Interest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, null=False)
     value = models.IntegerField()
 
     def __str__(self):
@@ -125,12 +125,20 @@ class Interest(models.Model):
 
 class PostTag(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, null=False)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, null=False)
     value = models.IntegerField()
 
     def __str__(self):
         return self.name
-    
+
+
+class Catergory(models.Model):
+    name = models.CharField(max_length=100, null=False)
+
+    def __str__(self):
+        return self.name
+
+
 # Interest Consequence Function, holds onto parameters for the function.
 class ICF(models.Model):
     interest = models.OneToOneField(Interest, on_delete=models.CASCADE, null=False)

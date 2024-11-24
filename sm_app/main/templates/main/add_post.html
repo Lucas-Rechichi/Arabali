@@ -125,19 +125,7 @@
                                 <br>
                             </form>
                             <div class="row">
-                                <div class="col-8">
-                                    <div class="row">
-                                        <div class="col-3">
-                                            <p class="mt-1">Catergory: </p>
-                                        </div>
-                                        <div class="col-9">
-                                            <button id="determine-catergory" type="button" class="btn btn-outline-success">Determine</button>
-                                        </div>
-                                    </div>
-                                    <p class="text-success">Default</p>
-                                    <p class="small">Catergories are auto generated based on the content of your post.</p>
-                                </div>
-                                <div class="col-4 d-flex justify-content-center">
+                                <div class="col d-flex justify-content-center">
                                     <button type="submit" id="create-post" class="btn btn-success d-flex justify-content-center mt-5" style="max-height: fit-content;">
                                         <p class="m-0 p-0 me-2">Post</p>
                                         <i class="bi bi-file-earmark-richtext"></i>
@@ -154,7 +142,7 @@
                                 <div class="card m-5">
                                     <div class="row">
                                         <div class="col m-2">
-                                            <button class="btn btn-light"><img src="{{user_stats.pfp.url}}", onclick='location.href = "/profile/{{posts.user}}"' style="width: 30px; height: 30px;"></button>
+                                            <button class="btn btn-light"><img src="{{user_stats.pfp.url}}", onclick='location.href = "/profile/{{username}}"' style="width: 30px; height: 30px;"></button>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -164,7 +152,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col m-2" id="post-media-preview-container">
-                                            <i class="bi bi-card-image d-flex justify-content-center" style="font-size: 15rem;"></i>
+                                            <i class="bi bi-card-image d-flex justify-content-center" style="font-size: 15rem; color: #198754;"></i>
                                         </div>
                                     </div>
                                     <div class="row m-2">
@@ -203,8 +191,62 @@
         </div>
     </div>
 </div>
-
 <!-- To store notifications -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+</div>
+<!-- Creating post modal -->
+<div id="creating-post-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong>Creating Post</strong>
+                <button class="btn btn-close" data-bs-dismis="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <p class="lead text-center">Creating Post</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <div class="spinner-border text-dark" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Post created modal -->
+<div id="post-created-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong>Creating Post</strong>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <p class="lead text-center">Post Created</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <i class="bi bi-file-post" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 d-flex justify-content-center">
+                        <button type="button" class="btn btn-success" data-bs-dismis="modal">Make Another</button>
+                    </div>
+                    <div class="col-6 d-flex justify-content-center">
+                        <button type="button" class="btn btn-success">Exit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
