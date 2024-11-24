@@ -17,6 +17,8 @@ urlpatterns = [
     path('posts/<int:post_id>', main_v.post_view, name="post_view"),
 
     # AJAX views
+
+    # for posts
     path('page/liked/', posts.liked, name="liked"),
     path('page/new-comment/', posts.new_comment, name="new_comment"),
     path('page/new_reply/', posts.new_reply, name="new_reply"),
@@ -24,6 +26,11 @@ urlpatterns = [
     path('page/scrolled-by/', posts.scrolled_by, name="scrolled_by"),
     path('page/load-posts/', posts.load_posts, name="load_posts"),
     path('page/save-location/', posts.save_location, name='save_location'),
+
+    # for adding posts
+    path('add/add-post/', post_creation.add_post, name="add_post"),
+
+    # for universal functions
     path('universal/error/', universal.ajax_error, name="ajax_error"),
     path('universal/remove-notification/', universal.remove_notification, name='remove_notification'),
     path('universal/realtime-suggestions-manager/', universal.realtime_suggestions_manager, name='realtime_suggestions')

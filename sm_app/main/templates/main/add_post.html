@@ -101,13 +101,13 @@
                             <form id="create-post-form">
                                 <label for="post-title" class="form-label">Title:</label>
                                 <input id="post-title" class="form-control form-control-lg" type="text" placeholder="My Post" aria-label="Title of your post" required>
-                                <div class="post-title-invalid invalid-feedback ms-1">
+                                <div id="post-title-invalid" aria-describedby="post-title" class="invalid-feedback ms-1">
                                     <strong>Title required</strong>
                                 </div>
                                 <br>
                                 <label for="post-contents" class="form-label">Contents:</label>
-                                <textarea class="form-control" id="post-contents" rows="3" placeholder="This post is about..." aria-label="Contents of your post" required></textarea>
-                                <div class="post-contents-invalid invalid-feedback ms-1">
+                                <textarea id="post-contents" class="form-control" rows="3" placeholder="This post is about..." aria-label="Contents of your post" required></textarea>
+                                <div id="post-contents-invalid"  aria-describedby="post-contents" class="invalid-feedback ms-1">
                                     <strong>Post contents required</strong>
                                 </div>
                                 <br>
@@ -119,6 +119,9 @@
                                         <input type="file" id="media-input" multiple hidden required>
                                     </button>
                                 </div>
+                                <div id="post-media-invalid" aria-describedby="media-input" class="invalid-feedback ms-1">
+                                    <strong>Post media required</strong>
+                                </div>
                                 <br>
                             </form>
                             <div class="row">
@@ -128,14 +131,14 @@
                                             <p class="mt-1">Catergory: </p>
                                         </div>
                                         <div class="col-9">
-                                            <button type="button" class="btn btn-outline-success">Determine</button>
+                                            <button id="determine-catergory" type="button" class="btn btn-outline-success">Determine</button>
                                         </div>
                                     </div>
                                     <p class="text-success">Default</p>
                                     <p class="small">Catergories are auto generated based on the content of your post.</p>
                                 </div>
                                 <div class="col-4 d-flex justify-content-center">
-                                    <button type="button" id="create-post" class="btn btn-success d-flex justify-content-center mt-5" style="max-height: fit-content;">
+                                    <button type="submit" id="create-post" class="btn btn-success d-flex justify-content-center mt-5" style="max-height: fit-content;">
                                         <p class="m-0 p-0 me-2">Post</p>
                                         <i class="bi bi-file-earmark-richtext"></i>
                                     </button>

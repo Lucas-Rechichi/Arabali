@@ -153,8 +153,8 @@ LOGIN_REDIRECT_URL =  "/page/recommended|All/1"
 LOGOUT_REDIRECT_URL =  "/logout/"
 
 # images
-MEDIA_ROOT = os.path.join(BASE_DIR, 'arabali_users')
-MEDIA_URL = '/arabali_users/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
+MEDIA_URL = '/images/'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 

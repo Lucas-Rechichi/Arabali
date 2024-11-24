@@ -7,9 +7,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 
 # To direct the media_objects from user imput into their respective folders.
 def get_media_upload_path_posts(instance, filename):
-    
+
     # Return the full upload path
-    return os.path.join(instance.user.username, 'posts/', filename)
+    return os.path.join('posts/', instance.post.user.username, f'{instance.post.title}_{instance.post.pk}', filename)
 
 def get_image_upload_path_posts(instance, filename):
     
@@ -18,7 +18,7 @@ def get_image_upload_path_posts(instance, filename):
 
 def get_image_upload_path_profile(instance, filename):
 
-    return os.path.join(instance.user.username, 'profile/', filename)
+    return os.path.join('users/', instance.user.username, filename)
 
 def get_default_content_type(model):
 
@@ -42,10 +42,9 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     title = models.CharField(max_length=100)
     contents = models.TextField()
-    likes = models.IntegerField()
+    likes = models.IntegerField(null=False)
     liked_by = models.ManyToManyField(LikedBy, related_name='post_liked_by')
-    created_at = models.DateTimeField()
-    day_of_creation = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(null=True, default=None)
 
     def __str__(self):
@@ -71,7 +70,7 @@ from messaging.models import ChatRoom, Message, PollMessage
 
 # Media sub-class for multible media files, not migrated into the database currently
 class Media(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name='post')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name='media')
     media_obj = models.FileField(null=True, upload_to=get_media_upload_path_posts)
     caption = models.CharField(max_length=50)
 

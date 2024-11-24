@@ -154,7 +154,10 @@ dmypy.json
 cython_debug/
 
 # App specific:
-arabali_users/
+users/
+conversation_storage/
+chatrooms/
+posts/
 
 # Certificates and keys:
 localhost.crt
