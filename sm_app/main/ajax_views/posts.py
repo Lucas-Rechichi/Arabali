@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from main.extras import approx_display, capitalize_plus, difference, exact_display, modified_reciprocal, remove_last_character
-from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Notification, Following
+from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Media
 from messaging.models import Message, ChatRoom, PollMessage
 from messaging.extras import emoticons_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -381,6 +381,7 @@ def load_posts(request):
 
         # setup
         post_liked_by = {}
+        post_media = {}
         post_comments = {}
         post_liked_by_users = list(post.liked_by.all())
 
@@ -394,12 +395,18 @@ def load_posts(request):
                 'username': post_liked_by_users[j].name,
                 'user_pfp_url': user_liked_userstats.pfp.url,
             }
+        
+        for k, media in Media.objects.filter(post=post):
+            post_media[k] = {
+                'media_url': media.media_obj.url,
+                'caption': media.caption 
+            }
 
-        for k, comment in enumerate(post.comments.all()): # comments
+        for l, comment in enumerate(post.comments.all()): # comments
             # setup
             post_comment_replies = {}
 
-            for l, reply in enumerate(comment.replies.all()): # replies
+            for m, reply in enumerate(comment.replies.all()): # replies
                 # getting relevant data
                 reply_user_userstats = UserStats.objects.get(user=reply.user)
 
@@ -407,7 +414,7 @@ def load_posts(request):
                 liked_reply = NestedComment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
 
                 # packaging data into a dictionary
-                post_comment_replies[l] = { 
+                post_comment_replies[m] = { 
                     'reply_id': reply.pk,
                     'reply_username': reply.user.username,
                     'has_liked': liked_reply,
@@ -422,7 +429,7 @@ def load_posts(request):
             liked_comment = Comment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
 
             # packaging data into a dictionary
-            post_comments[k] = {
+            post_comments[l] = {
                 'comment_id': comment.pk,
                 'comment_username': comment.user.username,
                 'has_liked': liked_comment,
@@ -436,13 +443,14 @@ def load_posts(request):
         liked_post = Post.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
 
         # packaging data into a dictionary
-        posts[i] = {
+        post[i] = {
             'post_id': post.pk,
             'post_username': post.user.username,
             'has_liked': liked_post,
             'post_user_pfp_url': user_stats.pfp.url, 
             'post_title': post.title,
             'post_contents': post.contents,
+            'post_media': post_media,
             'post_likes': post.likes,
             'post_media_url': post.media.url,
             'post_created_at': post.created_at,

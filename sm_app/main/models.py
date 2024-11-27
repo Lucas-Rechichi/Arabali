@@ -1,7 +1,11 @@
 import os
 
+import mimetypes
+from PIL import Image
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
@@ -73,6 +77,21 @@ class Media(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name='media')
     media_obj = models.FileField(null=True, upload_to=get_media_upload_path_posts)
     caption = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # saves the model instance first
+
+        if self.media_obj.:
+            # image preperation for manipulation
+            media_path = self.image.path
+            img = Image.open(image_path)
+
+            # resises the image for the expected image size (1280x720px)
+            img = img.resize((1280, 720), Image.ANTIALIAS)  
+            img = img.convert('RGB')  
+
+            # saves the image
+            img.save(image_path, format='JPEG', quality=85) 
 
 
 # Notifications

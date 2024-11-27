@@ -9,7 +9,7 @@ from main.extras import capitalize_plus, remove_until_character, initialize_page
 from main.algorithum import Algorithum
 from main.forms import AddPost, EditProfile, EditPost, Search
 from main.models import LikedBy, Following, DateAndOrTimeSave
-from main.models import UserStats, Comment, NestedComment, PostTag, PCF
+from main.models import UserStats, Comment, NestedComment, Media
 from validate.views import create_user_directory
 from main.configure import Configure
 from datetime import datetime, date
@@ -112,25 +112,108 @@ def page(request, catagory):
         return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
 
     # Only allows the top 10 posts to be displayed first.
-    feed = Algorithum.Core.posts_per_page(incrementing_factor=1, posts=posts)
+    posts_to_append = Algorithum.Core.posts_per_page(incrementing_factor=1, posts=posts)
+    
+    feed = []
+    # Loops though all selected posts
+    for i, post in enumerate(posts_to_append):
+        user_stats = UserStats.objects.get(user=post.user)
+        # gets the nested data within comments, liked_by and replies
+
+        # setup
+        post_liked_by = []
+        post_media = []
+        post_comments = []
+        post_liked_by_users = list(post.liked_by.all())
+
+        for j in range(0, len(post_liked_by_users)): # liked_by
+            # getting relevant data
+            user_liked_user_obj = User.objects.get(username=post_liked_by_users[j].name)
+            user_liked_userstats = UserStats.objects.get(user=user_liked_user_obj)
+
+            # packaging data into a dictionary
+            post_liked_by.append({
+                'username': post_liked_by_users[j].name,
+                'user_pfp_url': user_liked_userstats.pfp.url,
+            })
+        
+        for k, media in enumerate(Media.objects.filter(post=post)):
+            post_media.append({
+                'media_url': media.media_obj.url,
+                'caption': media.caption 
+            })
+
+        for l, comment in enumerate(post.comments.all()): # comments
+            # setup
+            post_comment_replies = []
+
+            for m, reply in enumerate(comment.replies.all()): # replies
+                # getting relevant data
+                reply_user_userstats = UserStats.objects.get(user=reply.user)
+
+                # if the user has liked this reply
+                liked_reply = NestedComment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
+
+                # packaging data into a dictionary
+                post_comment_replies.append({ 
+                    'reply_id': reply.pk,
+                    'reply_username': reply.user.username,
+                    'has_liked': liked_reply,
+                    'reply_user_pfp_url': reply_user_userstats.pfp.url,
+                    'reply_text': reply.text,
+                    'reply_likes': reply.likes,
+                })
+            # getting relevant data
+            comment_user_userstats = UserStats.objects.get(user=comment.user)
+
+            # if the user has liked this comment
+            liked_comment = Comment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
+
+            # packaging data into a dictionary
+            post_comments.append({
+                'comment_id': comment.pk,
+                'comment_username': comment.user.username,
+                'has_liked': liked_comment,
+                'comment_user_pfp_url': comment_user_userstats.pfp.url,
+                'comment_text': comment.text,
+                'comment_likes': comment.likes,
+                'comment_replies': post_comment_replies
+            })
+
+        # if the user has liked the post
+        liked_post = Post.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
+
+        # packaging data into a dictionary
+        feed.append({
+            'post_id': post.pk,
+            'post_username': post.user.username,
+            'has_liked': liked_post,
+            'post_user_pfp_url': user_stats.pfp.url, 
+            'post_title': post.title,
+            'post_contents': post.contents,
+            'post_media': post_media,
+            'post_likes': post.likes,
+            'post_created_at': post.created_at,
+            'post_liked_by': post_liked_by,
+            'post_comments': post_comments
+        })
+
     
     # Variables
     variables = {
-        "username":name, 
-        "post":feed,
-        "catagory":catagory,
-        "trend_catagories":trend_categories,
+        "username": name, 
+        "posts": feed,
+        "catagory": catagory,
+        "trend_catagories": trend_categories,
         "type": {
             "popular": popular_type,
             "recommended": recommended_type
         },
-        'user_stats':users_stats, 
-        'user':user_stats,
+        'user_stats': users_stats, 
+        'user': user_stats,
         'post_users': post_users,
         'liked_by': liked_by,
-        'user_liked_by': user_liked_by,
-        'post_comments': post_comments,
-        'post_replies':post_replies, 
+        'user_liked_by': user_liked_by, 
         'search_bar': search_bar,
         'notifications': init['notification_list'],
         'notification_count': init['notification_count']
