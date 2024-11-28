@@ -213,7 +213,6 @@ def page(request, catagory):
         'user': user_stats,
         'post_users': post_users,
         'liked_by': liked_by,
-        'user_liked_by': user_liked_by, 
         'search_bar': search_bar,
         'notifications': init['notification_list'],
         'notification_count': init['notification_count']

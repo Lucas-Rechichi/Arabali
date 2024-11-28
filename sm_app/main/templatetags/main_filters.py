@@ -6,3 +6,4 @@ register = template.Library()
 @register.filter
 def add (num_1, num_2):
     return num_1 + num_2
+

@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from main.models import Following, UserStats
 from messaging.models import ChatRoom, Message, PollMessage, PollingChoice, MessageNotificationSetting
-from messaging.templatetags import filters
+from messaging.templatetags import messaging_filters
 from messaging.forms import CreateChatRoom
 from messaging.extras import get_chat_rooms, emoticons_dict
 from main.extras import initialize_page

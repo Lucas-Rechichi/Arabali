@@ -81,17 +81,21 @@ class Media(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # saves the model instance first
 
-        if self.media_obj.:
+        mime_type, _ = mimetypes.guess_type(self.media_obj.file.name)
+
+        if mime_type in ['image/jpeg', 'image/png', 'image/gif']:
             # image preperation for manipulation
-            media_path = self.image.path
+            image_path = self.media_obj.path
             img = Image.open(image_path)
 
             # resises the image for the expected image size (1280x720px)
-            img = img.resize((1280, 720), Image.ANTIALIAS)  
+            img = img.resize((1280, 720), Image.Resampling.LANCZOS)  
             img = img.convert('RGB')  
 
             # saves the image
             img.save(image_path, format='JPEG', quality=85) 
+        else:
+            raise ValidationError('Only image files are allowed (JPEG, PNG, GIF).')
 
 
 # Notifications
