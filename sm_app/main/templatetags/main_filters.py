@@ -7,3 +7,11 @@ register = template.Library()
 def add (num_1, num_2):
     return num_1 + num_2
 
+@register.filter
+def correct_apostrophe(name):
+    name_list = list(name)
+    if name_list[-1] == 's':
+        return f"{name}'"
+    else:
+        return f"{name}'s"
+

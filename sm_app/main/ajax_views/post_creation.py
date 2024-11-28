@@ -27,7 +27,7 @@ def add_post(request):
     media_for_post.save()
 
     # Determining the catergory for this post using AI
-    post_catergory = Algorithum.PostCreations.predict_catergory_request(post=new_post)
+    post_catergory = Algorithum.PostCreations.predict_catergory_request(post_obj=new_post)
 
     # Creating the post tag
     tags = PostTag.objects.all()

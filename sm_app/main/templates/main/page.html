@@ -38,7 +38,6 @@
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-3">
-            
                                         </div>
                                         <div class="col-6">
                                             {{search_bar|crispy}}
@@ -162,378 +161,366 @@
                         <br>
                         <div class="row">
                             {% for post in posts %}
-                                    <div class="col-12">
-                                        <div class="card m-5">
-                                            <div class="row">
-                                                <div class="col m-2">
-                                                    <button class="btn btn-light"><img class="border border-success" src="{{post.post_user_pfp_url}}" alt="{{post.post_username}}" onclick='location.href = "/profile/{{post.post_username}}"' style="width: 30px; height: 30px; border-radius: 15px;"></button>
-                                                </div>
+                                <div class="col-12">
+                                    <div class="card m-5">
+                                        <div class="row">
+                                            <div class="col m-2">
+                                                <button class="btn btn-light"><img class="border border-success" src="{{post.post_user_pfp_url}}" alt="{{post.post_username|correct_apostrophe}} Profile Picture" onclick='location.href = "/profile/{{post.post_username}}"' style="width: 30px; height: 30px; border-radius: 15px;"></button>
                                             </div>
-                                            <div class="row">
-                                                <div class="col m-2">
-                                                    <h6 class="display-6">{{post.post_username}}</h6>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div id="post-{{post.post_id}}-media-carousal" class="carousel slide">
-                                                    <div class="carousel-indicators">
-                                                        {% for media_obj in post.post_media %}
-                                                            {% if forloop.counter0 == 0 %}
-                                                                <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                                            {% else %}
-                                                                <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    </div>
-                                                    <div class="carousel-inner">
-                                                        {% for media_obj in post.post_media %}
-                                                            {% if forloop.counter == 1 %}
-                                                                <div class="carousel-item active">
-                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100"  alt="{{post.post_title}}'s Media: Slide {{forloop.counter}}" aria-current="true">
-                                                                    <div class="carousel-caption d-block d-md-block">
-                                                                        <p>{{media_obj.caption}}</p>
-                                                                    </div>
-                                                                </div>
-                                                            {% else %}
-                                                                <div class="carousel-item">
-                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100" alt="{{post.post_title}}'s Media: Slide {{forloop.counter}}">
-                                                                    <div class="carousel-caption d-block d-md-block">
-                                                                        <p>{{media_obj.caption}}</p>
-                                                                    </div>
-                                                                </div>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    </div>
-                                                    <button class="carousel-control-prev" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="prev">
-                                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                        <span class="visually-hidden">Previous</span>
-                                                    </button>
-                                                    <button class="carousel-control-next" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="next">
-                                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                        <span class="visually-hidden">Next</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="row m-2">
-                                                <div class="col">
-                                                    <h3 class="display-6">{{post.post_title}}</h3>
-                                                </div>
-                                            </div>
-                                            <div class="row m-1">
-                                                <div class="col">
-                                                    <p class="lead">{{post.post_contents}}</p>
-                                                </div>
-                                            </div>
-                                            <div class="row m-1">
-                                                <div class="col-6 d-flex justify-content-start">
-                                                    <button type="button" class="btn" data-bs-target="#expand-{{post.post_id}}" data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
-                                                </div>
-                                                <div class="col-6 d-flex justify-content-end">
-                                                    {% if post.has_liked %}
-                                                        <button type="button" class="btn btn-success border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
-                                                            <div class="row align-items-center">
-                                                                <div class="col mt-1 d-flex justify-content-end">
-                                                                    <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{post.post_id}}" style="color: #ffffff;"></i>
-                                                                </div>
-                                                                <div class="col mt-4">
-                                                                    <p class="text-white" id="page-like-text-{{post.post_id}}">{{post.post_likes}}</p>
-                                                                </div>
-                                                            </div>
-                                                        </button>
-                                                    {% else %}
-                                                        <button type="button" class="btn border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
-                                                            <div class="row align-items-center">
-                                                                <div class="col mt-1 d-flex justify-content-end">
-                                                                    <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{post.post_id}}" style="color: #198754;"></i>
-                                                                </div>
-                                                                <div class="col mt-4">
-                                                                    <p class="text-success" id="page-like-text-{{post.post_id}}">{{post.post_likes}}</p>
-                                                                </div>
-                                                            </div>
-                                                        </button>
-                                                    {% endif %}
-                                                </div>
-                                            </div>    
                                         </div>
-                                        <!-- modal -->
-                                        <div id="expand-{{post.post_id}}" class="modal fade">
-                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        Post
-                                                        <button class="btn btn-close" data-bs-dismiss="modal" data-bs-target="#expand-{{post.post_id}}"></button>
+                                        <div class="row">
+                                            <div class="col m-2">
+                                                <h6 class="display-6">{{post.post_username}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div id="post-{{post.post_id}}-media-carousal" class="carousel slide">
+                                                <div class="carousel-indicators">
+                                                    {% for media_obj in post.post_media %}
+                                                        {% if forloop.counter0 == 0 %}
+                                                            <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                                        {% else %}
+                                                            <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="carousel-inner">
+                                                    {% for media_obj in post.post_media %}
+                                                        {% if forloop.counter == 1 %}
+                                                            <div class="carousel-item active">
+                                                                <img src="{{media_obj.media_url}}" class="d-block w-100"  alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}" aria-current="true">
+                                                                <div class="carousel-caption d-block d-md-block">
+                                                                    <p>{{media_obj.caption}}</p>
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="carousel-item">
+                                                                <img src="{{media_obj.media_url}}" class="d-block w-100" alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}">
+                                                                <div class="carousel-caption d-block d-md-block">
+                                                                    <p>{{media_obj.caption}}</p>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Previous</span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                    <span class="visually-hidden">Next</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="row m-2">
+                                            <div class="col">
+                                                <h3 class="display-6">{{post.post_title}}</h3>
+                                            </div>
+                                        </div>
+                                        <div class="row m-1">
+                                            <div class="col">
+                                                <p class="lead">{{post.post_contents}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row m-1">
+                                            <div class="col-6 d-flex justify-content-start">
+                                                <button type="button" class="btn" data-bs-target="#expand-{{post.post_id}}" data-bs-toggle="modal"><i class="bi bi-three-dots"></i></button>
+                                            </div>
+                                            <div class="col-6 d-flex justify-content-end">
+                                                {% if post.has_liked %}
+                                                    <button type="button" class="btn btn-success border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
+                                                        <div class="row align-items-center">
+                                                            <div class="col mt-1 d-flex justify-content-end">
+                                                                <i class="bi bi-hand-thumbs-up-fill" id="page-like-icon-{{post.post_id}}" style="color: #ffffff;"></i>
+                                                            </div>
+                                                            <div class="col mt-4">
+                                                                <p class="text-white" id="page-like-text-{{post.post_id}}">{{post.post_likes}}</p>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                {% else %}
+                                                    <button type="button" class="btn border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
+                                                        <div class="row align-items-center">
+                                                            <div class="col mt-1 d-flex justify-content-end">
+                                                                <i class="bi bi-hand-thumbs-up" id="page-like-icon-{{post.post_id}}" style="color: #198754;"></i>
+                                                            </div>
+                                                            <div class="col mt-4">
+                                                                <p class="text-success" id="page-like-text-{{post.post_id}}">{{post.post_likes}}</p>
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>    
+                                    </div>
+                                    <!-- modal -->
+                                    <div id="expand-{{post.post_id}}" class="modal fade">
+                                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    Post
+                                                    <button class="btn btn-close" data-bs-dismiss="modal" data-bs-target="#expand-{{post.post_id}}"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col m-2">
+                                                            <button class="btn btn-light"><img class="border border-success" src="{{post.post_user_pfp_url}}" alt="{{post.post_username|correct_apostrophe}} Profile Picture" onclick='location.href = "/profile/{{post.post_username}}"' style="width: 30px; height: 30px; border-radius: 15px;"></button>
+                                                        </div>
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col m-2">
-                                                                <button class="btn btn-light"><img class="border border-success" src="{{post.post_user_pfp_url}}" alt="{{post.post_username}}" onclick='location.href = "/profile/{{post.post_username}}"' style="width: 30px; height: 30px; border-radius: 15px;"></button>
+                                                    <div class="row">
+                                                        <div class="col m-2">
+                                                            <h6 class="display-6">{{post.post_username}}</h6>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col m-2">
+                                                            <div id="modal-{{post.post_id}}-media-carousal" class="carousel slide">
+                                                                <div class="carousel-indicators">
+                                                                    {% for media_obj in post.post_media %}
+                                                                        {% if forloop.counter0 == 0 %}
+                                                                            <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                                                        {% else %}
+                                                                            <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                                <div class="carousel-inner">
+                                                                    {% for media_obj in post.post_media %}
+                                                                        {% if forloop.counter == 1 %}
+                                                                            <div class="carousel-item active">
+                                                                                <img src="{{media_obj.media_url}}" class="d-block w-100"  alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}" aria-current="true">
+                                                                                <div class="carousel-caption d-block d-md-block">
+                                                                                    <p>{{media_obj.caption}}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        {% else %}
+                                                                            <div class="carousel-item">
+                                                                                <img src="{{media_obj.media_url}}" class="d-block w-100" alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}">
+                                                                                <div class="carousel-caption d-block d-md-block">
+                                                                                    <p>{{media_obj.caption}}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                                <button class="carousel-control-prev" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide="prev">
+                                                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                    <span class="visually-hidden">Previous</span>
+                                                                </button>
+                                                                <button class="carousel-control-next" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide="next">
+                                                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                    <span class="visually-hidden">Next</span>
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="col m-2">
-                                                                <h6 class="display-6">{{post.post_username}}</h6>
+                                                    </div>
+                                                    <div class="row m-2">
+                                                        <div class="col">
+                                                            <h3 class="display-6">{{post.post_title}}</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row m-1">
+                                                        <div class="col">
+                                                            <p class="lead">{{post.post_contents}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-4">
+                                                            <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-{{post.post_id}}" role="button" aria-expanded="false" aria-controls="liked-by-{{post.post_id}}">Liked By</a> 
+                                                        </div>
+                                                        <div class="col-8 d-flex justify-content-end">
+                                                            {% if post.has_liked %}
+                                                                <button type="button" class="btn btn-success border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
+                                                                    <div class="row align-items-center">
+                                                                        <div class="col mt-1 d-flex justify-content-end">
+                                                                            <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{post.post_id}}" style="color: #ffffff;"></i>
+                                                                        </div>
+                                                                        <div class="col mt-4">
+                                                                            <p class="text-white" id="modal-like-text-{{post.post_id}}">{{post.post_likes}}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </button>
+                                                            {% else %}
+                                                                <button type="button" class="btn border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
+                                                                    <div class="row align-items-center">
+                                                                        <div class="col mt-1 d-flex justify-content-end">
+                                                                            <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{post.post_id}}" style="color: #198754;"></i>
+                                                                        </div>
+                                                                        <div class="col mt-4">
+                                                                            <p class="text-success" id="modal-like-text-{{post.post_id}}">{{post.post_likes}}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </button>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <div class="collapse card m-1" id="liked-by-{{post.post_id}}">
+                                                                <ul class="list-group list-group-flush">
+                                                                    {% for liked_by in post.post_liked_by %}
+                                                                        <button type="button" class="btn mb-2 d-inline-flex">
+                                                                            <img src="{{liked_by.user_pfp_url}}" alt="{{liked_by.username|correct_apostrophe}} Profile Picture"  style="width: 30px; height: 30px;">
+                                                                            <p class="p-0 m-0 ms-2">{{liked_by.username}}</p>
+                                                                        </button>
+                                                                    {% endfor %}
+                                                                </ul>
                                                             </div>
                                                         </div>
-                                                        <div class="row">
-                                                            <div class="col m-2">
-                                                                <div id="modal-{{post.post_id}}-media-carousal" class="carousel slide">
-                                                                    <div class="carousel-indicators">
-                                                                        {% for media_obj in post.post_media %}
-                                                                            {% if forloop.counter0 == 0 %}
-                                                                                <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                                                                            {% else %}
-                                                                                <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                    </div>
-                                                                    <div class="carousel-inner">
-                                                                        {% for media_obj in post.post_media %}
-                                                                            {% if forloop.counter == 1 %}
-                                                                                <div class="carousel-item active">
-                                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100"  alt="{{post.post_title}}'s Media: Slide {{forloop.counter}}" aria-current="true">
-                                                                                    <div class="carousel-caption d-block d-md-block">
-                                                                                        <p>{{media_obj.caption}}</p>
-                                                                                    </div>
-                                                                                </div>
-                                                                            {% else %}
-                                                                                <div class="carousel-item">
-                                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100" alt="{{post.post_title}}'s Media: Slide {{forloop.counter}}">
-                                                                                    <div class="carousel-caption d-block d-md-block">
-                                                                                        <p>{{media_obj.caption}}</p>
-                                                                                    </div>
-                                                                                </div>
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                    </div>
-                                                                    <button class="carousel-control-prev" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide="prev">
-                                                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                                        <span class="visually-hidden">Previous</span>
-                                                                    </button>
-                                                                    <button class="carousel-control-next" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide="next">
-                                                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                                        <span class="visually-hidden">Next</span>
-                                                                    </button>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col text-center">
+                                                            <p class="lead">Date Created: {{post.post_created_at}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <p class="lead text-center">Comments:</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col d-flex justify-content-center">
+                                                            <!-- Comments form -->
+                                                            <div class="row">
+                                                                <div class="col-8">
+                                                                    <div class="mb-3">
+                                                                        <label for="comment-text-{{post.post_id}}" class="form-label">Comment</label>
+                                                                        <input type="text" class="form-control" id="comment-text-{{post.post_id}}" placeholder="Add Comment...">
+                                                                    </div>   
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <br>
+                                                                    <button type="button" class="btn btn-success mt-2 ms-5 add-comment" data-post-id="{{post.post_id}}">Add</button>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="row m-2">
-                                                            <div class="col">
-                                                                <h3 class="display-6">{{post.post_title}}</h3>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row m-1">
-                                                            <div class="col">
-                                                                <p class="lead">{{post.post_contents}}</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-4">
-                                                                <a class="btn btn-success" data-bs-toggle="collapse" href="#liked-by-{{post.post_id}}" role="button" aria-expanded="false" aria-controls="liked-by-{{post.post_id}}">Liked By</a> 
-                                                            </div>
-                                                            <div class="col-8 d-flex justify-content-end">
-                                                                {% if post.has_liked %}
-                                                                    <button type="button" class="btn btn-success border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
-                                                                        <div class="row align-items-center">
-                                                                            <div class="col mt-1 d-flex justify-content-end">
-                                                                                <i class="bi bi-hand-thumbs-up-fill" id="modal-like-icon-{{post.post_id}}" style="color: #ffffff;"></i>
-                                                                            </div>
-                                                                            <div class="col mt-4">
-                                                                                <p class="text-white" id="modal-like-text-{{post.post_id}}">{{post.post_likes}}</p>
+                                                    </div>
+                                                    <!-- comments -->
+                                                    <div id="comments-container-{{post.post_id}}">
+                                                        {% for comment in post.post_comments %}
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <div class="card p-3 m-2">
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <img class="border border-success" src="{{comment.comment_user_pfp_url}}" alt="{{comment.comment_username|correct_apostrophe}} Profile Picture" style="height:20px; width: 20px; border-radius: 10px;">
+                                                                                <strong>{{comment.comment_username}}</strong>
                                                                             </div>
                                                                         </div>
-                                                                    </button>
-                                                                {% else %}
-                                                                    <button type="button" class="btn border border-success like-button like-button-{{post.post_id}} d-flex align-items-center pb-3 pt-2" data-post-id="{{post.post_id}}" style="height: 25px;">
-                                                                        <div class="row align-items-center">
-                                                                            <div class="col mt-1 d-flex justify-content-end">
-                                                                                <i class="bi bi-hand-thumbs-up" id="modal-like-icon-{{post.post_id}}" style="color: #198754;"></i>
-                                                                            </div>
-                                                                            <div class="col mt-4">
-                                                                                <p class="text-success" id="modal-like-text-{{post.post_id}}">{{post.post_likes}}</p>
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                {{comment.comment_text}} 
                                                                             </div>
                                                                         </div>
-                                                                    </button>
-                                                                {% endif %}
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                <div class="collapse card m-1" id="liked-by-{{post.post_id}}">
-                                                                    <ul class="list-group list-group-flush">
-                                                                        {% for liked_by in post.post_liked_by %}
-                                                                            <button type="button" class="btn mb-2 d-inline-flex">
-                                                                                <img src="{{liked_by.user_pfp_url}}" alt="{{liked_by.username}}'s Profile Picture"  style="width: 30px; height: 30px;">
-                                                                                <p class="p-0 m-0 ms-2">{{liked_by.username}}</p>
-                                                                            </button>
-                                                                        {% endfor %}
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col text-center">
-                                                                <p class="lead">Date Created: {{posts.created_at}}</p>
-                                                            </div>
-                                                        </div>
-                                                        <br>
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                <p class="lead text-center">Comments:</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col d-flex justify-content-center">
-                                                                <!-- Comments form -->
-                                                                <div class="row">
-                                                                    <div class="col-8">
-                                                                        <div class="mb-3">
-                                                                            <label for="comment-text-{{post.post_id}}" class="form-label">Comment</label>
-                                                                            <input type="text" class="form-control" id="comment-text-{{post.post_id}}" placeholder="Add Comment...">
-                                                                        </div>   
-                                                                    </div>
-                                                                    <div class="col-4">
-                                                                        <br>
-                                                                        <button type="button" class="btn btn-success mt-2 ms-5 add-comment" data-post-id="{{post.post_id}}">Add</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <!-- comments -->
-                                                        <div id="comments-container-{{post.post_id}}">
-                                                            {% for commentPk, commentData  in post_comments.items %}
-                                                                {% if commentData.post_id|stringformat:"%s%s" == posts.id|stringformat:"%s%s" %}
-                                                                    <div class="row">
-                                                                        <div class="col">
-                                                                            <div class="card p-3 m-2">
-                                                                                <div class="row">
-                                                                                    <div class="col">
-                                                                                        {% for user_key, user_value in post_users.items %}
-                                                                                            {% if user_key|stringformat:"%s%s" == commentData.user|stringformat:"%s%s" %}
-                                                                                                <img class="border border-success" src="{{user_value}}" alt="" style="height:20px; width: 20px; border-radius: 10px;">
-                                                                                                <strong>{{commentData.user}}</strong>
-                                                                                            {% endif %}
-                                                                                        {% endfor %}
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="row">
-                                                                                    <div class="col">
-                                                                                        {{ commentData.text }} 
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="row">
-                                                                                    <div class="col-4">
-                                                                                        <a href="#nested-comments-{{commentPk}}" data-bs-toggle="collapse" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Replies</a>
-                                                                                    </div>
-                                                                                    <div class="col-8 d-flex justify-content-end">
-                                                                                        {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                                            <button type="button" class="btn btn-success border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{commentPk}}" style="height: 25px;">
-                                                                                                <div class="row align-items-center">
-                                                                                                    <div class="col mt-1 d-flex justify-content-end">
-                                                                                                        <i class="bi bi-hand-thumbs-up-fill" id="comment-like-icon-{{commentPk}}" style="color: #ffffff;"></i>
-                                                                                                    </div>
-                                                                                                    <div class="col mt-4">
-                                                                                                        <p class="text-white" id="comment-like-text-{{commentPk}}">{{commentData.likes}}</p>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </button>
-                                                                                        {% else %}
-                                                                                            <button type="button" class="btn border border-success comment-like-button comment-like-button-{{commentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{commentPk}}" style="height: 25px;">
-                                                                                                <div class="row align-items-center">
-                                                                                                    <div class="col mt-1 d-flex justify-content-end">
-                                                                                                        <i class="bi bi-hand-thumbs-up" id="comment-like-icon-{{commentPk}}" style="color: #198754;"></i>
-                                                                                                    </div>
-                                                                                                    <div class="col mt-4">
-                                                                                                        <p class="text-success" id="comment-like-text-{{commentPk}}">{{commentData.likes}}</p>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </button>
-                                                                                        {% endif %}
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="row">
-                                                                                    <div class="col">
-                                                                                        <div class="collapse" id="nested-comments-{{commentPk}}">
+                                                                        <div class="row">
+                                                                            <div class="col-4">
+                                                                                <a href="#nested-comments-{{comment.comment_id}}" data-bs-toggle="collapse" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Replies</a>
+                                                                            </div>
+                                                                            <div class="col-8 d-flex justify-content-end">
+                                                                                {% if comment.has_liked %}
+                                                                                    <button type="button" class="btn btn-success border border-success comment-like-button comment-like-button-{{comment.comment_id}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{comment.comment_id}}" style="height: 25px;">
+                                                                                        <div class="row align-items-center">
+                                                                                            <div class="col mt-1 d-flex justify-content-end">
+                                                                                                <i class="bi bi-hand-thumbs-up-fill" id="comment-like-icon-{{comment.comment_id}}" style="color: #ffffff;"></i>
+                                                                                            </div>
+                                                                                            <div class="col mt-4">
+                                                                                                <p class="text-white" id="comment-like-text-{{comment.comment_id}}">{{comment.comment_likes}}</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </button>
+                                                                                {% else %}
+                                                                                    <button type="button" class="btn border border-success comment-like-button comment-like-button-{{comment.comment_id}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{comment.comment_id}}" style="height: 25px;">
+                                                                                        <div class="row align-items-center">
+                                                                                            <div class="col mt-1 d-flex justify-content-end">
+                                                                                                <i class="bi bi-hand-thumbs-up" id="comment-like-icon-{{comment.comment_id}}" style="color: #198754;"></i>
+                                                                                            </div>
+                                                                                            <div class="col mt-4">
+                                                                                                <p class="text-success" id="comment-like-text-{{comment.comment_id}}">{{comment.comment_liked}}</p>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </button>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <div class="col">
+                                                                                <div class="collapse" id="nested-comments-{{comment.comment_id}}">
+                                                                                    <div class="row">
+                                                                                        <div class="col">
+                                                                                            <!-- For repling -->
                                                                                             <div class="row">
-                                                                                                <div class="col">
-                                                                                                    <!-- For repling -->
-                                                                                                    <div class="row">
-                                                                                                        <div class="col-8">
-                                                                                                            <div class="mb-3">
-                                                                                                                <label for="reply-text-{{commentPk}}" class="form-label">Reply</label>
-                                                                                                                <input type="text" class="form-control" id="reply-text-{{commentPk}}" placeholder="Add reply...">
-                                                                                                            </div>   
-                                                                                                        </div>
-                                                                                                        <div class="col-4">
-                                                                                                            <br>
-                                                                                                            <button type="button" class="btn btn-success mt-2 ms-5 add-reply" data-comment-id="{{commentPk}}">Reply</button>
-                                                                                                        </div>
+                                                                                                <div class="col-8">
+                                                                                                    <div class="mb-3">
+                                                                                                        <label for="reply-text-{{comment.comment_id}}" class="form-label">Reply</label>
+                                                                                                        <input type="text" class="form-control" id="reply-text-{{comment.comment_id}}" placeholder="Add reply...">
+                                                                                                    </div>   
+                                                                                                </div>
+                                                                                                <div class="col-4">
+                                                                                                    <br>
+                                                                                                    <button type="button" class="btn btn-success mt-2 ms-5 add-reply" data-comment-id="{{comment.comment_id}}">Reply</button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <br>
+                                                                                    <div id="replies-container-{{comment.comment_id}}">
+                                                                                        {% for reply in comment.comment_replies %}
+                                                                                            <div class="card p-1">
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        <img class="border border-success" src="{{reply.reply_user_pfp_url}}" alt="{{reply.reply_username|correct_apostrophe}} Profile Picture" style="height:20px; width: 20px; border-radius: 10px;">
+                                                                                                        <em>{{reply.reply_username}}</em>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="row">
+                                                                                                    <div class="col">
+                                                                                                        {{reply.reply_text}}
+                                                                                                    </div>
+                                                                                                    <div class="col d-flex justify-content-end">
+                                                                                                        {% if reply.has_liked %}
+                                                                                                            <button type="button" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{reply.reply_id}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{reply.reply_id}}" style="height: 25px;">
+                                                                                                                <div class="row align-items-center">
+                                                                                                                    <div class="col mt-1 d-flex justify-content-end">
+                                                                                                                        <i class="bi bi-hand-thumbs-up-fill" id="nested-comment-like-icon-{{reply.reply_id}}" style="color: #ffffff;"></i>
+                                                                                                                    </div>
+                                                                                                                    <div class="col mt-4">
+                                                                                                                        <p class="text-white" id="nested-comment-like-text-{{reply.reply_id}}">{{reply.reply_likes}}</p>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </button>
+                                                                                                        {% else %}
+                                                                                                            <button type="button" class="btn border border-success nested-comment-like-button nested-comment-like-button-{{reply.reply_id}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{reply.reply_id}}" style="height: 25px;">
+                                                                                                                <div class="row align-items-center">
+                                                                                                                    <div class="col mt-1 d-flex justify-content-end">
+                                                                                                                        <i class="bi bi-hand-thumbs-up" id="nested-comment-like-icon-{{reply.reply_id}}" style="color: #198754;"></i>
+                                                                                                                    </div>
+                                                                                                                    <div class="col mt-4">
+                                                                                                                        <p class="text-success" id="nested-comment-like-text-{{reply.reply_id}}">{{reply.reply_likes}}</p>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </button>
+                                                                                                        {% endif %}
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
                                                                                             <br>
-                                                                                            <div id="replies-container-{{commentPk}}">
-                                                                                                {% for subCommentPk, subCommentData in post_replies.items %} 
-                                                                                                    {% if subCommentData.comment_id|stringformat:"%s%s" == commentData.id|stringformat:"%s%s" %}
-                                                                                                        <div class="card p-1">
-                                                                                                            <div class="row">
-                                                                                                                <div class="col">
-                                                                                                                    {% for user_key, user_value in post_users.items %}
-                                                                                                                        {% if user_key|stringformat:"%s%s" == subCommentData.user|stringformat:"%s%s" %}
-                                                                                                                            <img class="border border-success" src="{{user_value}}" alt="{{ subCommentData.user }}'s Profile Picture" style="height:20px; width: 20px; border-radius: 10px;">
-                                                                                                                            <em>{{ subCommentData.user }}</em>
-                                                                                                                        {% endif %}
-                                                                                                                    {% endfor %}
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                            <div class="row">
-                                                                                                                <div class="col">
-                                                                                                                    {{subCommentData.text}}
-                                                                                                                </div>
-                                                                                                                <div class="col d-flex justify-content-end">
-                                                                                                                    {% if user_liked_by in subCommentData.liked__by.all %}
-                                                                                                                        <button type="button" class="btn btn-success border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
-                                                                                                                            <div class="row align-items-center">
-                                                                                                                                <div class="col mt-1 d-flex justify-content-end">
-                                                                                                                                    <i class="bi bi-hand-thumbs-up-fill" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #ffffff;"></i>
-                                                                                                                                </div>
-                                                                                                                                <div class="col mt-4">
-                                                                                                                                    <p class="text-white" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                        </button>
-                                                                                                                    {% else %}
-                                                                                                                        <button type="button" class="btn border border-success nested-comment-like-button nested-comment-like-button-{{subCommentPk}} d-flex align-items-center pb-3 pt-2" data-comment-id="{{subCommentPk}}" style="height: 25px;">
-                                                                                                                            <div class="row align-items-center">
-                                                                                                                                <div class="col mt-1 d-flex justify-content-end">
-                                                                                                                                    <i class="bi bi-hand-thumbs-up" id="nested-comment-like-icon-{{subCommentPk}}" style="color: #198754;"></i>
-                                                                                                                                </div>
-                                                                                                                                <div class="col mt-4">
-                                                                                                                                    <p class="text-success" id="nested-comment-like-text-{{subCommentPk}}">{{subCommentData.likes}}</p>
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                        </button>
-                                                                                                                    {% endif %}
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                        <br>
-                                                                                                    {% endif %}
-                                                                                                {% endfor %}
-                                                                                            </div>
-                                                                                        </div>
+                                                                                        {% endfor %}
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>   
+                                                                        </div>
                                                                     </div>
-                                                                {% endif %} 
-                                                            {% endfor %}
-                                                        </div>
+                                                                </div>   
+                                                            </div>
+                                                        {% endfor %}
                                                     </div>
                                                 </div>
-                                            </div> 
-                                        </div>
+                                            </div>
+                                        </div> 
                                     </div>
+                                </div>
                             {% endfor %}
                         </div>
                         {% if type.popular %} 

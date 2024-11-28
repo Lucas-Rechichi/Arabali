@@ -8,13 +8,10 @@ $(document).ready(function () {
     
         // Defining variables
         var clickedButton = $('.like-button-' + postId); 
-        var isLiked
         var modalLikeCounter
         var pageLikeCounter
         var modalLikeIcon
         var pageLikeIcon
-        console.log('defined');
-        console.log(isLiked)
 
         // AJAX request
         $.ajax({
@@ -89,10 +86,7 @@ $(document).ready(function () {
             }
         });
     });
-    $(document).on('submit', '#post-form', function(e) {
-        e.preventDefault(); // Prevents reloading of the website
-        console.log('prevented');
-    });
+
     $('.comments-container').on('click', '.comment-like-button', function() { // When the button is pressed
         console.log('clicked');
         var commentId = $(this).data('comment-id');

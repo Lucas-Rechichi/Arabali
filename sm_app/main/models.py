@@ -138,7 +138,7 @@ class NestedComment(models.Model):
 
 # Algorithum
 class Interest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interest')
     name = models.CharField(max_length=100, null=False)
     value = models.IntegerField()
 
@@ -147,7 +147,7 @@ class Interest(models.Model):
     
 
 class PostTag(models.Model):
-    post = models.OneToOneField(Post, on_delete=models.CASCADE, null=False)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, null=False, related_name='post_tag')
     name = models.CharField(max_length=100, null=False)
     value = models.IntegerField()
 
@@ -164,10 +164,8 @@ class Catergory(models.Model):
 
 # Interest Consequence Function, holds onto parameters for the function.
 class ICF(models.Model):
-    interest = models.OneToOneField(Interest, on_delete=models.CASCADE, null=False)
-    form = models.CharField(max_length=100, null=False)
-    a = models.FloatField(null=True)
-    k = models.FloatField(null=True)
+    interest = models.OneToOneField(Interest, on_delete=models.CASCADE, null=False, related_name='ICF')
+    factor = models.FloatField()
 
     def __str__(self):
         return f'Function for {self.interest.name} for user {self.interest.user.username}'
@@ -175,28 +173,27 @@ class ICF(models.Model):
 
 # Post Consequence Function, holds onto parameters for the function.
 class PCF(models.Model):
-    tag = models.OneToOneField(PostTag, on_delete=models.CASCADE, null=False)
-    form = models.CharField(max_length=100, null=False)
-    a = models.FloatField()
-    k = models.FloatField()
+    tag = models.OneToOneField(PostTag, on_delete=models.CASCADE, null=False, related_name='PCF')
+    factor = models.FloatField()
+    is_active = models.BooleanField()
 
     def __str__(self):
         return f'Function for {self.tag.name} for post {self.tag.post.title}'
     
 # Interaction Tracking
 class InterestInteraction(models.Model):
-    interest = models.ForeignKey(Interest, on_delete=models.CASCADE)
+    interest = models.ForeignKey(Interest, on_delete=models.CASCADE, related_name='interest_interactions')
     value = models.IntegerField()
-    type = models.CharField(max_length=20, null=False) 
+    is_new = models.BooleanField() 
 
     def __str__(self):
         return f'interaction from {self.interest.user} on interest {self.interest}'
 
 
 class PostInteraction(models.Model):
-    tag = models.ForeignKey(PostTag, on_delete=models.CASCADE)
+    tag = models.ForeignKey(PostTag, on_delete=models.CASCADE, related_name='post_interactions')
     value = models.IntegerField()
-    type = models.CharField(max_length=20, null=False) 
+    is_new = models.BooleanField() 
     
     def __str__(self):
         return f'interaction on {self.tag} for tag  {self.tag.name}'
