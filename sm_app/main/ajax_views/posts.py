@@ -13,28 +13,33 @@ from main.algorithum import Algorithum
 
 def liked(request):
     if request.method == 'POST':
+        # Getting relevant data
         isLiked = False
         user = request.user.username
         post_id = request.POST.get('post_id')
+
+        # Retrival from database
         try:
             post = Post.objects.get(id=post_id)
             tag = PostTag.objects.get(post=post)
-
-            # Checking if the user has this interest already.
-            if Interest.objects.filter(user=request.user, name=tag.name).exists():
-                interest = Interest.objects.get(user=request.user, name=tag.name)
-            else:
-                # making the new interest, it's function, and the initial interaction.
-                new_interest = Interest(user=request.user, name=tag.name, value=0)
-                new_interest.save()
-                new_interest_function = ICF(a=1, k=1, interest=new_interest, form='Parabolic Truncus')
-                new_interest_function.save()
-                new_interest.save()
-                interest = new_interest
-
         except ObjectDoesNotExist:
             return JsonResponse({'error': 'Post not found'}, status=404)
-        if post.liked_by.filter(name=user).exists(): # If the user has liked the post already
+
+        # Getting or creating the user interest
+        if Interest.objects.filter(user=request.user, name=tag.name).exists():
+            interest = Interest.objects.get(user=request.user, name=tag.name)
+        else:
+            # Making the new interest and it's function
+            new_interest = Interest(user=request.user, name=tag.name, value=0)
+            new_interest.save()
+
+            new_interest_function = ICF(factor=1)
+            new_interest_function.save()
+            new_interest.save()
+            interest = new_interest
+
+        # Liking the post
+        if post.liked_by.filter(name=user).exists(): # if the user has liked the post already
             liked_by = LikedBy.objects.get(name=user)
             post.likes -= 1
 
@@ -44,6 +49,7 @@ def liked(request):
             else:
                 tag.value -= 3
             tag.save()
+
             if interest.value - 3 <= 0:
                 interest.value = 0
             else:
@@ -51,8 +57,8 @@ def liked(request):
             interest.save()
 
             # Keeping a record of the interactions
-            post_interaction = PostInteraction(tag=tag, value=-3, type='current')
-            interest_interaction = InterestInteraction(interest=interest, value=-3, type='current')
+            post_interaction = PostInteraction(tag=tag, value=-3, is_new=True)
+            interest_interaction = InterestInteraction(interest=interest, value=-3,  is_new=True)
             post_interaction.save()
             interest_interaction.save()
 
@@ -61,14 +67,16 @@ def liked(request):
         else:
             liked_by = LikedBy.objects.get(name=user)
             post.likes += 1
+
+            # Value change
             tag.value += 3
             tag.save()
             interest.value += 3
             interest.save()
 
             # Keeping a record of the interactions
-            post_interaction = PostInteraction(tag=tag, value=3, type='current')
-            interest_interaction = InterestInteraction(interest=interest, value=3, type='current')
+            post_interaction = PostInteraction(tag=tag, value=3, is_new=True)
+            interest_interaction = InterestInteraction(interest=interest, value=3, is_new=True)
             post_interaction.save()
             interest_interaction.save()
 
@@ -80,16 +88,17 @@ def liked(request):
         tag.save()
         interest.save()
 
-        # Alter the algorithum baced on this interaction
-        Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
-        Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
+        response = {
+            'likes': post.likes, 
+            'isLiked': isLiked
+        }
 
-        return JsonResponse({'likes': post.likes, 'isLiked': isLiked})
+        return JsonResponse(response)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def comment_liked(request):
     if request.method == 'POST':
-        print(request.POST)
+
         # Getting relevent data
         username = request.user.username
         comment_id = request.POST.get('comment_id')
@@ -107,6 +116,19 @@ def comment_liked(request):
             tag = PostTag.objects.get(post=comment.comment.post)
             type = 'reply'
 
+        # Getting or creating the user interest
+        if Interest.objects.filter(user=request.user, name=tag.name).exists():
+            interest = Interest.objects.get(user=request.user, name=tag.name)
+        else:
+            # Making the new interest and it's function
+            new_interest = Interest(user=request.user, name=tag.name, value=0)
+            new_interest.save()
+
+            new_interest_function = ICF(factor=1)
+            new_interest_function.save()
+            new_interest.save()
+            interest = new_interest
+
         # Like and dislike logic
         if comment.liked_by.filter(name=username).exists():
             liked_by = LikedBy.objects.get(name=username)
@@ -121,7 +143,8 @@ def comment_liked(request):
                 else:
                     tag.value -= 2
                 tag.save()
-                interest = Interest.objects.get(user=request.user, name=tag.name)
+
+                
                 if interest.value - 2 <= 0:
                     interest.value = 0
                 else:
@@ -129,22 +152,21 @@ def comment_liked(request):
                 interest.save()
 
                 # Keeping a record of the interactions
-                post_interaction = PostInteraction(tag=tag, value=-2, type='current')
+                post_interaction = PostInteraction(tag=tag, value=-2, is_new=True)
                 post_interaction.save()
-                interest_interaction = InterestInteraction(interest=interest, value=-2, type='current')
+                interest_interaction = InterestInteraction(interest=interest, value=-2, is_new=True)
                 interest_interaction.save()
 
             # Logic for replies
             if type == 'reply':
 
                 # Value change
-                if tag.value - 1 <= 0: # First comment is the reply, second refers to it's corisponding comment
+                if tag.value - 1 <= 0:
                     tag.value = 0
                 else:
                     tag.value -= 1
                 tag.save()
 
-                interest = Interest.objects.get(user=request.user, name=tag.name)
                 if interest.value - 1 <= 0:
                     interest.value = 0
                 else:
@@ -152,9 +174,9 @@ def comment_liked(request):
                 interest.save()
 
                 # Keeping a record of the interactions
-                post_interaction = PostInteraction(tag=tag, value=-1, type='current')
+                post_interaction = PostInteraction(tag=tag, value=-1, is_new=True)
                 post_interaction.save()
-                interest_interaction = InterestInteraction(interest=interest, value=-1, type='current')
+                interest_interaction = InterestInteraction(interest=interest, value=-1, is_new=True)
                 interest_interaction.save()
             
             comment.liked_by.remove(liked_by)
@@ -175,9 +197,9 @@ def comment_liked(request):
                 interest.save()
 
                 # Keeping a record of the interactions
-                post_interaction = PostInteraction(tag=tag, value=2, type='current')
+                post_interaction = PostInteraction(tag=tag, value=2, is_new=True)
                 post_interaction.save()
-                interest_interaction = InterestInteraction(interest=interest, value=2, type='current')
+                interest_interaction = InterestInteraction(interest=interest, value=2, is_new=True)
                 interest_interaction.save()
 
             if type == 'reply':
@@ -191,41 +213,53 @@ def comment_liked(request):
                 interest.save()
 
                 # Keeping a record of the interactions
-                post_interaction = PostInteraction(tag=tag, value=1, type='current')
+                post_interaction = PostInteraction(tag=tag, value=1, is_new=True)
                 post_interaction.save()
-                interest_interaction = InterestInteraction(interest=interest, value=1, type='current')
+                interest_interaction = InterestInteraction(interest=interest, value=1, is_new=True)
                 interest_interaction.save()
 
+            # Adding the liked_by object to the comment or reply
             comment.liked_by.add(liked_by)
             isLiked = True
             comment.save()
 
-        # Altering of the algorithum
-        Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
-        Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
+        
+        response = {
+            'likes': comment.likes, 
+            'isLiked': isLiked
+        }
 
-        return JsonResponse({'likes': comment.likes, 'isLiked': isLiked})
+        return JsonResponse(response)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def new_comment(request):
     if UserStats.objects.get(user=request.user).can_comment:
         if request.method == 'POST':
-            # If the user has actually added text into their comment
+
+            # If the user has added text into their comment
             if request.POST.get('text'):
+
+                # Getting relevant data
                 post_id = request.POST.get('post_id')
-                post = Post.objects.get(id=post_id)
                 text = request.POST.get('text')
+
+                # Retrieving database objects
+                post = Post.objects.get(id=post_id)
                 user_stats = UserStats.objects.get(user=request.user)
                 tag = PostTag.objects.get(post=post)
 
-                # If the user has this interest already
+                # Getting or creating the user interest
                 if Interest.objects.filter(user=request.user, name=tag.name).exists():
                     interest = Interest.objects.get(user=request.user, name=tag.name)
                 else:
+                    # Making the new interest and it's function
                     new_interest = Interest(user=request.user, name=tag.name, value=0)
                     new_interest.save()
-                    interest = new_interest
 
+                    new_interest_function = ICF(factor=1)
+                    new_interest_function.save()
+                    new_interest.save()
+                    interest = new_interest
 
                 # Making the comment
                 comment = Comment(post=post, text=text, likes=0, user=request.user, created_at = datetime.now())
@@ -238,14 +272,10 @@ def new_comment(request):
                 interest.save()
 
                 # Keeping a record of the interactions
-                post_interaction = PostInteraction(tag=tag, value=5, type='current')
+                post_interaction = PostInteraction(tag=tag, value=5, is_new=True)
                 post_interaction.save()
-                interest_interaction = InterestInteraction(interest=interest, value=5, type='current')
+                interest_interaction = InterestInteraction(interest=interest, value=5, is_new=True)
                 interest_interaction.save()
-                
-                # Altering of the algorithum
-                Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
-                Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
 
                 # Sending the comments data over to the HTML document so that it can be displayed inside of the post
                 response = {
@@ -271,11 +301,16 @@ def new_reply(request):
         if request.method == 'POST':
             tag = PostTag.objects.get(post=Comment.objects.get(id=request.POST.get('comment_id')).post)
 
-            # If the user has this interest already
+            # Getting or creating the user interest
             if Interest.objects.filter(user=request.user, name=tag.name).exists():
                 interest = Interest.objects.get(user=request.user, name=tag.name)
             else:
+                # Making the new interest and it's function
                 new_interest = Interest(user=request.user, name=tag.name, value=0)
+                new_interest.save()
+
+                new_interest_function = ICF(factor=1)
+                new_interest_function.save()
                 new_interest.save()
                 interest = new_interest
 
@@ -288,24 +323,23 @@ def new_reply(request):
                 # Making the comment
                 comment = Comment.objects.get(id=comment_id)
                 reply = NestedComment(user=user, comment=comment, likes=0, created_at=datetime.now(), text=request.POST.get('text'))
-                tag.value += 4
-                interest.value += 1
-                tag.save()
-                interest.save()
                 reply.save()
 
-                # Keeping a record of the interactions
-                post_interaction = PostInteraction(tag=tag, value=4, type='current')
-                post_interaction.save()
-                interest_interaction = InterestInteraction(interest=interest, value=1, type='current')
-                interest_interaction.save()
+                # Value Change
+                tag.value += 1
+                interest.value += 4
+                tag.save()
+                interest.save()
                 
-                # Altering of the algorithum
-                Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
-                Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
+
+                # Keeping a record of the interactions
+                post_interaction = PostInteraction(tag=tag, value=1, is_new=True)
+                post_interaction.save()
+                interest_interaction = InterestInteraction(interest=interest, value=4, is_new=True)
+                interest_interaction.save()
 
                 # Sending the comments data over to the HTML document so that it can be displayed inside of the comment
-                responce = {
+                response = {
                     'reply_id':reply.pk,
                     'user':reply.user.username,
                     'comment_id':reply.comment.pk,
@@ -314,7 +348,7 @@ def new_reply(request):
                     'text':reply.text,
                     'likes':reply.likes
                 }
-                return JsonResponse(responce)
+                return JsonResponse(response)
             else:
                 return JsonResponse({'error': 'Invalid request method'}, status=405)
         else:
@@ -322,41 +356,63 @@ def new_reply(request):
 
 # If the user scrolls by a post.     
 def scrolled_by(request):
+    # Getting relevant data
     user = request.user
     post_id = request.POST.get('post_id')
-    print(post_id)
+
+    # Retriving database objects
     post = Post.objects.get(id=post_id)
     tag = PostTag.objects.get(post=post)
-    if Interest.objects.filter(user=user, name=tag.name):
-        interest = Interest.objects.get(user=user, name=tag.name)
+
+    # Getting or creating the user interest
+    if Interest.objects.filter(user=request.user, name=tag.name).exists():
+        interest = Interest.objects.get(user=request.user, name=tag.name)
     else:
-        new_interest = Interest(user=user, name=tag.name, value=0)
+        # Making the new interest and it's function
+        new_interest = Interest(user=request.user, name=tag.name, value=0)
         new_interest.save()
-        new_interest_interaction = ICF(interest=new_interest, form='Parabolic Truncus', a=0, k=0.1)
-        new_interest_interaction.save()
+
+        new_interest_function = ICF(factor=1)
+        new_interest_function.save()
+        new_interest.save()
         interest = new_interest
+
+    # Value Change
     tag.value += 1
     interest.value += 1
     tag.save()
     interest.save()
-    interest_interaction = InterestInteraction(interest=interest, value=1, type='current')
-    post_interaction = PostInteraction(tag=tag, value=1, type='current')
+
+    # Keeping a record of the interactions
+    interest_interaction = InterestInteraction(interest=interest, value=1, is_new=True)
+    post_interaction = PostInteraction(tag=tag, value=1, is_new=True)
     interest_interaction.save()
     post_interaction.save()
-    Algorithum.AutoAlterations.predictions(interest=interest, tag=None)
-    Algorithum.AutoAlterations.predictions(tag=tag, interest=None)
-    return JsonResponse({'post_id': post_id})
+
+    response = {
+        'post_id': post_id
+    }
+    return JsonResponse(response)
 
 # For the location permissions in catch up posts 
 def save_location(request):
+
+    # Getting and retriving data and database objects respectfully
     user_stats = UserStats.objects.get(user=request.user)
+
+    # Location access logic
     if request.POST.get('accessing-location') == 'true':
-        user_stats = UserStats.objects.get(user=request.user)
+
+        # Getting latitude and longitude
         latitude = request.POST.get('latitude')
         longitude = request.POST.get('longitude')
+
+        # Saving the latitude and longitude to the userstats 
         user_stats.last_recorded_latitude = latitude
         user_stats.last_recorded_longitude = longitude
-        if request.POST.get('auto-request') == 'false': # so that auto acessing of location dosent reset the 2 hour delay on acessing modals
+
+        # For the location permission modals
+        if request.POST.get('auto-request') == 'false': # so that auto accessing of location dosent reset the 2 hour delay on accessing modals
             user_stats.last_recorded_location = datetime.now()
         user_stats.save()
     else:
@@ -365,12 +421,16 @@ def save_location(request):
     return JsonResponse({'username': user_stats.user.username})
 
 def load_posts(request):
+
+    # Getting relevant data
     increment = request.POST.get('increment')
     catergory = request.POST.get('catergory')
     user = request.user
 
+    # Incrementing the increment
     new_increment = int(increment) + 1
 
+    # Getting the posts to append to the page
     posts_to_append = Algorithum.Core.auto_post_loading(incrementing_factor=new_increment, catergory=catergory, user=user)
     posts = {}
 

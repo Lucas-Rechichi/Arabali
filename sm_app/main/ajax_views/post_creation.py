@@ -29,12 +29,10 @@ def add_post(request):
     # Determining the catergory for this post using AI
     post_catergory = Algorithum.PostCreations.predict_catergory_request(post_obj=new_post)
 
-    # Creating the post tag
-    tags = PostTag.objects.all()
-    tag_values = []
-    for tag in tags:
-        tag_values.append(tag.value)
+    # getting the average post value.
+    tag_values = list(PostTag.objects.all().values_list('value', flat=True))
 
+    # Creating the post tag
     ave_tag_value = Algorithum.Core.average(num_list=tag_values, is_abs=True)
     post_tag = PostTag(post=new_post, name=post_catergory, value=ave_tag_value)
     post_tag.save()
@@ -43,6 +41,8 @@ def add_post(request):
     if not Catergory.objects.filter(name=post_catergory).exists():
         new_catergory = Catergory(name=post_catergory)
         new_catergory.save()
+
+    
 
     response = {}
 

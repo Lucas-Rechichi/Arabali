@@ -4,7 +4,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 from main.prompts import Prompts
-from main.models import Catergory, PostTag
+from main.models import Catergory, PostTag, Interest
 class Algorithum:
 
     class Core:
@@ -36,7 +36,7 @@ class Algorithum:
 
     class PostCreations:
         def predict_catergory_request(post_obj):
-            
+
             # Setup of the LLM used to detrmine the catergory of the post
             load_dotenv()
             google_gemini_api_key = os.getenv('GOOGLE_GEMINI_API_KEY')
@@ -55,10 +55,11 @@ class Algorithum:
             response = model.generate_content([media_file, Prompts.dermine_catergory_prompt(title=title, contents=contents, catergories_list=current_catergories)])
 
             return response.text
-        
+
 
     class Depreciations:
         def calculate_post_consequence_function(post_tag_obj):
+
             # Getting tag value
             current_tag_value = post_tag_obj.value
 
@@ -84,7 +85,7 @@ class Algorithum:
 
             # Getting the average of the post_tags
             post_tag_values_list = list(PostTag.objects.all().values_list('value', flat=True))
-            average_post_tag_value = Algorithum.Core.average(num_list=post_tag_values_list, is_abs=False) # ABS dosen't mattter here due to all tags always being positive
+            average_post_tag_value = Algorithum.Core.average(num_list=post_tag_values_list, is_abs=False) # ABS dosen't mattter here due to all tag values always being positive
 
             # Getting the sum of the difference_list
             sum_of_difference = 0.0
@@ -102,23 +103,80 @@ class Algorithum:
 
                 # Updating tag value and function factor
                 if function_result == 0:
-                    new_tag_value = current_tag_value - average_post_tag_value
+                    new_post_tag_value = current_tag_value - average_post_tag_value
 
                 else:
-                    new_tag_value = current_tag_value + (average_post_tag_value * function_result)
+                    new_post_tag_value = current_tag_value + (average_post_tag_value * function_result)
                 
-                new_function_factor = (current_tag_value/new_tag_value)
+                new_function_factor = (current_tag_value/new_post_tag_value)
 
                 # Recording updates to the database
-                post_tag_obj.value = new_tag_value
+                post_tag_obj.value = new_post_tag_value
                 post_tag_obj.save()
 
                 function_obj.factor = new_function_factor
                 function_obj.save()
 
+        def calculate_interest_consequence_function(interest_obj):
 
+            # Getting interest value
+            current_interest_value = interest_obj.value
 
+            # Getting the old and new interactions, And putting them in a list
+            old_interactions_list = list(interest_obj.interest_interactions.filter(is_new=False).values_list('value', flat=True))
+            current_interactions_list = list(interest_obj.interest_interactions.filter(is_new=True).values_list('value', flat=True))
+
+            # Making the lists the same length
+            if len(old_interactions_list) > len(current_interactions_list):
+                for _ in range(0, len(old_interactions_list)):
+                    current_interactions_list.append(0)
+
+            if len(old_interactions_list) < len(current_interactions_list):
+                for _ in range(0, len(current_interactions_list)):
+                    old_interactions_list.append(0)
+
+            # Computing the difference list
+            difference_list = []
+            interaction_count = len(old_interactions_list) # current_interactions_list can be used here also
+            for index in range(0, interaction_count):
+                difference = Algorithum.Core.difference(num_final=current_interactions_list[index], num_initial=old_interactions_list[index], is_abs=False)
+                difference_list.append(difference)
+
+            # Getting the average of the interests
+            interest_values_list = list(Interest.objects.all().values_list('value', flat=True))
+            average_interest_value = Algorithum.Core.average(num_list=interest_values_list, is_abs=False) # ABS dosen't mattter here due to all interest values always being positive
+
+            # Getting the sum of the difference_list
+            sum_of_difference = 0.0
+            for index in range(0, len(difference_list)):
+                sum_of_difference += difference_list[index]
+
+            # Getting the function parameters
+            function_obj = interest_obj.ICF
+            current_factor = function_obj.factor
+                
+            # Computing the function
+            function_result = (current_factor) * ( (sum_of_difference) ** (1/3) )
+
+            # Updating tag value and function factor
+            if function_result == 0:
+                new_interest_value = current_interest_value - average_interest_value
+
+            else:
+                new_interest_value = current_interest_value + (average_interest_value * function_result)
             
+            new_function_factor = (current_interest_value/new_interest_value)
+
+            # Recording updates to the database
+            interest_obj.value = new_interest_value
+            interest_obj.save()
+
+            function_obj.factor = new_function_factor
+            function_obj.save()
+
+    class Maintenence:
+        def delete_interest():
+            pass
 
             
 

@@ -447,7 +447,7 @@ class Algorithum:
                         tags = PostTag.objects.filter(name=interest.name).annotate(Count('value')).order_by('-value')
                         for tag_id, tag in enumerate(tags):
                             if tag_id == i:
-                                post = Post.objects.get(posttag=tag)
+                                post = Post.objects.get(post_tag=tag)
                                 order.append(post)
                     i += 1
 
@@ -455,7 +455,7 @@ class Algorithum:
                 interest = Interest.objects.get(name=sub_catagory.removeprefix('|'), user=user)
                 tags = PostTag.objects.filter(name=interest.name)
                 for tag in tags:
-                    post = Post.objects.get(posttag=tag)
+                    post = Post.objects.get(post_tag=tag)
                     order.append(post)
             return order
         

@@ -37,8 +37,6 @@ def page(request, catagory):
     if not DateAndOrTimeSave.objects.filter(abstract='Interaction Check').exists():
         interaction_stamp = DateAndOrTimeSave(abstract='Interaction Check', day=date.today())
         interaction_stamp.save()
-    
-    Algorithum.AutoAlterations.interaction_check()
 
     # Getting Relelvent Profile Pictures
     post_users = {}

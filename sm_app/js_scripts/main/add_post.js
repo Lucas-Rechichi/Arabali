@@ -89,8 +89,50 @@ $(document).ready(function () {
             if (mediaFiles.type.startsWith('image/')) {
                 // preview the media
                 var mediaURL = URL.createObjectURL(mediaFiles);
-                var mediaPreviewHtml = `
-                    <img src="${mediaURL}" alt="Preview of selected media" style="height: 248px; width: 100%; border-radius: 20px;">
+                
+                carouselSlidesHtml = ``;
+                carouselIndicatorsHtml = ``;
+
+                // for the carousel preview (unfinished)
+                var mediaPreviewHtml = ` 
+                    <div id="post-{{post.post_id}}-media-carousal" class="carousel slide">
+                        <div class="carousel-indicators">
+                            {% for media_obj in post.post_media %}
+                                {% if forloop.counter0 == 0 %}
+                                    <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                {% else %}
+                                    <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="carousel-inner">
+                            {% for media_obj in post.post_media %}
+                                {% if forloop.counter == 1 %}
+                                    <div class="carousel-item active">
+                                        <img src="{{media_obj.media_url}}" class="d-block w-100"  alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}" aria-current="true">
+                                        <div class="carousel-caption d-block d-md-block">
+                                            <p>{{media_obj.caption}}</p>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="carousel-item">
+                                        <img src="{{media_obj.media_url}}" class="d-block w-100" alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}">
+                                        <div class="carousel-caption d-block d-md-block">
+                                            <p>{{media_obj.caption}}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
                 `;
                 $('#post-media-preview-container').html(mediaPreviewHtml)
 
