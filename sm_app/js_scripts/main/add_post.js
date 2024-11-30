@@ -1,3 +1,5 @@
+import { previewMediaFiles, addMediaToList } from "./functions";
+
 $(document).ready(function () {
 
     // Getting csrf token from the HTML document
@@ -84,21 +86,29 @@ $(document).ready(function () {
     });
 
     $('#post-media-card').on('drop', function (event) {
-        event.preventDefault();
-        mediaFiles = event.originalEvent.dataTransfer.files; // remove the '[0]' to have all media files in a list.
+        event.preventDefault(); // prevents the opening of another tab to view the image.
+
+        // Getting media files from drop input
+        mediaFiles = event.originalEvent.dataTransfer.files;
+
+        // Processing files
         if (mediaFiles) {
+            // Gets all media from the input, and stores it in a list
+            var mediaToListResponse = addMediaToList(mediaFiles, mediaList)
 
-            // Loop though the length of the media files (maximum of 6)
-            if (mediaFiles.length > 6) {
+            // Visual indicatiors for when the media input limit is reached
+            if (mediaToListResponse['limitReached']) {
                 $('#post-media-limit-message').css('display', 'block');
-                return null
             }
-            // Add functions created in functions.js
-            
-            $('#post-media-preview-container').html(carouselPreviewHtml)
-            $('#post-carousel-control-card').html(controlPannelHtml)
 
-            // change the state of the field if validation has occured
+            // Creates the preview for the carousel control pannel, the carousel preview in the post, and the caption form.
+            var carouselPreviewResponse = previewMediaFiles(mediaList)
+
+            // Appending the HTML to the document
+            $('#post-media-preview-container').html(carouselPreviewResponse['carousel'])
+            $('#post-carousel-control-card').html(carouselPreviewResponse['controlPannel'])
+
+            // Change the state of the field if validation has occured
             if ( ( $('#post-media-card').hasClass('is-invalid') || $('#post-media-invalid').css('display') === 'block' ) && ( $('#create-post').hasClass('validated') ) ) {
                 $('#post-media-card').removeClass('invalid-media').addClass('valid-media');
                 $('#post-media-invalid').css('display', 'none');
@@ -107,6 +117,7 @@ $(document).ready(function () {
             // Visual indicators for the dropover box
             $(this).removeClass('drag-over-state');
             $(this).addClass('valid-media');
+
         }
     })
 
@@ -160,7 +171,7 @@ $(document).ready(function () {
             // getting relevant data
             var titleInput = $('#post-title').val();
             var contentsInput = $('#post-contents').val();
-            var mediaInput = mediaFiles
+            var mediaInput = mediaList
 
             creatingPostModal.show()
 

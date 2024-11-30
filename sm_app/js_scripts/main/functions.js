@@ -4,12 +4,13 @@ export function previewMediaFiles(mediaFilesList) {
     var mediaURL;
 
     // preview
-    var carousalPreviewHtml = ``;
     var carouselSlidesHtml = ``;
     var carouselIndicatorsHtml = ``;
+    var carouselCaptionformHtml = ``;
 
     var carouselSlideHtml;
     var carouselIndicatiorHtml;
+    var carouselCaptionInputHtml;
 
     // carousel control
     var carouselPannelsHtml = ``;
@@ -140,7 +141,7 @@ export function previewMediaFiles(mediaFilesList) {
         </div>
     `;
 
-    previewHtml = {
+    var previewHtml = {
         'carousel': carouselPreviewHtml,
         'controlPannel': controlPannelHtml,
     }
@@ -149,11 +150,31 @@ export function previewMediaFiles(mediaFilesList) {
 }
 
 
-export function addMediaToList(mediaFiles) {
-    var mediaList;
+export function addMediaToList(mediaFiles, currentMediaList) {
 
-    for (let i=0; i < mediaFiles.length; i++) {
-        mediaList.push(mediaFiles[i]);
+    var mediaList;
+    var limitReached = false;
+    // File count cannot be greater than 6, extract the files that can be accepted.
+    if (mediaFiles.length > 6) {
+        // Get the maximum amount of files that can be accepted
+        var acceptableFilesLength = 6 - currentMediaList.length;
+
+        for (let i=0; i < acceptableFilesLength; i++) {
+            currentMediaList.push(mediaFiles[i])
+            limitReached = true
+        }
+
+    } else {
+        for (let i=0; i < mediaFiles.length; i++) {
+            currentMediaList.push(mediaFiles[i])
+            limitReached = false
+        }
     }
 
+    var response = {
+        'updatedMediaList': currentMediaList,
+        'limitReached': limitReached
+    }
+
+    return response
 }
