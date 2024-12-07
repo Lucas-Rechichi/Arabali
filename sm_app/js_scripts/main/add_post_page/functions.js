@@ -6,7 +6,7 @@ export function previewMediaFiles(mediaFilesList) {
     // preview
     var carouselSlidesHtml = ``;
     var carouselIndicatorsHtml = ``;
-    var carouselCaptionformHtml = ``;
+    var carouselCaptionFormHtml = ``;
 
     var carouselSlideHtml;
     var carouselIndicatiorHtml;
@@ -58,56 +58,56 @@ export function previewMediaFiles(mediaFilesList) {
             // Creating the carousel cotrol elements
             if (i == 0) {
                 carouselPannelHtml = `
-                    <div class="row">
-                        <div class="col-2">
-                            <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                            <p class="lead text-center">${i}</p>
-                            <div class="row">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark" disabled><i class="bi bi-arrow-left-short"></i></button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-right-short"></i></button>
-                                </div>
+                    <div class="col-2">
+                        <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
+                        <p class="lead text-center">${i}</p>
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark" disabled><i class="bi bi-arrow-left-short"></i></button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-right-short"></i></button>
                             </div>
                         </div>
                     </div>
                 `;
             } else if (i == 5) {
                 carouselPannelHtml = `
-                    <div class="row">
-                        <div class="col-2">
-                            <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                            <p class="lead text-center">${i}</p>
-                            <div class="row">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-left-short"></i></button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark" disabled><i class="bi bi-arrow-right-short"></i></button>
-                                </div>
+                    <div class="col-2">
+                        <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
+                        <p class="lead text-center">${i}</p>
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-left-short"></i></button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark" disabled><i class="bi bi-arrow-right-short"></i></button>
                             </div>
                         </div>
                     </div>
                 `;
             } else {
                 carouselPannelHtml = `
-                    
-                        <div class="col-2">
-                            <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                            <p class="lead text-center">${i}</p>
-                            <div class="row">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-left-short"></i></button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-right-short"></i></button>
-                                </div>
+                    <div class="col-2">
+                        <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
+                        <p class="lead text-center">${i}</p>
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-left-short"></i></button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-right-short"></i></button>
                             </div>
                         </div>
-                    
+                    </div>
                 `;
             }
+
+            // Create the carousel captions forms
+            carouselCaptionInputHtml = `
+                
+            `;
+
 
             // Append data to the plural variable
             carouselIndicatorsHtml += carouselIndicatiorHtml;

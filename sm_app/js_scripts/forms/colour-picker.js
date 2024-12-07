@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+$(document).ready(function () {
     // Setup variables
     const toHSL = culori.converter('hsl');
 

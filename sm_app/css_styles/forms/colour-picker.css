@@ -7,7 +7,7 @@
 }
 
 /* Colour picker button */
-.color-picker-button-wrapper {
+.colour-picker-button-wrapper {
     width: 36px;
     height: 36px;
     border-radius: 18px;
@@ -29,13 +29,12 @@
     cursor: pointer;
 }
 .colour-picker-button {
-    margin-top: 3px;
-    margin-left: 3px;
     height: 30px;
     width: 30px;
     border: 3px solid transparent;
     border-radius: 15px;
-    background-color: black
+    background-color: black;
+    cursor: pointer;
 }
 
 /* Colour Picker */
