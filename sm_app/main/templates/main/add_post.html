@@ -21,15 +21,22 @@
     {{search_bar| crispy}}
 {% endblock %}
 
-<!-- For unique scripts -->
-{% block scripts %}
-    <script type="text/javascript" src="{% static 'main/add_post.js'%}"></script>
+<!-- For page specific CDN's -->
+{% block cdns %}
+    <script src="https://unpkg.com/culori"></script>
 {% endblock %}
 
-<!-- For unique css styles -->
+<!-- For page specific scripts -->
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'main/add_post_page/add_post.js'%}"></script>
+    <script type="text/javascript" src="{% static 'main/add_post_page/functions.js'%}"></script>
+{% endblock %}
+
+<!-- For page specific css styles -->
 {% block styles %}
     <link rel="stylesheet" href="{% static 'forms/drag_and_drop.css' %}">
     <link rel="stylesheet" href="{% static 'forms/validation.css' %}">
+    <link rel="stylesheet" href="{% static 'forms/colour-picker.css'%}">
 {% endblock %}
 
 
@@ -265,4 +272,40 @@
         </div>
     </div>
 </div>
+<!-- For the colour picker -->
+<ul id="colour-picker-1" class="colour-picker dropdown-menu p-2" style="max-width: 460px">
+    <div class="colour-picker-preview" id="colour-preview"></div>
+
+    <label for="hue-slider" class="form-label mb-0">Hue:</label>
+    <input type="range" id="hue-slider" min="0" max="360" value="0">
+
+    <label for="saturation-slider" class="form-label mb-0">Saturation:</label>
+    <input type="range" id="saturation-slider" min="0" max="100" value="100">
+
+    <label for="lightness-slider" class="form-label mb-0">Lightness:</label>
+    <input type="range" id="lightness-slider" min="0" max="100" value="50">
+
+    <label for="opacity-slider" class="form-label mb-0">Opacity:</label>
+    <input type="range" id="opacity-slider" min="0" max="100" value="100">
+
+    <div class="row">
+        <div class="col">
+            <label for="hex-input" class="form-label">Hex:</label>
+            <input type="text" id="hex-input" class="form-control" placeholder="#ffffff" value="#ff0000">
+        </div>
+        <div class="col">
+            <label for="rgba-input" class="form-label">RGB/RGBA:</label>
+            <input type="text" id="rgba-input" class="form-control" placeholder="rgba(255,255,255,1)" value="rgb(255, 0, 0)">
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col d-flex justify-content-end">
+            <button class="btn btn-success" id="save-colour-selection">Save</button>
+        </div>
+        <div class="col">
+            <button class="btn btn-outline-success border boreder-success" id="cancel-colour-selection" data-bs-toggle="dropdown">Cancel</button>
+        </div>
+    </div>
+</ul>
 {% endblock %}

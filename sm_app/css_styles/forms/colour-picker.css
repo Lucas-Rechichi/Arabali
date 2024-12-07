@@ -1,0 +1,150 @@
+/* Variables fot the slider thumbs (knobs) */
+:root {
+    --hue-slider-thumb-bg: red;
+    --saturation-slider-thumb-bg: red;
+    --lightness-slider-thumb-bg: red;
+    --opacity-slider-thumb-bg: black;
+}
+
+/* Colour picker button */
+.color-picker-button-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: linear-gradient(90deg,
+    hsl(0, 100%, 50%),
+    hsl(30, 100%, 50%),
+    hsl(60, 100%, 50%),
+    hsl(90, 100%, 50%),
+    hsl(120, 100%, 50%),
+    hsl(150, 100%, 50%),
+    hsl(180, 100%, 50%),
+    hsl(210, 100%, 50%),
+    hsl(240, 100%, 50%),
+    hsl(270, 100%, 50%),
+    hsl(300, 100%, 50%),
+    hsl(330, 100%, 50%),
+    hsl(360, 100%, 50%)
+    );
+    cursor: pointer;
+}
+.colour-picker-button {
+    margin-top: 3px;
+    margin-left: 3px;
+    height: 30px;
+    width: 30px;
+    border: 3px solid transparent;
+    border-radius: 15px;
+    background-color: black
+}
+
+/* Colour Picker */
+
+/* Preview */
+.colour-picker-preview {
+    width: 100%;
+    height: 50px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+/* Sliders */
+#hue-slider {
+    width: 100%;
+    appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg,
+        hsl(0, 100%, 50%),
+        hsl(30, 100%, 50%),
+        hsl(60, 100%, 50%),
+        hsl(90, 100%, 50%),
+        hsl(120, 100%, 50%),
+        hsl(150, 100%, 50%),
+        hsl(180, 100%, 50%),
+        hsl(210, 100%, 50%),
+        hsl(240, 100%, 50%),
+        hsl(270, 100%, 50%),
+        hsl(300, 100%, 50%),
+        hsl(330, 100%, 50%),
+        hsl(360, 100%, 50%)
+    );  
+    outline: none;
+    cursor: pointer;
+}
+
+#saturation-slider {
+    width: 100%;
+    appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, grey, red);
+    outline: none;
+    cursor: pointer;
+}
+#lightness-slider {
+    width: 100%;
+    appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, black, red, white );
+    outline: none;
+    cursor: pointer;
+}
+#opacity-slider {
+    width: 100%;
+    appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, white, black);
+    outline: none;
+    cursor: pointer;
+}
+
+/* Slider thumbs (knobs) */
+#hue-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--hue-slider-thumb-bg);
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    cursor: pointer;
+}
+
+#saturation-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--saturation-slider-thumb-bg);
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    cursor: pointer;
+}
+
+#lightness-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--lightness-slider-thumb-bg);
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    cursor: pointer;
+}
+
+
+#opacity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--opacity-slider-thumb-bg);
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    cursor: pointer;
+}
+
