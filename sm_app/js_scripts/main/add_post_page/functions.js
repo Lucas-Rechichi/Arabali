@@ -3,18 +3,20 @@ export function previewMediaFiles(mediaFilesList) {
     // Preparing variables 
     var mediaURL;
 
-    // preview
+    // Preview
     var carouselSlidesHtml = ``;
     var carouselIndicatorsHtml = ``;
-    var carouselCaptionFormHtml = ``;
-
+    
     var carouselSlideHtml;
     var carouselIndicatiorHtml;
+
+    // Carousel control and caption form
+    var carouselPannelsHtml = ``;
+    var carouselCaptionFormHtml = ``;
+
+    var carouselPannelHtml;
     var carouselCaptionInputHtml;
 
-    // carousel control
-    var carouselPannelsHtml = ``;
-    var carouselPannelHtml = ``;
 
     // Loops though all media within the media files list
     for (let i=0; i < mediaFilesList.length; i++) {
@@ -60,13 +62,13 @@ export function previewMediaFiles(mediaFilesList) {
                 carouselPannelHtml = `
                     <div class="col-2">
                         <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                        <p class="lead text-center">${i}</p>
+                        <p class="lead text-center">${i + 1}</p>
                         <div class="row">
                             <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark" disabled><i class="bi bi-arrow-left-short"></i></button>
+                                <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-left-short"></i></button>
                             </div>
                             <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-right-short"></i></button>
+                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
                             </div>
                         </div>
                     </div>
@@ -75,13 +77,13 @@ export function previewMediaFiles(mediaFilesList) {
                 carouselPannelHtml = `
                     <div class="col-2">
                         <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                        <p class="lead text-center">${i}</p>
+                        <p class="lead text-center">${i + 1}</p>
                         <div class="row">
                             <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-left-short"></i></button>
+                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
                             </div>
                             <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark" disabled><i class="bi bi-arrow-right-short"></i></button>
+                                <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-right-short"></i></button>
                             </div>
                         </div>
                     </div>
@@ -90,13 +92,13 @@ export function previewMediaFiles(mediaFilesList) {
                 carouselPannelHtml = `
                     <div class="col-2">
                         <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                        <p class="lead text-center">${i}</p>
+                        <p class="lead text-center">${i + 1}</p>
                         <div class="row">
                             <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-left-short"></i></button>
+                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
                             </div>
                             <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark"><i class="bi bi-arrow-right-short"></i></button>
+                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
                             </div>
                         </div>
                     </div>
@@ -105,7 +107,37 @@ export function previewMediaFiles(mediaFilesList) {
 
             // Create the carousel captions forms
             carouselCaptionInputHtml = `
-                
+                <div class="row">
+                    <div class="col">
+                        <div id="caption-input-${i}" class="card caption-inputs">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="caption-text" class="form-label">Caption:</label>
+                                    <input type="text" id="caption-text" class="form-control" placeholder="Caption" aria-label="Caption">
+                                </div>
+                                <div class="col">
+                                    <label for="caption-colour" class="form-label">Colour:</label>
+                                    <div class="colour-picker-button-outer-shell">
+                                        <div id="colour-picker-button-background-${i}" class="colour-picker-button-background">
+                                            <div id="colour-picker-button-${i}" class="colour-picker-button" data-colour="#000000" data-caption-id="${i}"></div> 
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <select id="font-select-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                                        <option selected>Default Font</option>
+                                        <option value="strong"><Strong>Strong</Strong></option>
+                                        <option value="italic"><em>Italic</em></option>
+                                        <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                        <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                        <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                        <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
 
 
@@ -113,6 +145,7 @@ export function previewMediaFiles(mediaFilesList) {
             carouselIndicatorsHtml += carouselIndicatiorHtml;
             carouselSlidesHtml += carouselSlideHtml;
             carouselPannelsHtml += carouselPannelHtml;
+            carouselCaptionFormHtml += carouselCaptionInputHtml;
         }
     }
 
@@ -122,7 +155,7 @@ export function previewMediaFiles(mediaFilesList) {
                 ${carouselIndicatorsHtml}
             </div>
             <div class="carousel-inner">
-                ${carouselPannelsHtml}
+                ${carouselSlidesHtml}
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#preview-media-carousal" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -144,6 +177,7 @@ export function previewMediaFiles(mediaFilesList) {
     var previewHtml = {
         'carousel': carouselPreviewHtml,
         'controlPannel': controlPannelHtml,
+        'captionForm': carouselCaptionFormHtml,
     }
 
     return previewHtml
@@ -152,7 +186,6 @@ export function previewMediaFiles(mediaFilesList) {
 
 export function addMediaToList(mediaFiles, currentMediaList) {
 
-    var mediaList;
     var limitReached = false;
     // File count cannot be greater than 6, extract the files that can be accepted.
     if (mediaFiles.length > 6) {

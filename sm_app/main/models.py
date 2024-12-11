@@ -138,7 +138,7 @@ class NestedComment(models.Model):
 
 # Algorithum
 class Interest(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interest')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interests')
     name = models.CharField(max_length=100, null=False)
     value = models.IntegerField()
 

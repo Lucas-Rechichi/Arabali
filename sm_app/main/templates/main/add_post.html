@@ -28,12 +28,14 @@
 
 <!-- For page specific scripts -->
 {% block scripts %}
-    <script type="text/javascript" src="{% static 'main/add_post_page/add_post.js'%}"></script>
-    <script type="text/javascript" src="{% static 'main/add_post_page/functions.js'%}"></script>
+    <script type="module" src="{% static 'main/add_post_page/add_post.js'%}"></script>
+    <script type="module" src="{% static 'main/add_post_page/functions.js'%}"></script>
+    <script type="text/javascript" src="{% static 'forms/colour-picker.js'%}"></script>
 {% endblock %}
 
 <!-- For page specific css styles -->
 {% block styles %}
+    <link rel="stylesheet" href="{% static 'main/add_post.css' %}">
     <link rel="stylesheet" href="{% static 'forms/drag_and_drop.css' %}">
     <link rel="stylesheet" href="{% static 'forms/validation.css' %}">
     <link rel="stylesheet" href="{% static 'forms/colour-picker.css'%}">
@@ -132,14 +134,18 @@
                                 <br>
                                 <label for="post-carousel-control-card" class="form-label">Carousel Control:</label>
                                 <div class="card" id="post-carousel-control-card">
-                                    
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="lead text-center m-0 pt-2 pb-2">No media to caption.</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div id="post-media-limit-message" aria-describedby="post-carousel-control-card" class="invalid-feedback ms-1">
                                     <strong>Maximum limit for media files is six (6).</strong>
                                 </div>
                                 <br>
-                                <label for="carousel-captions" class="form-label">Carousel Captions:</label>
-                                <div class="card" id="carousel-captions">
+                                <label for="post-carousel-captions-form" class="form-label">Carousel Captions:</label>
+                                <div class="card" id="post-carousel-captions-form">
                                     <div class="row">
                                         <div class="col">
                                             <p class="lead text-center m-0 pt-2 pb-2">No media to caption.</p>
@@ -273,38 +279,38 @@
     </div>
 </div>
 <!-- For the colour picker -->
-<ul id="colour-picker-1" class="colour-picker dropdown-menu p-2" style="max-width: 460px">
+<ul id="colour-picker" class="colour-picker colour-picker-clickable dropdown-menu p-2" style="max-width: 300px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
     <div class="colour-picker-preview" id="colour-preview"></div>
 
     <label for="hue-slider" class="form-label mb-0">Hue:</label>
-    <input type="range" id="hue-slider" min="0" max="360" value="0">
+    <input type="range" id="hue-slider" class="colour-picker-clickable" min="0" max="360" value="0">
 
     <label for="saturation-slider" class="form-label mb-0">Saturation:</label>
-    <input type="range" id="saturation-slider" min="0" max="100" value="100">
+    <input type="range" id="saturation-slider" class="colour-picker-clickable" min="0" max="100" value="100">
 
     <label for="lightness-slider" class="form-label mb-0">Lightness:</label>
-    <input type="range" id="lightness-slider" min="0" max="100" value="50">
+    <input type="range" id="lightness-slider" class="colour-picker-clickable" min="0" max="100" value="50">
 
     <label for="opacity-slider" class="form-label mb-0">Opacity:</label>
-    <input type="range" id="opacity-slider" min="0" max="100" value="100">
+    <input type="range" id="opacity-slider" class="colour-picker-clickable" min="0" max="100" value="100">
 
     <div class="row">
         <div class="col">
             <label for="hex-input" class="form-label">Hex:</label>
-            <input type="text" id="hex-input" class="form-control" placeholder="#ffffff" value="#ff0000">
+            <input type="text" id="hex-input" class="form-control colour-picker-clickable" placeholder="#ffffff" value="#ff0000">
         </div>
         <div class="col">
             <label for="rgba-input" class="form-label">RGB/RGBA:</label>
-            <input type="text" id="rgba-input" class="form-control" placeholder="rgba(255,255,255,1)" value="rgb(255, 0, 0)">
+            <input type="text" id="rgba-input" class="form-control colour-picker-clickable" placeholder="rgba(255,255,255,1)" value="rgb(255, 0, 0)">
         </div>
     </div>
     <br>
     <div class="row">
         <div class="col d-flex justify-content-end">
-            <button class="btn btn-success" id="save-colour-selection">Save</button>
+            <button class="btn btn-success colour-picker-clickable" id="save-colour-selection">Save</button>
         </div>
         <div class="col">
-            <button class="btn btn-outline-success border boreder-success" id="cancel-colour-selection" data-bs-toggle="dropdown">Cancel</button>
+            <button class="btn btn-outline-success border boreder-success colour-picker-clickable" id="cancel-colour-selection" data-bs-toggle="dropdown">Cancel</button>
         </div>
     </div>
 </ul>

@@ -1,4 +1,4 @@
-import { previewMediaFiles, addMediaToList } from "./functions";
+import { previewMediaFiles, addMediaToList } from './functions.js';
 
 $(document).ready(function () {
 
@@ -55,23 +55,33 @@ $(document).ready(function () {
 
     // Media preview: insert
     $('#media-input').on('input', function (event) {
-        mediaFiles = event.target.files[0]; // remove the '[0]' to have all media files in a list.
+        mediaFiles = event.target.files; 
+        console.log(mediaFiles);
+
         if (mediaFiles) {
             console.log(mediaFiles.type)
-            if (mediaFiles.type.startsWith('image/')) {
-                // preview the media
-                var mediaURL = URL.createObjectURL(mediaFiles);
-                var mediaPreviewHtml = `
-                    <img src="${mediaURL}" alt="Preview of selected media" style="height: 248px; width: 100%; border-radius: 20px;">
-                `;
-                $('#post-media-preview-container').html(mediaPreviewHtml)
 
-                // change the state of the field if validation has occured
-                if ( ( $('#post-media-card').hasClass('is-invalid') || $('#post-media-invalid').css('display') === 'block' ) && ( $('#create-post').hasClass('validated') ) ) {
-                    $('#post-media-card').removeClass('invalid-media').addClass('valid-media');
-                    $('#post-media-invalid').css('display', 'none');
-                }
-            }   
+            // Add new media to the list
+            var mediaListData = addMediaToList(mediaFiles, mediaList)
+            mediaList = mediaListData['updatedMediaList'];
+
+            // Visual indicatiors for when the media input limit is reached
+            if (mediaListData['limitReached']) {
+                $('#post-media-limit-message').css('display', 'block');
+            }2
+
+            // Get the preview HTML, replace controls/preview HTML or placehonders
+            var carouselObjects = previewMediaFiles(mediaList);
+            $('#post-media-preview-container').html(carouselObjects['carousel']); 
+            $('#post-carousel-control-card').html(carouselObjects['controlPannel']); 
+            $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
+
+
+            // Change the state of the field if validation has occured
+            if ( ( $('#post-media-card').hasClass('is-invalid') || $('#post-media-invalid').css('display') === 'block' ) && ( $('#create-post').hasClass('validated') ) ) {
+                $('#post-media-card').removeClass('invalid-media').addClass('valid-media');
+                $('#post-media-invalid').css('display', 'none');
+            }
         }
     })
 
@@ -93,21 +103,21 @@ $(document).ready(function () {
 
         // Processing files
         if (mediaFiles) {
-            // Gets all media from the input, and stores it in a list
-            var mediaToListResponse = addMediaToList(mediaFiles, mediaList)
+            // Add new media to the list
+            var mediaListData = addMediaToList(mediaFiles, mediaList)
+            mediaList = mediaListData['updatedMediaList'];
 
             // Visual indicatiors for when the media input limit is reached
-            if (mediaToListResponse['limitReached']) {
+            if (mediaListData['limitReached']) {
                 $('#post-media-limit-message').css('display', 'block');
             }
 
-            // Creates the preview for the carousel control pannel, the carousel preview in the post, and the caption form.
-            var carouselPreviewResponse = previewMediaFiles(mediaList)
-
-            // Appending the HTML to the document
-            $('#post-media-preview-container').html(carouselPreviewResponse['carousel'])
-            $('#post-carousel-control-card').html(carouselPreviewResponse['controlPannel'])
-
+            // Get the preview HTML, replace controls/preview HTML or placehonders
+            var carouselObjects = previewMediaFiles(mediaList);
+            $('#post-media-preview-container').html(carouselObjects['carousel']);
+            $('#post-carousel-control-card').html(carouselObjects['controlPannel']);
+            $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
+            
             // Change the state of the field if validation has occured
             if ( ( $('#post-media-card').hasClass('is-invalid') || $('#post-media-invalid').css('display') === 'block' ) && ( $('#create-post').hasClass('validated') ) ) {
                 $('#post-media-card').removeClass('invalid-media').addClass('valid-media');

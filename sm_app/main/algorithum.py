@@ -137,7 +137,7 @@ class Algorithum:
                     posts.append(post_tag.post)
 
             else: # catergory is recommended or catch up (yet to add features for followers)
-                interests = list(user.interest_set.annotate(Count('value')).order_by('-value'))
+                interests = list(user.interests.annotate(Count('value')).order_by('-value'))
                 best_interest = interests[0]
                 posts = list(PostTag.objects.get(name=best_interest.name).posts.all())
 
