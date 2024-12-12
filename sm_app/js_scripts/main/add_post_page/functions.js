@@ -66,10 +66,15 @@ export function previewMediaFiles(mediaFilesList) {
                             <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
                             <div class="row">
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-left-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left" disabled><i class="bi bi-arrow-left-short"></i></button>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col d-flex justify-content-center"">
+                                    <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -83,10 +88,15 @@ export function previewMediaFiles(mediaFilesList) {
                             <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
                             <div class="row">
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-right-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right" disabled><i class="bi bi-arrow-right-short"></i></button>
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col d-flex justify-content-center"">
+                                    <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -100,10 +110,16 @@ export function previewMediaFiles(mediaFilesList) {
                             <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
                             <div class="row">
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row mt-1">
+                                <div class="col d-flex justify-content-center"">
+                                    <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -198,29 +214,34 @@ export function previewMediaFiles(mediaFilesList) {
 
 
 export function addMediaToList(mediaFiles, currentMediaList) {
-
+    // Setup
     var limitReached = false;
-    // File count cannot be greater than 6, extract the files that can be accepted.
-    if (mediaFiles.length > 6) {
-        // Get the maximum amount of files that can be accepted
-        var acceptableFilesLength = 6 - currentMediaList.length;
 
-        for (let i=0; i < acceptableFilesLength; i++) {
-            currentMediaList.push(mediaFiles[i])
-            limitReached = true
-        }
-
+    // File count cannot be greater than 6, extract the files that can be accepted only if they can fit.
+    if (currentMediaList.length > 6) { // already full, no input, trigger on-screen error
+        limitReached = true;
     } else {
-        for (let i=0; i < mediaFiles.length; i++) {
-            currentMediaList.push(mediaFiles[i])
+        if (mediaFiles.length + currentMediaList.length > 6) { // the addition of the media files exceeds 6, input what can fit, starting by what was inputted first, trigger on-screen error
+            limitReached = true;
+            var maxInput = 6 - currentMediaList.length; // get how much files can fit inside the files
+
+            for (let i=0; i < maxInput; i++ ) {
+                currentMediaList.push(mediaFiles[i]) // append to current list
+            }
+        } else { // input all files, no on-screen error
             limitReached = false
+
+            for (let i=0; i < mediaFiles.length; i++ ) {
+                currentMediaList.push(mediaFiles[i]) // append to current list
+            }
         }
     }
 
+    // Response set
     var response = {
         'updatedMediaList': currentMediaList,
         'limitReached': limitReached
-    }
+    };
 
     return response
 }

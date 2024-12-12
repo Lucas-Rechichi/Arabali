@@ -1,7 +1,16 @@
-.carousel-control-button {
+/* For the buttons on the carousel control pannel */
+.carousel-pannel-shuffle {
     padding-left: 2px;
     padding-top: 2px;
     padding-right: 2px;
     padding-bottom: 2px;
     height: 30px;
+}
+
+.carousel-pannel-delete {
+    width: 66px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
