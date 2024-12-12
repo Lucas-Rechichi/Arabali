@@ -40,7 +40,7 @@ export function previewMediaFiles(mediaFilesList) {
             if (i == 0) {
                 carouselSlideHtml = `
                     <div class="carousel-item active">
-                        <img src="${mediaURL}" class="d-block w-100"  alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" aria-current="true">
+                        <img src="${mediaURL}" class="d-block w-100"  alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" aria-current="true" style="width: 365px; height: 200px;">
                         <div class="carousel-caption d-block d-md-block">
                             <p>This image represents...</p>
                         </div>
@@ -49,7 +49,7 @@ export function previewMediaFiles(mediaFilesList) {
             } else {
                 carouselSlideHtml = `
                     <div class="carousel-item">
-                        <img src="${mediaURL}" class="d-block w-100" alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}">
+                        <img src="${mediaURL}" class="d-block w-100" alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" style="width: 365px; height: 200px;">
                         <div class="carousel-caption d-block d-md-block">
                             <p>This image represents...</p>
                         </div>
@@ -61,14 +61,16 @@ export function previewMediaFiles(mediaFilesList) {
             if (i == 0) {
                 carouselPannelHtml = `
                     <div class="col-2">
-                        <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                        <p class="lead text-center">${i + 1}</p>
-                        <div class="row">
-                            <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-left-short"></i></button>
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
+                        <div class="card p-1">
+                            <p class="lead text-center m-0">${i + 1}</p>
+                            <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-left-short"></i></button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -76,14 +78,16 @@ export function previewMediaFiles(mediaFilesList) {
             } else if (i == 5) {
                 carouselPannelHtml = `
                     <div class="col-2">
-                        <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                        <p class="lead text-center">${i + 1}</p>
-                        <div class="row">
-                            <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-right-short"></i></button>
+                        <div class="card p-1">
+                            <p class="lead text-center m-0">${i + 1}</p>
+                            <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button" disabled><i class="bi bi-arrow-right-short"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -91,14 +95,16 @@ export function previewMediaFiles(mediaFilesList) {
             } else {
                 carouselPannelHtml = `
                     <div class="col-2">
-                        <img src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 40px; height: 40px;">
-                        <p class="lead text-center">${i + 1}</p>
-                        <div class="row">
-                            <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
-                            </div>
-                            <div class="col-6">
-                                <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
+                        <div class="card p-1">
+                            <p class="lead text-center m-0">${i + 1}</p>
+                            <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
+                            <div class="row">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-left-short"></i></button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-dark carousel-control-button"><i class="bi bi-arrow-right-short"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -109,13 +115,16 @@ export function previewMediaFiles(mediaFilesList) {
             carouselCaptionInputHtml = `
                 <div class="row">
                     <div class="col">
-                        <div id="caption-input-${i}" class="card caption-inputs">
+                        <div id="caption-input-${i}" class="card caption-inputs p-1">
                             <div class="row">
-                                <div class="col">
+                                <div class="col-2">
+                                    <p class="lead text-center">${i + 1}</p>
+                                </div>
+                                <div class="col-4">
                                     <label for="caption-text" class="form-label">Caption:</label>
                                     <input type="text" id="caption-text" class="form-control" placeholder="Caption" aria-label="Caption">
                                 </div>
-                                <div class="col">
+                                <div class="col-2">
                                     <label for="caption-colour" class="form-label">Colour:</label>
                                     <div class="colour-picker-button-outer-shell">
                                         <div id="colour-picker-button-background-${i}" class="colour-picker-button-background">
@@ -123,7 +132,8 @@ export function previewMediaFiles(mediaFilesList) {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col">
+                                <div class="col-4">
+                                    <label for="font-select-${i}" class="form-label">Font:</label>
                                     <select id="font-select-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
                                         <option selected>Default Font</option>
                                         <option value="strong"><Strong>Strong</Strong></option>

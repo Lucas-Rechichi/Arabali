@@ -9,13 +9,11 @@ $(document).ready(function () {
     // Opening colour picker
     $('#post-carousel-captions-form').on('click', '.colour-picker-button', function (event) {
         captionID = $(this).data('caption-id');
-        if (colourPickerActive) {
-            colourPickerActive = false
-            $('.colour-picker').fadeOut(300);
+        console.log(captionID)
 
-        } else {
+        if (!colourPickerActive) {
             colourPickerActive = true
-            setTimeout(function () {
+            
                 $('.colour-picker').css({
                     display: "block",
                     position: "fixed",
@@ -23,26 +21,28 @@ $(document).ready(function () {
                     left: event.pageX,
                     top: event.pageY,
                 });
-            }, 300)
+            
         }
     })
 
     // For clicking outside of the colour picker
-    $(document).click(function (event) {
-        if (event.target.parentElement !== null) {
-            if (!(event.target.parentElement.classList.contains('colour-picker-clickable')) && !(event.target.classList.contains('colour-picker-clickable'))) {
-                if ($('.colour-picker').css('display') === 'block') {
-                    colourPickerActive = false
-                    $('.colour-picker').fadeOut(300);
-                }
-            }
-        } else {
-            if ($('.colour-picker').css('display') === 'block') {
-                colourPickerActive = false
-                $('.colour-picker').fadeOut(300);
-            }
-        }
-    })
+    // $(document).click(function (event) {
+    //     setTimeout(function () {
+    //         if (event.target.parentElement !== null) {
+    //             if (!(event.target.parentElement.classList.contains('colour-picker-clickable')) && !(event.target.classList.contains('colour-picker-clickable'))) {
+    //                 if (colourPickerActive) {
+    //                     colourPickerActive = false
+    //                     $('#colour-picker').fadeOut(300);
+    //                 }
+    //             }
+    //         } else {
+    //             if (colourPickerActive) {
+    //                 colourPickerActive = false
+    //                 $('#colour-picker').fadeOut(300);
+    //             }
+    //         }
+    //     }, 300)
+    // })
 
 
     // COLOUR PICKER

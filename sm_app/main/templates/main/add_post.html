@@ -133,10 +133,10 @@
                                 </div>
                                 <br>
                                 <label for="post-carousel-control-card" class="form-label">Carousel Control:</label>
-                                <div class="card" id="post-carousel-control-card">
+                                <div class="card p-2" id="post-carousel-control-card">
                                     <div class="row">
                                         <div class="col">
-                                            <p class="lead text-center m-0 pt-2 pb-2">No media to caption.</p>
+                                            <p class="lead text-center m-0 pt-2 pb-2">No media to sort.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -145,7 +145,7 @@
                                 </div>
                                 <br>
                                 <label for="post-carousel-captions-form" class="form-label">Carousel Captions:</label>
-                                <div class="card" id="post-carousel-captions-form">
+                                <div class="card p-2" id="post-carousel-captions-form">
                                     <div class="row">
                                         <div class="col">
                                             <p class="lead text-center m-0 pt-2 pb-2">No media to caption.</p>
@@ -171,7 +171,7 @@
                                 <div class="card m-5">
                                     <div class="row">
                                         <div class="col m-2">
-                                            <button class="btn btn-light"><img src="{{user_stats.pfp.url}}", onclick='location.href = "/profile/{{username}}"' style="width: 30px; height: 30px;"></button>
+                                            <button class="btn btn-light"><img class="border border-success rounded-circle" src="{{user_stats.pfp.url}}", onclick='location.href = "/profile/{{username}}"' style="width: 30px; height: 30px;"></button>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -279,7 +279,7 @@
     </div>
 </div>
 <!-- For the colour picker -->
-<ul id="colour-picker" class="colour-picker colour-picker-clickable dropdown-menu p-2" style="max-width: 300px; background: rgba(255, 255, 255, 1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+<ul class="colour-picker colour-picker-clickable dropdown-menu p-2" style="max-width: 300px; background: rgba(255, 255, 255, 1);">
     <div class="colour-picker-preview" id="colour-preview"></div>
 
     <label for="hue-slider" class="form-label mb-0">Hue:</label>
