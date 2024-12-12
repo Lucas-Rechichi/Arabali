@@ -8,22 +8,36 @@ $(document).ready(function () {
 
     // Opening colour picker
     $('#post-carousel-captions-form').on('click', '.colour-picker-button', function (event) {
-        captionID = $(this).data('caption-id');
+        event.preventDefault();
+        
+        // Fetch caption ID
+        captionID = $(this).data('caption-id')
         console.log(captionID)
+        var colourPicker = $('#colour-picker');
 
-        if (!colourPickerActive) {
+        console.log('Current display:', colourPicker.css('display'));
+
+        if (colourPickerActive) {
+            colourPickerActive = false
+            colourPicker.fadeOut(300);
+
+        } else {
             colourPickerActive = true
+            var xPosition = event.pageX;
+            var yPosition = event.pageY;
+
             
-                $('.colour-picker').css({
-                    display: "block",
-                    position: "fixed",
-                    zIndex: 10000,
-                    left: event.pageX,
-                    top: event.pageY,
-                });
+            colourPicker.css({
+                display: "block",
+                position: "fixed",
+                zIndex: 10000,
+                left: xPosition + 'px',
+                top: yPosition + 'px',
+            });
             
+            console.log('Current display:', colourPicker.css('display'));
         }
-    })
+    })    
 
     // For clicking outside of the colour picker
     // $(document).click(function (event) {

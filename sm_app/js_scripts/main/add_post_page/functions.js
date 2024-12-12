@@ -125,12 +125,15 @@ export function previewMediaFiles(mediaFilesList) {
                                     <input type="text" id="caption-text" class="form-control" placeholder="Caption" aria-label="Caption">
                                 </div>
                                 <div class="col-2">
-                                    <label for="caption-colour" class="form-label">Colour:</label>
-                                    <div class="colour-picker-button-outer-shell">
-                                        <div id="colour-picker-button-background-${i}" class="colour-picker-button-background">
-                                            <div id="colour-picker-button-${i}" class="colour-picker-button" data-colour="#000000" data-caption-id="${i}"></div> 
+                                    <div class="dropdown">
+                                        <label for="caption-colour" class="form-label">Colour:</label>
+                                        <div class="colour-picker-button-outer-shell">
+                                            <div id="colour-picker-button-background-${i}" class="colour-picker-button-background">
+                                                <div id="colour-picker-button-${i}" class="colour-picker-button" data-colour="#000000" data-caption-id="${i}"></div> 
+                                            </div>
                                         </div>
                                     </div>
+                                    
                                 </div>
                                 <div class="col-4">
                                     <label for="font-select-${i}" class="form-label">Font:</label>
