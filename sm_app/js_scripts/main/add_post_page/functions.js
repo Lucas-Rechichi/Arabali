@@ -132,13 +132,25 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
 
             // For shuffling media data around in the carousel control pannel
             if (shuffle && movingSlideData && affectedSlideData) {
+                // Getting data
                 var movingCaptionID = movingSlideData['id'];
                 var affectedCaptionID = affectedSlideData['id'];
 
+                // Data logic
+                var isEffected;
                 if (i == movingCaptionID) {
-                    var captionText = movingSlideData['text'];
-                    var captionColour = movingSlideData['colourHex8'];
-                    var captionFont = movingSlideData['font'];
+                    var relevantData = movingSlideData
+                    isEffected = true
+                } else if (i == affectedCaptionID) {
+                    var relevantData = affectedSlideData
+                    isEffected = true
+                } else {
+                    isEffected = false
+                }
+                if (isEffected) {
+                    var captionText = relevantData['text'];
+                    var captionColour = relevantData['colourHex8'];
+                    var captionFont = relevantData['font'];
 
                     captionTextHtml = `
                         <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
@@ -232,17 +244,35 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                                 <option value="palatino-linotype" seleced><p class="p-0 m-0">Palatino Linotype</p></option>
                             `
                             break;
-
                     }
+
                     // Adding in font option to select
                     captionFontHtml = `
                         <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
                             ${optionsHtml}
                         </select>
                     `;
+
+                } else { // uneffected index
+                    captionTextHtml = `
+                        <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
+                    `;
+                    captionColourHtml = `
+                        <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#000000ff" data-caption-id="${i}"></div> 
+                    `;
+                    captionFontHtml = `
+                        <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                            <option value="default" selected>Default Font</option>
+                            <option value="strong"><Strong>Strong</Strong></option>
+                            <option value="italic"><em>Italic</em></option>
+                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                            <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                            <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                            <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                        </select>
+                    `
                 }
 
-                // TODO: Do the condidional output if i == affectedCaptionID
             } else { // No shuffling
                 captionTextHtml = `
                     <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">

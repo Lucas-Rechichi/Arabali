@@ -55,8 +55,8 @@ $(document).ready(function () {
 
     // Media preview: insert
     $('#media-input').on('input', function (event) {
-        mediaFiles = event.target.files; 
-        console.log(mediaFiles);
+        mediaFiles = Array.from(event.target.files); 
+
 
         if (mediaFiles) {
             console.log(mediaFiles.type)
@@ -71,7 +71,7 @@ $(document).ready(function () {
             }2
 
             // Get the preview HTML, replace controls/preview HTML or placehonders
-            var carouselObjects = previewMediaFiles(mediaList);
+            var carouselObjects = previewMediaFiles(mediaList, false);
             $('#post-media-preview-container').html(carouselObjects['carousel']); 
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']); 
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -99,7 +99,7 @@ $(document).ready(function () {
         event.preventDefault(); // prevents the opening of another tab to view the image.
 
         // Getting media files from drop input
-        mediaFiles = event.originalEvent.dataTransfer.files;
+        mediaFiles = Array.from(event.originalEvent.dataTransfer.files);
 
         // Processing files
         if (mediaFiles) {
@@ -113,7 +113,7 @@ $(document).ready(function () {
             }
 
             // Get the preview HTML, replace controls/preview HTML or placehonders
-            var carouselObjects = previewMediaFiles(mediaList);
+            var carouselObjects = previewMediaFiles(mediaList, false);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -130,7 +130,7 @@ $(document).ready(function () {
 
         }
     })
-    // Carousel control pannel: Shuffle
+    // Carousel control pannel: Shuffle TODO: Fix shuffleing issue with the mediaFiles array (not shuffling.)
     $('#post-carousel-control-pannel').on('click', '.carousel-pannel-shuffle', function () {
 
         // Get relevant data
@@ -141,7 +141,6 @@ $(document).ready(function () {
         if (direction === 'left') {
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
             var affectedSlideID = slideID - 1;
-
             [mediaFiles[affectedSlideID], mediaFiles[slideID]] = [mediaFiles[slideID], mediaFiles[affectedSlideID]];
 
             // Hold onto caption data (text, colour, font)
@@ -160,15 +159,38 @@ $(document).ready(function () {
             }
 
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList);
+            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
 
-            // Input held onto caption data (within previewMediaFiles?)
+            
 
         } else { // direction === 'right'
-            var affectedSlideID = slideID + 1
+            // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
+            var affectedSlideID = slideID + 1;
+            [mediaFiles[slideID], mediaFiles[affectedSlideID]] = [mediaFiles[affectedSlideID], mediaFiles[slideID]];
+
+            // Hold onto caption data (text, colour, font)
+            var slideCaptionData = {
+                'id': slideID,
+                'text': $('#caption-text-' + slideID).val(),
+                'colourHex8': $('#caption-text-colour-' + slideID).data('colour'),
+                'font': $('#text-font-' + slideID).val()
+            }
+
+            var affectedSlideCaptionData = {
+                'id': affectedSlideID,
+                'text': $('#caption-text-' + affectedSlideID).val(),
+                'colourHex8': $('#caption-text-colour-' + affectedSlideID).data('colour'),
+                'font': $('#text-font-' + affectedSlideID).val()
+            }
+
+            // Recall previewMediaFiles function with the newly ordered files
+            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData);
+            $('#post-media-preview-container').html(carouselObjects['carousel']);
+            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
+            $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
         }
     })
     // Carousel control pannel: Delete
