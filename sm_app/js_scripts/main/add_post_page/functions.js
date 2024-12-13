@@ -1,4 +1,4 @@
-export function previewMediaFiles(mediaFilesList) {
+export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affectedSlideData) {
 
     // Preparing variables 
     var mediaURL;
@@ -16,6 +16,9 @@ export function previewMediaFiles(mediaFilesList) {
 
     var carouselPannelHtml;
     var carouselCaptionInputHtml;
+    var captionTextHtml;
+    var captionColourHtml;
+    var captionFontHtml;
 
 
     // Loops though all media within the media files list
@@ -127,6 +130,139 @@ export function previewMediaFiles(mediaFilesList) {
                 `;
             }
 
+            // For shuffling media data around in the carousel control pannel
+            if (shuffle && movingSlideData && affectedSlideData) {
+                var movingCaptionID = movingSlideData['id'];
+                var affectedCaptionID = affectedSlideData['id'];
+
+                if (i == movingCaptionID) {
+                    var captionText = movingSlideData['text'];
+                    var captionColour = movingSlideData['colourHex8'];
+                    var captionFont = movingSlideData['font'];
+
+                    captionTextHtml = `
+                        <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
+                    `;
+                    // TODO: update css colour when shuffled as well.
+                    captionColourHtml = `
+                        <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="${captionColour}" data-caption-id="${i}"></div> 
+                    `;
+                    // For the font selected
+                    switch (captionFont) {
+                        case 'default':
+                            var optionsHtml = `
+                                <option value="default" selected>Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'strong':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong" selected><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'italic':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic" selected><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'corier-new':
+                            var optionsHtml = `
+                                <option value="default" selected>Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'comic-sans-MS':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS selected"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'impact':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact" selected><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'palatino-linotype':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype" seleced><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                    }
+                    // Adding in font option to select
+                    captionFontHtml = `
+                        <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                            ${optionsHtml}
+                        </select>
+                    `;
+                }
+
+                // TODO: Do the condidional output if i == affectedCaptionID
+            } else { // No shuffling
+                captionTextHtml = `
+                    <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
+                `;
+                captionColourHtml = `
+                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#000000ff" data-caption-id="${i}"></div> 
+                `;
+                captionFontHtml = `
+                    <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                        <option value="default" selected>Default Font</option>
+                        <option value="strong"><Strong>Strong</Strong></option>
+                        <option value="italic"><em>Italic</em></option>
+                        <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                        <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                        <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                        <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                    </select>
+                `
+            }
+
             // Create the carousel captions forms
             carouselCaptionInputHtml = `
                 <div class="row">
@@ -137,31 +273,23 @@ export function previewMediaFiles(mediaFilesList) {
                                     <p class="lead text-center">${i + 1}</p>
                                 </div>
                                 <div class="col-4">
-                                    <label for="caption-text" class="form-label">Caption:</label>
-                                    <input type="text" id="caption-text" class="form-control" placeholder="Caption" aria-label="Caption">
+                                    <label for="caption-text-${i}" class="form-label">Caption:</label>
+                                    ${captionTextHtml}
                                 </div>
                                 <div class="col-2">
                                     <div class="dropdown">
-                                        <label for="caption-colour" class="form-label">Colour:</label>
+                                        <label for="caption-text-colour-${i}" class="form-label">Colour:</label>
                                         <div class="colour-picker-button-outer-shell">
                                             <div id="colour-picker-button-background-${i}" class="colour-picker-button-background">
-                                                <div id="colour-picker-button-${i}" class="colour-picker-button" data-colour="#000000" data-caption-id="${i}"></div> 
+                                                ${captionColourHtml}
                                             </div>
                                         </div>
                                     </div>
                                     
                                 </div>
                                 <div class="col-4">
-                                    <label for="font-select-${i}" class="form-label">Font:</label>
-                                    <select id="font-select-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
-                                        <option selected>Default Font</option>
-                                        <option value="strong"><Strong>Strong</Strong></option>
-                                        <option value="italic"><em>Italic</em></option>
-                                        <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                        <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                        <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                                        <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
-                                    </select>
+                                    <label for="text-font-${i}" class="form-label">Font:</label>
+                                    ${captionFontHtml}
                                 </div>
                             </div>
                         </div>

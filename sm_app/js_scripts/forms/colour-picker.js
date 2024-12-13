@@ -6,15 +6,41 @@ $(document).ready(function () {
     let colourPickerActive = false;
     let captionID;
 
+    // Setup variables
+    const toHsl = culori.converter('hsl');
+
+    // Initial hsl and opacity values (for black)
+    let hue = 0;
+    let saturation = 100;
+    let lightness = 0;
+    let opacity = 1;
+    
+
     // Opening colour picker
     $('#post-carousel-captions-form').on('click', '.colour-picker-button', function (event) {
         event.preventDefault();
         
-        // Fetch caption ID
+        // Fetch caption ID and current colour
         captionID = $(this).data('caption-id')
-        console.log(captionID)
-        var colourPicker = $('#colour-picker');
 
+        var colourPicker = $('#colour-picker');
+        var currentColourHsl = toHsl(colourPicker.data('colour'));
+
+        if (currentColourHsl['s'] === 0 || currentColourHsl['s'] === 1) {
+            hue = 0;
+            saturation = currentColourHsl['s'] * 100;
+            lightness = currentColourHsl['l'] * 100;
+
+        } else {
+            hue = currentColourHsl['h'];
+            saturation = currentColourHsl['s'] * 100;
+            lightness = currentColourHsl['l'] * 100;
+        }
+
+        updateColour(hueChange=true, usedSliders=false);
+
+
+        
         console.log('Current display:', colourPicker.css('display'));
 
         if (colourPickerActive) {
@@ -60,14 +86,6 @@ $(document).ready(function () {
 
 
     // COLOUR PICKER
-    // Setup variables
-    const toHsl = culori.converter('hsl');
-
-    // Initial hsl and opacity values (for black)
-    let hue = 0;
-    let saturation = 100;
-    let lightness = 0;
-    let opacity = 1;
 
     // Update the preview and input fields
     function updateColour (hueChange, usedSliders) {

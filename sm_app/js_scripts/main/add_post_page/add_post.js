@@ -140,13 +140,30 @@ $(document).ready(function () {
         // Logic for moving slides
         if (direction === 'left') {
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
-            var affectedSlideID = slideID - 1
+            var affectedSlideID = slideID - 1;
 
             [mediaFiles[affectedSlideID], mediaFiles[slideID]] = [mediaFiles[slideID], mediaFiles[affectedSlideID]];
 
             // Hold onto caption data (text, colour, font)
+            var slideCaptionData = {
+                'id': slideID,
+                'text': $('#caption-text-' + slideID).val(),
+                'colourHex8': $('#caption-text-colour-' + slideID).data('colour'),
+                'font': $('#text-font-' + slideID).val()
+            }
+
+            var affectedSlideCaptionData = {
+                'id': affectedSlideID,
+                'text': $('#caption-text-' + affectedSlideID).val(),
+                'colourHex8': $('#caption-text-colour-' + affectedSlideID).data('colour'),
+                'font': $('#text-font-' + affectedSlideID).val()
+            }
 
             // Recall previewMediaFiles function with the newly ordered files
+            var carouselObjects = previewMediaFiles(mediaList);
+            $('#post-media-preview-container').html(carouselObjects['carousel']);
+            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
+            $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
 
             // Input held onto caption data (within previewMediaFiles?)
 
