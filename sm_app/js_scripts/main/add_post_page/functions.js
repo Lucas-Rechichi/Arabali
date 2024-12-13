@@ -60,9 +60,9 @@ export function previewMediaFiles(mediaFilesList) {
             // Creating the carousel cotrol elements
             if (i == 0) {
                 carouselPannelHtml = `
-                    <div class="col-2">
+                    <div id="carousel-pannel-slide-${i}" class="col-2">
                         <div class="card p-1">
-                            <p class="lead text-center m-0">${i + 1}</p>
+                            <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
                             <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
                             <div class="row">
                                 <div class="col-6">
@@ -82,9 +82,9 @@ export function previewMediaFiles(mediaFilesList) {
                 `;
             } else if (i == 5) {
                 carouselPannelHtml = `
-                    <div class="col-2">
+                    <div id="carousel-pannel-slide-${i}" class="col-2">
                         <div class="card p-1">
-                            <p class="lead text-center m-0">${i + 1}</p>
+                            <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
                             <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
                             <div class="row">
                                 <div class="col-6">
@@ -104,16 +104,16 @@ export function previewMediaFiles(mediaFilesList) {
                 `;
             } else {
                 carouselPannelHtml = `
-                    <div class="col-2">
+                    <div id="carousel-pannel-slide-${i}" class="col-2">
                         <div class="card p-1">
-                            <p class="lead text-center m-0">${i + 1}</p>
+                            <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
                             <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
                             <div class="row">
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-control-button carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
                                 </div>
                             </div>
                             <br>

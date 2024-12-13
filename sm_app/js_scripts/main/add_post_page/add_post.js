@@ -51,7 +51,7 @@ $(document).ready(function () {
     })
     // Media setup
     var mediaFiles;
-    var mediaList = [];
+    let mediaList = [];
 
     // Media preview: insert
     $('#media-input').on('input', function (event) {
@@ -73,7 +73,7 @@ $(document).ready(function () {
             // Get the preview HTML, replace controls/preview HTML or placehonders
             var carouselObjects = previewMediaFiles(mediaList);
             $('#post-media-preview-container').html(carouselObjects['carousel']); 
-            $('#post-carousel-control-card').html(carouselObjects['controlPannel']); 
+            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']); 
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
 
 
@@ -115,7 +115,7 @@ $(document).ready(function () {
             // Get the preview HTML, replace controls/preview HTML or placehonders
             var carouselObjects = previewMediaFiles(mediaList);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
-            $('#post-carousel-control-card').html(carouselObjects['controlPannel']);
+            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
             
             // Change the state of the field if validation has occured
@@ -130,6 +130,31 @@ $(document).ready(function () {
 
         }
     })
+    // Carousel control pannel: Shuffle
+    $('#post-carousel-control-pannel').on('click', '.carousel-pannel-shuffle', function () {
+
+        // Get relevant data
+        var slideID = $(this).data('slide-id');
+        var direction = $(this).data('direction');
+
+        // Logic for moving slides
+        if (direction === 'left') {
+            // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
+            var affectedSlideID = slideID - 1
+
+            [mediaFiles[affectedSlideID], mediaFiles[slideID]] = [mediaFiles[slideID], mediaFiles[affectedSlideID]];
+
+            // Hold onto caption data (text, colour, font)
+
+            // Recall previewMediaFiles function with the newly ordered files
+
+            // Input held onto caption data (within previewMediaFiles?)
+
+        } else { // direction === 'right'
+            var affectedSlideID = slideID + 1
+        }
+    })
+    // Carousel control pannel: Delete
 
     // Visual modals 
     var creatingPostModal = new bootstrap.Modal(document.getElementById('creating-post-modal'), {
