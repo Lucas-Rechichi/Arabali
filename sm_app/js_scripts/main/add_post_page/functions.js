@@ -403,3 +403,33 @@ export function addMediaToList(mediaFiles, currentMediaList) {
 
     return response
 }
+
+// For the shuffling of the 
+export function shuffleArray(array, movingItem, direction) {
+    // Get the item index in the array
+    var movingItemIndex = array.indexOf(movingItem)
+
+    // Logic for direction
+    if (direction === 'right') {
+        var directionInterger = 1
+        var affectedItemIndex = array.indexOf(array[movingItemIndex + 1])
+    } else { // direction === 'left'
+        var directionInterger = -1
+        var affectedItemIndex = array.indexOf(array[movingItemIndex - 1])
+    }
+
+    // Create a new list with the swap applied
+    var newList = [];
+    for (let i=0; i < array.length; i++) {
+        if (i === movingItemIndex) {
+            newList.push(array[affectedItemIndex])
+        } else if (i === affectedItemIndex) {
+            newList.push(array[movingItemIndex])
+        } else {
+            newList.push(array[i])
+        }
+    }
+
+    // return newList
+    return newList
+}

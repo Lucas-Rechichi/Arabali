@@ -1,4 +1,4 @@
-import { previewMediaFiles, addMediaToList } from './functions.js';
+import { previewMediaFiles, addMediaToList, shuffleArray } from './functions.js';
 
 $(document).ready(function () {
 
@@ -50,7 +50,7 @@ $(document).ready(function () {
         $('#post-contents-preview').text(previewText)
     })
     // Media setup
-    var mediaFiles;
+    let mediaFiles;
     let mediaList = [];
 
     // Media preview: insert
@@ -141,7 +141,7 @@ $(document).ready(function () {
         if (direction === 'left') {
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
             var affectedSlideID = slideID - 1;
-            [mediaFiles[affectedSlideID], mediaFiles[slideID]] = [mediaFiles[slideID], mediaFiles[affectedSlideID]];
+            mediaFiles = shuffleArray(mediaFiles, mediaFiles[slideID - 1], direction)
 
             // Hold onto caption data (text, colour, font)
             var slideCaptionData = {
@@ -168,8 +168,8 @@ $(document).ready(function () {
 
         } else { // direction === 'right'
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
-            var affectedSlideID = slideID + 1;
-            [mediaFiles[slideID], mediaFiles[affectedSlideID]] = [mediaFiles[affectedSlideID], mediaFiles[slideID]];
+            var affectedSlideID = slideID - 1;
+            mediaFiles = shuffleArray(mediaFiles, mediaFiles[slideID - 1], direction)
 
             // Hold onto caption data (text, colour, font)
             var slideCaptionData = {
