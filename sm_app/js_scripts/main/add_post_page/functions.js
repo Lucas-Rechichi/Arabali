@@ -83,7 +83,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                         </div>
                     </div>
                 `;
-            } else if (i == 5) {
+            } else if (i == mediaFilesList.length - 1) {
                 carouselPannelHtml = `
                     <div id="carousel-pannel-slide-${i}" class="col-2">
                         <div class="card p-1">
@@ -119,7 +119,6 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                                     <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
                                 </div>
                             </div>
-                            <br>
                             <div class="row mt-1">
                                 <div class="col d-flex justify-content-center"">
                                     <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
@@ -405,31 +404,25 @@ export function addMediaToList(mediaFiles, currentMediaList) {
 }
 
 // For the shuffling of the 
-export function shuffleArray(array, movingItem, direction) {
-    // Get the item index in the array
-    var movingItemIndex = array.indexOf(movingItem)
+export function shuffleArray(array, movingIndex, direction) {
+    // Get the item in the list, removing it from the list
+    var movingItem = array.splice(movingIndex, 1)[0]; // positoning?
 
-    // Logic for direction
+    // Get the moving item, removing it from the list, and add in the list with it's new order
     if (direction === 'right') {
-        var directionInterger = 1
-        var affectedItemIndex = array.indexOf(array[movingItemIndex + 1])
-    } else { // direction === 'left'
-        var directionInterger = -1
-        var affectedItemIndex = array.indexOf(array[movingItemIndex - 1])
+        var affectedIndex = movingIndex;
+        var affectedItem = array.splice(affectedIndex, 1)[0]; // positoning?
+
+        array.splice(movingIndex, 0, affectedItem);
+        array.splice(movingIndex + 1, 0, movingItem);
+    } else {
+        var affectedIndex = movingIndex - 1;
+        var affectedItem = array.splice(affectedIndex, 1)[0]; // positoning?
+        
+        array.splice(affectedIndex, 0, movingItem);
+        array.splice(affectedIndex + 1, 0, affectedItem);
     }
 
-    // Create a new list with the swap applied
-    var newList = [];
-    for (let i=0; i < array.length; i++) {
-        if (i === movingItemIndex) {
-            newList.push(array[affectedItemIndex])
-        } else if (i === affectedItemIndex) {
-            newList.push(array[movingItemIndex])
-        } else {
-            newList.push(array[i])
-        }
-    }
-
-    // return newList
-    return newList
+    // Return the newly arranged array
+    return array
 }

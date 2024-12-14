@@ -141,7 +141,7 @@ $(document).ready(function () {
         if (direction === 'left') {
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
             var affectedSlideID = slideID - 1;
-            mediaFiles = shuffleArray(mediaFiles, mediaFiles[slideID - 1], direction)
+            mediaFiles = shuffleArray(mediaFiles, slideID, direction)
 
             // Hold onto caption data (text, colour, font)
             var slideCaptionData = {
@@ -159,7 +159,7 @@ $(document).ready(function () {
             }
 
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData);
+            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -168,8 +168,8 @@ $(document).ready(function () {
 
         } else { // direction === 'right'
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
-            var affectedSlideID = slideID - 1;
-            mediaFiles = shuffleArray(mediaFiles, mediaFiles[slideID - 1], direction)
+            var affectedSlideID = slideID + 1;
+            mediaFiles = shuffleArray(mediaFiles, slideID, direction)
 
             // Hold onto caption data (text, colour, font)
             var slideCaptionData = {
@@ -187,7 +187,7 @@ $(document).ready(function () {
             }
 
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData);
+            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
