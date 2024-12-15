@@ -128,139 +128,163 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                     </div>
                 `;
             }
-            // Getting data
-            var movingCaptionID = movingSlideData['id'];
-            var affectedCaptionID = affectedSlideData['id'];
-            if (shuffle && (i === movingCaptionID || i === affectedCaptionID)) {
+            // For when shuffling of media occurs
+            if (shuffle) {
+                // Getting data
+                var movingCaptionID = movingSlideData['id'];
+                var affectedCaptionID = affectedSlideData['id'];
 
-                // Logic for what needs to be moved
-                if (i === movingCaptionID) {
-                    if (direction === 'right') {
-                        var relevantData = affectedSlideData
+                // If the index lines up with the indexes involved with the shuffle
+                if (i === movingCaptionID || i === affectedCaptionID) {
+                    
+                    // Logic for what needs to be moved
+                    if (i === movingCaptionID) {
+                        if (direction === 'right') {
+                            var relevantData = affectedSlideData
+                        } else {
+                            var relevantData = movingSlideData
+                        }
                     } else {
-                        var relevantData = movingSlideData
+                        if (direction === 'right') {
+                            var relevantData = movingSlideData
+                        } else {
+                            var relevantData = affectedSlideData
+                        }
                     }
-                } else {
-                    if (direction === 'right') {
-                        var relevantData = movingSlideData
-                    } else {
-                        var relevantData = affectedSlideData
+
+                    // Get the caption components from the relevant data
+                    var captionText = relevantData['text']
+                    var captionColour = relevantData['colourHex8']
+                    var captionFont = relevantData['font']
+
+                    captionTextHtml = `
+                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
+                    `;
+
+                    // TODO: Update css colour when shuffled as well.
+                    captionColourHtml = `
+                        <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="${captionColour}" data-caption-id="${i}"></div> 
+                    `;
+
+                    // For the font selected
+                    switch (captionFont) {
+                        case 'default':
+                            var optionsHtml = `
+                                <option value="default" selected>Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'strong':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong" selected><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'italic':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic" selected><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'corier-new':
+                            var optionsHtml = `
+                                <option value="default" selected>Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'comic-sans-MS':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS selected"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'impact':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact" selected><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
+
+                        case 'palatino-linotype':
+                            var optionsHtml = `
+                                <option value="default">Default Font</option>
+                                <option value="strong"><Strong>Strong</Strong></option>
+                                <option value="italic"><em>Italic</em></option>
+                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                                <option value="palatino-linotype" seleced><p class="p-0 m-0">Palatino Linotype</p></option>
+                            `
+                            break;
                     }
-                }
 
-                // Get the caption components from the relevant data
-                var captionText = relevantData['text']
-                var captionColour = relevantData['colourHex8']
-                var captionFont = relevantData['font']
+                    // Adding in font option to select
+                    captionFontHtml = `
+                        <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                            ${optionsHtml}
+                        </select>
+                    `;
 
-                captionTextHtml = `
-                    <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
-                `;
-
-                // TODO: Update css colour when shuffled as well.
-                captionColourHtml = `
-                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="${captionColour}" data-caption-id="${i}"></div> 
-                `;
-
-                // For the font selected
-                switch (captionFont) {
-                    case 'default':
-                        var optionsHtml = `
-                            <option value="default" selected>Default Font</option>
-                            <option value="strong"><Strong>Strong</Strong></option>
-                            <option value="italic"><em>Italic</em></option>
-                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                            <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                            <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                            <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
-                        `
-                        break;
-
-                    case 'strong':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong" selected><Strong>Strong</Strong></option>
-                            <option value="italic"><em>Italic</em></option>
-                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                            <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                            <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                            <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
-                        `
-                        break;
-
-                    case 'italic':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong"><Strong>Strong</Strong></option>
-                            <option value="italic" selected><em>Italic</em></option>
-                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                            <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                            <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                            <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
-                        `
-                        break;
-
-                    case 'corier-new':
-                        var optionsHtml = `
-                            <option value="default" selected>Default Font</option>
-                            <option value="strong"><Strong>Strong</Strong></option>
-                            <option value="italic"><em>Italic</em></option>
-                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                            <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                            <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                            <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
-                        `
-                        break;
-
-                    case 'comic-sans-MS':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong"><Strong>Strong</Strong></option>
-                            <option value="italic"><em>Italic</em></option>
-                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                            <option value="comic-sans-MS selected"><p class="p-0 m-0">Comic Sans MS</p></option>
-                            <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                            <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
-                        `
-                        break;
-
-                    case 'impact':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong"><Strong>Strong</Strong></option>
-                            <option value="italic"><em>Italic</em></option>
-                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                            <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                            <option value="impact" selected><p class="p-0 m-0">Impact</p></option>
-                            <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
-                        `
-                        break;
-
-                    case 'palatino-linotype':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong"><Strong>Strong</Strong></option>
-                            <option value="italic"><em>Italic</em></option>
-                            <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                            <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                            <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                            <option value="palatino-linotype" seleced><p class="p-0 m-0">Palatino Linotype</p></option>
-                        `
-                        break;
-                }
-
-                // Adding in font option to select
-                captionFontHtml = `
-                    <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
-                        ${optionsHtml}
-                    </select>
-                `;
-
-                // TODO: Make the new caption layout
-            } else {
-                // Default to normal caption layout
+                    // TODO: Make the new caption layout
+                } 
             }
             
+            // No shuffle or unaffected index
+            if (!shuffle || !(i === movingCaptionID || i === affectedCaptionID)) {
+                captionTextHtml = `
+                    <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
+                `;
+                captionColourHtml = `
+                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#000000ff" data-caption-id="${i}"></div> 
+                `;
+                captionFontHtml = `
+                    <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                        <option value="default" selected>Default Font</option>
+                        <option value="strong"><Strong>Strong</Strong></option>
+                        <option value="italic"><em>Italic</em></option>
+                        <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
+                        <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
+                        <option value="impact"><p class="p-0 m-0">Impact</p></option>
+                        <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                    </select>
+                `;
+            };
+
             // Create the carousel captions forms
             carouselCaptionInputHtml = `
                 <div class="row">

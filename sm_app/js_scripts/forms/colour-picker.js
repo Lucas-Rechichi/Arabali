@@ -18,13 +18,12 @@ $(document).ready(function () {
 
     // Opening colour picker
     $('#post-carousel-captions-form').on('click', '.colour-picker-button', function (event) {
-        event.preventDefault();
-        
+
         // Fetch caption ID and current colour
         captionID = $(this).data('caption-id')
 
-        var colourPicker = $('#colour-picker');
-        var currentColourHsl = toHsl(colourPicker.data('colour'));
+        var colourPreview = $('.colour-picker-preview');
+        var currentColourHsl = toHsl(colourPreview.data('colour'));
 
         if (currentColourHsl['s'] === 0 || currentColourHsl['s'] === 1) {
             hue = 0;
@@ -39,7 +38,8 @@ $(document).ready(function () {
 
         updateColour(hueChange=true, usedSliders=false);
 
-
+        // Get the colour picker popup, and display it
+        var colourPicker = $('#colour-picker');
         
         console.log('Current display:', colourPicker.css('display'));
 
@@ -49,41 +49,20 @@ $(document).ready(function () {
 
         } else {
             colourPickerActive = true
-            var xPosition = event.pageX;
-            var yPosition = event.pageY;
 
+            setTimeout(function () {
+                colourPicker.css({
+                    display: "block",
+                    zIndex: 9000,
+                    left: event.pageX,
+                    top: event.pageY,
+                });
+            }, 300);
             
-            colourPicker.css({
-                display: "block",
-                position: "fixed",
-                zIndex: 10000,
-                left: xPosition + 'px',
-                top: yPosition + 'px',
-            });
-            
-            console.log('Current display:', colourPicker.css('display'));
         }
+
+        console.log('Current display:', colourPicker.css('display'));
     })    
-
-    // For clicking outside of the colour picker
-    // $(document).click(function (event) {
-    //     setTimeout(function () {
-    //         if (event.target.parentElement !== null) {
-    //             if (!(event.target.parentElement.classList.contains('colour-picker-clickable')) && !(event.target.classList.contains('colour-picker-clickable'))) {
-    //                 if (colourPickerActive) {
-    //                     colourPickerActive = false
-    //                     $('#colour-picker').fadeOut(300);
-    //                 }
-    //             }
-    //         } else {
-    //             if (colourPickerActive) {
-    //                 colourPickerActive = false
-    //                 $('#colour-picker').fadeOut(300);
-    //             }
-    //         }
-    //     }, 300)
-    // })
-
 
     // COLOUR PICKER
 
