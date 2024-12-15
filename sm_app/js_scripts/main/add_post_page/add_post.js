@@ -141,7 +141,7 @@ $(document).ready(function () {
         if (direction === 'left') {
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
             var affectedSlideID = slideID - 1;
-            mediaFiles = shuffleArray(mediaFiles, slideID, direction)
+            mediaFiles = shuffleArray(mediaFiles, slideID, direction) // TODO: Use media list
 
             // Hold onto caption data (text, colour, font)
             var slideCaptionData = {

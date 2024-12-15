@@ -1,4 +1,4 @@
-export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affectedSlideData) {
+export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affectedSlideData, direction) {
 
     // Preparing variables 
     var mediaURL;
@@ -152,7 +152,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                     var captionFont = relevantData['font'];
 
                     captionTextHtml = `
-                        <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
+                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
                     `;
                     // TODO: update css colour when shuffled as well.
                     captionColourHtml = `
@@ -254,7 +254,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
 
                 } else { // uneffected index
                     captionTextHtml = `
-                        <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
+                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
                     `;
                     captionColourHtml = `
                         <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#000000ff" data-caption-id="${i}"></div> 
@@ -274,7 +274,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
 
             } else { // No shuffling
                 captionTextHtml = `
-                    <input type="text" id="caption-text-#${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
+                    <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
                 `;
                 captionColourHtml = `
                     <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#000000ff" data-caption-id="${i}"></div> 
