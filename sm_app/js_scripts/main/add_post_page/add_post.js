@@ -159,7 +159,7 @@ $(document).ready(function () {
             }
 
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData);
+            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData, direction);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -187,7 +187,7 @@ $(document).ready(function () {
             }
 
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData);
+            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData, direction);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
