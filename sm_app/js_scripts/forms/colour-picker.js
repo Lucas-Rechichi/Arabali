@@ -19,24 +19,8 @@ $(document).ready(function () {
     // Opening colour picker
     $('#post-carousel-captions-form').on('click', '.colour-picker-button', function (event) {
 
-        // Fetch caption ID and current colour
+        // Fetch caption ID
         captionID = $(this).data('caption-id')
-
-        var colourPreview = $('.colour-picker-preview');
-        var currentColourHsl = toHsl(colourPreview.data('colour'));
-
-        if (currentColourHsl['s'] === 0 || currentColourHsl['s'] === 1) {
-            hue = 0;
-            saturation = currentColourHsl['s'] * 100;
-            lightness = currentColourHsl['l'] * 100;
-
-        } else {
-            hue = currentColourHsl['h'];
-            saturation = currentColourHsl['s'] * 100;
-            lightness = currentColourHsl['l'] * 100;
-        }
-
-        updateColour(hueChange=true, usedSliders=false);
 
         // Get the colour picker popup, and display it
         var colourPicker = $('#colour-picker');
@@ -50,6 +34,24 @@ $(document).ready(function () {
         } else {
             colourPickerActive = true
 
+            // Get the current colour of the colour picker button, send that over to the colour picker popup
+            var colourPickerButton = $('#caption-text-colour-' + captionID);
+            var currentColourHsl = toHsl(colourPickerButton.data('colour'));
+
+            if (currentColourHsl['s'] === 0 || currentColourHsl['s'] === 1) {
+                hue = 0;
+                saturation = currentColourHsl['s'] * 100;
+                lightness = currentColourHsl['l'] * 100;
+
+            } else {
+                hue = currentColourHsl['h'];
+                saturation = currentColourHsl['s'] * 100;
+                lightness = currentColourHsl['l'] * 100;
+            }
+
+            updateColour(hueChange=true, usedSliders=false);
+
+            // Display the colour picker
             setTimeout(function () {
                 colourPicker.css({
                     display: "block",
@@ -246,23 +248,23 @@ $(document).ready(function () {
 
         // Gets the new colour and formats it in hex8 colour format
         var colourSelected = culori.formatHex8(`hsla(${hue}, ${saturation}%, ${lightness}%, ${opacity})`)
-        var newColourHtml = `<div id="colour-picker-button-${captionID}" class="colour-picker-button" data-colour="${colourSelected}" data-caption-id="${captionID}"></div>`
+        var newColourHtml = `<div id="caption-text-colour-${captionID}" class="colour-picker-button" data-colour="${colourSelected}" data-caption-id="${captionID}"></div>`
 
         // Replaces the current button so that the new one can store the new colour
-        $('#colour-picker-button-' + captionID).remove();
-        $('#colour-picker-button-background' + captionID).html(newColourHtml);
+        $('#caption-text-colour-' + captionID).remove();
+        $('#colour-picker-button-background-' + captionID).html(newColourHtml);
 
         // Updates the new button visually with the new colour
-        $('#colour-picker-button-' + captionID).css('background-color', colourSelected)
+        $('#caption-text-colour-' + captionID).css('background-color', colourSelected)
 
         // Close the colour picker menu
-        $('.colour-picker').fadeOut(300);
+        $('#colour-picker').fadeOut(300);
     })
 
     // Cancel colour button
     $('#cancel-colour-selection').click(function () {
         colourPickerActive = false
-        $('.colour-picker').fadeOut(300);
+        $('#colour-picker').fadeOut(300);
     })
 
     // Calculates the saturation effect on a RGB colour

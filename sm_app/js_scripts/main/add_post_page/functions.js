@@ -136,20 +136,13 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
 
                 // If the index lines up with the indexes involved with the shuffle
                 if (i === movingCaptionID || i === affectedCaptionID) {
-                    
+
                     // Logic for what needs to be moved
+                    var relevantData
                     if (i === movingCaptionID) {
-                        if (direction === 'right') {
-                            var relevantData = affectedSlideData
-                        } else {
-                            var relevantData = movingSlideData
-                        }
+                        relevantData = affectedSlideData
                     } else {
-                        if (direction === 'right') {
-                            var relevantData = movingSlideData
-                        } else {
-                            var relevantData = affectedSlideData
-                        }
+                        relevantData = movingSlideData
                     }
 
                     // Get the caption components from the relevant data

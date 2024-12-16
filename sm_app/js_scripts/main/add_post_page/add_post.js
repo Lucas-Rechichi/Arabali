@@ -141,7 +141,7 @@ $(document).ready(function () {
         if (direction === 'left') {
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
             var affectedSlideID = slideID - 1;
-            mediaFiles = shuffleArray(mediaFiles, slideID, direction) // TODO: Use media list
+            mediaList = shuffleArray(mediaList, slideID, direction) // TODO: Use media list
 
             // Hold onto caption data (text, colour, font)
             var slideCaptionData = {
@@ -159,17 +159,22 @@ $(document).ready(function () {
             }
 
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData, direction);
+            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData, direction);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
 
-            
+            // Change the css of the colour picker buttons for the caption form
+            var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
+
+            colourPickerButtons.each(function () {
+                $(this).css('background-color', `${$(this).data('colour')}`);
+            })
 
         } else { // direction === 'right'
             // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
             var affectedSlideID = slideID + 1;
-            mediaFiles = shuffleArray(mediaFiles, slideID, direction)
+            mediaList = shuffleArray(mediaList, slideID, direction)
 
             // Hold onto caption data (text, colour, font)
             var slideCaptionData = {
@@ -187,13 +192,30 @@ $(document).ready(function () {
             }
 
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaFiles, true, slideCaptionData, affectedSlideCaptionData, direction);
+            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData, direction);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
+
+            // Change the css of the colour picker buttons for the caption form
+            var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
+
+            colourPickerButtons.each(function () {
+                $(this).css('background-color', `${$(this).data('colour')}`);
+            })
         }
     })
     // Carousel control pannel: Delete
+    $('#post-carousel-control-pannel').on('click', '.carousel-pannel-delete', function () {
+        // Get caption id
+        var slideID = $(this).data('caption-id');
+
+
+
+        // Delete from media list, redo previews
+
+    });
+
 
     // Visual modals 
     var creatingPostModal = new bootstrap.Modal(document.getElementById('creating-post-modal'), {
