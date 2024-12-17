@@ -210,11 +210,51 @@ $(document).ready(function () {
         // Get caption id
         var slideID = $(this).data('caption-id');
 
-
-
         // Delete from media list, redo previews
+        mediaList.splice(slideID, 1)
 
+        if (mediaList.length > 0) {
+            // Recall previewMediaFiles function with the newly ordered files
+            var carouselObjects = previewMediaFiles(mediaList, false);
+            $('#post-media-preview-container').html(carouselObjects['carousel']);
+            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
+            $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
+        } else {
+            // Replace data with defaults
+            var emptyPannelMessageHtml = `
+                <div class="row">
+                    <div class="col">
+                        <p class="lead text-center m-0 pt-2 pb-2">No media to sort.</p>
+                    </div>
+                </div>
+            `;
+            var emptyCaptionContainerMessageHtml = `
+                <div class="row">
+                    <div class="col">
+                        <p class="lead text-center m-0 pt-2 pb-2">No media to caption.</p>
+                    </div>
+                </div>
+            `;
+            var imagePlaceholderHtml = `
+                <i class="bi bi-card-image d-flex justify-content-center" style="font-size: 15rem; color: #198754;"></i>
+            `;
+
+            $('#post-carousel-control-pannel').html(emptyPannelMessageHtml);
+            $('#post-carousel-captions-form').html(emptyCaptionContainerMessageHtml);
+            $('#post-media-preview-container').html(imagePlaceholderHtml);
+        }
     });
+
+    // TODO: Input previews for carousel captions, preview updated colours and fonts 
+    $('#post-carousel-captions-form').on('input', '.caption-text', function () {
+        // change the caption text of the specified index
+    })
+
+    // put colour change within colour picker
+
+    $('#post-carousel-captios-form').on('change', '.caption-text-font', function () {
+        // change the font used for the caption with the correct caption index/id
+    })
 
 
     // Visual modals 

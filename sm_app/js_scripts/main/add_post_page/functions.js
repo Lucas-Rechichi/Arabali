@@ -248,7 +248,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
 
                     // Adding in font option to select
                     captionFontHtml = `
-                        <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                        <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Default select example" data-caption-id="${i}">
                             ${optionsHtml}
                         </select>
                     `;
@@ -266,7 +266,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                     <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#000000ff" data-caption-id="${i}"></div> 
                 `;
                 captionFontHtml = `
-                    <select id="text-font-${i}" class="form-select font-select" aria-label="Default select example" data-caption-id="${i}">
+                    <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Default select example" data-caption-id="${i}">
                         <option value="default" selected>Default Font</option>
                         <option value="strong"><Strong>Strong</Strong></option>
                         <option value="italic"><em>Italic</em></option>
