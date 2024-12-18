@@ -1,4 +1,4 @@
-export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affectedSlideData, direction) {
+export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCaptionID, direction) {
 
     // Preparing variables 
     var mediaURL;
@@ -8,6 +8,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
     var carouselIndicatorsHtml = ``;
     
     var carouselSlideHtml;
+    var carouselCaptionHtml;
     var carouselIndicatiorHtml;
 
     // Carousel control and caption form
@@ -19,6 +20,11 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
     var captionTextHtml;
     var captionColourHtml;
     var captionFontHtml;
+
+    var captionData;
+    var captionText;
+    var captionColour;
+    var captionFont;
 
 
     // Loops though all media within the media files list
@@ -36,27 +42,6 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
             } else {
                 carouselIndicatiorHtml = `
                     <button type="button" data-bs-target="#preview-media-carousal" data-bs-slide-to="${i}" aria-label="Slide ${i + 1}"></button>
-                `;
-            }
-
-            // Creating the carousal slides
-            if (i == 0) {
-                carouselSlideHtml = `
-                    <div class="carousel-item active">
-                        <img src="${mediaURL}" class="d-block w-100"  alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" aria-current="true" style="width: 365px; height: 200px;">
-                        <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
-                            <p id="carousel-caption-text-${i}" data-caption-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                carouselSlideHtml = `
-                    <div class="carousel-item">
-                        <img src="${mediaURL}" class="d-block w-100" alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" style="width: 365px; height: 200px;">
-                        <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
-                            <p id="carousel-caption-text-${i}" data-caption-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
-                        </div>
-                    </div>
                 `;
             }
 
@@ -127,143 +112,146 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                         </div>
                     </div>
                 `;
-            }
-            // For when shuffling of media occurs
+            };
+
+            // For when shuffling of media occurs, change captions and caption preview.
             if (shuffle) {
-                // Getting data
-                var movingCaptionID = movingSlideData['id'];
-                var affectedCaptionID = affectedSlideData['id'];
-
                 // If the index lines up with the indexes involved with the shuffle
-                if (i === movingCaptionID || i === affectedCaptionID) {
-
+                if (i === captionID || i === affectedCaptionID) {
                     // Logic for what needs to be moved
-                    var relevantData
-                    if (i === movingCaptionID) {
-                        relevantData = affectedSlideData
+                    if (i === captionID) {
+                        captionData = getCaptionData(affectedCaptionID);
                     } else {
-                        relevantData = movingSlideData
+                        captionData = getCaptionData(captionID);
                     }
+                } else {
+                    captionData =  getCaptionData(i);
+                };
 
-                    // Get the caption components from the relevant data
-                    var captionText = relevantData['text']
-                    var captionColour = relevantData['colourHex8']
-                    var captionFont = relevantData['font']
-
+                // HTML for the caption form
+                if (captionData['text'] === 'This image represents...') {
                     captionTextHtml = `
-                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
+                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
                     `;
-
-                    // TODO: Update css colour when shuffled as well.
-                    captionColourHtml = `
-                        <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="${captionColour}" data-caption-id="${i}"></div> 
+                } else {
+                    captionTextHtml = `
+                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" value="${captionData['text']}" aria-label="Caption" data-caption-id="${i}">
                     `;
+                };
 
-                    // For the font selected
-                    switch (captionFont) {
-                        case 'default':
-                            var optionsHtml = `
-                                <option value="default" selected>Default Font</option>
-                                <option value="strong">Strong</option>
-                                <option value="italic">Italic</option>
-                                <option value="corier-new">Corier New</option>
-                                <option value="comic-sans-MS">Comic Sans MS</option>
-                                <option value="impact">Impact</option>
-                                <option value="palatino-linotype">Palatino Linotype</option>
-                            `
-                            break;
+                captionColourHtml = `
+                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="${captionData['colour']}" data-caption-id="${i}"></div> 
+                `;
 
-                        case 'strong':
-                            var optionsHtml = `
-                                <option value="default">Default Font</option>
-                                <option value="strong" selected>Strong</option>
-                                <option value="italic">Italic</option>
-                                <option value="corier-new">Corier New</option>
-                                <option value="comic-sans-MS">Comic Sans MS</option>
-                                <option value="impact">Impact</option>
-                                <option value="palatino-linotype">Palatino Linotype</option>
-                            `
-                            break;
+                // For the font selected
+                switch (captionData['font']) {
+                    case 'default':
+                        var optionsHtml = `
+                            <option value="default" selected>Default Font</option>
+                            <option value="strong">Strong</option>
+                            <option value="italic">Italic</option>
+                            <option value="corier-new">Corier New</option>
+                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="impact">Impact</option>
+                            <option value="palatino-linotype">Palatino Linotype</option>
+                        `;
+                        break;
 
-                        case 'italic':
-                            var optionsHtml = `
-                                <option value="default">Default Font</option>
-                                <option value="strong">Strong</option>
-                                <option value="italic" selected>Italic</option>
-                                <option value="corier-new">Corier New</option>
-                                <option value="comic-sans-MS">Comic Sans MS</option>
-                                <option value="impact">Impact</option>
-                                <option value="palatino-linotype">Palatino Linotype</option>
-                            `
-                            break;
+                    case 'strong':
+                        var optionsHtml = `
+                            <option value="default">Default Font</option>
+                            <option value="strong" selected>Strong</option>
+                            <option value="italic">Italic</option>
+                            <option value="corier-new">Corier New</option>
+                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="impact">Impact</option>
+                            <option value="palatino-linotype">Palatino Linotype</option>
+                        `;
+                        break;
 
-                        case 'corier-new':
-                            var optionsHtml = `
-                                <option value="default">Default Font</option>
-                                <option value="strong">Strong</option>
-                                <option value="italic">Italic</option>
-                                <option value="corier-new" selected>Corier New</option>
-                                <option value="comic-sans-MS">Comic Sans MS</option>
-                                <option value="impact">Impact</option>
-                                <option value="palatino-linotype">Palatino Linotype</option>
-                            `
-                            break;
+                    case 'italic':
+                        var optionsHtml = `
+                            <option value="default">Default Font</option>
+                            <option value="strong">Strong</option>
+                            <option value="italic" selected>Italic</option>
+                            <option value="corier-new">Corier New</option>
+                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="impact">Impact</option>
+                            <option value="palatino-linotype">Palatino Linotype</option>
+                        `;
+                        break;
 
-                        case 'comic-sans-MS':
-                            var optionsHtml = `
-                                <option value="default">Default Font</option>
-                                <option value="strong">Strong</option>
-                                <option value="italic">Italic</option>
-                                <option value="corier-new">Corier New</option>
-                                <option value="comic-sans-MS" selected>Comic Sans MS</option>
-                                <option value="impact">Impact</option>
-                                <option value="palatino-linotype">Palatino Linotype</option>
-                            `
-                            break;
+                    case 'corier-new':
+                        var optionsHtml = `
+                            <option value="default">Default Font</option>
+                            <option value="strong">Strong</option>
+                            <option value="italic">Italic</option>
+                            <option value="corier-new" selected>Corier New</option>
+                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="impact">Impact</option>
+                            <option value="palatino-linotype">Palatino Linotype</option>
+                        `;
+                        break;
 
-                        case 'impact':
-                            var optionsHtml = `
-                                <option value="default">Default Font</option>
-                                <option value="strong">Strong</option>
-                                <option value="italic">Italic</option>
-                                <option value="corier-new">Corier New</option>
-                                <option value="comic-sans-MS">Comic Sans MS</option>
-                                <option value="impact" selected>Impact</option>
-                                <option value="palatino-linotype">Palatino Linotype</option>
-                            `
-                            break;
+                    case 'comic-sans-MS':
+                        var optionsHtml = `
+                            <option value="default">Default Font</option>
+                            <option value="strong">Strong</option>
+                            <option value="italic">Italic</option>
+                            <option value="corier-new">Corier New</option>
+                            <option value="comic-sans-MS" selected>Comic Sans MS</option>
+                            <option value="impact">Impact</option>
+                            <option value="palatino-linotype">Palatino Linotype</option>
+                        `;
+                        break;
 
-                        case 'palatino-linotype':
-                            var optionsHtml = `
-                                <option value="default">Default Font</option>
-                                <option value="strong">Strong</option>
-                                <option value="italic">Italic</option>
-                                <option value="corier-new">Corier New</option>
-                                <option value="comic-sans-MS">Comic Sans MS</option>
-                                <option value="impact">Impact</option>
-                                <option value="palatino-linotype" selected>Palatino Linotype</option>
-                            `
-                            break;
-                    }
+                    case 'impact':
+                        var optionsHtml = `
+                            <option value="default">Default Font</option>
+                            <option value="strong">Strong</option>
+                            <option value="italic">Italic</option>
+                            <option value="corier-new">Corier New</option>
+                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="impact" selected>Impact</option>
+                            <option value="palatino-linotype">Palatino Linotype</option>
+                        `;
+                        break;
 
-                    // Adding in font option to select
-                    captionFontHtml = `
-                        <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Default select example" data-caption-id="${i}">
-                            ${optionsHtml}
-                        </select>
-                    `;
+                    case 'palatino-linotype':
+                        var optionsHtml = `
+                            <option value="default">Default Font</option>
+                            <option value="strong">Strong</option>
+                            <option value="italic">Italic</option>
+                            <option value="corier-new">Corier New</option>
+                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="impact">Impact</option>
+                            <option value="palatino-linotype" selected>Palatino Linotype</option>
+                        `;
+                        break;
 
-                    // TODO: Make the new caption layout
-                } 
-            }
-            
-            // No shuffle or unaffected index
-            if (!shuffle || !(i === movingCaptionID || i === affectedCaptionID)) {
+                }
+
+                // HTML for the caption preview
+                carouselCaptionHtml = `
+                    <p id="carousel-caption-text-${i}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${captionData['text']}</p>
+                `;
+
+                // Adding in font option to select
+                captionFontHtml = `
+                    <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Font Selection" data-caption-id="${i}">
+                        ${optionsHtml}
+                    </select>
+                `;
+            };
+
+            // No shuffle
+            if (!shuffle) {
+                // Caption form
                 captionTextHtml = `
                     <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
                 `;
                 captionColourHtml = `
-                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#000000ff" data-caption-id="${i}"></div> 
+                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#ffffffff" data-caption-id="${i}"></div> 
                 `;
                 captionFontHtml = `
                     <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Default select example" data-caption-id="${i}">
@@ -275,6 +263,32 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                         <option value="impact">Impact</option>
                         <option value="palatino-linotype">Palatino Linotype</option>
                     </select>
+                `;
+
+                // Caption preview
+                carouselCaptionHtml = `
+                    <p id="carousel-caption-text-${i}" data-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
+                `;
+            };
+
+            // Creating the carousal slides
+            if (i == 0) {
+                carouselSlideHtml = `
+                    <div class="carousel-item active">
+                        <img src="${mediaURL}" class="d-block w-100"  alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" aria-current="true" style="width: 365px; height: 200px;">
+                        <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
+                            ${carouselCaptionHtml}
+                        </div>
+                    </div>
+                `;
+            } else {
+                carouselSlideHtml = `
+                    <div class="carousel-item">
+                        <img src="${mediaURL}" class="d-block w-100" alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" style="width: 365px; height: 200px;">
+                        <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
+                            ${carouselCaptionHtml}
+                        </div>
+                    </div>
                 `;
             };
 
@@ -318,8 +332,8 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
             carouselSlidesHtml += carouselSlideHtml;
             carouselPannelsHtml += carouselPannelHtml;
             carouselCaptionFormHtml += carouselCaptionInputHtml;
-        }
-    }
+        };
+    };
 
     var carouselPreviewHtml = `
         <div id="preview-media-carousal" class="carousel slide">
@@ -348,10 +362,10 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
         'carousel': carouselPreviewHtml,
         'controlPannel': controlPannelHtml,
         'captionForm': carouselCaptionFormHtml,
-    }
+    };
 
     return previewHtml
-}
+};
 
 
 export function addMediaToList(mediaFiles, currentMediaList) {

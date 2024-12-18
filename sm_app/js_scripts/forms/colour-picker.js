@@ -1,7 +1,6 @@
 import { getCaptionData } from "../main/add_post_page/functions.js";
 
 $(document).ready(function () {
-    
     // FUNCTIONALITY
 
     // Setup
@@ -11,10 +10,10 @@ $(document).ready(function () {
     // Setup variables
     const toHsl = culori.converter('hsl');
 
-    // Initial hsl and opacity values (for black)
+    // Initial hsl and opacity values (for white)
     let hue = 0;
     let saturation = 100;
-    let lightness = 0;
+    let lightness = 100;
     let opacity = 1;
     
 
@@ -262,7 +261,7 @@ $(document).ready(function () {
         // Updates the colour of the specified input
         var captionData = getCaptionData(captionID);
         var newCaptionHtml = `
-            <p id="carousel-caption-text-${captionID}" data-caption-font="${captionData['font']}" data-colour="${colourSelected}" style="color: ${colourSelected}">${captionData['text']}</p>
+            <p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${colourSelected}" style="color: ${colourSelected}">${captionData['text']}</p>
         `;
         $('#carousel-caption-' + captionID).html(newCaptionHtml);
 

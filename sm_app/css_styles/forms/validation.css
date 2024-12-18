@@ -7,3 +7,13 @@
     border-color: #dc3545;
     background-color: rgba(255, 201, 206, 0.777);
 }
+
+/* For the validation of warning messages */
+
+.warning-message {
+    display: none;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: .875em;
+    color: #dc3545;
+}

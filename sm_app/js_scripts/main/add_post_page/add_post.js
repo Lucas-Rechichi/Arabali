@@ -143,23 +143,8 @@ $(document).ready(function () {
             var affectedSlideID = slideID - 1;
             mediaList = shuffleArray(mediaList, slideID, direction) // TODO: Use media list
 
-            // Hold onto caption data (text, colour, font)
-            var slideCaptionData = {
-                'id': slideID,
-                'text': $('#caption-text-' + slideID).val(),
-                'colourHex8': $('#caption-text-colour-' + slideID).data('colour'),
-                'font': $('#text-font-' + slideID).val()
-            }
-
-            var affectedSlideCaptionData = {
-                'id': affectedSlideID,
-                'text': $('#caption-text-' + affectedSlideID).val(),
-                'colourHex8': $('#caption-text-colour-' + affectedSlideID).data('colour'),
-                'font': $('#text-font-' + affectedSlideID).val()
-            }
-
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData, direction);
+            var carouselObjects = previewMediaFiles(mediaList, true, slideID, affectedSlideID, direction);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -176,23 +161,8 @@ $(document).ready(function () {
             var affectedSlideID = slideID + 1;
             mediaList = shuffleArray(mediaList, slideID, direction)
 
-            // Hold onto caption data (text, colour, font)
-            var slideCaptionData = {
-                'id': slideID,
-                'text': $('#caption-text-' + slideID).val(),
-                'colourHex8': $('#caption-text-colour-' + slideID).data('colour'),
-                'font': $('#text-font-' + slideID).val()
-            }
-
-            var affectedSlideCaptionData = {
-                'id': affectedSlideID,
-                'text': $('#caption-text-' + affectedSlideID).val(),
-                'colourHex8': $('#caption-text-colour-' + affectedSlideID).data('colour'),
-                'font': $('#text-font-' + affectedSlideID).val()
-            }
-
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList, true, slideCaptionData, affectedSlideCaptionData, direction);
+            var carouselObjects = previewMediaFiles(mediaList, true, slideID, affectedSlideID, direction);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -254,9 +224,9 @@ $(document).ready(function () {
         var captionData = getCaptionData(captionID);
 
         if (textInput.length === 0) {
-            var textHtml = `<p id="carousel-caption-text-${captionID}" data-caption-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">This image represents...</p>`
+            var textHtml = `<p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">This image represents...</p>`
         } else {
-            var textHtml = `<p id="carousel-caption-text-${captionID}" data-caption-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${textInput}</p>`
+            var textHtml = `<p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${textInput}</p>`
         }
 
         $('#carousel-caption-' + captionID).html(textHtml)
@@ -328,6 +298,7 @@ $(document).ready(function () {
             var contentsInput = $('#post-contents').val();
             var mediaInput = mediaList
 
+            // Show the creating post modal
             creatingPostModal.show()
 
             formData = new FormData()
