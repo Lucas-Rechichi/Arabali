@@ -247,12 +247,29 @@ $(document).ready(function () {
 
     // TODO: Input previews for carousel captions, preview updated colours and fonts 
     $('#post-carousel-captions-form').on('input', '.caption-text', function () {
-        // change the caption text of the specified index
+        var captionID = $(this).data('caption-id');
+        var textInput = $(this).val();
+        // TODO: Add validation capabilities to this input
+
+        if (textInput.length === 0) {
+            var textHtml = `<p>This image represents...</p>`
+        } else {
+            var textHtml = `<p>${textInput}</p>`;
+        }
+
+        $('#carousel-caption-' + captionID).html(textHtml)
+        
     })
 
+    // TODO: Add validation capabilities to this input
     // put colour change within colour picker
 
     $('#post-carousel-captios-form').on('change', '.caption-text-font', function () {
+        var captionID = $(this).data('caption-id');
+        var option = $(this).val()
+
+        console.log(option);
+        // TODO: Add validation capabilities to this input
         // change the font used for the caption with the correct caption index/id
     })
 

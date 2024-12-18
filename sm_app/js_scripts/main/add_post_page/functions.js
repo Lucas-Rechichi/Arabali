@@ -44,7 +44,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                 carouselSlideHtml = `
                     <div class="carousel-item active">
                         <img src="${mediaURL}" class="d-block w-100"  alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" aria-current="true" style="width: 365px; height: 200px;">
-                        <div class="carousel-caption d-block d-md-block">
+                        <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
                             <p>This image represents...</p>
                         </div>
                     </div>
@@ -53,7 +53,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                 carouselSlideHtml = `
                     <div class="carousel-item">
                         <img src="${mediaURL}" class="d-block w-100" alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" style="width: 365px; height: 200px;">
-                        <div class="carousel-caption d-block d-md-block">
+                        <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
                             <p>This image represents...</p>
                         </div>
                     </div>
