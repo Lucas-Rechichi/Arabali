@@ -1,3 +1,5 @@
+import { getCaptionData } from "../main/add_post_page/functions.js";
+
 $(document).ready(function () {
     
     // FUNCTIONALITY
@@ -49,7 +51,7 @@ $(document).ready(function () {
                 lightness = currentColourHsl['l'] * 100;
             }
 
-            updateColour(hueChange=true, usedSliders=false);
+            updateColour(true, false);
 
             // Display the colour picker
             setTimeout(function () {
@@ -156,23 +158,23 @@ $(document).ready(function () {
     // Event listeners for sliders
     $('#hue-slider').on('input', function () {
         hue = $(this).val();
-        updateColour(hueChange=true, usedSliders=true);
+        updateColour(true, true);
         
     });
 
     $('#saturation-slider').on('input', function () {
         saturation = $(this).val();
-        updateColour(hueChange=false, usedSliders=true);
+        updateColour(false, true);
     });
 
     $('#lightness-slider').on('input', function () {
         lightness = $(this).val();
-        updateColour(hueChange=false, usedSliders=true);
+        updateColour(false, true);
     });
 
     $('#opacity-slider').on('input', function () {
         opacity = $(this).val() / 100; // to make the opacity between 0 and 1
-        updateColour(hueChange=false, usedSliders=true);
+        updateColour(false, true);
     });
 
     // For the input of the text fields
@@ -193,7 +195,7 @@ $(document).ready(function () {
                 lightness = colourHsl['l'] * 100;
             }
 
-            updateColour(hueChange=true, usedSliders=false);
+            updateColour(true, false);
         } 
 
     })
@@ -202,7 +204,7 @@ $(document).ready(function () {
         var newRgbValue = event.target.value;
         var validated;
         if (newRgbValue.includes('rgba')) {
-            validated = rgbStringValidation(newRgbValue, alpha=true)
+            validated = rgbStringValidation(newRgbValue, true)
             if (validated) {
                 var colourHsl = toHsl(newRgbValue)
                 if (colourHsl['s'] === 0 || colourHsl['s'] === 1) {
@@ -216,13 +218,13 @@ $(document).ready(function () {
                     lightness = colourHsl['l'] * 100
                     opacity = colourHsl['alpha']
                 }
-                updateColour(hueChange=true, usedSliders=false);
+                updateColour(true, usedSliders=false);
             } else {
                 // throw a validation error
             }
 
         } else {
-            validated = rgbStringValidation(newRgbValue, alpha=false)
+            validated = rgbStringValidation(newRgbValue, false)
             if (validated) {
                 var colourHsl = toHsl(newRgbValue)
                 if (colourHsl['s'] === 0) {
@@ -235,7 +237,7 @@ $(document).ready(function () {
                     lightness = colourHsl['l'] * 100
                 }
 
-                updateColour(hueChange=true, usedSliders=false)
+                updateColour(true, false)
             } else {
                 // throw a validation error
             }
@@ -256,6 +258,13 @@ $(document).ready(function () {
 
         // Updates the new button visually with the new colour
         $('#caption-text-colour-' + captionID).css('background-color', colourSelected)
+
+        // Updates the colour of the specified input
+        var captionData = getCaptionData(captionID);
+        var newCaptionHtml = `
+            <p id="carousel-caption-text-${captionID}" data-caption-font="${captionData['font']}" data-colour="${colourSelected}" style="color: ${colourSelected}">${captionData['text']}</p>
+        `;
+        $('#carousel-caption-' + captionID).html(newCaptionHtml);
 
         // Close the colour picker menu
         $('#colour-picker').fadeOut(300);
@@ -419,5 +428,5 @@ $(document).ready(function () {
     }
 
     // Initialise the colour picker
-    updateColour(hueChange=true, usedSliders=false);
+    updateColour(true, false);
     })

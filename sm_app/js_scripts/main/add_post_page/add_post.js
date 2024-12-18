@@ -1,4 +1,4 @@
-import { previewMediaFiles, addMediaToList, shuffleArray } from './functions.js';
+import { previewMediaFiles, addMediaToList, shuffleArray, getCaptionData } from './functions.js';
 
 $(document).ready(function () {
 
@@ -251,10 +251,12 @@ $(document).ready(function () {
         var textInput = $(this).val();
         // TODO: Add validation capabilities to this input
 
+        var captionData = getCaptionData(captionID);
+
         if (textInput.length === 0) {
-            var textHtml = `<p>This image represents...</p>`
+            var textHtml = `<p id="carousel-caption-text-${captionID}" data-caption-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">This image represents...</p>`
         } else {
-            var textHtml = `<p>${textInput}</p>`;
+            var textHtml = `<p id="carousel-caption-text-${captionID}" data-caption-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${textInput}</p>`
         }
 
         $('#carousel-caption-' + captionID).html(textHtml)

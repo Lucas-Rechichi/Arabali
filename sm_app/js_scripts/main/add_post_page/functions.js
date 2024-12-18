@@ -45,7 +45,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                     <div class="carousel-item active">
                         <img src="${mediaURL}" class="d-block w-100"  alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" aria-current="true" style="width: 365px; height: 200px;">
                         <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
-                            <p>This image represents...</p>
+                            <p id="carousel-caption-text-${i}" data-caption-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
                         </div>
                     </div>
                 `;
@@ -54,7 +54,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                     <div class="carousel-item">
                         <img src="${mediaURL}" class="d-block w-100" alt="Media preview with url: ${mediaURL} and for slide: ${i + 1}" style="width: 365px; height: 200px;">
                         <div id="carousel-caption-${i}" class="carousel-caption d-block d-md-block">
-                            <p>This image represents...</p>
+                            <p id="carousel-caption-text-${i}" data-caption-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
                         </div>
                     </div>
                 `;
@@ -164,84 +164,84 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                         case 'default':
                             var optionsHtml = `
                                 <option value="default" selected>Default Font</option>
-                                <option value="strong"><Strong>Strong</Strong></option>
-                                <option value="italic"><em>Italic</em></option>
-                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                                <option value="strong">Strong</option>
+                                <option value="italic">Italic</option>
+                                <option value="corier-new">Corier New</option>
+                                <option value="comic-sans-MS">Comic Sans MS</option>
+                                <option value="impact">Impact</option>
+                                <option value="palatino-linotype">Palatino Linotype</option>
                             `
                             break;
 
                         case 'strong':
                             var optionsHtml = `
                                 <option value="default">Default Font</option>
-                                <option value="strong" selected><Strong>Strong</Strong></option>
-                                <option value="italic"><em>Italic</em></option>
-                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                                <option value="strong" selected>Strong</option>
+                                <option value="italic">Italic</option>
+                                <option value="corier-new">Corier New</option>
+                                <option value="comic-sans-MS">Comic Sans MS</option>
+                                <option value="impact">Impact</option>
+                                <option value="palatino-linotype">Palatino Linotype</option>
                             `
                             break;
 
                         case 'italic':
                             var optionsHtml = `
                                 <option value="default">Default Font</option>
-                                <option value="strong"><Strong>Strong</Strong></option>
-                                <option value="italic" selected><em>Italic</em></option>
-                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                                <option value="strong">Strong</option>
+                                <option value="italic" selected>Italic</option>
+                                <option value="corier-new">Corier New</option>
+                                <option value="comic-sans-MS">Comic Sans MS</option>
+                                <option value="impact">Impact</option>
+                                <option value="palatino-linotype">Palatino Linotype</option>
                             `
                             break;
 
                         case 'corier-new':
                             var optionsHtml = `
-                                <option value="default" selected>Default Font</option>
-                                <option value="strong"><Strong>Strong</Strong></option>
-                                <option value="italic"><em>Italic</em></option>
-                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                                <option value="default">Default Font</option>
+                                <option value="strong">Strong</option>
+                                <option value="italic">Italic</option>
+                                <option value="corier-new" selected>Corier New</option>
+                                <option value="comic-sans-MS">Comic Sans MS</option>
+                                <option value="impact">Impact</option>
+                                <option value="palatino-linotype">Palatino Linotype</option>
                             `
                             break;
 
                         case 'comic-sans-MS':
                             var optionsHtml = `
                                 <option value="default">Default Font</option>
-                                <option value="strong"><Strong>Strong</Strong></option>
-                                <option value="italic"><em>Italic</em></option>
-                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                <option value="comic-sans-MS selected"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                                <option value="strong">Strong</option>
+                                <option value="italic">Italic</option>
+                                <option value="corier-new">Corier New</option>
+                                <option value="comic-sans-MS" selected>Comic Sans MS</option>
+                                <option value="impact">Impact</option>
+                                <option value="palatino-linotype">Palatino Linotype</option>
                             `
                             break;
 
                         case 'impact':
                             var optionsHtml = `
                                 <option value="default">Default Font</option>
-                                <option value="strong"><Strong>Strong</Strong></option>
-                                <option value="italic"><em>Italic</em></option>
-                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                <option value="impact" selected><p class="p-0 m-0">Impact</p></option>
-                                <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                                <option value="strong">Strong</option>
+                                <option value="italic">Italic</option>
+                                <option value="corier-new">Corier New</option>
+                                <option value="comic-sans-MS">Comic Sans MS</option>
+                                <option value="impact" selected>Impact</option>
+                                <option value="palatino-linotype">Palatino Linotype</option>
                             `
                             break;
 
                         case 'palatino-linotype':
                             var optionsHtml = `
                                 <option value="default">Default Font</option>
-                                <option value="strong"><Strong>Strong</Strong></option>
-                                <option value="italic"><em>Italic</em></option>
-                                <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                                <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                                <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                                <option value="palatino-linotype" seleced><p class="p-0 m-0">Palatino Linotype</p></option>
+                                <option value="strong">Strong</option>
+                                <option value="italic">Italic</option>
+                                <option value="corier-new">Corier New</option>
+                                <option value="comic-sans-MS">Comic Sans MS</option>
+                                <option value="impact">Impact</option>
+                                <option value="palatino-linotype" selected>Palatino Linotype</option>
                             `
                             break;
                     }
@@ -268,12 +268,12 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                 captionFontHtml = `
                     <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Default select example" data-caption-id="${i}">
                         <option value="default" selected>Default Font</option>
-                        <option value="strong"><Strong>Strong</Strong></option>
-                        <option value="italic"><em>Italic</em></option>
-                        <option value="corier-new"><p class="p-0 m-0">Corier New</p></option>
-                        <option value="comic-sans-MS"><p class="p-0 m-0">Comic Sans MS</p></option>
-                        <option value="impact"><p class="p-0 m-0">Impact</p></option>
-                        <option value="palatino-linotype"><p class="p-0 m-0">Palatino Linotype</p></option>
+                        <option value="strong">Strong</option>
+                        <option value="italic">Italic</option>
+                        <option value="corier-new">Corier New</option>
+                        <option value="comic-sans-MS">Comic Sans MS</option>
+                        <option value="impact">Impact</option>
+                        <option value="palatino-linotype">Palatino Linotype</option>
                     </select>
                 `;
             };
@@ -330,12 +330,10 @@ export function previewMediaFiles(mediaFilesList, shuffle, movingSlideData, affe
                 ${carouselSlidesHtml}
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#preview-media-carousal" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
+                <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Left.png">
             </button>
             <button class="carousel-control-next" type="button" data-bs-target="#preview-media-carousal" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
+                <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Right.png">
             </button>
         </div>
     `;
@@ -411,4 +409,20 @@ export function shuffleArray(array, movingIndex, direction) {
 
     // Return the newly arranged array
     return array
+}
+
+export function getCaptionData(captionID) {
+    var caption = $('#carousel-caption-text-' + captionID);
+
+    var captiontext = caption.text();
+    var captionColour = caption.data('colour');
+    var captionFont = caption.data('font');
+
+    var captionData = {
+        'text': captiontext,
+        'colour': captionColour,
+        'font': captionFont
+    }
+
+    return captionData
 }
