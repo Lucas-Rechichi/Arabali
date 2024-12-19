@@ -224,7 +224,7 @@ $(document).ready(function () {
         var captionData = getCaptionData(captionID);
 
         if (textInput.length === 0) {
-            var textHtml = `<p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">This image represents...</p>`
+            var captionHtml = `<p id="carousel-caption-text-${captionID}" class="${captionData['fontClass']}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">This image represents...</p>`
 
             if ( $('#create-post').hasClass('validated') ) {
                 $('#caption-text-' + captionID).removeClass('is-valid').addClass('is-invalid');
@@ -232,7 +232,7 @@ $(document).ready(function () {
             }
 
         } else {
-            var textHtml = `<p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${textInput}</p>`
+            var captionHtml = `<p id="carousel-caption-text-${captionID}" class="${captionData['fontClass']}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${textInput}</p>`
 
             if ( ( $('#caption-text-' + captionID).hasClass('is-invalid') || $('#carousel-caption-invalid-' + captionID).css('display') === 'block' ) && ( $('#create-post').hasClass('validated') ) ) {
                 $('#caption-text-' + captionID).removeClass('is-invalid').addClass('is-valid');
@@ -240,7 +240,7 @@ $(document).ready(function () {
             }
         }
 
-        $('#carousel-caption-' + captionID).html(textHtml)
+        $('#carousel-caption-' + captionID).html(captionHtml)
         
     })
 
@@ -249,9 +249,12 @@ $(document).ready(function () {
 
     $('#post-carousel-captions-form').on('change', '.caption-text-font', function () {
         var captionID = $(this).data('caption-id');
-        var option = $('#caption-text-font-' + captionID).val();
+        var option = $(this).val();
+        var captionData = getCaptionData(captionID);
 
-        console.log(option);
+        var captionHtml = `<p id="carousel-caption-text-${captionID}" class="${'font-' + option}" data-font="${option}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${captionData['text']}</p>`
+
+        $('#carousel-caption-' + captionID).html(captionHtml);
     })
 
 
@@ -274,15 +277,17 @@ $(document).ready(function () {
         var mediaDropField = $('.file-drop-input');
 
         var captionsAreValid = true;
+        var captionData;
         var captionDataList = [];
         for (let i=0; i < mediaList.length; i++) {
             if ( !($('#caption-text-' + i).val()) ) {
                 captionsAreValid = false
             } else {
+                captionData = getCaptionData(i)
                 captionDataList.push({
-                    'text': $('#carousel-caption-text' + i).text(),
-                    'colour': $('#carousel-caption-text' + i).data('colour'),
-                    'font': $('#carousel-caption-text' + i).data('font')
+                    'text': captionData['text'],
+                    'colour': captionData['colour'],
+                    'font-class': captionData['fontClass'] 
                 })
             }
         }

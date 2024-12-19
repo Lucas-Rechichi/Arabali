@@ -22,10 +22,6 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
     var captionFontHtml;
 
     var captionData;
-    var captionText;
-    var captionColour;
-    var captionFont;
-
 
     // Loops though all media within the media files list
     for (let i=0; i < mediaFilesList.length; i++) {
@@ -151,7 +147,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                             <option value="strong">Strong</option>
                             <option value="italic">Italic</option>
                             <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="comic-sans-ms">Comic Sans MS</option>
                             <option value="impact">Impact</option>
                             <option value="palatino-linotype">Palatino Linotype</option>
                         `;
@@ -163,7 +159,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                             <option value="strong" selected>Strong</option>
                             <option value="italic">Italic</option>
                             <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="comic-sans-ms">Comic Sans MS</option>
                             <option value="impact">Impact</option>
                             <option value="palatino-linotype">Palatino Linotype</option>
                         `;
@@ -175,7 +171,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                             <option value="strong">Strong</option>
                             <option value="italic" selected>Italic</option>
                             <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="comic-sans-ms">Comic Sans MS</option>
                             <option value="impact">Impact</option>
                             <option value="palatino-linotype">Palatino Linotype</option>
                         `;
@@ -187,19 +183,19 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                             <option value="strong">Strong</option>
                             <option value="italic">Italic</option>
                             <option value="corier-new" selected>Corier New</option>
-                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="comic-sans-ms">Comic Sans MS</option>
                             <option value="impact">Impact</option>
                             <option value="palatino-linotype">Palatino Linotype</option>
                         `;
                         break;
 
-                    case 'comic-sans-MS':
+                    case 'comic-sans-ms':
                         var optionsHtml = `
                             <option value="default">Default Font</option>
                             <option value="strong">Strong</option>
                             <option value="italic">Italic</option>
                             <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-MS" selected>Comic Sans MS</option>
+                            <option value="comic-sans-ms" selected>Comic Sans MS</option>
                             <option value="impact">Impact</option>
                             <option value="palatino-linotype">Palatino Linotype</option>
                         `;
@@ -211,7 +207,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                             <option value="strong">Strong</option>
                             <option value="italic">Italic</option>
                             <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="comic-sans-ms">Comic Sans MS</option>
                             <option value="impact" selected>Impact</option>
                             <option value="palatino-linotype">Palatino Linotype</option>
                         `;
@@ -223,7 +219,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                             <option value="strong">Strong</option>
                             <option value="italic">Italic</option>
                             <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-MS">Comic Sans MS</option>
+                            <option value="comic-sans-ms">Comic Sans MS</option>
                             <option value="impact">Impact</option>
                             <option value="palatino-linotype" selected>Palatino Linotype</option>
                         `;
@@ -233,7 +229,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
 
                 // HTML for the caption preview
                 carouselCaptionHtml = `
-                    <p id="carousel-caption-text-${i}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${captionData['text']}</p>
+                    <p id="carousel-caption-text-${i}" class="${captionData['fontClass']}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${captionData['text']}</p>
                 `;
 
                 // Adding in font option to select
@@ -259,7 +255,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                         <option value="strong">Strong</option>
                         <option value="italic">Italic</option>
                         <option value="corier-new">Corier New</option>
-                        <option value="comic-sans-MS">Comic Sans MS</option>
+                        <option value="comic-sans-ms">Comic Sans MS</option>
                         <option value="impact">Impact</option>
                         <option value="palatino-linotype">Palatino Linotype</option>
                     </select>
@@ -267,7 +263,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
 
                 // Caption preview
                 carouselCaptionHtml = `
-                    <p id="carousel-caption-text-${i}" data-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
+                    <p id="carousel-caption-text-${i}" class="font-default" data-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
                 `;
             };
 
@@ -435,11 +431,44 @@ export function getCaptionData(captionID) {
     var captionColour = caption.data('colour');
     var captionFont = caption.data('font');
 
+    var fontClass;
+    switch (captionFont) {
+        case 'default':
+            fontClass = 'font-default';
+            break;
+        
+        case 'strong':
+            fontClass = 'font-strong';
+            break;
+
+        case 'italic':
+            fontClass = 'font-italic';
+            break;
+
+        case 'corier-new':
+            fontClass = 'font-corier-new';
+            break;
+
+        case 'comic-sans-ms':
+            fontClass = 'font-comic-sans-ms';
+            break;
+
+        case 'impact':
+            fontClass = 'font-impact';
+            break;
+
+        case 'palatino-linotype':
+            fontClass = 'font-palatino-linotype';
+            break;
+    }
+
+
     var captionData = {
         'text': captiontext,
         'colour': captionColour,
-        'font': captionFont
-    }
+        'font': captionFont,
+        'fontClass': fontClass
+    };
 
-    return captionData
+    return captionData;
 }

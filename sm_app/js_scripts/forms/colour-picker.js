@@ -261,7 +261,7 @@ $(document).ready(function () {
         // Updates the colour of the specified input
         var captionData = getCaptionData(captionID);
         var newCaptionHtml = `
-            <p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${colourSelected}" style="color: ${colourSelected}">${captionData['text']}</p>
+            <p id="carousel-caption-text-${captionID}" class="${captionData['fontClass']}" data-font="${captionData['font']}" data-colour="${colourSelected}" style="color: ${colourSelected}">${captionData['text']}</p>
         `;
         $('#carousel-caption-' + captionID).html(newCaptionHtml);
 
