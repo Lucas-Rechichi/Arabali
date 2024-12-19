@@ -126,7 +126,6 @@ $(document).ready(function () {
 
             // Visual indicators for the dropover box
             $(this).removeClass('drag-over-state');
-            $(this).addClass('valid-media');
 
         }
     })
@@ -213,36 +212,46 @@ $(document).ready(function () {
             $('#post-carousel-captions-form').html(emptyCaptionContainerMessageHtml);
             $('#post-media-preview-container').html(imagePlaceholderHtml);
         }
+        // Hide the limit message
+        $('#post-media-limit-message').css('display', 'none');
     });
 
     // TODO: Input previews for carousel captions, preview updated colours and fonts 
     $('#post-carousel-captions-form').on('input', '.caption-text', function () {
         var captionID = $(this).data('caption-id');
         var textInput = $(this).val();
-        // TODO: Add validation capabilities to this input
 
         var captionData = getCaptionData(captionID);
 
         if (textInput.length === 0) {
             var textHtml = `<p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">This image represents...</p>`
+
+            if ( $('#create-post').hasClass('validated') ) {
+                $('#caption-text-' + captionID).removeClass('is-valid').addClass('is-invalid');
+                $('#carousel-caption-invalid-' + captionID).css('display', 'block');
+            }
+
         } else {
             var textHtml = `<p id="carousel-caption-text-${captionID}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${textInput}</p>`
+
+            if ( ( $('#caption-text-' + captionID).hasClass('is-invalid') || $('#carousel-caption-invalid-' + captionID).css('display') === 'block' ) && ( $('#create-post').hasClass('validated') ) ) {
+                $('#caption-text-' + captionID).removeClass('is-invalid').addClass('is-valid');
+                $('#carousel-caption-invalid-' + captionID).css('display', 'none');
+            }
         }
 
         $('#carousel-caption-' + captionID).html(textHtml)
         
     })
 
-    // TODO: Add validation capabilities to this input
-    // put colour change within colour picker
+    // Colour picker previews are within colour-picker.js
 
-    $('#post-carousel-captios-form').on('change', '.caption-text-font', function () {
+
+    $('#post-carousel-captions-form').on('change', '.caption-text-font', function () {
         var captionID = $(this).data('caption-id');
-        var option = $(this).val()
+        var option = $('#caption-text-font-' + captionID).val();
 
         console.log(option);
-        // TODO: Add validation capabilities to this input
-        // change the font used for the caption with the correct caption index/id
     })
 
 
@@ -257,16 +266,31 @@ $(document).ready(function () {
     // Post submission
     $('#create-post').click(function () {
         $(this).addClass('validated')
+        console.log($('#caption-text-0').val())
 
-        // defining key input fields 
+        // Defining key input fields 
         var titleField = $('#post-title');
         var contentsField = $('#post-contents');
         var mediaDropField = $('.file-drop-input');
 
-        // form validation
-        if (titleField.val().length == 0 || contentsField.val().length == 0 || !mediaFiles) {
+        var captionsAreValid = true;
+        var captionDataList = [];
+        for (let i=0; i < mediaList.length; i++) {
+            if ( !($('#caption-text-' + i).val()) ) {
+                captionsAreValid = false
+            } else {
+                captionDataList.push({
+                    'text': $('#carousel-caption-text' + i).text(),
+                    'colour': $('#carousel-caption-text' + i).data('colour'),
+                    'font': $('#carousel-caption-text' + i).data('font')
+                })
+            }
+        }
 
-            // for the title
+        // Form validation
+        if (titleField.val().length == 0 || contentsField.val().length == 0 || !mediaFiles || !captionsAreValid) {
+
+            // For the title
             if (titleField.val().length == 0) {
                 titleField.removeClass('is-valid').addClass('is-invalid');
                 $('#post-title-invalid').css('display', 'block');
@@ -275,7 +299,7 @@ $(document).ready(function () {
                 $('#post-title-invalid').css('display', 'none');
             }
 
-            // for the contents of the post
+            // For the contents of the post
             if (contentsField.val().length == 0) {
                 contentsField.removeClass('is-valid').addClass('is-invalid');
                 $('#post-contents-invalid').css('display', 'block');
@@ -284,7 +308,7 @@ $(document).ready(function () {
                 $('#post-contetns-invalid').css('display', 'none');
             }   
 
-            // for the media of the post
+            // For the media of the post
             if (!mediaFiles) {
                 mediaDropField.removeClass('valid-media').addClass('invalid-media');
                 $('#post-media-invalid').css('display', 'block');
@@ -292,11 +316,24 @@ $(document).ready(function () {
                 mediaDropField.removeClass('invalid-media').addClass('valid-media');
                 $('#post-media-invalid').css('display', 'none');
             }
+
+            for (let i=0; i < mediaList.length; i++) {
+                if ( !($('#caption-text-' + i).val()) ) {
+                    $('#caption-text-' + i).removeClass('is-valid').addClass('is-invalid');
+                    $('#carousel-caption-invalid-' + i).css('display', 'block');
+                } else {
+                    $('#caption-text' + i).removeClass('is-invalid').addClass('is-valid');
+                    $('#carousel-caption-invalid-' + i).css('display', 'none');
+                }
+            }
+
         } else {
             // getting relevant data
             var titleInput = $('#post-title').val();
             var contentsInput = $('#post-contents').val();
-            var mediaInput = mediaList
+            var mediaInput = mediaList;
+
+            // Caption data is gotten within first for loop
 
             // Show the creating post modal
             creatingPostModal.show()
@@ -305,6 +342,7 @@ $(document).ready(function () {
             formData.append('title', titleInput)
             formData.append('contents', contentsInput)
             formData.append('media', mediaInput)
+            formData.append('captions', captionDataList)
             formData.append('csrfmiddlewaretoken', csrfToken)
 
             $.ajax({

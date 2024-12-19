@@ -304,6 +304,9 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                                 <div class="col-4">
                                     <label for="caption-text-${i}" class="form-label">Caption:</label>
                                     ${captionTextHtml}
+                                    <div id="carousel-caption-invalid-${i}" aria-describedby="carousel-caption" class="invalid-feedback ms-1">
+                                        <strong>Caption Text Requred</strong>
+                                    </div>
                                 </div>
                                 <div class="col-2">
                                     <div class="dropdown">
