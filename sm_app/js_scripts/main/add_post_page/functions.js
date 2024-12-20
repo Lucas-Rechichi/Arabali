@@ -431,37 +431,7 @@ export function getCaptionData(captionID) {
     var captionColour = caption.data('colour');
     var captionFont = caption.data('font');
 
-    var fontClass;
-    switch (captionFont) {
-        case 'default':
-            fontClass = 'font-default';
-            break;
-        
-        case 'strong':
-            fontClass = 'font-strong';
-            break;
-
-        case 'italic':
-            fontClass = 'font-italic';
-            break;
-
-        case 'corier-new':
-            fontClass = 'font-corier-new';
-            break;
-
-        case 'comic-sans-ms':
-            fontClass = 'font-comic-sans-ms';
-            break;
-
-        case 'impact':
-            fontClass = 'font-impact';
-            break;
-
-        case 'palatino-linotype':
-            fontClass = 'font-palatino-linotype';
-            break;
-    }
-
+    var fontClass = 'font-' +  captionFont;
 
     var captionData = {
         'text': captiontext,

@@ -76,7 +76,9 @@ from messaging.models import ChatRoom, Message, PollMessage
 class Media(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name='media')
     media_obj = models.FileField(null=True, upload_to=get_media_upload_path_posts)
-    caption = models.CharField(max_length=50)
+    caption_text = models.CharField(max_length=50)
+    caption_colour = models.CharField(max_length=9)
+    caption_font = models.CharField(max_length=20)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # saves the model instance first
@@ -84,15 +86,15 @@ class Media(models.Model):
         mime_type, _ = mimetypes.guess_type(self.media_obj.file.name)
 
         if mime_type in ['image/jpeg', 'image/png', 'image/gif']:
-            # image preperation for manipulation
+            # Image preperation for manipulation
             image_path = self.media_obj.path
             img = Image.open(image_path)
 
-            # resises the image for the expected image size (1280x720px)
+            # Resises the image for the expected image size (1280x720px)
             img = img.resize((1280, 720), Image.Resampling.LANCZOS)  
             img = img.convert('RGB')  
 
-            # saves the image
+            # Save the image
             img.save(image_path, format='JPEG', quality=85) 
         else:
             raise ValidationError('Only image files are allowed (JPEG, PNG, GIF).')

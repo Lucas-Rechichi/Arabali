@@ -287,7 +287,7 @@ $(document).ready(function () {
                 captionDataList.push({
                     'text': captionData['text'],
                     'colour': captionData['colour'],
-                    'font-class': captionData['fontClass'] 
+                    'font': captionData['font'] 
                 })
             }
         }
@@ -336,20 +336,26 @@ $(document).ready(function () {
             // getting relevant data
             var titleInput = $('#post-title').val();
             var contentsInput = $('#post-contents').val();
-            var mediaInput = mediaList;
 
             // Caption data is gotten within first for loop
 
             // Show the creating post modal
             creatingPostModal.show()
 
-            formData = new FormData()
+            // Formatting data into FormData object
+            var formData = new FormData()
+
+            // For media files
+            for (let i=0; i < mediaList.length; i++) {
+                formData.append('media', mediaList[i])
+            }
+
             formData.append('title', titleInput)
             formData.append('contents', contentsInput)
-            formData.append('media', mediaInput)
-            formData.append('captions', captionDataList)
+            formData.append('captions', JSON.stringify(captionDataList))
             formData.append('csrfmiddlewaretoken', csrfToken)
 
+            // AJAX request
             $.ajax({
                 type: 'POST',
                 url: '/add/add-post/',

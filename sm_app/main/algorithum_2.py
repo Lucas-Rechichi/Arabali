@@ -1,10 +1,13 @@
 import os
+import base64
+import magic
 import google.generativeai as genai
 
 from dotenv import load_dotenv
-
 from main.prompts import Prompts
 from main.models import Catergory, PostTag, Interest
+
+from django.core.files.storage import default_storage
 class Algorithum:
 
     class Core:
@@ -43,16 +46,33 @@ class Algorithum:
 
             genai.configure(api_key=google_gemini_api_key)
             model = genai.GenerativeModel(model_name='gemini-1.5-flash')
+            chat = model.start_chat()
+
+            for i, media in enumerate(post_obj.media.all()):
+                # Get content type of the media
+                media_path = media.media_obj.name
+                full_media_path = default_storage.path(media_path)
+
+                mime = magic.Magic(mime=True)
+                media_content_type = mime.from_file(full_media_path)
+
+                # Format media URL
+                encoded_image = base64.b64encode(media.media_obj.read()).decode('utf-8')
+                media_url = f'data:{media_content_type};base64,{encoded_image}'
+
+                caption_list = {
+                    'text': media.caption_text,
+                    'colour': media.caption_colour,
+                    'font': media.caption_font
+                }
+
+                response = chat.send_message(Prompts.store_media_data(media_url=media_url, caption_list=caption_list, index=i))
 
             title = post_obj.title
             contents = post_obj.contents
-            media = post_obj.media.all()[0].media_obj.url.removeprefix('/')
 
-            # Getting the current tags
             current_catergories = Catergory.objects.all()
-
-            media_file = genai.upload_file(media)
-            response = model.generate_content([media_file, Prompts.dermine_catergory_prompt(title=title, contents=contents, catergories_list=current_catergories)])
+            response = chat.send_message(Prompts.dermine_catergory_prompt(title=title, contents=contents, catergories_list=current_catergories))
 
             return response.text
 

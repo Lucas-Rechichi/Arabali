@@ -138,7 +138,7 @@ def page(request, catagory):
         for k, media in enumerate(Media.objects.filter(post=post)):
             post_media.append({
                 'media_url': media.media_obj.url,
-                'caption': media.caption 
+                'caption': media.caption_text 
             })
 
         for l, comment in enumerate(post.comments.all()): # comments

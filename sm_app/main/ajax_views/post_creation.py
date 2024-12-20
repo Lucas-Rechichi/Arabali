@@ -1,14 +1,7 @@
 import json
 
-from datetime import datetime, date
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from main.extras import approx_display, capitalize_plus, difference, exact_display, modified_reciprocal, remove_last_character
 from main.models import Post, Media, PostTag, Catergory
-from messaging.models import Message, ChatRoom, PollMessage
-from messaging.extras import emoticons_dict
-from django.core.exceptions import ObjectDoesNotExist
 from main.algorithum_2 import Algorithum
 
 
@@ -17,14 +10,22 @@ def add_post(request):
     # Getting sent data
     title = request.POST.get('title')
     contents = request.POST.get('contents')
-    media = request.FILES.get('media')
+    media = request.FILES.getlist('media')
+    captions = json.loads(request.POST.get('captions'))
+
     user = request.user
 
     # Creating the post and it's media
     new_post = Post(title=title, contents=contents, user=user, likes=0)
     new_post.save()
-    media_for_post = Media(post=new_post, media_obj=media, caption='default caption')
-    media_for_post.save()
+
+    # Creating media objects for the post (the slides of the carousel)
+    for i, media_obj in enumerate(media):
+        caption_text = captions[i]['text']
+        caption_colour = captions[i]['colour']
+        caption_font = captions[i]['font']
+        new_media = Media(post=new_post, media_obj=media_obj, caption_text=caption_text, caption_colour=caption_colour, caption_font=caption_font)
+        new_media.save()
 
     # Determining the catergory for this post using AI
     post_catergory = Algorithum.PostCreations.predict_catergory_request(post_obj=new_post)
@@ -42,7 +43,7 @@ def add_post(request):
         new_catergory = Catergory(name=post_catergory)
         new_catergory.save()
 
-    
+    print(post_tag.name)
 
     response = {}
 
