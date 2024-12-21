@@ -20,6 +20,8 @@ from django.contrib.auth.models import User
 
 class Algorithum:
     class Core:
+
+        # Function for finding the average value within the list
         def average(num_list, is_abs):
             total_value = 0.0
             for i in num_list:
@@ -38,12 +40,41 @@ class Algorithum:
                     ave = (total_value) / (len(num_list))
             return ave
         
+        # Function for finding the difference between 2 numbers 
         def difference(num_final, num_initial, is_abs):
             if is_abs:
                 return abs(num_final - num_initial)
             else:
                 return num_final - num_initial
         
+        # Function for sorting objects baced on the value
+        def basic_sort(object_name, sub_catergory):
+
+            # Setup
+            order = []
+
+            # Logic for what to sort
+            if object_name == 'tag':
+                if sub_catergory == '|All':
+                    sorted_objects = PostTag.objects.annotate(Count('value')).order_by('-value')
+                else:
+                    filtered_objects = PostTag.objects.filter(name=sub_catergory.removeprefix('|'))
+                    sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
+
+            # Appends the sorted queryset to a list
+            order.append(object.name for object in sorted_objects)
+
+            return order
+
+        # Function for sorting objects with respect to their individual value compared to the average value
+        def shuffle_sort(values_list, names_list):
+
+            # Setup
+            order = []
+
+            
+
+
 
     class PostCreations:
         def predict_catergory_request(post_obj):
@@ -179,12 +210,43 @@ class Algorithum:
                 return feed
             
         def show_catergories(type):
+            catergory_list = []
+
+            # Type logic
             if type == 'popular':
-                # Show popular catergories based on the tag (basic sorting)
+
+                # Setup
+                catergories = Catergory.objects.all()
+                catergory_names_list = []
+                catergory_values_list = []
+
+                # Loops though all catergories
+                for catergory in catergories:
+                    tags = PostTag.objects.filter(name=catergory.name)
+                    total_value = 0.0
+
+                    # Loops though all tags with the same name as the catergories
+                    for tag in tags:
+                        total_value += tag.value # append the individual tag value to the total for this catergory
+
+                    # Append the name and the total value of the catergory so that they share the same index order
+                    catergory_names_list.append(catergory.name)
+                    catergory_values_list.append(total_value)
+
+                # Loops though all catergories, gets the one with the highest value then appends the name to the catergory list
+                for _ in range(0, len(catergory_names_list) + 1):
+                    highest_value = max(catergory_values_list)
+                    index = catergory_values_list.index(highest_value)
+
+                    selected_name = catergory_names_list[index]
+                    catergory_list.append(selected_name)
+
                 pass
             else:
                 # Show recommended catergories baces on interest first than the tag value (shuffle, than basic sorting)
                 pass
+
+            return catergory_list
 
         # TODO: Make function for both sorting types to be used (in Algorithum.Sorting)
             
@@ -332,7 +394,7 @@ class Algorithum:
         def delete_interest():
             pass
 
-    class Sorting:
+    class PostSorting:
 
         # Sorts posts baced on their value
         def popular_sort(user, sub_catagory):
