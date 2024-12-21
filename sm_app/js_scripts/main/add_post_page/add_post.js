@@ -245,8 +245,6 @@ $(document).ready(function () {
     })
 
     // Colour picker previews are within colour-picker.js
-
-
     $('#post-carousel-captions-form').on('change', '.caption-text-font', function () {
         var captionID = $(this).data('caption-id');
         var option = $(this).val();
@@ -264,6 +262,11 @@ $(document).ready(function () {
     })
     var postCreatedModal = new bootstrap.Modal(document.getElementById('post-created-modal'), {
         keyboard: false
+    })
+
+    // Button for visual modal
+    $('#make-another-post').click(function () {
+        creatingPostModal.hide();
     })
 
     // Post submission
@@ -366,7 +369,7 @@ $(document).ready(function () {
                     creatingPostModal.hide()
                     setTimeout(function () {
                         postCreatedModal.show()
-                    }, 300)
+                    }, 500)
                 }
             })
         }

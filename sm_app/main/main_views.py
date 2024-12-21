@@ -5,14 +5,14 @@ from validate.forms import User
 from django.contrib.auth.decorators import login_required
 
 from main.models import Post
-from main.extras import capitalize_plus, remove_until_character, initialize_page
+from main.extras import remove_until_character, initialize_page
 from main.algorithum import Algorithum
-from main.forms import AddPost, EditProfile, EditPost, Search
+from main.forms import EditProfile, EditPost, Search
 from main.models import LikedBy, Following, DateAndOrTimeSave
 from main.models import UserStats, Comment, NestedComment, Media
-from validate.views import create_user_directory
 from main.configure import Configure
-from datetime import datetime, date
+
+from datetime import date
 
 # Create your views here.
 def home(request):
@@ -138,7 +138,9 @@ def page(request, catagory):
         for k, media in enumerate(Media.objects.filter(post=post)):
             post_media.append({
                 'media_url': media.media_obj.url,
-                'caption': media.caption_text 
+                'caption_text': media.caption_text,
+                'caption_colour': media.caption_colour,
+                'caption_font': media.caption_font
             })
 
         for l, comment in enumerate(post.comments.all()): # comments
