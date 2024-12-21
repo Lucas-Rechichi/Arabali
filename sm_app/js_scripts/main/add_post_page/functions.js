@@ -30,14 +30,14 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
 
         // Check to see if images are used for media
         if (mediaFilesList[i].type.startsWith('image/')) {
-            // Creating the carousal indicatiors
+            // Creating the carousel indicatiors
             if (i == 0) {
                 carouselIndicatiorHtml = `
-                    <button type="button" data-bs-target="#preview-media-carousal" data-bs-slide-to="${i}" class="active" aria-current="true" aria-label="Slide ${i + 1}"></button>
+                    <button type="button" data-bs-target="#preview-media-carousel" data-bs-slide-to="${i}" class="active" aria-current="true" aria-label="Slide ${i + 1}"></button>
                 `;
             } else {
                 carouselIndicatiorHtml = `
-                    <button type="button" data-bs-target="#preview-media-carousal" data-bs-slide-to="${i}" aria-label="Slide ${i + 1}"></button>
+                    <button type="button" data-bs-target="#preview-media-carousel" data-bs-slide-to="${i}" aria-label="Slide ${i + 1}"></button>
                 `;
             }
 
@@ -267,7 +267,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                 `;
             };
 
-            // Creating the carousal slides
+            // Creating the carousel slides
             if (i == 0) {
                 carouselSlideHtml = `
                     <div class="carousel-item active">
@@ -335,17 +335,17 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
     };
 
     var carouselPreviewHtml = `
-        <div id="preview-media-carousal" class="carousel slide">
+        <div id="preview-media-carousel" class="carousel slide">
             <div class="carousel-indicators">
                 ${carouselIndicatorsHtml}
             </div>
             <div class="carousel-inner">
                 ${carouselSlidesHtml}
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#preview-media-carousal" data-bs-slide="prev">
+            <button class="carousel-control-prev" type="button" data-bs-target="#preview-media-carousel" data-bs-slide="prev">
                 <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Left.png">
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#preview-media-carousal" data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#preview-media-carousel" data-bs-slide="next">
                 <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Right.png">
             </button>
         </div>

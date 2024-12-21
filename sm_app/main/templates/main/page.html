@@ -175,13 +175,13 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div id="post-{{post.post_id}}-media-carousal" class="carousel slide">
+                                            <div id="post-{{post.post_id}}-media-carousel" class="carousel slide">
                                                 <div class="carousel-indicators">
                                                     {% for media_obj in post.post_media %}
                                                         {% if forloop.counter0 == 0 %}
-                                                            <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                                            <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                                                         {% else %}
-                                                            <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
+                                                            <button type="button" data-bs-target="#post-{{post.post_id}}-media-carousel" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
                                                         {% endif %}
                                                     {% endfor %}
                                                 </div>
@@ -204,10 +204,10 @@
                                                         {% endif %}
                                                     {% endfor %}
                                                 </div>
-                                                <button class="carousel-control-prev" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="prev">
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#post-{{post.post_id}}-media-carousel" data-bs-slide="prev">
                                                     <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Left.png">
                                                 </button>
-                                                <button class="carousel-control-next" type="button" data-bs-target="#post-{{post.post_id}}-media-carousal" data-bs-slide="next">
+                                                <button class="carousel-control-next" type="button" data-bs-target="#post-{{post.post_id}}-media-carousel" data-bs-slide="next">
                                                     <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Right.png">
                                                 </button>
                                             </div>
@@ -274,13 +274,13 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col m-2">
-                                                            <div id="modal-{{post.post_id}}-media-carousal" class="carousel slide">
+                                                            <div id="modal-{{post.post_id}}-media-carousel" class="carousel slide">
                                                                 <div class="carousel-indicators">
                                                                     {% for media_obj in post.post_media %}
                                                                         {% if forloop.counter0 == 0 %}
-                                                                            <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                                                            <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                                                                         {% else %}
-                                                                            <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
+                                                                            <button type="button" data-bs-target="#modal-{{post.post_id}}-media-carousel" data-bs-slide-to="{{forloop.counter0}}" aria-label="Slide {{forloop.counter0|add:1}}"></button>
                                                                         {% endif %}
                                                                     {% endfor %}
                                                                 </div>
@@ -303,10 +303,10 @@
                                                                         {% endif %}
                                                                     {% endfor %}
                                                                 </div>
-                                                                <button class="carousel-control-prev" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide="prev">
+                                                                <button class="carousel-control-prev" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousel" data-bs-slide="prev">
                                                                     <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Left.png">
                                                                 </button>
-                                                                <button class="carousel-control-next" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousal" data-bs-slide="next">
+                                                                <button class="carousel-control-next" type="button" data-bs-target="#modal-{{post.post_id}}-media-carousel" data-bs-slide="next">
                                                                     <img class="carousel-button" src="/images/system/html_images/Carousel Arrow Right.png">
                                                                 </button>
                                                             </div>

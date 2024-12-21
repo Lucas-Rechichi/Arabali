@@ -27,7 +27,6 @@ def page(request, catagory):
     user_stats = UserStats.objects.get(user=user)
     posts = Post.objects.all()
     users_stats = UserStats.objects.all()
-    user_liked_by = LikedBy.objects.get(name=name)
     init = initialize_page(request)
 
     if user_stats.is_banned:
@@ -37,12 +36,6 @@ def page(request, catagory):
     if not DateAndOrTimeSave.objects.filter(abstract='Interaction Check').exists():
         interaction_stamp = DateAndOrTimeSave(abstract='Interaction Check', day=date.today())
         interaction_stamp.save()
-
-    # Getting Relelvent Profile Pictures
-    post_users = {}
-    for user_stat in users_stats:
-        post_users[str(user_stat.user.username)] = user_stat.pfp.url
-    
 
     # Forms
     if request.method == 'POST':
@@ -95,110 +88,32 @@ def page(request, catagory):
 
     # Orders posts baced on catagory
     if 'popular' in catagory:
+
+        # Sort the posts baced on the given catergory
         posts = Algorithum.Sorting.popular_sort(user=user, sub_catagory=sub_catagory)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
+        
         trend_categories = Algorithum.Core.trending_catagories(catagory_list=trend_categories, type='popular')
         popular_type = True
     elif 'recommended' in catagory:
+
+        # Sort the posts baced on the given catergory
         posts = Algorithum.Sorting.recommended_sort(user=user, sub_catagory=sub_catagory)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
+        
         trend_categories = Algorithum.Core.trending_catagories(catagory_list=trend_categories, type='recommended')
         recommended_type = True
     else:
         return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
 
-    # Only allows the top 10 posts to be displayed first.
+    # Only allows the top 10 posts to be displayed first
     posts_to_append = Algorithum.Core.posts_per_page(incrementing_factor=1, posts=posts)
     
-    feed = []
-    # Loops though all selected posts
-    for i, post in enumerate(posts_to_append):
-        user_stats = UserStats.objects.get(user=post.user)
-        # gets the nested data within comments, liked_by and replies
+    # Extracts relevant data for the post feed
+    feed = Algorithum.PostRendering.get_post_data(post_list=posts_to_append, user_obj=user)
 
-        # setup
-        post_liked_by = []
-        post_media = []
-        post_comments = []
-        post_liked_by_users = list(post.liked_by.all())
-
-        for j in range(0, len(post_liked_by_users)): # liked_by
-            # getting relevant data
-            user_liked_user_obj = User.objects.get(username=post_liked_by_users[j].name)
-            user_liked_userstats = UserStats.objects.get(user=user_liked_user_obj)
-
-            # packaging data into a dictionary
-            post_liked_by.append({
-                'username': post_liked_by_users[j].name,
-                'user_pfp_url': user_liked_userstats.pfp.url,
-            })
-        
-        for k, media in enumerate(Media.objects.filter(post=post)):
-            post_media.append({
-                'media_url': media.media_obj.url,
-                'caption_text': media.caption_text,
-                'caption_colour': media.caption_colour,
-                'caption_font': media.caption_font
-            })
-
-        for l, comment in enumerate(post.comments.all()): # comments
-            # setup
-            post_comment_replies = []
-
-            for m, reply in enumerate(comment.replies.all()): # replies
-                # getting relevant data
-                reply_user_userstats = UserStats.objects.get(user=reply.user)
-
-                # if the user has liked this reply
-                liked_reply = NestedComment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
-
-                # packaging data into a dictionary
-                post_comment_replies.append({ 
-                    'reply_id': reply.pk,
-                    'reply_username': reply.user.username,
-                    'has_liked': liked_reply,
-                    'reply_user_pfp_url': reply_user_userstats.pfp.url,
-                    'reply_text': reply.text,
-                    'reply_likes': reply.likes,
-                })
-            # getting relevant data
-            comment_user_userstats = UserStats.objects.get(user=comment.user)
-
-            # if the user has liked this comment
-            liked_comment = Comment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
-
-            # packaging data into a dictionary
-            post_comments.append({
-                'comment_id': comment.pk,
-                'comment_username': comment.user.username,
-                'has_liked': liked_comment,
-                'comment_user_pfp_url': comment_user_userstats.pfp.url,
-                'comment_text': comment.text,
-                'comment_likes': comment.likes,
-                'comment_replies': post_comment_replies
-            })
-
-        # if the user has liked the post
-        liked_post = Post.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
-
-        # packaging data into a dictionary
-        feed.append({
-            'post_id': post.pk,
-            'post_username': post.user.username,
-            'has_liked': liked_post,
-            'post_user_pfp_url': user_stats.pfp.url, 
-            'post_title': post.title,
-            'post_contents': post.contents,
-            'post_media': post_media,
-            'post_likes': post.likes,
-            'post_created_at': post.created_at,
-            'post_liked_by': post_liked_by,
-            'post_comments': post_comments
-        })
-
-    
     # Variables
     variables = {
         "username": name, 
@@ -211,7 +126,6 @@ def page(request, catagory):
         },
         'user_stats': users_stats, 
         'user': user_stats,
-        'post_users': post_users,
         'liked_by': liked_by,
         'search_bar': search_bar,
         'notifications': init['notification_list'],
@@ -220,7 +134,7 @@ def page(request, catagory):
     return render(request, "main/page.html", variables)
 
 @login_required
-def catch_up_page(request, increment):
+def catch_up_page(request):
     # Setup
     user_stats = UserStats.objects.get(user=request.user)
     users_stats = UserStats.objects.all()

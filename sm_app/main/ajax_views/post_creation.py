@@ -2,7 +2,7 @@ import json
 
 from django.http import JsonResponse
 from main.models import Post, Media, PostTag, Catergory
-from main.algorithum_2 import Algorithum
+from main.algorithum import Algorithum
 
 
 def add_post(request):
