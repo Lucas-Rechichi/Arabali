@@ -178,6 +178,16 @@ class Algorithum:
 
                 return feed
             
+        def show_catergories(type):
+            if type == 'popular':
+                # Show popular catergories based on the tag (basic sorting)
+                pass
+            else:
+                # Show recommended catergories baces on interest first than the tag value (shuffle, than basic sorting)
+                pass
+
+        # TODO: Make function for both sorting types to be used (in Algorithum.Sorting)
+            
         def auto_post_loading(incrementing_factor, catergory, user):
             if catergory == 'all':
                 posts = list(Post.objects.annotate(Count('created_at')).order_by('-created-at'))
