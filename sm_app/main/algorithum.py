@@ -6,7 +6,7 @@ import google.generativeai as genai
 from datetime import date
 
 from dotenv import load_dotenv
-from main.extras import capitalize_plus, exact_display, approx_display, harvinsine_distance
+from main.extras import capitalize_plus, exact_display, approx_display, haversine_distance
 from main.extras import remove_last_character, modified_reciprocal, difference
 
 from main.prompts import Prompts
@@ -491,31 +491,31 @@ class Algorithum:
             distances = {}
 
             # Calculate harvinsine distance between every follower that user follows and the user
-            for follower in followers:
-                distance_between_users = harvinsine_distance(lat1=user_stats.last_recorded_latitude, lat2=follower.last_recorded_latitude, lon1=user_stats.last_recorded_longitude, lon2=follower.last_recorded_longitude)
-                distances[f'{follower.user.username}'] = distance_between_users
-
-            print(followers)
+            for index, follower in enumerate(followers):
+                distance_between_users = haversine_distance(lat1=user_stats.last_recorded_latitude, lat2=follower.last_recorded_latitude, lon1=user_stats.last_recorded_longitude, lon2=follower.last_recorded_longitude)
+                distances[index] = distance_between_users
 
             # Sorts them baced on the one that is the closest to the user in distance
-            distances = dict(sorted(distances.items(), key=lambda item: item[1]))
+            distances = dict(sorted(distances.values(), key=lambda item: item[0]))
 
-            # Filters posts that were created today and also are followers of the user acessing the page. 
-            # The followers come from the distance dictionary and therefore is ordered baced on the distances as well.
+            # Setup
             daily_feed = []
             remaining_feed = []
 
+            # Filters the posts into 2 lists, one for the posts that are todays posts and one for the remaining posts
             todays_posts = Post.objects.filter(created_at__date=date.today())
-            for post in todays_posts:
-                if post.user.username in distances.keys():
+            for post, distance in todays_posts, distances.items():
+                if post.user.username == distance[0]:
                     daily_feed.append(post)
 
             remaining_posts = Post.objects.exclude(created_at__date=date.today())
-            for post in remaining_posts:
-                if post.user.username in distances.keys():
-                    remaining_feed.append(post)
-
+            for post, distance in remaining_posts, distances:
+                if post.user.username == distance[0]:
+                    daily_feed.append(post)
+            
             return daily_feed, remaining_feed
+
+
 
     class Search:
 

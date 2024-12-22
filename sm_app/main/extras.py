@@ -170,9 +170,17 @@ def algorithm_function(x, tag, interest, type): # Commented print methods are us
 
     return result
 
-def harvinsine_distance(lat1, lat2, lon1, lon2):
+# Haversine distance, returns it in meters (m)
+def haversine_distance(lat1, lat2, lon1, lon2): 
+    # Setup
     delta_lat = math.radians(lat2 - lat1)
     delta_lon = math.radians(lon2 - lon1)
+
+    # Haversine formula broken down
     R = 6371000 # 6.371x10^6 m, radius of earth
-    distance = 2 * R * math.asin(math.sqrt((math.sin((delta_lat) / (2)) ** 2) + math.cos(lat1) * math.cos(lat2) *(math.sin((delta_lon) / (2)) ** 2)))
+    a = math.sin(delta_lat/2) ** 2
+    b = math.sin(delta_lon/2) ** 2
+    c = b * math.cos(math.radians(lat1)) * math.cos(math.radians(lat2))
+    distance = 2 * math.asin(math.sqrt(a + c)) * R
+
     return distance
