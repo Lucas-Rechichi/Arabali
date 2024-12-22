@@ -67,12 +67,26 @@ class Algorithum:
             return order
 
         # Function for sorting objects with respect to their individual value compared to the average value
-        def shuffle_sort(values_list, names_list):
+        def shuffle_sort(values_list, names_list, iterations):
 
             # Setup
             order = []
 
-            
+            # Loops for as many iterationa as specified
+            for _ in range(0, iterations + 1):
+                # Get the average value, the highest value and it's index
+                average = Algorithum.Core.average(num_list=values_list, is_abs=True)
+                highest_value = max(values_list)
+                value_index = values_list.index(highest_value)
+
+                # Get the modified value, replace the highest value with it's modified value in the list
+                modified_value = highest_value - average
+                values_list[value_index] = modified_value
+
+                # Append the name to the order list
+                order.append(names_list[value_index])
+
+            return order
 
 
 
@@ -107,9 +121,11 @@ class Algorithum:
 
                 response = chat.send_message(Prompts.store_media_data(media_url=media_url, caption_list=caption_list, index=i))
 
+            # Get post data for the AI to deside what tag it should be
             title = post_obj.title
             contents = post_obj.contents
 
+            # AI desion
             current_catergories = Catergory.objects.all()
             response = chat.send_message(Prompts.dermine_catergory_prompt(title=title, contents=contents, catergories_list=current_catergories))
 
@@ -397,48 +413,74 @@ class Algorithum:
     class PostSorting:
 
         # Sorts posts baced on their value
-        def popular_sort(user, sub_catagory):
+        def popular_sort(sub_catagory):
+
+            # Setup
+            order = []
+
+            # Returns an error if the url has no sub-catergory specified
             if sub_catagory == None:
                 return 'Error: No Sub-Catergory.'
+
+            # Gets the order of the posts using basic sort
             sub_catagory = str(sub_catagory)
-            if sub_catagory == '|All':
-                all_tags = PostTag.objects.annotate(Count('value')).order_by('-value')
-                order = []
-                for tag in all_tags:
-                    order.append(tag.post)
-                return order
-            else:
-                relevent_tags = PostTag.objects.filter(name=sub_catagory.removeprefix('|'))
-                all_tags = relevent_tags.annotate(Count('value')).order_by('-value')
-                order = []
-                for tag in all_tags:
-                    order.append(tag.post)
-                return order
+            tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_catagory)
+
+            # Gets the post related to the tag
+            for tag in tag_order:
+                order.append(tag.post)
+
+            return order
 
         # Sorting posts baced on their relevance to the user's interest.   
         def recommended_sort(user, sub_catagory):
+
+            # Setup
+            order = []
+            interest_names_list = []
+            interest_values_list = []
+            tag_iterations = {}
+
+            # Returns an error if the url has no sub-catergory specified
             if sub_catagory == None:
                 return 'Error: No Sub-Catergory.'
-            order = []
-            i = 0
-            if sub_catagory == '|All':
-                interests = Interest.objects.filter(user=user).annotate(Count('value')).order_by('-value')
-                for _ in range(len(interests)):
-                    for interest in interests:
-                        tags = PostTag.objects.filter(name=interest.name).annotate(Count('value')).order_by('-value')
-                        for tag_id, tag in enumerate(tags):
-                            if tag_id == i:
-                                post = Post.objects.get(post_tag=tag)
-                                order.append(post)
-                    i += 1
+            
+            # Get all the interest values and names for the specified user
+            interests = Interest.objects.filter(user=user)
 
+            # Loops though all interests the user has, append sto lists such that they have the same index
+            for interest in interests:
+                interest_names_list.append(interest.name)
+                interest_values_list.append(interest_values_list)
+
+            # Defines the amount of iterations for the names list to generate
+            post_count = Post.objects.count()
+            if post_count < 10:
+                iterations = len(post_count)
             else:
-                interest = Interest.objects.get(name=sub_catagory.removeprefix('|'), user=user)
-                tags = PostTag.objects.filter(name=interest.name)
-                for tag in tags:
-                    post = Post.objects.get(post_tag=tag)
-                    order.append(post)
+                iterations = 10
+
+            # Gets the list of names using a shuffle sort
+            name_order = Algorithum.Core.shuffle_sort(values_list=interest_values_list, names_list=interest_names_list, iterations=iterations)
+
+            # Gets the relevant tags for the selected name
+            for name in name_order:
+                # Logic for new tag entries
+                if name not in tag_iterations:
+                    tag_iterations[name] = 0
+                
+                # Orders the tags based on individual value
+                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_catagory)
+
+                # Select the tag depending on what iteration that name is on
+                selected_tag = tag_order[tag_iterations[name]]
+                order.append(selected_tag.post) # appends the tag's relevant post to the order
+
+                # increments the tag iterations so that the next post in order is chosen
+                tag_iterations[name] += 1
+
             return order
+
         
         def catch_up_sort(user):
 
@@ -462,15 +504,17 @@ class Algorithum:
             # The followers come from the distance dictionary and therefore is ordered baced on the distances as well.
             daily_feed = []
             remaining_feed = []
+
             todays_posts = Post.objects.filter(created_at__date=date.today())
             for post in todays_posts:
                 if post.user.username in distances.keys():
                     daily_feed.append(post)
+
             remaining_posts = Post.objects.exclude(created_at__date=date.today())
             for post in remaining_posts:
                 if post.user.username in distances.keys():
                     remaining_feed.append(post)
-            print(daily_feed, remaining_feed)
+
             return daily_feed, remaining_feed
 
     class Search:
