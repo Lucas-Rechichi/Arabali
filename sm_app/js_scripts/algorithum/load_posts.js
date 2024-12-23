@@ -2,15 +2,20 @@ $(document).ready(function () {
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
     var postEndMarker = $('.end-of-posts');
-    var increment = postEndMarker.data('increment');
-    var catergory = postEndMarker.data('catergory');
     var triggered = false
 
     $(window).on('scroll', function () {
+        // Getting the increment and catergory from the end of posts marker
+        let increment = postEndMarker.data('increment');
+        let catergory = postEndMarker.data('catergory');
+
+        // Getting the scroll position, window height, element offset top and element height
         var scrollTop = $(window).scrollTop();
         var windowHeight = window.innerHeight;
         var elementOffsetTop = postEndMarker.offset().top;
         var elementHeight = postEndMarker.outerHeight();
+
+        // Checking if the target element is in view
         if (!triggered) {
             if ((scrollTop + windowHeight) >= elementOffsetTop && scrollTop <= (elementOffsetTop + elementHeight)) {
                 // Your JavaScript code to execute
@@ -18,6 +23,7 @@ $(document).ready(function () {
                 console.log('Conditional 1: ' + scrollTop + '+' +  windowHeight + '(' + (scrollTop + windowHeight) + ')' + '>='  + elementOffsetTop);
                 console.log('Conditional 2: ' + scrollTop + '<='  + elementOffsetTop + '+' + elementHeight + '(' + (scrollTop + windowHeight) + ')' );
                 // Perform other actions here
+
                 triggered = true
                 $.ajax({
                     type: 'POST',
@@ -391,9 +397,10 @@ $(document).ready(function () {
                         `;
 
                         // Add in the new end of posts marker into the HTML document
-                        postEndMarker.html('')
-                        $('#post-card').append(newEndMarkerHtml)
+                        postEndMarker.remove();
+                        $('#post-card').append(newEndMarkerHtml);
 
+                        // Delay the next trigger
                         setTimeout(function () {
                             triggered = false
                         }, 400)

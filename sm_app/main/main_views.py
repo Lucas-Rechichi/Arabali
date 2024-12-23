@@ -82,7 +82,6 @@ def page(request, catagory):
         sub_catagory = None
 
     # Orders posts baced on catagory: Setup
-    trend_categories = []
     popular_type = False
     recommended_type = False
 
@@ -90,27 +89,27 @@ def page(request, catagory):
     if 'popular' in catagory:
 
         # Sort the posts baced on the given catergory
-        posts = Algorithum.Sorting.popular_sort(user=user, sub_catagory=sub_catagory)
+        posts = Algorithum.PostSorting.popular_sort(user=user, sub_catagory=sub_catagory)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
         
-        trend_categories = Algorithum.Core.trending_catagories(catagory_list=trend_categories, type='popular')
+        display_categories = Algorithum.PostRendering.show_catergories(type='popular')
         popular_type = True
     elif 'recommended' in catagory:
 
         # Sort the posts baced on the given catergory
-        posts = Algorithum.Sorting.recommended_sort(user=user, sub_catagory=sub_catagory)
+        posts = Algorithum.PostSorting.recommended_sort(user=user, sub_catagory=sub_catagory)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
         
-        trend_categories = Algorithum.Core.trending_catagories(catagory_list=trend_categories, type='recommended')
+        display_categories = Algorithum.PostRendering.show_catergories(type='recommended')
         recommended_type = True
     else:
         return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
 
     # Only allows the top 10 posts to be displayed first
-    posts_to_append = Algorithum.Core.posts_per_page(incrementing_factor=1, posts=posts)
-    
+    posts_to_append = Algorithum.PostRendering.posts_per_page(post_list=posts, incrementing_factor=1, limit_index=None)
+
     # Extracts relevant data for the post feed
     feed = Algorithum.PostRendering.get_post_data(post_list=posts_to_append, user_obj=user)
 
@@ -119,7 +118,7 @@ def page(request, catagory):
         "username": name, 
         "posts": feed,
         "catagory": catagory,
-        "trend_catagories": trend_categories,
+        "display_catergories": display_categories,
         "type": {
             "popular": popular_type,
             "recommended": recommended_type
@@ -141,7 +140,6 @@ def catch_up_page(request):
     posts = Post.objects.all()
     init = initialize_page(request)
     user_liked_by = LikedBy.objects.get(name=request.user.username)
-    follow = Following.objects.all()
 
     if user_stats.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
@@ -158,77 +156,50 @@ def catch_up_page(request):
     if hour_difference <= 2:
         location_pop_up = 'deny'
 
-    # Algorithum
-    daily_posts, remaining_posts = Algorithum.Sorting.catch_up_sort(user=request.user)
+    # Algorithum for sorting the posts
+    daily_posts, remaining_posts = Algorithum.PostSorting.catch_up_sort(user=request.user)
 
-    # Special Sorting for this specific page.
-    all_posts = {}
-    daily_feed = []
-    remaining_feed = []
-    all_caught_up = None
-    i = 0
-    for post in daily_posts:
-        i += 1
-        print(post, i)
-        all_posts['daily'] = {
-            'no': i, 
-            'post': post
-        }
-    all_posts['all caught up'] = {
-        'no': i + 1,
-        'post':  '''<div class="row">
-                        <div class="col-12">
-                            <div class="card m-5">
-                                <div class="row">
-                                    <div class="col">
-                                        <h4 class="display-4 text-center">You Are All Caught Up!</4>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col d-flex justify-content-center">
-                                        <div class="fs-1">
-                                            <i class="bi bi-person-fill-check" style="font-size: 15rem; color: #198754;"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <p class="lead text-center">Below are older posts from the people that you follow.</p>
-                                    </div>
-                                </div>
+    # Post Rendering
+    daily_post_count = len(daily_posts)
+    if daily_post_count > 10:
+        daily_posts = Algorithum.PostRendering.posts_per_page(post_list=daily_posts, incrementing_factor=1, limit_index=None)
+        remaining_feed = None
+    else:
+        daily_posts = Algorithum.PostRendering.posts_per_page(post_list=daily_posts, incrementing_factor=1, limit_index=None)
+        post_difference = 10 - daily_post_count
+        remaining_posts = Algorithum.PostRendering.posts_per_page(posts=remaining_posts, incrementing_factor=1, limit_index=post_difference)
+
+    # Getting post data
+    daily_feed = Algorithum.PostRendering.get_post_data(post_list=daily_posts, user_obj=request.user)
+    remaining_feed = Algorithum.PostRendering.get_post_data(post_list=remaining_posts, user_obj=request.user)
+
+    # All caught up message
+    all_caught_up = '''
+        <div class="row">
+            <div class="col-12">
+                <div class="card m-5">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="display-4 text-center">You Are All Caught Up!</4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col d-flex justify-content-center">
+                            <div class="fs-1">
+                                <i class="bi bi-person-fill-check" style="font-size: 15rem; color: #198754;"></i>
                             </div>
                         </div>
-                    </div>'''
-    }
-    x = i + 2
-    for post in remaining_posts:
-        x += 1
-        all_posts['remaining'] = {
-            'no': x, 
-            'post': post
-        }
-    for key, value in all_posts.items():
-        if (10 * (increment - 1)) < value['no'] < ((10 * increment) + 1):
-            if key == 'daily':
-                daily_feed.append(value['post'])
-            elif key == 'remaining':
-                remaining_feed.append(value['post'])
-            elif key == 'all caught up':
-                all_caught_up = value['post']
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p class="lead text-center">Below are older posts from the people that you follow.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    '''
 
-    # Getting Relelvent Profile Pictures
-    post_users = {}
-    for user_stat_obj in users_stats:
-        post_users[str(user_stat_obj.user.username)] = user_stat_obj.pfp.url
-
-    # Getting the users that follow the user acessing this page
-    followers = user_stats.following.all()
-    follower_userstats_list = []
-    for follower in followers:
-        follower_user = User.objects.get(username=follower.name)
-        follower_userstats = UserStats.objects.get(user=follower_user)
-        follower_userstats_list.append(follower_userstats)
-    
     # Comment and Reply Processing
     liked_by = {}
     post_comments = {}
@@ -267,15 +238,8 @@ def catch_up_page(request):
         "daily_posts":daily_feed if daily_posts else None,
         "remaining_posts":remaining_feed if remaining_posts else None,
         "all_caught_up": all_caught_up,
-        "increment": {
-            "previous": increment - 1,
-            "current": increment,
-            "next": increment + 1 
-        },
         'user_stats':users_stats, 
         'user':user_stats,
-        'post_users': post_users,
-        'user_followers': follower_userstats_list,
         'liked_by': liked_by,
         'user_liked_by': user_liked_by,
         'post_comments': post_comments,

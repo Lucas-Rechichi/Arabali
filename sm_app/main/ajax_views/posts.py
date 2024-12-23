@@ -431,7 +431,7 @@ def load_posts(request):
     new_increment = int(increment) + 1
 
     # Getting the posts to append to the page
-    posts_to_append = Algorithum.Core.auto_post_loading(incrementing_factor=new_increment, catergory=catergory, user=user)
+    posts_to_append = Algorithum.PostRendering.auto_post_loading(incrementing_factor=new_increment, catergory=catergory, user=user)
     posts = {}
 
     # Loops though all selected posts

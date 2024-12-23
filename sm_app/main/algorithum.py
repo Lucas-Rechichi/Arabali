@@ -24,8 +24,8 @@ class Algorithum:
         # Function for finding the average value within the list
         def average(num_list, is_abs):
             total_value = 0.0
-            for i in num_list:
-                total_value += i 
+            for num in num_list:
+                total_value += num
 
             if is_abs:
                 if len(num_list) == 0:
@@ -56,24 +56,23 @@ class Algorithum:
             # Logic for what to sort
             if object_name == 'tag':
                 if sub_catergory == '|All':
-                    sorted_objects = PostTag.objects.annotate(Count('value')).order_by('-value')
+                    sorted_objects = PostTag.objects.all().annotate(Count('value')).order_by('-value')
                 else:
                     filtered_objects = PostTag.objects.filter(name=sub_catergory.removeprefix('|'))
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
-
             # Appends the sorted queryset to a list
-            order.append(object.name for object in sorted_objects)
+            for obj in sorted_objects:
+                order.append(obj)
 
             return order
 
         # Function for sorting objects with respect to their individual value compared to the average value
         def shuffle_sort(values_list, names_list, iterations):
-
             # Setup
             order = []
 
             # Loops for as many iterationa as specified
-            for _ in range(0, iterations + 1):
+            for _ in range(0, iterations):
                 # Get the average value, the highest value and it's index
                 average = Algorithum.Core.average(num_list=values_list, is_abs=True)
                 highest_value = max(values_list)
@@ -223,7 +222,7 @@ class Algorithum:
                     'post_comments': post_comments
                 })
 
-                return feed
+            return feed
             
         def show_catergories(type):
             catergory_list = []
@@ -264,8 +263,25 @@ class Algorithum:
 
             return catergory_list
 
-        # TODO: Make function for both sorting types to be used (in Algorithum.Sorting)
-            
+        # Function for restricting the post count to 10 for the first loading of the feed
+        def posts_per_page(post_list, incrementing_factor, limit_index):
+            appending_posts = []
+
+            # Logic for the left and right bounds
+            if limit_index:
+                limit_index = 10 - limit_index
+            else:
+                limit_index = 0
+
+            # Restrict the post count
+            for i, post in enumerate(post_list):
+                i += 1
+                if (10 * (incrementing_factor - 1)) < i < ((10 * incrementing_factor) + 1) - limit_index:
+                    appending_posts.append(post)
+
+            return appending_posts
+    
+        # Function for loading the next 10 posts for the feed
         def auto_post_loading(incrementing_factor, catergory, user):
             if catergory == 'all':
                 posts = list(Post.objects.annotate(Count('created_at')).order_by('-created-at'))
@@ -451,12 +467,12 @@ class Algorithum:
             # Loops though all interests the user has, append sto lists such that they have the same index
             for interest in interests:
                 interest_names_list.append(interest.name)
-                interest_values_list.append(interest_values_list)
+                interest_values_list.append(interest.value)
 
             # Defines the amount of iterations for the names list to generate
             post_count = Post.objects.count()
             if post_count < 10:
-                iterations = len(post_count)
+                iterations = post_count
             else:
                 iterations = 10
 
