@@ -8,8 +8,6 @@ $(document).ready(function () {
     // Preview update functions for the post title and the contents
     $('#post-title').on('input', function () {
         var textInput = $('#post-title').val()
-        console.log('Text: ' + textInput)
-        console.log('Length: ' + textInput.length)
 
         if (textInput.length == 0) {
             var previewText = 'My Post'
@@ -29,8 +27,6 @@ $(document).ready(function () {
 
     $('#post-contents').on('input', function () {
         var textInput = $('#post-contents').val()
-        console.log('Text: ' + textInput)
-        console.log('Length: ' + textInput.length)
 
         if (textInput.length == 0) {
             var previewText = 'This post is about...'
@@ -70,7 +66,7 @@ $(document).ready(function () {
                 $('#post-media-limit-message').css('display', 'block');
             }2
 
-            // Get the preview HTML, replace controls/preview HTML or placehonders
+            // Get the preview HTML, replace controls/preview HTML or placeholders
             var carouselObjects = previewMediaFiles(mediaList, false);
             $('#post-media-preview-container').html(carouselObjects['carousel']); 
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']); 
@@ -211,6 +207,12 @@ $(document).ready(function () {
             $('#post-carousel-control-pannel').html(emptyPannelMessageHtml);
             $('#post-carousel-captions-form').html(emptyCaptionContainerMessageHtml);
             $('#post-media-preview-container').html(imagePlaceholderHtml);
+
+            // Change the state of the field if validation has occured
+            if ( ( $('#post-media-card').hasClass('is-invalid') || $('#post-media-invalid').css('display') === 'none' ) && ( $('#create-post').hasClass('validated') ) ) {
+                $('#post-media-card').removeClass('valid-media').addClass('invalid-media');
+                $('#post-media-invalid').css('display', 'block');
+            }
         }
         // Hide the limit message
         $('#post-media-limit-message').css('display', 'none');
