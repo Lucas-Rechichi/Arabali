@@ -45,17 +45,16 @@ $(document).ready(function () {
         }
         $('#post-contents-preview').text(previewText)
     })
+
     // Media setup
     let mediaFiles;
     let mediaList = [];
 
-    // Media preview: insert
+    // Media preview: Insert
     $('#media-input').on('input', function (event) {
         mediaFiles = Array.from(event.target.files); 
 
-
         if (mediaFiles) {
-            console.log(mediaFiles.type)
 
             // Add new media to the list
             var mediaListData = addMediaToList(mediaFiles, mediaList)
@@ -64,12 +63,12 @@ $(document).ready(function () {
             // Visual indicatiors for when the media input limit is reached
             if (mediaListData['limitReached']) {
                 $('#post-media-limit-message').css('display', 'block');
-            }2
+            }
 
             // Get the preview HTML, replace controls/preview HTML or placeholders
             var carouselObjects = previewMediaFiles(mediaList, false);
             $('#post-media-preview-container').html(carouselObjects['carousel']); 
-            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']); 
+            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
 
 
@@ -84,10 +83,22 @@ $(document).ready(function () {
     // Media preview: drag and drop
     $('#post-media-card').on('dragover', function (event) {
         event.preventDefault();
+
+        // For seeing the dragover state
+        if ( $('#create-post').hasClass('validated') && ( $('#post-media-invalid').css('display') === 'block' || $('#file-drop-input').hasClass('invalid-media') ) ) {
+            $('#post-media-card').removeClass('invalid-media');
+        }
+
         $(this).addClass('drag-over-state');
     });
 
     $('#post-media-card').on('dragleave', function () {
+
+        // For validation
+        if ( $('#create-post').hasClass('validated') && $('#post-media-invalid').css('display') === 'block' ) {
+            $('#post-media-card').addClass('invalid-media');
+        };
+
         $(this).removeClass('drag-over-state');
     });
 
@@ -319,7 +330,7 @@ $(document).ready(function () {
             }   
 
             // For the media of the post
-            if (!mediaFiles) {
+            if (mediaList.length == 0) {
                 mediaDropField.removeClass('valid-media').addClass('invalid-media');
                 $('#post-media-invalid').css('display', 'block');
             } else {

@@ -48,18 +48,26 @@ class Algorithum:
                 return num_final - num_initial
         
         # Function for sorting objects baced on the value
-        def basic_sort(object_name, sub_catergory):
+        def basic_sort(object_name, sub_catergory, user_obj):
 
             # Setup
             order = []
 
             # Logic for what to sort
             if object_name == 'tag':
-                if sub_catergory == '|All':
+                if sub_catergory != '|All':
                     sorted_objects = PostTag.objects.all().annotate(Count('value')).order_by('-value')
                 else:
                     filtered_objects = PostTag.objects.filter(name=sub_catergory.removeprefix('|'))
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
+
+            else :
+                if sub_catergory == '|All':
+                    sorted_objects = Interest.objects.all().annotate(Count('value')).order_by('-value')
+                else:
+                    filtered_objects = Interest.objects.filter(name=sub_catergory.removeprefix('|'), user=user_obj)
+                    sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
+
             # Appends the sorted queryset to a list
             for obj in sorted_objects:
                 order.append(obj)
@@ -224,7 +232,7 @@ class Algorithum:
 
             return feed
             
-        def show_catergories(type):
+        def show_catergories(type, user_obj):
             catergory_list = []
 
             # Type logic
@@ -258,8 +266,8 @@ class Algorithum:
 
                 pass
             else:
-                # Show recommended catergories baces on interest first than the tag value (shuffle, than basic sorting)
-                pass
+                interest_list = Algorithum.Core.basic_sort(object_name='interests', sub_catergory='|All', user_obj=user_obj)
+                catergory_list = interest_list
 
             return catergory_list
 

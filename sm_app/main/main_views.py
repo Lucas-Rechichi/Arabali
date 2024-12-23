@@ -93,7 +93,7 @@ def page(request, catagory):
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
         
-        display_categories = Algorithum.PostRendering.show_catergories(type='popular')
+        display_categories = Algorithum.PostRendering.show_catergories(type='popular', user_obj=user)
         popular_type = True
     elif 'recommended' in catagory:
 
@@ -102,7 +102,7 @@ def page(request, catagory):
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
         
-        display_categories = Algorithum.PostRendering.show_catergories(type='recommended')
+        display_categories = Algorithum.PostRendering.show_catergories(type='recommended', user_obj=user)
         recommended_type = True
     else:
         return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
