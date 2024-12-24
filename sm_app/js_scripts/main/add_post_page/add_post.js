@@ -82,7 +82,7 @@ $(document).ready(function () {
 
     // Media preview: drag and drop
     $('#post-media-card').on('dragover', function (event) {
-        event.preventDefault();
+        event.preventDefault(); // prevents the opening of another tab to view the image.
 
         // For seeing the dragover state
         if ( $('#create-post').hasClass('validated') && ( $('#post-media-invalid').css('display') === 'block' || $('#file-drop-input').hasClass('invalid-media') ) ) {
@@ -110,6 +110,7 @@ $(document).ready(function () {
 
         // Processing files
         if (mediaFiles) {
+
             // Add new media to the list
             var mediaListData = addMediaToList(mediaFiles, mediaList)
             mediaList = mediaListData['updatedMediaList'];
@@ -136,7 +137,7 @@ $(document).ready(function () {
 
         }
     })
-    // Carousel control pannel: Shuffle TODO: Fix shuffleing issue with the mediaFiles array (not shuffling.)
+    // Carousel control pannel: Shuffle
     $('#post-carousel-control-pannel').on('click', '.carousel-pannel-shuffle', function () {
 
         // Get relevant data
@@ -184,7 +185,7 @@ $(document).ready(function () {
     // Carousel control pannel: Delete
     $('#post-carousel-control-pannel').on('click', '.carousel-pannel-delete', function () {
         // Get caption id
-        var slideID = $(this).data('caption-id');
+        var slideID = $(this).data('-id');
 
         // Delete from media list, redo previews
         mediaList.splice(slideID, 1)
@@ -285,13 +286,13 @@ $(document).ready(function () {
     // Post submission
     $('#create-post').click(function () {
         $(this).addClass('validated')
-        console.log($('#caption-text-0').val())
 
         // Defining key input fields 
         var titleField = $('#post-title');
         var contentsField = $('#post-contents');
         var mediaDropField = $('.file-drop-input');
 
+        // For the captions
         var captionsAreValid = true;
         var captionData;
         var captionDataList = [];
@@ -309,7 +310,7 @@ $(document).ready(function () {
         }
 
         // Form validation
-        if (titleField.val().length == 0 || contentsField.val().length == 0 || !mediaFiles || !captionsAreValid) {
+        if (titleField.val().length == 0 || contentsField.val().length == 0 || mediaList.length == 0 || !captionsAreValid) {
 
             // For the title
             if (titleField.val().length == 0) {
@@ -343,7 +344,7 @@ $(document).ready(function () {
                     $('#caption-text-' + i).removeClass('is-valid').addClass('is-invalid');
                     $('#carousel-caption-invalid-' + i).css('display', 'block');
                 } else {
-                    $('#caption-text' + i).removeClass('is-invalid').addClass('is-valid');
+                    $('#caption-text-' + i).removeClass('is-invalid').addClass('is-valid');
                     $('#carousel-caption-invalid-' + i).css('display', 'none');
                 }
             }

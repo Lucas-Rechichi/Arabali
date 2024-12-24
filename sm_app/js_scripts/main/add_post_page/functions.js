@@ -366,10 +366,10 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
     return previewHtml
 };
 
-
+// Function for adding new media files to the current media list
 export function addMediaToList(mediaFiles, currentMediaList) {
     // Setup
-    var limitReached = false;
+    var limitReached;
 
     // File count cannot be greater than 6, extract the files that can be accepted only if they can fit.
     if (currentMediaList.length > 6) { // already full, no input, trigger on-screen error
@@ -377,13 +377,14 @@ export function addMediaToList(mediaFiles, currentMediaList) {
     } else {
         if (mediaFiles.length + currentMediaList.length > 6) { // the addition of the media files exceeds 6, input what can fit, starting by what was inputted first, trigger on-screen error
             limitReached = true;
-            var maxInput = 6 - currentMediaList.length; // get how much files can fit inside the files
+            var maxInput = 6 - currentMediaList.length; // get how much files can fit inside the media list
 
             for (let i=0; i < maxInput; i++ ) {
-                currentMediaList.push(mediaFiles[i]) // append to current list
+                currentMediaList.push(mediaFiles[i]) // append the first selected media to current list
             }
+
         } else { // input all files, no on-screen error
-            limitReached = false
+            limitReached = false;
 
             for (let i=0; i < mediaFiles.length; i++ ) {
                 currentMediaList.push(mediaFiles[i]) // append to current list

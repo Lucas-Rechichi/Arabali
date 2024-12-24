@@ -55,13 +55,13 @@ class Algorithum:
 
             # Logic for what to sort
             if object_name == 'tag':
-                if sub_catergory != '|All':
+                if sub_catergory == '|All':
                     sorted_objects = PostTag.objects.all().annotate(Count('value')).order_by('-value')
                 else:
                     filtered_objects = PostTag.objects.filter(name=sub_catergory.removeprefix('|'))
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
-            else :
+            else:
                 if sub_catergory == '|All':
                     sorted_objects = Interest.objects.all().annotate(Count('value')).order_by('-value')
                 else:
@@ -494,7 +494,7 @@ class Algorithum:
                     tag_iterations[name] = 0
                 
                 # Orders the tags based on individual value
-                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_catagory)
+                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_catagory, user_obj=user)
 
                 # Select the tag depending on what iteration that name is on
                 selected_tag = tag_order[tag_iterations[name]]

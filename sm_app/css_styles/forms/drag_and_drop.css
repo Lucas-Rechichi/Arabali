@@ -8,6 +8,7 @@
     align-items: center;
     cursor: pointer;
 }
+
 .file-drop-input.drag-over-state {
     border-color: #198754;
     background-color: rgba(30, 255, 75, 0.3);
