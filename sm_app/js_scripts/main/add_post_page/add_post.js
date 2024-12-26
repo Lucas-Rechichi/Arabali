@@ -22,6 +22,7 @@ $(document).ready(function () {
                 $('#post-title-invalid').css('display', 'none');
             }
         }
+
         $('#post-title-preview').text(previewText)
     })
 
@@ -65,12 +66,18 @@ $(document).ready(function () {
                 $('#post-media-limit-message').css('display', 'block');
             }
 
+            // Prepare previewMediaFiles metadata
+            var metadata = {
+                'type': 'media-upload',
+                'input-index-start': mediaListData['inputIndexStart'],
+                'input-index-end': mediaListData['inputIndexEnd']
+            }
+
             // Get the preview HTML, replace controls/preview HTML or placeholders
-            var carouselObjects = previewMediaFiles(mediaList, false);
+            var carouselObjects = previewMediaFiles(mediaList, metadata);
             $('#post-media-preview-container').html(carouselObjects['carousel']); 
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
-
 
             // Change the state of the field if validation has occured
             if ( ( $('#post-media-card').hasClass('is-invalid') || $('#post-media-invalid').css('display') === 'block' ) && ( $('#create-post').hasClass('validated') ) ) {
@@ -120,8 +127,15 @@ $(document).ready(function () {
                 $('#post-media-limit-message').css('display', 'block');
             }
 
+            // Prepare previewMediaFiles metadata
+            var metadata = {
+                'type': 'media-upload',
+                'input-index-start': mediaListData['inputIndexStart'],
+                'input-index-end': mediaListData['inputIndexEnd']
+            }
+
             // Get the preview HTML, replace controls/preview HTML or placehonders
-            var carouselObjects = previewMediaFiles(mediaList, false);
+            var carouselObjects = previewMediaFiles(mediaList, metadata);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -137,6 +151,7 @@ $(document).ready(function () {
 
         }
     })
+
     // Carousel control pannel: Shuffle
     $('#post-carousel-control-pannel').on('click', '.carousel-pannel-shuffle', function () {
 
@@ -146,53 +161,54 @@ $(document).ready(function () {
 
         // Logic for moving slides
         if (direction === 'left') {
-            // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
+            // Compute the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
             var affectedSlideID = slideID - 1;
-            mediaList = shuffleArray(mediaList, slideID, direction) // TODO: Use media list
-
-            // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList, true, slideID, affectedSlideID, direction);
-            $('#post-media-preview-container').html(carouselObjects['carousel']);
-            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
-            $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
-
-            // Change the css of the colour picker buttons for the caption form
-            var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
-
-            colourPickerButtons.each(function () {
-                $(this).css('background-color', `${$(this).data('colour')}`);
-            })
-
-        } else { // direction === 'right'
-            // Get the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
-            var affectedSlideID = slideID + 1;
             mediaList = shuffleArray(mediaList, slideID, direction)
 
-            // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList, true, slideID, affectedSlideID, direction);
-            $('#post-media-preview-container').html(carouselObjects['carousel']);
-            $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
-            $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
-
-            // Change the css of the colour picker buttons for the caption form
-            var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
-
-            colourPickerButtons.each(function () {
-                $(this).css('background-color', `${$(this).data('colour')}`);
-            })
+        } else { // direction === 'right'
+            // Compute the id pf the affected slide, shuffle the position of the media inside of the mediaFiles array
+            var affectedSlideID = slideID + 1;
+            mediaList = shuffleArray(mediaList, slideID, direction)
         }
+
+        // Prepare previewMediaFiles metadata
+        var metadata = {
+            'type': 'media-shuffle',
+            'moving-slide-id': slideID,
+            'affected-slide-id': affectedSlideID
+        }
+
+        // Recall previewMediaFiles function with the newly ordered files
+        var carouselObjects = previewMediaFiles(mediaList, metadata);
+        $('#post-media-preview-container').html(carouselObjects['carousel']);
+        $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
+        $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
+
+        // Change the css of the colour picker buttons for the caption form
+        var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
+
+        colourPickerButtons.each(function () {
+            $(this).css('background-color', `${$(this).data('colour')}`);
+        })
     })
+
     // Carousel control pannel: Delete
     $('#post-carousel-control-pannel').on('click', '.carousel-pannel-delete', function () {
-        // Get caption id
-        var slideID = $(this).data('-id');
+        // Get slide id
+        var slideID = $(this).data('slide-id');
 
         // Delete from media list, redo previews
         mediaList.splice(slideID, 1)
 
         if (mediaList.length > 0) {
+
+            // Prepare previewMediaFiles metadata
+            var metadata = {
+                'type': 'media-delete',
+            }
+
             // Recall previewMediaFiles function with the newly ordered files
-            var carouselObjects = previewMediaFiles(mediaList, false);
+            var carouselObjects = previewMediaFiles(mediaList, metadata);
             $('#post-media-preview-container').html(carouselObjects['carousel']);
             $('#post-carousel-control-pannel').html(carouselObjects['controlPannel']);
             $('#post-carousel-captions-form').html(carouselObjects['captionForm']);
@@ -221,7 +237,7 @@ $(document).ready(function () {
             $('#post-media-preview-container').html(imagePlaceholderHtml);
 
             // Change the state of the field if validation has occured
-            if ( ( $('#post-media-card').hasClass('is-invalid') || $('#post-media-invalid').css('display') === 'none' ) && ( $('#create-post').hasClass('validated') ) ) {
+            if ( ( $('#post-media-card').hasClass('valid-media') || $('#post-media-invalid').css('display') === 'none' ) && ( $('#create-post').hasClass('validated') ) ) {
                 $('#post-media-card').removeClass('valid-media').addClass('invalid-media');
                 $('#post-media-invalid').css('display', 'block');
             }
@@ -230,7 +246,7 @@ $(document).ready(function () {
         $('#post-media-limit-message').css('display', 'none');
     });
 
-    // TODO: Input previews for carousel captions, preview updated colours and fonts 
+    // Caption form input previews
     $('#post-carousel-captions-form').on('input', '.caption-text', function () {
         var captionID = $(this).data('caption-id');
         var textInput = $(this).val();
@@ -259,6 +275,7 @@ $(document).ready(function () {
     })
 
     // Colour picker previews are within colour-picker.js
+
     $('#post-carousel-captions-form').on('change', '.caption-text-font', function () {
         var captionID = $(this).data('caption-id');
         var option = $(this).val();

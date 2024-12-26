@@ -25,8 +25,6 @@ $(document).ready(function () {
 
         // Get the colour picker popup, and display it
         var colourPicker = $('#colour-picker');
-        
-        console.log('Current display:', colourPicker.css('display'));
 
         if (colourPickerActive) {
             colourPickerActive = false
@@ -63,96 +61,9 @@ $(document).ready(function () {
             }, 300);
             
         }
-
-        console.log('Current display:', colourPicker.css('display'));
-    })    
-
+    })
+    
     // COLOUR PICKER
-
-    // Update the preview and input fields
-    function updateColour (hueChange, usedSliders) {
-        var hslaColour = `hsla(${hue}, ${saturation}%, ${lightness}%, ${opacity})`;
-        $('#colour-preview').css('background', hslaColour)
-
-        // Convert HSL to HEX and RGBA
-        var rgb = culori.formatRgb(hslaColour)
-        var hex = culori.formatHex(rgb)
-
-        var isGreyscale = false;
-
-        // Hue change logic
-        if (hueChange) {
-            // Get the rgb values
-            if (rgb.includes('rgba')) {
-                var rgbValuesString = rgb.slice(5, -1)
-                var rgbValues = getRgbaFromString(rgbValuesString)
-            } else {
-                var rgbValuesString = rgb.slice(4, -1)
-                var rgbValues = getRgbaFromString(rgbValuesString)
-            }
-
-            var r = rgbValues[0]
-            var g = rgbValues[1]
-            var b = rgbValues[2]
-
-            if (r == g && r == b && g == b) { // if it is a greyscale colour
-                isGreyscale = true
-                var hueStyleRgb = `hsl(${hue}, 100%, 50%)`
-                hue = 0 // default the hue to 0 for the rest of the range fields
-
-            } else {
-                // Change the display of the saturation and lightness sliders
-                var displayRGB = culori.formatRgb(`hsl(${hue}, 100%, 50%)`) 
-
-                $('#saturation-slider').css('background', `linear-gradient(to right, grey, ${displayRGB})`)
-                $('#lightness-slider').css('background', `linear-gradient(to right, black, ${displayRGB}, white)`)
-            }
-        }
-
-        // Slider use logic
-        if (!usedSliders) {
-            $('#hue-slider').val(hue);
-            if (opacity == 1) {
-                $('#saturation-slider').val(saturation);
-            }
-            $('#lightness-slider').val(lightness);
-            $('#opacity-slider').val(opacity * 100);
-        } 
-
-        // Change the colour of the slider knobs to match the colour being represented
-        var hslDisplay = `hsl(${hue}, 100%, 50%)`;
-        var rgbDisplay = culori.formatRgb(hslDisplay);
-
-        // for hue and saturation
-        if (isGreyscale) {
-            // Keep hue slider in it's original position
-            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleRgb);
-
-            if (opacity == 1) {
-                var saturationStyleRgb = saturationOnRgb(rgbDisplay, saturation/100);
-                $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
-            } 
-
-        } else {
-            var hueStyleRgb = rgbDisplay;
-            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleRgb);
-
-            var saturationStyleRgb = saturationOnRgb(rgbDisplay, saturation/100);
-            $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
-        }
-        
-        // for lightness
-        var lightnessStyleRgb = culori.formatRgb(`hsl(${hue}, 100%, ${lightness}%)`);
-        $('#lightness-slider')[0].style.setProperty('--lightness-slider-thumb-bg', lightnessStyleRgb);
-
-        // for opacity
-        var opacityStyleRgb = `rgb(0, 0, 0, ${opacity})`;
-        $('#opacity-slider')[0].style.setProperty('--opacity-slider-thumb-bg', opacityStyleRgb);
-
-        // Change the input values to match the new colour
-        $('#hex-input').val(hex);
-        $('#rgba-input').val(rgb);
-    };
 
     // Event listeners for sliders
     $('#hue-slider').on('input', function () {
@@ -274,6 +185,91 @@ $(document).ready(function () {
         colourPickerActive = false
         $('#colour-picker').fadeOut(300);
     })
+
+    // Update the preview and input fields
+    function updateColour (hueChange, usedSliders) {
+        var hslaColour = `hsla(${hue}, ${saturation}%, ${lightness}%, ${opacity})`;
+        $('#colour-preview').css('background', hslaColour)
+
+        // Convert HSL to HEX and RGBA
+        var rgb = culori.formatRgb(hslaColour)
+        var hex = culori.formatHex(rgb)
+
+        var isGreyscale = false;
+
+        // Hue change logic
+        if (hueChange) {
+            // Get the rgb values
+            if (rgb.includes('rgba')) {
+                var rgbValuesString = rgb.slice(5, -1)
+                var rgbValues = getRgbaFromString(rgbValuesString)
+            } else {
+                var rgbValuesString = rgb.slice(4, -1)
+                var rgbValues = getRgbaFromString(rgbValuesString)
+            }
+
+            var r = rgbValues[0]
+            var g = rgbValues[1]
+            var b = rgbValues[2]
+
+            if (r == g && r == b && g == b) { // if it is a greyscale colour
+                isGreyscale = true
+                var hueStyleRgb = `hsl(${hue}, 100%, 50%)`
+                hue = 0 // default the hue to 0 for the rest of the range fields
+
+            } else {
+                // Change the display of the saturation and lightness sliders
+                var displayRGB = culori.formatRgb(`hsl(${hue}, 100%, 50%)`) 
+
+                $('#saturation-slider').css('background', `linear-gradient(to right, grey, ${displayRGB})`)
+                $('#lightness-slider').css('background', `linear-gradient(to right, black, ${displayRGB}, white)`)
+            }
+        }
+
+        // Slider use logic
+        if (!usedSliders) {
+            $('#hue-slider').val(hue);
+            if (opacity == 1) {
+                $('#saturation-slider').val(saturation);
+            }
+            $('#lightness-slider').val(lightness);
+            $('#opacity-slider').val(opacity * 100);
+        } 
+
+        // Change the colour of the slider knobs to match the colour being represented
+        var hslDisplay = `hsl(${hue}, 100%, 50%)`;
+        var rgbDisplay = culori.formatRgb(hslDisplay);
+
+        // for hue and saturation
+        if (isGreyscale) {
+            // Keep hue slider in it's original position
+            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleRgb);
+
+            if (opacity == 1) {
+                var saturationStyleRgb = saturationOnRgb(rgbDisplay, saturation/100);
+                $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
+            } 
+
+        } else {
+            var hueStyleRgb = rgbDisplay;
+            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleRgb);
+
+            var saturationStyleRgb = saturationOnRgb(rgbDisplay, saturation/100);
+            $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
+        }
+        
+        // for lightness
+        var lightnessStyleRgb = culori.formatRgb(`hsl(${hue}, 100%, ${lightness}%)`);
+        $('#lightness-slider')[0].style.setProperty('--lightness-slider-thumb-bg', lightnessStyleRgb);
+
+        // for opacity
+        var opacityStyleRgb = `rgb(0, 0, 0, ${opacity})`;
+        $('#opacity-slider')[0].style.setProperty('--opacity-slider-thumb-bg', opacityStyleRgb);
+
+        // Change the input values to match the new colour
+        $('#hex-input').val(hex);
+        $('#rgba-input').val(rgb);
+    };
 
     // Calculates the saturation effect on a RGB colour
     function saturationOnRgb (rgb, saturation) {

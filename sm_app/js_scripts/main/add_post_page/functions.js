@@ -1,4 +1,4 @@
-export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCaptionID, direction) {
+export function previewMediaFiles(mediaFilesList, metadata) {
 
     // Preparing variables 
     var mediaURL;
@@ -23,6 +23,8 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
 
     var captionData;
 
+    var type = metadata['type'];
+
     // Loops though all media within the media files list
     for (let i=0; i < mediaFilesList.length; i++) {
         // Creating the media URL object
@@ -41,7 +43,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                 `;
             }
 
-            // Creating the carousel cotrol elements
+            // Creating the carousel control elements
             if (i == 0) {
                 carouselPannelHtml = `
                     <div id="carousel-pannel-slide-${i}" class="col-2">
@@ -57,7 +59,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                                 </div>
                             </div>
                             <div class="row mt-1">
-                                <div class="col d-flex justify-content-center"">
+                                <div class="col d-flex justify-content-center">
                                     <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
                                 </div>
                             </div>
@@ -79,7 +81,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                                 </div>
                             </div>
                             <div class="row mt-1">
-                                <div class="col d-flex justify-content-center"">
+                                <div class="col d-flex justify-content-center">
                                     <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
                                 </div>
                             </div>
@@ -101,7 +103,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                                 </div>
                             </div>
                             <div class="row mt-1">
-                                <div class="col d-flex justify-content-center"">
+                                <div class="col d-flex justify-content-center">
                                     <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
                                 </div>
                             </div>
@@ -110,147 +112,62 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                 `;
             };
 
-            // For when shuffling of media occurs, change captions and caption preview.
-            if (shuffle) {
-                // If the index lines up with the indexes involved with the shuffle
-                if (i === captionID || i === affectedCaptionID) {
-                    // Logic for what needs to be moved
-                    if (i === captionID) {
-                        captionData = getCaptionData(affectedCaptionID);
-                    } else {
-                        captionData = getCaptionData(captionID);
-                    }
-                } else {
-                    captionData =  getCaptionData(i);
-                };
+            // Conditionals for different types of use cases for this function
+            if (type === 'media-upload' || type === 'media-delete') {
+                // For new media
+                var inputIndexStart = metadata['input-index-start']
+                var inputIndexEnd = metadata['input-index-end']
 
-                // HTML for the caption form
-                if (captionData['text'] === 'This image represents...') {
-                    captionTextHtml = `
-                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
-                    `;
-                } else {
-                    captionTextHtml = `
-                        <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" value="${captionData['text']}" aria-label="Caption" data-caption-id="${i}">
-                    `;
-                };
+                if (inputIndexStart <= i <= inputIndexEnd && type === 'media-upload') { // if the index falls within the new range of media 
+                    var captionText = '';
+                    var captionColour = '#ffffffff';
+                    var captionFont = 'default';
+                    var captionFontClass = 'font-default';
+                } else { // for both excluded indexes and when deleting media
+                    var captionData = getCaptionData(i)
 
-                captionColourHtml = `
-                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="${captionData['colour']}" data-caption-id="${i}"></div> 
-                `;
-
-                // For the font selected
-                switch (captionData['font']) {
-                    case 'default':
-                        var optionsHtml = `
-                            <option value="default" selected>Default Font</option>
-                            <option value="strong">Strong</option>
-                            <option value="italic">Italic</option>
-                            <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-ms">Comic Sans MS</option>
-                            <option value="impact">Impact</option>
-                            <option value="palatino-linotype">Palatino Linotype</option>
-                        `;
-                        break;
-
-                    case 'strong':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong" selected>Strong</option>
-                            <option value="italic">Italic</option>
-                            <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-ms">Comic Sans MS</option>
-                            <option value="impact">Impact</option>
-                            <option value="palatino-linotype">Palatino Linotype</option>
-                        `;
-                        break;
-
-                    case 'italic':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong">Strong</option>
-                            <option value="italic" selected>Italic</option>
-                            <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-ms">Comic Sans MS</option>
-                            <option value="impact">Impact</option>
-                            <option value="palatino-linotype">Palatino Linotype</option>
-                        `;
-                        break;
-
-                    case 'corier-new':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong">Strong</option>
-                            <option value="italic">Italic</option>
-                            <option value="corier-new" selected>Corier New</option>
-                            <option value="comic-sans-ms">Comic Sans MS</option>
-                            <option value="impact">Impact</option>
-                            <option value="palatino-linotype">Palatino Linotype</option>
-                        `;
-                        break;
-
-                    case 'comic-sans-ms':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong">Strong</option>
-                            <option value="italic">Italic</option>
-                            <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-ms" selected>Comic Sans MS</option>
-                            <option value="impact">Impact</option>
-                            <option value="palatino-linotype">Palatino Linotype</option>
-                        `;
-                        break;
-
-                    case 'impact':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong">Strong</option>
-                            <option value="italic">Italic</option>
-                            <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-ms">Comic Sans MS</option>
-                            <option value="impact" selected>Impact</option>
-                            <option value="palatino-linotype">Palatino Linotype</option>
-                        `;
-                        break;
-
-                    case 'palatino-linotype':
-                        var optionsHtml = `
-                            <option value="default">Default Font</option>
-                            <option value="strong">Strong</option>
-                            <option value="italic">Italic</option>
-                            <option value="corier-new">Corier New</option>
-                            <option value="comic-sans-ms">Comic Sans MS</option>
-                            <option value="impact">Impact</option>
-                            <option value="palatino-linotype" selected>Palatino Linotype</option>
-                        `;
-                        break;
-
+                    var captionText = captionData['text'];
+                    var captionColour = captionData['colour'];
+                    var captionFont = captionData['font'];
+                    var captionFontClass = captionData['fontClass'];
                 }
 
-                // HTML for the caption preview
-                carouselCaptionHtml = `
-                    <p id="carousel-caption-text-${i}" class="${captionData['fontClass']}" data-font="${captionData['font']}" data-colour="${captionData['colour']}" style="color: ${captionData['colour']}">${captionData['text']}</p>
-                `;
+            } else { // type === 'media-shuffle' 
+                
+                // Logic for what needs to be moved
+                if (i === slideID) {
+                    captionData = getCaptionData(affectedSlideID);
+                } else if (i === affectedSlideID) {
+                    captionData = getCaptionData(slideID);
+                } else { // 'i' is not affected by the shuffle
+                    captionData = getCaptionData(i)
+                }
 
-                // Adding in font option to select
-                captionFontHtml = `
-                    <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Font Selection" data-caption-id="${i}">
-                        ${optionsHtml}
-                    </select>
-                `;
-            };
-
-            // No shuffle
-            if (!shuffle) {
-                // Caption form
+                var captionText = captionData['text'];
+                var captionColour = captionData['colour'];
+                var captionFont = captionData['font'];
+                var captionFontClass = captionData['fontClass'];
+            }
+            
+            // HTML for the caption form
+            if (captionText === 'This image represents...') {
                 captionTextHtml = `
                     <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" aria-label="Caption" data-caption-id="${i}">
                 `;
-                captionColourHtml = `
-                    <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="#ffffffff" data-caption-id="${i}"></div> 
+            } else {
+                captionTextHtml = `
+                    <input type="text" id="caption-text-${i}" class="form-control caption-text" placeholder="Caption" value="${captionText}" aria-label="Caption" data-caption-id="${i}">
                 `;
-                captionFontHtml = `
-                    <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Default select example" data-caption-id="${i}">
+            };
+
+            captionColourHtml = `
+                <div id="caption-text-colour-${i}" class="colour-picker-button" data-colour="${captionColour}" data-caption-id="${i}"></div> 
+            `;
+
+            // For the font selected
+            switch (captionFont) {
+                case 'default':
+                    var optionsHtml = `
                         <option value="default" selected>Default Font</option>
                         <option value="strong">Strong</option>
                         <option value="italic">Italic</option>
@@ -258,14 +175,93 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
                         <option value="comic-sans-ms">Comic Sans MS</option>
                         <option value="impact">Impact</option>
                         <option value="palatino-linotype">Palatino Linotype</option>
-                    </select>
-                `;
+                    `;
+                    break;
 
-                // Caption preview
-                carouselCaptionHtml = `
-                    <p id="carousel-caption-text-${i}" class="font-default" data-font="default" data-colour="#ffffffff" style="color: #ffffffff">This image represents...</p>
-                `;
-            };
+                case 'strong':
+                    var optionsHtml = `
+                        <option value="default">Default Font</option>
+                        <option value="strong" selected>Strong</option>
+                        <option value="italic">Italic</option>
+                        <option value="corier-new">Corier New</option>
+                        <option value="comic-sans-ms">Comic Sans MS</option>
+                        <option value="impact">Impact</option>
+                        <option value="palatino-linotype">Palatino Linotype</option>
+                    `;
+                    break;
+
+                case 'italic':
+                    var optionsHtml = `
+                        <option value="default">Default Font</option>
+                        <option value="strong">Strong</option>
+                        <option value="italic" selected>Italic</option>
+                        <option value="corier-new">Corier New</option>
+                        <option value="comic-sans-ms">Comic Sans MS</option>
+                        <option value="impact">Impact</option>
+                        <option value="palatino-linotype">Palatino Linotype</option>
+                    `;
+                    break;
+
+                case 'corier-new':
+                    var optionsHtml = `
+                        <option value="default">Default Font</option>
+                        <option value="strong">Strong</option>
+                        <option value="italic">Italic</option>
+                        <option value="corier-new" selected>Corier New</option>
+                        <option value="comic-sans-ms">Comic Sans MS</option>
+                        <option value="impact">Impact</option>
+                        <option value="palatino-linotype">Palatino Linotype</option>
+                    `;
+                    break;
+
+                case 'comic-sans-ms':
+                    var optionsHtml = `
+                        <option value="default">Default Font</option>
+                        <option value="strong">Strong</option>
+                        <option value="italic">Italic</option>
+                        <option value="corier-new">Corier New</option>
+                        <option value="comic-sans-ms" selected>Comic Sans MS</option>
+                        <option value="impact">Impact</option>
+                        <option value="palatino-linotype">Palatino Linotype</option>
+                    `;
+                    break;
+
+                case 'impact':
+                    var optionsHtml = `
+                        <option value="default">Default Font</option>
+                        <option value="strong">Strong</option>
+                        <option value="italic">Italic</option>
+                        <option value="corier-new">Corier New</option>
+                        <option value="comic-sans-ms">Comic Sans MS</option>
+                        <option value="impact" selected>Impact</option>
+                        <option value="palatino-linotype">Palatino Linotype</option>
+                    `;
+                    break;
+
+                case 'palatino-linotype':
+                    var optionsHtml = `
+                        <option value="default">Default Font</option>
+                        <option value="strong">Strong</option>
+                        <option value="italic">Italic</option>
+                        <option value="corier-new">Corier New</option>
+                        <option value="comic-sans-ms">Comic Sans MS</option>
+                        <option value="impact">Impact</option>
+                        <option value="palatino-linotype" selected>Palatino Linotype</option>
+                    `;
+                    break;
+            }
+
+            // HTML for the caption preview
+            carouselCaptionHtml = `
+                <p id="carousel-caption-text-${i}" class="${captionFontClass}" data-font="${captionFont}" data-colour="${captionColour}" style="color: ${captionColour}">${captionText}</p>
+            `;
+
+            // Adding in font option to select element
+            captionFontHtml = `
+                <select id="caption-text-font-${i}" class="form-select caption-text-font" aria-label="Font Selection" data-caption-id="${i}">
+                    ${optionsHtml}
+                </select>
+            `;
 
             // Creating the carousel slides
             if (i == 0) {
@@ -326,7 +322,7 @@ export function previewMediaFiles(mediaFilesList, shuffle, captionID, affectedCa
             `;
 
 
-            // Append data to the plural variable
+            // Append data to the plural variables
             carouselIndicatorsHtml += carouselIndicatiorHtml;
             carouselSlidesHtml += carouselSlideHtml;
             carouselPannelsHtml += carouselPannelHtml;
@@ -379,12 +375,18 @@ export function addMediaToList(mediaFiles, currentMediaList) {
             limitReached = true;
             var maxInput = 6 - currentMediaList.length; // get how much files can fit inside the media list
 
+            var inputIndexStart = 6 - maxInput;
+            var inputIndexEnd = 5;
+
             for (let i=0; i < maxInput; i++ ) {
                 currentMediaList.push(mediaFiles[i]) // append the first selected media to current list
             }
 
         } else { // input all files, no on-screen error
             limitReached = false;
+
+            var inputIndexStart = currentMediaList.length
+            var inputIndexEnd = currentMediaList.length + mediaFiles.length - 1
 
             for (let i=0; i < mediaFiles.length; i++ ) {
                 currentMediaList.push(mediaFiles[i]) // append to current list
@@ -395,27 +397,29 @@ export function addMediaToList(mediaFiles, currentMediaList) {
     // Response set
     var response = {
         'updatedMediaList': currentMediaList,
-        'limitReached': limitReached
+        'limitReached': limitReached,
+        'inputIndexStart': inputIndexStart,
+        'inputIndexEnd': inputIndexEnd,
     };
 
     return response
 }
 
-// For the shuffling of the 
+// For swapping two items in an array
 export function shuffleArray(array, movingIndex, direction) {
     // Get the item in the list, removing it from the list
-    var movingItem = array.splice(movingIndex, 1)[0]; // positoning?
+    var movingItem = array.splice(movingIndex, 1)[0];
 
     // Get the moving item, removing it from the list, and add in the list with it's new order
     if (direction === 'right') {
-        var affectedIndex = movingIndex;
-        var affectedItem = array.splice(affectedIndex, 1)[0]; // positoning?
+        var affectedIndex = movingIndex; // The function takes 1 item out of the list, therefore when moving right, the index of the affected item becomes the index of the moving item.
+        var affectedItem = array.splice(affectedIndex, 1)[0]; 
 
         array.splice(movingIndex, 0, affectedItem);
         array.splice(movingIndex + 1, 0, movingItem);
     } else {
         var affectedIndex = movingIndex - 1;
-        var affectedItem = array.splice(affectedIndex, 1)[0]; // positoning?
+        var affectedItem = array.splice(affectedIndex, 1)[0]; 
         
         array.splice(affectedIndex, 0, movingItem);
         array.splice(affectedIndex + 1, 0, affectedItem);
@@ -425,6 +429,7 @@ export function shuffleArray(array, movingIndex, direction) {
     return array
 }
 
+// Function for getting the caption data from the caption preview
 export function getCaptionData(captionID) {
     var caption = $('#carousel-caption-text-' + captionID);
 
