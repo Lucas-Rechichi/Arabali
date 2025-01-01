@@ -44,7 +44,52 @@ export function previewMediaFiles(mediaFilesList, metadata) {
             }
 
             // Creating the carousel control elements
-            if (i == 0) {
+            if ( mediaFilesList.length != 1) {
+                if (i == 0) { // cannot swap left
+                    carouselPannelHtml = `
+                        <div id="carousel-pannel-slide-${i}" class="col-2">
+                            <div class="card p-1">
+                                <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
+                                <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left" disabled><i class="bi bi-arrow-left-short"></i></button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
+                                    </div>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="col d-flex justify-content-center">
+                                        <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (i == mediaFilesList.length - 1) { // cannot swap right
+                    carouselPannelHtml = `
+                        <div id="carousel-pannel-slide-${i}" class="col-2">
+                            <div class="card p-1">
+                                <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
+                                <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right" disabled><i class="bi bi-arrow-right-short"></i></button>
+                                    </div>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="col d-flex justify-content-center">
+                                        <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {  // can swap either way
                 carouselPannelHtml = `
                     <div id="carousel-pannel-slide-${i}" class="col-2">
                         <div class="card p-1">
@@ -52,7 +97,7 @@ export function previewMediaFiles(mediaFilesList, metadata) {
                             <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
                             <div class="row">
                                 <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left" disabled><i class="bi bi-arrow-left-short"></i></button>
+                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
                                 </div>
                                 <div class="col-6">
                                     <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
@@ -66,63 +111,43 @@ export function previewMediaFiles(mediaFilesList, metadata) {
                         </div>
                     </div>
                 `;
-            } else if (i == mediaFilesList.length - 1) {
-                carouselPannelHtml = `
-                    <div id="carousel-pannel-slide-${i}" class="col-2">
-                        <div class="card p-1">
-                            <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
-                            <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
-                            <div class="row">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right" disabled><i class="bi bi-arrow-right-short"></i></button>
-                                </div>
+                }
+            } else { // cannot swap 
+            carouselPannelHtml = `
+                <div id="carousel-pannel-slide-${i}" class="col-2">
+                    <div class="card p-1">
+                        <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
+                        <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left" disabled><i class="bi bi-arrow-left-short"></i></button>
                             </div>
-                            <div class="row mt-1">
-                                <div class="col d-flex justify-content-center">
-                                    <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
-                                </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right" disabled><i class="bi bi-arrow-right-short"></i></button>
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col d-flex justify-content-center">
+                                <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
                             </div>
                         </div>
                     </div>
-                `;
-            } else {
-                carouselPannelHtml = `
-                    <div id="carousel-pannel-slide-${i}" class="col-2">
-                        <div class="card p-1">
-                            <p id="carousel-slide-indicator-${i}" class="lead text-center m-0">${i + 1}</p>
-                            <img class="mb-1" src="${mediaURL}" alt="Previewing media with path: ${mediaURL}, for slide: ${i}" style="width: 70px; height: 40px;">
-                            <div class="row">
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="left"><i class="bi bi-arrow-left-short"></i></button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="button" class="btn btn-outline-dark carousel-pannel-shuffle" data-slide-id="${i}" data-direction="right"><i class="bi bi-arrow-right-short"></i></button>
-                                </div>
-                            </div>
-                            <div class="row mt-1">
-                                <div class="col d-flex justify-content-center">
-                                    <button type="button" class="btn btn-outline-danger carousel-pannel-delete" data-slide-id="${i}"><i class="bi bi-trash3-fill"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            };
+                </div>
+            `;
+            }
 
             // Conditionals for different types of use cases for this function
             if (type === 'media-upload' || type === 'media-delete') {
                 // For new media
                 var inputIndexStart = metadata['input-index-start']
-                var inputIndexEnd = metadata['input-index-end']
 
-                if (inputIndexStart <= i <= inputIndexEnd && type === 'media-upload') { // if the index falls within the new range of media 
-                    var captionText = '';
+                // Conditional for if the index falls within the new range of media 
+                if (i >= inputIndexStart && type === 'media-upload') { 
+                    var captionText = 'This image represents...';
                     var captionColour = '#ffffffff';
                     var captionFont = 'default';
                     var captionFontClass = 'font-default';
+
                 } else { // for both excluded indexes and when deleting media
                     var captionData = getCaptionData(i)
 
@@ -133,13 +158,17 @@ export function previewMediaFiles(mediaFilesList, metadata) {
                 }
 
             } else { // type === 'media-shuffle' 
-                
+
+                // For the slide indexes that are affected by the shuffle
+                var movingSlideID = metadata['moving-slide-id'];
+                var affectedSlideID = metadata['affected-slide-id'];
+
                 // Logic for what needs to be moved
-                if (i === slideID) {
+                if (i === movingSlideID) {
                     captionData = getCaptionData(affectedSlideID);
                 } else if (i === affectedSlideID) {
-                    captionData = getCaptionData(slideID);
-                } else { // 'i' is not affected by the shuffle
+                    captionData = getCaptionData(movingSlideID);
+                } else { // the index is not affected by the shuffle
                     captionData = getCaptionData(i)
                 }
 
@@ -288,10 +317,10 @@ export function previewMediaFiles(mediaFilesList, metadata) {
             carouselCaptionInputHtml = `
                 <div class="row">
                     <div class="col">
-                        <div id="caption-input-${i}" class="card caption-inputs p-1">
+                        <div id="caption-input-${i}" class="card caption-inputs p-1 mb-1">
                             <div class="row">
                                 <div class="col-2">
-                                    <p class="lead text-center">${i + 1}</p>
+                                    <p class="lead text-center mt-3">${i + 1}</p>
                                 </div>
                                 <div class="col-4">
                                     <label for="caption-text-${i}" class="form-label">Caption:</label>
@@ -375,8 +404,7 @@ export function addMediaToList(mediaFiles, currentMediaList) {
             limitReached = true;
             var maxInput = 6 - currentMediaList.length; // get how much files can fit inside the media list
 
-            var inputIndexStart = 6 - maxInput;
-            var inputIndexEnd = 5;
+            var inputIndexStart = 6 - maxInput; // where the input of new files starts within the list in terms of it's index
 
             for (let i=0; i < maxInput; i++ ) {
                 currentMediaList.push(mediaFiles[i]) // append the first selected media to current list
@@ -386,7 +414,6 @@ export function addMediaToList(mediaFiles, currentMediaList) {
             limitReached = false;
 
             var inputIndexStart = currentMediaList.length
-            var inputIndexEnd = currentMediaList.length + mediaFiles.length - 1
 
             for (let i=0; i < mediaFiles.length; i++ ) {
                 currentMediaList.push(mediaFiles[i]) // append to current list
@@ -399,7 +426,6 @@ export function addMediaToList(mediaFiles, currentMediaList) {
         'updatedMediaList': currentMediaList,
         'limitReached': limitReached,
         'inputIndexStart': inputIndexStart,
-        'inputIndexEnd': inputIndexEnd,
     };
 
     return response

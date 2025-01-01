@@ -1,7 +1,7 @@
 /* Variables fot the slider thumbs (knobs) */
 :root {
     --hue-slider-thumb-bg: red;
-    --saturation-slider-thumb-bg: red;
+    --saturation-slider-thumb-bg: grey;
     --lightness-slider-thumb-bg: red;
     --opacity-slider-thumb-bg: black;
 }

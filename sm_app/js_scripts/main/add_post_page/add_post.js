@@ -70,7 +70,6 @@ $(document).ready(function () {
             var metadata = {
                 'type': 'media-upload',
                 'input-index-start': mediaListData['inputIndexStart'],
-                'input-index-end': mediaListData['inputIndexEnd']
             }
 
             // Get the preview HTML, replace controls/preview HTML or placeholders
@@ -84,6 +83,11 @@ $(document).ready(function () {
                 $('#post-media-card').removeClass('invalid-media').addClass('valid-media');
                 $('#post-media-invalid').css('display', 'none');
             }
+            // Change the css of the colour picker buttons for the caption form
+            var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
+            colourPickerButtons.each(function () {
+                $(this).css('background-color', `${$(this).data('colour')}`);
+            })
         }
     })
 
@@ -131,7 +135,6 @@ $(document).ready(function () {
             var metadata = {
                 'type': 'media-upload',
                 'input-index-start': mediaListData['inputIndexStart'],
-                'input-index-end': mediaListData['inputIndexEnd']
             }
 
             // Get the preview HTML, replace controls/preview HTML or placehonders
@@ -145,6 +148,12 @@ $(document).ready(function () {
                 $('#post-media-card').removeClass('invalid-media').addClass('valid-media');
                 $('#post-media-invalid').css('display', 'none');
             }
+
+            // Change the css of the colour picker buttons for the caption form
+            var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
+            colourPickerButtons.each(function () {
+                $(this).css('background-color', `${$(this).data('colour')}`);
+            })
 
             // Visual indicators for the dropover box
             $(this).removeClass('drag-over-state');
@@ -186,7 +195,6 @@ $(document).ready(function () {
 
         // Change the css of the colour picker buttons for the caption form
         var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
-
         colourPickerButtons.each(function () {
             $(this).css('background-color', `${$(this).data('colour')}`);
         })
@@ -242,6 +250,13 @@ $(document).ready(function () {
                 $('#post-media-invalid').css('display', 'block');
             }
         }
+
+        // Change the css of the colour picker buttons for the caption form
+        var colourPickerButtons = $('#post-carousel-captions-form .colour-picker-button');
+        colourPickerButtons.each(function () {
+            $(this).css('background-color', `${$(this).data('colour')}`);
+        })
+
         // Hide the limit message
         $('#post-media-limit-message').css('display', 'none');
     });

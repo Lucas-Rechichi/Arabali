@@ -280,16 +280,16 @@
 </div>
 <!-- For the colour picker -->
 <ul id="colour-picker" class="colour-picker-clickable dropdown-menu p-2" style="max-width: 300px; background: rgba(255, 255, 255, 1); display: none;">
-    <div class="colour-picker-preview" id="colour-preview" data-colour="#000000ff"></div>
+    <div class="colour-picker-preview" id="colour-preview" data-colour="#ffffffff"></div>
 
     <label for="hue-slider" class="form-label mb-0">Hue:</label>
-    <input type="range" id="hue-slider" class="colour-picker-clickable" min="0" max="360" value="0">
+    <input type="range" id="hue-slider" class="colour-picker-clickable" min="0" max="359" value="0">
 
     <label for="saturation-slider" class="form-label mb-0">Saturation:</label>
-    <input type="range" id="saturation-slider" class="colour-picker-clickable" min="0" max="100" value="100">
+    <input type="range" id="saturation-slider" class="colour-picker-clickable" min="0" max="255" value="255">
 
     <label for="lightness-slider" class="form-label mb-0">Lightness:</label>
-    <input type="range" id="lightness-slider" class="colour-picker-clickable" min="0" max="100" value="50">
+    <input type="range" id="lightness-slider" class="colour-picker-clickable" min="0" max="255" value="127.5">
 
     <label for="opacity-slider" class="form-label mb-0">Opacity:</label>
     <input type="range" id="opacity-slider" class="colour-picker-clickable" min="0" max="100" value="100">
