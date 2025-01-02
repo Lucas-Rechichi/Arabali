@@ -12,8 +12,8 @@ $(document).ready(function () {
 
     // Initial hsl and opacity values (for white)
     let hue = 0;
-    let saturation = 255;
-    let lightness = 127.5;
+    let saturation = 0;
+    let lightness = 255;
     let opacity = 100;
 
     // Opening colour picker
@@ -113,7 +113,13 @@ $(document).ready(function () {
             }
 
             updateColour(true, false);
-        } 
+
+            $(this).removeClass('is-invalid')
+            $('#hex-input-invalid').css('display', 'none')
+        } else {
+            $(this).addClass('is-invalid')
+            $('#hex-input-invalid').css('display', 'block')
+        }
 
     })
 
@@ -136,8 +142,12 @@ $(document).ready(function () {
                     opacity = scale(colourHsl['alpha'], '0-1', '0-100');
                 }
                 updateColour(true, false);
+
+                $(this).removeClass('is-invalid')
+                $('#rgba-input-invalid').css('display', 'none')
             } else {
-                // throw a validation error
+                $(this).addClass('is-invalid')
+                $('#rgba-input-invalid').css('display', 'block')
             }
 
         } else {
@@ -155,8 +165,12 @@ $(document).ready(function () {
                 }
 
                 updateColour(true, false)
+
+                $(this).removeClass('is-invalid')
+                $('#rgba-input-invalid').css('display', 'none')
             } else {
-                // throw a validation error
+                $(this).addClass('is-invalid')
+                $('#rgba-input-invalid').css('display', 'block')
             }
         }
 
@@ -238,9 +252,7 @@ $(document).ready(function () {
         // Slider use logic
         if (!usedSliders) {
             $('#hue-slider').val(hue);
-            if (opacity == 1) { // saturation slider is to remain in the same place when tranceparent colours are used for the look of the colour picker
-                $('#saturation-slider').val(saturation); 
-            }
+            $('#saturation-slider').val(saturation); 
             $('#lightness-slider').val(lightness);
             $('#opacity-slider').val(opacity);
         } 
@@ -254,10 +266,8 @@ $(document).ready(function () {
 
             $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleRgb);
 
-            if (opacity == 1) { // saturation slider is to remain in the same place when tranceparent colours are used for the look of the colour picker
-                var saturationStyleRgb = saturationOnRgb(rgbDisplay, scale(saturation, '0-255', '0-1'));
-                $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
-            } 
+            var saturationStyleRgb = saturationOnRgb(rgbDisplay, scale(saturation, '0-255', '0-1'));
+            $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
 
         } else {
             var hueStyleRgb = rgbDisplay;
@@ -468,8 +478,7 @@ $(document).ready(function () {
         }
 
         return scaledColourValue
-    }
 
-    // Initialise the colour picker
-    updateColour(true, false);
-    })
+    
+    }
+})

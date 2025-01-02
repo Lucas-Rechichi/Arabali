@@ -286,10 +286,10 @@
     <input type="range" id="hue-slider" class="colour-picker-clickable" min="0" max="359" value="0">
 
     <label for="saturation-slider" class="form-label mb-0">Saturation:</label>
-    <input type="range" id="saturation-slider" class="colour-picker-clickable" min="0" max="255" value="255">
+    <input type="range" id="saturation-slider" class="colour-picker-clickable" min="0" max="255" value="0">
 
     <label for="lightness-slider" class="form-label mb-0">Lightness:</label>
-    <input type="range" id="lightness-slider" class="colour-picker-clickable" min="0" max="255" value="127.5">
+    <input type="range" id="lightness-slider" class="colour-picker-clickable" min="0" max="255" value="255">
 
     <label for="opacity-slider" class="form-label mb-0">Opacity:</label>
     <input type="range" id="opacity-slider" class="colour-picker-clickable" min="0" max="100" value="100">
@@ -298,10 +298,16 @@
         <div class="col">
             <label for="hex-input" class="form-label">Hex:</label>
             <input type="text" id="hex-input" class="form-control colour-picker-clickable" placeholder="#ffffff" value="#ff0000">
+            <div id="hex-input-invalid" class="invalid-feedback ms-1">
+                <strong>Input a valid HEX colour code.</strong>
+            </div>
         </div>
         <div class="col">
             <label for="rgba-input" class="form-label">RGB/RGBA:</label>
             <input type="text" id="rgba-input" class="form-control colour-picker-clickable" placeholder="rgba(255,255,255,1)" value="rgb(255, 0, 0)">
+            <div id="rgba-input-invalid" class="invalid-feedback ms-1">
+                <strong>Input a valid RGB/RGBA colour code.</strong>
+            </div>
         </div>
     </div>
     <br>
