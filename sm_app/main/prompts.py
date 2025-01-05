@@ -5,7 +5,8 @@ class Prompts:
             post evaluated, what catergory would you classify this post with? 
             List only the most fitting catergory. If you think it fits inside these existing catergories: 
             {str(catergories_list)}, then assign it to that catergory please. 
-            Only include the catergory name in your response.
+            Only include the catergory name in your response, and have the the category name be in 
+            all lowercase.
         '''
 
         return prompt

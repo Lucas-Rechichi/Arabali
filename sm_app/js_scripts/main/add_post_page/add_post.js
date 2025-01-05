@@ -289,7 +289,7 @@ $(document).ready(function () {
         
     })
 
-    // Colour picker previews are within colour-picker.js
+    // Colour picker preview event listener is within colour-picker.js, triggered by the save button
 
     $('#post-carousel-captions-form').on('change', '.caption-text-font', function () {
         var captionID = $(this).data('caption-id');

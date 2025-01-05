@@ -114,9 +114,12 @@ $(document).ready(function () {
 
             updateColour(true, false);
 
+            // Validation for the input
             $(this).removeClass('is-invalid')
             $('#hex-input-invalid').css('display', 'none')
         } else {
+
+            // Validation for the input
             $(this).addClass('is-invalid')
             $('#hex-input-invalid').css('display', 'block')
         }
@@ -143,9 +146,12 @@ $(document).ready(function () {
                 }
                 updateColour(true, false);
 
+                // Validation for the input
                 $(this).removeClass('is-invalid')
                 $('#rgba-input-invalid').css('display', 'none')
             } else {
+
+                // Validation for the input
                 $(this).addClass('is-invalid')
                 $('#rgba-input-invalid').css('display', 'block')
             }
@@ -166,9 +172,12 @@ $(document).ready(function () {
 
                 updateColour(true, false)
 
+                // Validation for the input
                 $(this).removeClass('is-invalid')
                 $('#rgba-input-invalid').css('display', 'none')
             } else {
+
+                // Validation for the input
                 $(this).addClass('is-invalid')
                 $('#rgba-input-invalid').css('display', 'block')
             }
@@ -191,7 +200,7 @@ $(document).ready(function () {
         // Updates the new button visually with the new colour
         $('#caption-text-colour-' + captionID).css('background-color', colourSelected)
 
-        // Updates the colour of the specified input
+        // Updates the caption colour
         var captionData = getCaptionData(captionID);
         var newCaptionHtml = `
             <p id="carousel-caption-text-${captionID}" class="${captionData['fontClass']}" data-font="${captionData['font']}" data-colour="${colourSelected}" style="color: ${colourSelected}">${captionData['text']}</p>
@@ -236,7 +245,7 @@ $(document).ready(function () {
 
             if (r == g && r == b && g == b) { // if it is a greyscale colour
                 isGreyscale = true
-                var hueStyleRgb = `hsl(${hue}, 100%, 50%)` // so that the hue slider knob can remain with it's colour dispite the saturation and lightness sliders retaining it's colour.
+                var hueStyleColour = `hsl(${hue}, 100%, 50%)` // so that the hue slider knob can remain with it's colour dispite the saturation and lightness sliders retaining it's colour.
                 hue = 0 // default the hue to 0 for the rest of the range fields
 
             } else {
@@ -258,22 +267,22 @@ $(document).ready(function () {
         } 
 
         // Change the colour of the slider knobs to match the colour being represented
-        var hslDisplay = `hsl(${hue}, 100%, 50%)`;
-        var rgbDisplay = culori.formatRgb(hslDisplay);
+        var hslDisplayColour = `hsl(${hue}, 100%, 50%)`;
+        var rgbDisplayColour = culori.formatRgb(hslDisplayColour);
 
         // For hue and saturation
         if (isGreyscale) {
 
-            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleRgb);
+            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleColour); // retains it's set hue
 
-            var saturationStyleRgb = saturationOnRgb(rgbDisplay, scale(saturation, '0-255', '0-1'));
-            $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
+            var saturationStyleRgb = saturationOnRgb(rgbDisplayColour, scale(saturation, '0-255', '0-1'));
+            $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb); // saturation is for red colour only
 
         } else {
-            var hueStyleRgb = rgbDisplay;
-            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleRgb);
+            var hueStyleColour = rgbDisplayColour;
+            $('#hue-slider')[0].style.setProperty('--hue-slider-thumb-bg', hueStyleColour);
 
-            var saturationStyleRgb = saturationOnRgb(rgbDisplay, scale(saturation, '0-255', '0-1'));
+            var saturationStyleRgb = saturationOnRgb(rgbDisplayColour, scale(saturation, '0-255', '0-1'));
             $('#saturation-slider')[0].style.setProperty('--saturation-slider-thumb-bg', saturationStyleRgb);
         }
 
@@ -292,16 +301,19 @@ $(document).ready(function () {
 
     // Calculates the saturation effect on a RGB colour
     function saturationOnRgb (rgb, saturation) {
-        var valuesString = rgb.replace('rgb(', '').replace(')', '')
 
+        // Get the RGB colour values
+        var valuesString = rgb.replace('rgb(', '').replace(')', '')
         var rgbaList = getRgbaFromString(valuesString)
 
         var r = rgbaList[0];
         var g = rgbaList[1];
         var b = rgbaList[2];
 
+        // Get the greyscale value
         var greyscaleVal = Math.round((0.3 * r) + (0.59 * g) + (0.11 * b))
 
+        // Compute the saturated colour when the saturation has been applied
         var rPrime = Math.round(r + (greyscaleVal - r) * (1 - saturation))
         var gPrime = Math.round(g + (greyscaleVal - g) * (1 - saturation))
         var bPrime = Math.round(b + (greyscaleVal - b) * (1 - saturation))
@@ -312,8 +324,7 @@ $(document).ready(function () {
 
     // Extracts the numbers from a string containg RGBA colours
     function getRgbaFromString (string) {
-        string += ', ';
-        let newString= '' ;
+        let newString = '';
         let stringComp = 0;
 
         // Standadize string
@@ -349,7 +360,7 @@ $(document).ready(function () {
         var b = parseInt(newString.slice(14, 19));
 
         // For alpha
-        var a = string.slice(9 + stringComp, string.length - 2)
+        var a = string.slice(9 + stringComp, string.length)
         if (a === '') {
             a = 1; // default alpha to 1
             var hasAlpha = false
@@ -362,45 +373,45 @@ $(document).ready(function () {
         
     }
 
-        // Validates the string depicting RGB/RGBA values
-        function rgbStringValidation (rgbString, alpha) {
-            var checkOne = false;
-            var checkTwo = false;
+    // Validates the string depicting RGB/RGBA values
+    function rgbStringValidation (rgbString, alpha) {
+        var checkOne = false;
+        var checkTwo = false;
             
-            // Different validation for opacity vs no opacity (alpha)
-            if (alpha) {
+        // Different validation for opacity vs no opacity (alpha)
+        if (alpha) {
 
-                // Check one: to see if the wrappers are correct
-                var prefix = rgbString.slice(0, 5);
-                var suffix = rgbString[rgbString.length - 1]
+            // Check one: to see if the wrappers are correct
+            var prefix = rgbString.slice(0, 5);
+            var suffix = rgbString[rgbString.length - 1]
 
-                if (prefix === 'rgba(' && suffix === ')') {
-                    checkOne = true
-                } else {
-                    checkOne = false
-                }
-
-                // Check two: to see if the values are valid
-                var stringValues = rgbString.slice(5, -1)
-                var rgbaValues = getRgbaFromString(stringValues) 
-
-                if (rgbaValues === false) {
-                    checkTwo = false
-                } else {
-                    var r = rgbaValues[0];
-                    var g = rgbaValues[1];
-                    var b = rgbaValues[2];
-                    var a = rgbaValues[3];
-                    var hasAlpha = rgbaValues[4];
-                    
-                    if (0 <= r <= 255 && 0 <= g <= 255 && 0 <= b <= 255 && 0 <= a <= 1 && hasAlpha == true) {
-                        checkTwo = true
-                    } else {
-                        checkTwo = false
-                    }
-                }
-                    
+            if (prefix === 'rgba(' && suffix === ')') {
+                checkOne = true
             } else {
+                checkOne = false
+            }
+
+            // Check two: to see if the values are valid
+            var stringValues = rgbString.slice(5, -1)
+            var rgbaValues = getRgbaFromString(stringValues) 
+
+            if (rgbaValues === false) {
+                checkTwo = false
+            } else {
+                var r = rgbaValues[0];
+                var g = rgbaValues[1];
+                var b = rgbaValues[2];
+                var a = rgbaValues[3];
+                var hasAlpha = rgbaValues[4];
+
+                if (0 <= r <= 255 && 0 <= g <= 255 && 0 <= b <= 255 && 0 <= a <= 1 && hasAlpha == true) {
+                    checkTwo = true
+                } else {
+                    checkTwo = false
+                }
+            }
+
+        } else {
 
             // Check one: to see if the wrappers are correct
             var prefix = rgbString.slice(0, 4);

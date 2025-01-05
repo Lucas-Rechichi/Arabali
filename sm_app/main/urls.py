@@ -8,8 +8,8 @@ urlpatterns = [
     path('add/', main_v.add_post, name="add_post"),
 
     # Bace with variable passing
-    path('page/catch_up', main_v.catch_up_page, name="catch_up_page"),
-    path('page/<str:catagory>', main_v.page, name="page"),
+    path('page/catch_up/<int:increment>', main_v.catch_up_page, name="catch_up_page"),
+    path('page/<str:category>/<str:sub_category>/<int:increment>', main_v.page, name="page"),
     path('search/<str:q>/<int:post_increment>/<int:user_increment>/<int:catergory_increment>', main_v.search_results, name="search"),
     path('error/<str:error>', main_v.error, name="error"),
     path('settings/<str:name>', main_v.config, name="settings"),

@@ -59,7 +59,7 @@ def login_page(request):
 
     if user is not None:
         login(request, user)
-        return redirect("/page/recommended|All/1/")
+        return redirect("/page/recommended/all/1/")
     return render(request, "validate/login.html")
 
 def logout_page(request):

@@ -55,14 +55,14 @@ class Algorithum:
 
             # Logic for what to sort
             if object_name == 'tag':
-                if sub_catergory == '|All':
+                if sub_catergory == 'all':
                     sorted_objects = PostTag.objects.all().annotate(Count('value')).order_by('-value')
                 else:
                     filtered_objects = PostTag.objects.filter(name=sub_catergory.removeprefix('|'))
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
             else:
-                if sub_catergory == '|All':
+                if sub_catergory == 'all':
                     sorted_objects = Interest.objects.all().annotate(Count('value')).order_by('-value')
                 else:
                     filtered_objects = Interest.objects.filter(name=sub_catergory.removeprefix('|'), user=user_obj)
@@ -94,7 +94,6 @@ class Algorithum:
                 order.append(names_list[value_index])
 
             return order
-
 
 
     class PostCreations:
@@ -266,7 +265,7 @@ class Algorithum:
 
                 pass
             else:
-                interest_list = Algorithum.Core.basic_sort(object_name='interests', sub_catergory='|All', user_obj=user_obj)
+                interest_list = Algorithum.Core.basic_sort(object_name='interests', sub_catergory='all', user_obj=user_obj)
                 catergory_list = interest_list
 
             return catergory_list
@@ -437,18 +436,18 @@ class Algorithum:
     class PostSorting:
 
         # Sorts posts baced on their value
-        def popular_sort(sub_catagory):
+        def popular_sort(sub_category):
 
             # Setup
             order = []
 
             # Returns an error if the url has no sub-catergory specified
-            if sub_catagory == None:
+            if sub_category == None:
                 return 'Error: No Sub-Catergory.'
 
             # Gets the order of the posts using basic sort
-            sub_catagory = str(sub_catagory)
-            tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_catagory)
+            sub_category = str(sub_category)
+            tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_category)
 
             # Gets the post related to the tag
             for tag in tag_order:
@@ -457,7 +456,7 @@ class Algorithum:
             return order
 
         # Sorting posts baced on their relevance to the user's interest.   
-        def recommended_sort(user, sub_catagory):
+        def recommended_sort(user, sub_category):
 
             # Setup
             order = []
@@ -466,7 +465,7 @@ class Algorithum:
             tag_iterations = {}
 
             # Returns an error if the url has no sub-catergory specified
-            if sub_catagory == None:
+            if sub_category == None:
                 return 'Error: No Sub-Catergory.'
             
             # Get all the interest values and names for the specified user
@@ -494,7 +493,7 @@ class Algorithum:
                     tag_iterations[name] = 0
                 
                 # Orders the tags based on individual value
-                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_catagory, user_obj=user)
+                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_category, user_obj=user)
 
                 # Select the tag depending on what iteration that name is on
                 selected_tag = tag_order[tag_iterations[name]]

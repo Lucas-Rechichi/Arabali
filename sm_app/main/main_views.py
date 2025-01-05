@@ -5,11 +5,11 @@ from validate.forms import User
 from django.contrib.auth.decorators import login_required
 
 from main.models import Post
-from main.extras import remove_until_character, initialize_page
+from main.extras import initialize_page
 from main.algorithum import Algorithum
 from main.forms import EditProfile, EditPost, Search
 from main.models import LikedBy, Following, DateAndOrTimeSave
-from main.models import UserStats, Comment, NestedComment, Media
+from main.models import UserStats, Comment, NestedComment
 from main.configure import Configure
 
 from datetime import date
@@ -20,7 +20,8 @@ def home(request):
 
 
 @login_required
-def page(request, catagory):
+def page(request, category, sub_category, increment):
+
     # Getting relevent variables
     name = request.user.username
     user = User.objects.get(username=name)
@@ -73,42 +74,37 @@ def page(request, catagory):
                 'likes':comment.likes,
                 'created_at':comment.created_at               
             }
-    
-    # Getting sub catagory
-    catagory = str(catagory)
-    if '|' in catagory:
-        sub_catagory = remove_until_character(catagory, '|')
-    else:
-        sub_catagory = None
 
-    # Orders posts baced on catagory: Setup
+    # Orders posts baced on category: Setup
     popular_type = False
     recommended_type = False
 
-    # Orders posts baced on catagory
-    if 'popular' in catagory:
+    # Orders posts baced on category
+    if category == 'popular':
 
         # Sort the posts baced on the given catergory
-        posts = Algorithum.PostSorting.popular_sort(user=user, sub_catagory=sub_catagory)
+        posts = Algorithum.PostSorting.popular_sort(user=user, sub_category=sub_category)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
-        
+
         display_categories = Algorithum.PostRendering.show_catergories(type='popular', user_obj=user)
         popular_type = True
-    elif 'recommended' in catagory:
+
+    elif category == 'recommended':
 
         # Sort the posts baced on the given catergory
-        posts = Algorithum.PostSorting.recommended_sort(user=user, sub_catagory=sub_catagory)
+        posts = Algorithum.PostSorting.recommended_sort(user=user, sub_category=sub_category)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
-        
+
         display_categories = Algorithum.PostRendering.show_catergories(type='recommended', user_obj=user)
         recommended_type = True
+
     else:
-        return render(request, 'main/error.html', {'issue': 'Catagory Dose Not Exist'})
+        return render(request, 'main/error.html', {'issue': 'Category Dose Not Exist'})
 
     # Only allows the top 10 posts to be displayed first
-    posts_to_append = Algorithum.PostRendering.posts_per_page(post_list=posts, incrementing_factor=1, limit_index=None)
+    posts_to_append = Algorithum.PostRendering.posts_per_page(post_list=posts, incrementing_factor=increment, limit_index=None)
 
     # Extracts relevant data for the post feed
     feed = Algorithum.PostRendering.get_post_data(post_list=posts_to_append, user_obj=user)
@@ -117,7 +113,7 @@ def page(request, catagory):
     variables = {
         "username": name, 
         "posts": feed,
-        "catagory": catagory,
+        "category": category,
         "display_catergories": display_categories,
         "type": {
             "popular": popular_type,
@@ -285,11 +281,11 @@ def profile(request, name):
     posts = Post.objects.filter(user=u)
     followed_userstats = []
     for x in follow:
-        if us.following.filter(subscribers=x).exists():
-            followed_userstats.append(UserStats.objects.filter(user=User.objects.get(username=follow.get(subscribers=x))))
+        if us.following.filter(name=x).exists():
+            followed_userstats.append(UserStats.objects.filter(user=User.objects.get(username=follow.get(name=x))))
     
 
-    is_following = us.following.filter(subscribers=request.user.username).exists()
+    is_following = us.following.filter(name=request.user.username).exists()
 
     if request.user.username == name:
         self_profile = True
@@ -298,13 +294,13 @@ def profile(request, name):
     if request.method == 'POST':
         if 'follow' in request.POST:
             if request.POST['follow'] == 'follow':
-                us.following.add(follow.get(subscribers=request.user.username))
+                us.following.add(follow.get(name=request.user.username))
                 us.followers += 1
             elif request.POST['follow'] == 'unfollow':
                 us.followers -= 1
-                us.following.remove(follow.get(subscribers=request.user.username))
+                us.following.remove(follow.get(name=request.user.username))
             us.save()
-            is_following = us.following.filter(subscribers=request.user.username).exists()
+            is_following = us.following.filter(name=request.user.username).exists()
             return HttpResponseRedirect(f'/profile/{u.username}')
     profile_vars = {
         'user': u, 
