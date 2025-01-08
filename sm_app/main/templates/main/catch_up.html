@@ -23,6 +23,7 @@
         <script type="text/javascript" src="{% static 'websockets/notification_socket.js' %}"></script>
         <!-- STYLES -->
         <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
+        <link rel="stylesheet" href="{% static 'main/posts.css' %}">
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -214,7 +215,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col m-2">
-                                                <h6 class="display-6">{{dailyPost.user}}</h6>
+                                                <h6 class="display-6">{{dailyPost.post_username}}</h6>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -831,7 +832,6 @@
                                 {% endfor %}
                             </div>
                         </div> 
-                    <div class="end-of-posts" data-increment="1" data-catergory="catch-up"></div>
                 </div>
                 <div class="col-6">
                     <div class="card" style="position: fixed;">

@@ -7,7 +7,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 
 # To direct the media_objects from user imput into their respective folders.
 def get_media_upload_path_posts(instance, filename):
@@ -157,7 +156,7 @@ class PostTag(models.Model):
         return self.name
 
 
-class Catergory(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=100, null=False)
 
     def __str__(self):

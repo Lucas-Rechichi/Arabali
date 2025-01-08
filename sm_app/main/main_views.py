@@ -10,6 +10,7 @@ from main.algorithum import Algorithum
 from main.forms import EditProfile, EditPost, Search
 from main.models import LikedBy, Following, DateAndOrTimeSave
 from main.models import UserStats, Comment, NestedComment
+from main.models import Category
 from main.configure import Configure
 
 from datetime import date
@@ -75,33 +76,30 @@ def page(request, category, sub_category, increment):
                 'created_at':comment.created_at               
             }
 
-    # Orders posts baced on category: Setup
-    popular_type = False
-    recommended_type = False
-
     # Orders posts baced on category
     if category == 'popular':
 
         # Sort the posts baced on the given catergory
         posts = Algorithum.PostSorting.popular_sort(sub_category=sub_category)
-        if posts == 'Error: No Sub-Catergory.':
-            return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
+        if posts == 'Error: No Sub-Category.':
+            return render(request, 'main/error.html', {'issue': 'No Sub Category.'})
 
         display_categories = Algorithum.PostRendering.show_catergories(type='popular', user_obj=user)
-        popular_type = True
 
     elif category == 'recommended':
 
         # Sort the posts baced on the given catergory
         posts = Algorithum.PostSorting.recommended_sort(user=user, sub_category=sub_category)
-        if posts == 'Error: No Sub-Catergory.':
-            return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
+        if posts == 'Error: No Sub-Category.':
+            return render(request, 'main/error.html', {'issue': 'No Sub Category.'})
 
         display_categories = Algorithum.PostRendering.show_catergories(type='recommended', user_obj=user)
-        recommended_type = True
 
     else:
         return render(request, 'main/error.html', {'issue': 'Category Dose Not Exist'})
+    
+    # Conditional for if the subcategory exists
+
 
     # Only allows the top 10 posts to be displayed first
     posts_to_append = Algorithum.PostRendering.posts_per_page(post_list=posts, incrementing_factor=increment, limit_index=None)
@@ -114,10 +112,14 @@ def page(request, category, sub_category, increment):
         "username": name, 
         "posts": feed,
         "category": category,
+        'sub_category': sub_category,
         "display_catergories": display_categories,
-        "type": {
-            "popular": popular_type,
-            "recommended": recommended_type
+        'increment': {
+            'backwards': increment - 5,
+            'previous': increment - 1,
+            'current': increment,
+            'next': increment + 1,
+            'forwards': increment + 5
         },
         'user_stats': users_stats, 
         'user': user_stats,
@@ -157,13 +159,13 @@ def catch_up_page(request, increment):
 
     # Post Rendering
     daily_post_count = len(daily_posts)
-    if daily_post_count > 10:
-        daily_posts = Algorithum.PostRendering.posts_per_page(post_list=daily_posts, incrementing_factor=1, limit_index=None)
+    if daily_post_count > increment * 10:
+        daily_posts = Algorithum.PostRendering.posts_per_page(post_list=daily_posts, incrementing_factor=increment, limit_index=None)
         remaining_feed = None
     else:
-        daily_posts = Algorithum.PostRendering.posts_per_page(post_list=daily_posts, incrementing_factor=1, limit_index=None)
-        post_difference = 10 - daily_post_count
-        remaining_posts = Algorithum.PostRendering.posts_per_page(posts=remaining_posts, incrementing_factor=1, limit_index=post_difference)
+        daily_posts = Algorithum.PostRendering.posts_per_page(post_list=daily_posts, incrementing_factor=increment, limit_index=None)
+        post_difference = (increment * 10) - daily_post_count
+        remaining_posts = Algorithum.PostRendering.posts_per_page(post_list=remaining_posts, incrementing_factor=increment, limit_index=post_difference)
 
     # Getting post data
     daily_feed = Algorithum.PostRendering.get_post_data(post_list=daily_posts, user_obj=request.user)
@@ -230,12 +232,12 @@ def catch_up_page(request, increment):
 
     # Variables
     variables = {
-        "username":init['username'], 
-        "daily_posts":daily_feed if daily_posts else None,
-        "remaining_posts":remaining_feed if remaining_posts else None,
+        "username": init['username'], 
+        "daily_posts": daily_feed if daily_feed else None,
+        "remaining_posts": remaining_feed if remaining_feed else None,
         "all_caught_up": all_caught_up,
-        'user_stats':users_stats, 
-        'user':user_stats,
+        'user_stats': users_stats, 
+        'user': user_stats,
         'liked_by': liked_by,
         'user_liked_by': user_liked_by,
         'post_comments': post_comments,
@@ -272,20 +274,20 @@ def add_post(request):
 @login_required
 def profile(request, name):
     init = initialize_page(request)
-    u = User.objects.get(username=name)
-    us = UserStats.objects.get(user=u)
-    if us.is_banned:
+    user = User.objects.get(username=name)
+    user_stats = UserStats.objects.get(user=user)
+    if user_stats.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     
     follow = Following.objects.all()
     posts = Post.objects.filter(user=u)
     followed_userstats = []
     for x in follow:
-        if us.following.filter(name=x).exists():
+        if user_stats.following.filter(name=x).exists():
             followed_userstats.append(UserStats.objects.filter(user=User.objects.get(username=follow.get(name=x))))
     
 
-    is_following = us.following.filter(name=request.user.username).exists()
+    is_following = user_stats.following.filter(name=request.user.username).exists()
 
     if request.user.username == name:
         self_profile = True
@@ -294,17 +296,17 @@ def profile(request, name):
     if request.method == 'POST':
         if 'follow' in request.POST:
             if request.POST['follow'] == 'follow':
-                us.following.add(follow.get(name=request.user.username))
-                us.followers += 1
+                user_stats.following.add(follow.get(name=request.user.username))
+                user_stats.followers += 1
             elif request.POST['follow'] == 'unfollow':
-                us.followers -= 1
-                us.following.remove(follow.get(name=request.user.username))
-            us.save()
-            is_following = us.following.filter(name=request.user.username).exists()
+                user_stats.followers -= 1
+                user_stats.following.remove(follow.get(name=request.user.username))
+            user_stats.save()
+            is_following = user_stats.following.filter(name=request.user.username).exists()
             return HttpResponseRedirect(f'/profile/{u.username}')
     profile_vars = {
-        'user': u, 
-        'userstats': us, 
+        'user': user, 
+        'userstats': user_stats, 
         'is_following': is_following, 
         'self_profile': self_profile, 
         'post': posts,
@@ -327,11 +329,6 @@ def post_view(request, post_id):
 
     if UserStats.objects.get(user=request.user).is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
-
-    # Profile pictures
-    post_users = {}
-    for user_stat in s:
-        post_users[str(user_stat.user.username)] = user_stat.pfp.url
 
     # Comments
     liked_by = {}
@@ -364,15 +361,16 @@ def post_view(request, post_id):
         }
     post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
 
+    post_data = Algorithum.PostRendering.get_post_data(post_list=[post], user_obj=user)[0]
+
     variables = {
-        "post": post, 
+        "post": post_data, 
         "user_stats": user_stats, 
         "user_liked_by": user_liked_by, # for the post, not comments
         "post_comments": post_comments,
         "post_replies" : post_replies,
         "search_bar" : init['search_bar'],
         "username": init['username'],
-        "post_users": post_users,
         'notifications': init['notification_list'],
         'notification_count': init['notification_count']
     }

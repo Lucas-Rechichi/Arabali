@@ -10,7 +10,7 @@ from main.extras import capitalize_plus, exact_display, approx_display, haversin
 from main.extras import remove_last_character, modified_reciprocal, difference
 
 from main.prompts import Prompts
-from main.models import Catergory, PostTag, Interest, UserStats, Following
+from main.models import Category, PostTag, Interest, UserStats, Following
 from main.models import Media, Comment, NestedComment, LikedBy, Post
 
 from django.db.models import Count
@@ -48,24 +48,24 @@ class Algorithum:
                 return num_final - num_initial
         
         # Function for sorting objects baced on the value
-        def basic_sort(object_name, sub_catergory, user_obj=None):
+        def basic_sort(object_name, sub_category, user_obj=None):
 
             # Setup
             order = []
 
             # Logic for what to sort
             if object_name == 'tag':
-                if sub_catergory == 'all':
+                if sub_category == 'all':
                     sorted_objects = PostTag.objects.all().annotate(Count('value')).order_by('-value')
                 else:
-                    filtered_objects = PostTag.objects.filter(name=sub_catergory)
+                    filtered_objects = PostTag.objects.filter(name=sub_category)
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
             else:
-                if sub_catergory == 'all':
+                if sub_category == 'all':
                     sorted_objects = Interest.objects.all().annotate(Count('value')).order_by('-value')
                 else:
-                    filtered_objects = Interest.objects.filter(name=sub_catergory, user=user_obj)
+                    filtered_objects = Interest.objects.filter(name=sub_category, user=user_obj)
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
             # Appends the sorted queryset to a list
@@ -147,7 +147,7 @@ class Algorithum:
             contents = post_obj.contents
 
             # AI desion
-            current_catergories = Catergory.objects.all()
+            current_catergories = Category.objects.all()
             response = chat.send_message(Prompts.dermine_catergory_prompt(title=title, contents=contents, catergories_list=current_catergories))
 
             return response.text
@@ -253,7 +253,7 @@ class Algorithum:
             if type == 'popular':
 
                 # Setup
-                catergories = Catergory.objects.all()
+                catergories = Category.objects.all()
                 catergory_names_list = []
                 catergory_values_list = []
 
@@ -280,7 +280,7 @@ class Algorithum:
 
                 pass
             else:
-                interest_list = Algorithum.Core.basic_sort(object_name='interests', sub_catergory='all', user_obj=user_obj)
+                interest_list = Algorithum.Core.basic_sort(object_name='interests', sub_category='all', user_obj=user_obj)
                 catergory_list = interest_list
 
             return catergory_list
@@ -458,11 +458,11 @@ class Algorithum:
 
             # Returns an error if the url has no sub-catergory specified
             if sub_category == None:
-                return 'Error: No Sub-Catergory.'
+                return 'Error: No Sub-Category.'
 
             # Gets the order of the posts using basic sort
             sub_category = str(sub_category)
-            tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_category)
+            tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_category=sub_category)
 
             # Gets the post related to the tag
             for tag in tag_order:
@@ -481,7 +481,7 @@ class Algorithum:
 
             # Returns an error if the url has no sub-catergory specified
             if sub_category == None:
-                return 'Error: No Sub-Catergory.'
+                return 'Error: No Sub-Category.'
             
             # Get all the interest values and names for the specified user
             interests = Interest.objects.filter(user=user)
@@ -504,7 +504,7 @@ class Algorithum:
                     tag_iterations[name] = 0
                 
                 # Orders the tags based on individual value
-                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=name, user_obj=user)
+                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_category=name, user_obj=user)
 
                 # Select the tag depending on what iteration that name is on
                 selected_tag = tag_order[tag_iterations[name]]
@@ -515,11 +515,10 @@ class Algorithum:
 
             return order
 
-        
         def catch_up_sort(user):
 
             # Setup
-            user_stats = UserStats.objects.get(user=user.pk)
+            user_stats = UserStats.objects.get(user=user)
             user_follower_object = Following.objects.get(name=user_stats.user.username)
             followers = UserStats.objects.filter(following=user_follower_object)
             distances = {}
@@ -538,12 +537,12 @@ class Algorithum:
 
             # Filters the posts into 2 lists, one for the posts that are todays posts and one for the remaining posts
             todays_posts = Post.objects.filter(created_at__date=date.today())
-            for post, distance in todays_posts, distances.values():
+            for post, distance in zip(todays_posts, list(distances.values())):
                 if post.user.username == distance:
                     daily_feed.append(post)
 
             remaining_posts = Post.objects.exclude(created_at__date=date.today())
-            for post, distance in remaining_posts, distances.values():
+            for post, distance in zip(remaining_posts, list(distances.values())):
                 if post.user.username == distance:
                     daily_feed.append(post)
             

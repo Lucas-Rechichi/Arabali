@@ -519,14 +519,27 @@
                                     </div>
                                 </div>
                             {% endfor %}
+                            <!-- Pagination -->
+                            <div class="row">
+                                <div class="col d-flex justify-content-center m-1">
+                                    {% if increment.current <= 5 %}
+                                        <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.backwards}}'" disabled><i class="bi bi-rewind-fill"></i></button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.backwards}}'"><i class="bi bi-rewind-fill"></i></button>
+                                    {% endif %}
+
+                                    {% if increment.current <= 1 %}
+                                        <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.previous}}'" disabled><i class="bi bi-caret-left-fill"></i></i></button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.previous}}'"><i class="bi bi-caret-left-fill"></i></i></button>
+                                    {% endif %}
+
+                                    <p class="lead m-1">{{increment.current}}</p>
+                                    <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.next}}'"><i class="bi bi-caret-right-fill"></i></button>
+                                    <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.forwards}}'"><i class="bi bi-fast-forward-fill"></i></i></button>
+                                </div>
+                            </div>
                         </div>
-                        {% if type.popular %} 
-                            <div class="end-of-posts" data-increment="1" data-catergory="popular"></div>
-                        {% elif type.recommended %}
-                            <div class="end-of-posts" data-increment="1" data-catergory="recommended"></div>
-                        {% else %}
-                            <div class="end-of-posts" data-increment="1" data-catergory="all"></div>
-                        {% endif %}
                     </div>
                 </div>
                 <div class="col-6">
@@ -556,7 +569,7 @@
                         <br>
                         <br>
                         <!-- For the popular page -->
-                        {% if type.popular %} 
+                        {% if category == 'popular' %} 
                             <div class="row">
                                 <div class="col">
                                     <h4 class="display-6 text-center">Trending Currently:</h4>
@@ -571,14 +584,14 @@
                                 {% for trend in trend_catagories %}
                                     <div class="col m-2">
                                         <div class="card">
-                                            <a href="/page/popular|{{trend.name}}/1" class="text-center link-success link-offset-2 link-underline-opacity-0">{{trend.name}}</a>
+                                            <a href="/page/popular/{{trend.name}}/1" class="text-center link-success link-offset-2 link-underline-opacity-0">{{trend.name}}</a>
                                         </div>
                                     </div>
                                 {% endfor %}
                             </div>
                         {% endif %}
                         <!-- For the recommended page -->
-                        {% if type.recommended %}
+                        {% if category == recommended %}
                             <div class="row">
                                 <div class="col">
                                     <h4 class="display-6 text-center">Recommended Catergories:</h4>

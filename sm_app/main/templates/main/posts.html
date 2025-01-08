@@ -1,5 +1,6 @@
 {% load crispy_forms_tags %}
 {% load static %}
+{% load main_filters %}
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -20,6 +21,7 @@
         <script type="text/javascript" src="{% static 'websockets/post_socket.js' %}"></script>
         <!-- STYLES -->
         <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
+        <link rel="stylesheet" href="{% static 'main/posts.css' %}">
     </head>
     <body>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -157,7 +159,7 @@
                     </div>
                     <div class="row">
                         <div class="col m-2">
-                            <h6 class="display-6">{{post.user}}</h6>
+                            <h6 class="display-6">{{post.post_username}}</h6>
                         </div>
                     </div>
                     <div class="row">
@@ -202,12 +204,12 @@
                     </div>
                     <div class="row">
                         <div class="col m-2">
-                            <h3 class="display-6">{{post.title}}</h3>
+                            <h3 class="display-6">{{post.post_title}}</h3>
                         </div>
                     </div>
                     <div class="row m-1">
                         <div class="col">
-                            <p class="lead">{{post.contents}}</p>
+                            <p class="lead">{{post.post_contents}}</p>
                         </div>
                     </div>
                     <div class="row m-1">

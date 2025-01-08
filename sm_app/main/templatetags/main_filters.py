@@ -4,7 +4,7 @@ from messaging.extras import emoticons_dict
 register = template.Library()
 
 @register.filter
-def add (num_1, num_2):
+def add(num_1, num_2):
     return num_1 + num_2
 
 @register.filter

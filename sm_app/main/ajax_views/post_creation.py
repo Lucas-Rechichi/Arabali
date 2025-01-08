@@ -1,7 +1,7 @@
 import json
 
 from django.http import JsonResponse
-from main.models import Post, Media, PostTag, Catergory
+from main.models import Post, Media, PostTag, Category
 from main.algorithum import Algorithum
 
 
@@ -39,8 +39,8 @@ def add_post(request):
     post_tag.save()
     
     # Creating a new catergory instance if this is a new type of post.
-    if not Catergory.objects.filter(name=post_catergory).exists():
-        new_catergory = Catergory(name=post_catergory)
+    if not Category.objects.filter(name=post_catergory).exists():
+        new_catergory = Category(name=post_catergory)
         new_catergory.save()
 
     print(post_tag.name)
