@@ -14,4 +14,10 @@ def correct_apostrophe(name):
         return f"{name}'"
     else:
         return f"{name}'s"
+    
+
+@register.filter
+def capitalise(string):
+    string = str(string)
+    return string.capitalize()
 

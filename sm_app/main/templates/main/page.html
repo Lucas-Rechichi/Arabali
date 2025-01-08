@@ -593,7 +593,7 @@
                                 {% for tag in display_catergories %}
                                     <div class="col m-2">
                                         <div class="card">
-                                            <a href="/page/recommended/{{tag.name}}/1" class="text-center link-success link-offset-2 link-underline-opacity-0">{{tag.name}}</a>
+                                            <a href="/page/recommended/{{tag.name}}/1" class="text-center link-success link-offset-2 link-underline-opacity-0">{{tag.name|capitalise}}</a>
                                         </div>
                                     </div>
                                 {% endfor %}

@@ -13,7 +13,7 @@ from main.prompts import Prompts
 from main.models import Catergory, PostTag, Interest, UserStats, Following
 from main.models import Media, Comment, NestedComment, LikedBy, Post
 
-from django.db.models import Count, Sum
+from django.db.models import Count
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
 
@@ -48,7 +48,7 @@ class Algorithum:
                 return num_final - num_initial
         
         # Function for sorting objects baced on the value
-        def basic_sort(object_name, sub_catergory, user_obj):
+        def basic_sort(object_name, sub_catergory, user_obj=None):
 
             # Setup
             order = []
@@ -58,14 +58,14 @@ class Algorithum:
                 if sub_catergory == 'all':
                     sorted_objects = PostTag.objects.all().annotate(Count('value')).order_by('-value')
                 else:
-                    filtered_objects = PostTag.objects.filter(name=sub_catergory.removeprefix('|'))
+                    filtered_objects = PostTag.objects.filter(name=sub_catergory)
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
             else:
                 if sub_catergory == 'all':
                     sorted_objects = Interest.objects.all().annotate(Count('value')).order_by('-value')
                 else:
-                    filtered_objects = Interest.objects.filter(name=sub_catergory.removeprefix('|'), user=user_obj)
+                    filtered_objects = Interest.objects.filter(name=sub_catergory, user=user_obj)
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
             # Appends the sorted queryset to a list
@@ -78,6 +78,7 @@ class Algorithum:
         def shuffle_sort(values_list, names_list, iterations):
             # Setup
             order = []
+            name_exclusions = []
 
             # Loops for as many iterationa as specified
             for _ in range(0, iterations):
@@ -90,8 +91,22 @@ class Algorithum:
                 modified_value = highest_value - average
                 values_list[value_index] = modified_value
 
+                # Sees if the number of iterations of the order exceeds the number of posts in the database
+                relevant_tag_count = PostTag.objects.filter(name=names_list[value_index]).count()
+                name_count = order.count(names_list[value_index])
+
+                if name_count >= relevant_tag_count:
+                    name_exclusions.append(names_list[value_index])
+
+                # If the limit has been reached for interests.
+                if sorted(names_list) == sorted(name_exclusions):
+                    break
+
                 # Append the name to the order list
-                order.append(names_list[value_index])
+                if names_list[value_index] in name_exclusions:
+                    continue
+                else:
+                    order.append(names_list[value_index])
 
             return order
 
@@ -471,17 +486,13 @@ class Algorithum:
             # Get all the interest values and names for the specified user
             interests = Interest.objects.filter(user=user)
 
-            # Loops though all interests the user has, append sto lists such that they have the same index
+            # Loops though all interests the user has, appends to lists such that they have the same index
             for interest in interests:
                 interest_names_list.append(interest.name)
                 interest_values_list.append(interest.value)
 
             # Defines the amount of iterations for the names list to generate
-            post_count = Post.objects.count()
-            if post_count < 10:
-                iterations = post_count
-            else:
-                iterations = 10
+            iterations = Post.objects.count()
 
             # Gets the list of names using a shuffle sort
             name_order = Algorithum.Core.shuffle_sort(values_list=interest_values_list, names_list=interest_names_list, iterations=iterations)
@@ -493,7 +504,7 @@ class Algorithum:
                     tag_iterations[name] = 0
                 
                 # Orders the tags based on individual value
-                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=sub_category, user_obj=user)
+                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_catergory=name, user_obj=user)
 
                 # Select the tag depending on what iteration that name is on
                 selected_tag = tag_order[tag_iterations[name]]
@@ -519,7 +530,7 @@ class Algorithum:
                 distances[index] = distance_between_users
 
             # Sorts them baced on the one that is the closest to the user in distance
-            distances = dict(sorted(distances.values(), key=lambda item: item[0]))
+            distances = dict(sorted(distances.items(), key=lambda item: item[0]))
 
             # Setup
             daily_feed = []
@@ -527,17 +538,16 @@ class Algorithum:
 
             # Filters the posts into 2 lists, one for the posts that are todays posts and one for the remaining posts
             todays_posts = Post.objects.filter(created_at__date=date.today())
-            for post, distance in todays_posts, distances.items():
-                if post.user.username == distance[0]:
+            for post, distance in todays_posts, distances.values():
+                if post.user.username == distance:
                     daily_feed.append(post)
 
             remaining_posts = Post.objects.exclude(created_at__date=date.today())
-            for post, distance in remaining_posts, distances:
-                if post.user.username == distance[0]:
+            for post, distance in remaining_posts, distances.values():
+                if post.user.username == distance:
                     daily_feed.append(post)
             
             return daily_feed, remaining_feed
-
 
 
     class Search:
@@ -562,6 +572,7 @@ class Algorithum:
                     'posts': {}
                 }
             }
+
             user_stats = UserStats.objects.all()
             tags = PostTag.objects.all()
             posts = Post.objects.all()
@@ -588,19 +599,10 @@ class Algorithum:
                             feed['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
                             
 
-                        #print(f"found {solution} in {user_stat.user.username}")
-                    else:
-                        #print(f"didn't find {solution} in {user_stat.user.username}")
-                        pass
                     if str(solution.lower()) in str(user_stat.user.username):
                         if user_stat.user.pk  not in feed['exact']['users'].keys() and user_stat.user.pk not in feed['approx']['users'].keys():
                             feed['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
                             
-
-                        #print(f"found {solution.lower()} in {user_stat.user.username}")
-                    else:
-                        #print(f"didn't find {solution.lower()} in {user_stat.user.username}")
-                        pass
 
             # Loops though all tags to see if the name of the tag relates to the search query
             for tag in tags:
@@ -610,20 +612,11 @@ class Algorithum:
                             feed['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
                             
 
-                        #print(f"found {solution} in {tag.name}")
-                    else:
-                        #print(f"didn't find {solution} in {tag.name}")
-                        pass
                     if str(solution.lower()) in str(tag.name):
                         if tag.name not in feed['exact']['tags'].keys() and tag.name not in feed['approx']['tags'].keys():
                             feed['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
                             
 
-                        #print(f"found {solution.lower()} in {tag.name}")
-                    else:
-                        #print(f"didn't find {solution.lower()} in {tag.name}")
-                        pass
-            
             # Loops though all posts to see if the title relates to the search query
             for post in posts:
                 for combination_id, solution in exact_solutions.items():
@@ -631,18 +624,9 @@ class Algorithum:
                         if post.pk not in feed['exact']['posts'].keys() and post.pk not in feed['approx']['posts'].keys():
                             feed['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
                             
-                        #print(f"found {solution} in {post.title}")
-                    else:
-                        #print(f"didn't find {solution} in {post.title}")
-                        pass
                     if str(solution.lower()) in str(post.title):
                         if post.pk not in feed['exact']['posts'].keys() and post.pk not in feed['approx']['posts'].keys():
                             feed['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
-                            
-                        #print(f"found {solution.lower()} in {post.title}")
-                    else:
-                        #print(f"didn't find {solution.lower()} in {post.title}")
-                        pass
 
             # APPROXIMATE SOLUTIONS
 
@@ -659,22 +643,13 @@ class Algorithum:
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
                             feed['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
-                            
-                        #print(f"found {solution} in {user_stat.user.username}")
-                    else:
-                        #print(f"didn't find {solution} in {user_stat.user.username}")
-                        pass
+
                     if str(solution.lower()) in str(user_stat.user.username):
                         if user_stat.user.pk  not in feed['approx']['users'].keys() and user_stat.user.pk not in feed['exact']['users'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
                             feed['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
-                            
-                        #print(f"found {solution.lower()} in {user_stat.user.username}")
-                    else:
-                        #print(f"didn't find {solution.lower()} in {user_stat.user.username}")
-                        pass
 
             # Loops though all tags to see if the name of the tag relates to the search query
             for tag in tags:
@@ -689,23 +664,13 @@ class Algorithum:
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
                             feed['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
-                            
-                        #print(f"found {solution} in {tag.name}")
-                    else:
-                        #print(f"didn't find {solution} in {tag.name}")
-                        pass
+
                     if str(solution.lower()) in str(tag.name):
                         if tag.name not in feed['approx']['tags'].keys() and tag.name not in feed['exact']['tags'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
                             feed['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
-                            
-
-                        #print(f"found {solution.lower()} in {tag.name}")
-                    else:
-                        #print(f"didn't find {solution.lower()} in {tag.name}")
-                        pass
             
             # Loops though all posts to see if the title relates to the search query
             for post in posts:
@@ -721,46 +686,31 @@ class Algorithum:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
                             feed['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
 
-                        # order here
-                            feed['approx']['posts'][post.pk]['value']
-                        #print(f"found {solution} in {post.title}")
-                    else:
-                        #print(f"didn't find {solution} in {post.title}")
-                        pass
                     if str(solution.lower()) in str(post.title):
                         if post.pk not in feed['approx']['posts'].keys() and post.pk not in feed['exact']['posts'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
                             feed['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
-                            
-                    else:
-                        #print(f"didn't find {solution.lower()} in {post.title}")
-                        pass
 
             # SORTING OF RESULTS
 
-            # Sort users by value
+            # Sort all  by value
             sorted_users = sorted(feed['exact']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
             feed['exact']['users'] = {k: v for k, v in sorted_users}
 
-            # Sort tags by value
             sorted_tags = sorted(feed['exact']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
             feed['exact']['tags'] = {k: v for k, v in sorted_tags}
 
-            # Sort posts by value
             sorted_posts = sorted(feed['exact']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
             feed['exact']['posts'] = {k: v for k, v in sorted_posts}
 
-            # Sort users by value
             sorted_users = sorted(feed['approx']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
             feed['approx']['users'] = {k: v for k, v in sorted_users}
 
-            # Sort tags by value
             sorted_tags = sorted(feed['approx']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
             feed['approx']['tags'] = {k: v for k, v in sorted_tags}
 
-            # Sort posts by value
             sorted_posts = sorted(feed['approx']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
             feed['approx']['posts'] = {k: v for k, v in sorted_posts}
 

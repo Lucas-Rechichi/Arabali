@@ -83,7 +83,7 @@ def page(request, category, sub_category, increment):
     if category == 'popular':
 
         # Sort the posts baced on the given catergory
-        posts = Algorithum.PostSorting.popular_sort(user=user, sub_category=sub_category)
+        posts = Algorithum.PostSorting.popular_sort(sub_category=sub_category)
         if posts == 'Error: No Sub-Catergory.':
             return render(request, 'main/error.html', {'issue': 'No Sub Catergory.'})
 
@@ -129,7 +129,7 @@ def page(request, category, sub_category, increment):
     return render(request, "main/page.html", variables)
 
 @login_required
-def catch_up_page(request):
+def catch_up_page(request, increment):
     # Setup
     user_stats = UserStats.objects.get(user=request.user)
     users_stats = UserStats.objects.all()
