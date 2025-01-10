@@ -286,7 +286,7 @@ class Configure():
             preserved_user = post.user
             preserved_title = post.title
             preserved_content = post.contents
-            preserved_creation_date = post.created_at
+            preserved_creation_date = post.date_created
             preserved_likes = post.likes
             preserved_liked_by = list(post.liked_by.all())
 
@@ -300,7 +300,7 @@ class Configure():
             post.delete()
 
             # Create new post object
-            new_post = Post(user=preserved_user, title=preserved_title, contents=preserved_content, created_at=preserved_creation_date, likes=preserved_likes, media=new_image)
+            new_post = Post(user=preserved_user, title=preserved_title, contents=preserved_content, date_created=preserved_creation_date, likes=preserved_likes, media=new_image)
             new_post.save()
             new_post.date_modified = datetime.now()
             new_post.save()

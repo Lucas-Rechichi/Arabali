@@ -13,7 +13,7 @@ from main.prompts import Prompts
 from main.models import Category, PostTag, Interest, UserStats, Following
 from main.models import Media, Comment, NestedComment, LikedBy, Post
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
 
@@ -239,7 +239,7 @@ class Algorithum:
                     'post_contents': post.contents,
                     'post_media': post_media,
                     'post_likes': post.likes,
-                    'post_created_at': post.created_at,
+                    'post_date_created': post.date_created,
                     'post_liked_by': post_liked_by,
                     'post_comments': post_comments
                 })
@@ -306,7 +306,7 @@ class Algorithum:
         # Function for loading the next 10 posts for the feed
         def auto_post_loading(incrementing_factor, catergory, user):
             if catergory == 'all':
-                posts = list(Post.objects.annotate(Count('created_at')).order_by('-created-at'))
+                posts = list(Post.objects.annotate(Count('date_created')).order_by('-created-at'))
 
             elif catergory == 'popular':
                 post_tags = PostTag.objects.annotate(Count('value')).order_by('-value')
@@ -521,31 +521,38 @@ class Algorithum:
             user_stats = UserStats.objects.get(user=user)
             user_follower_object = Following.objects.get(name=user_stats.user.username)
             followers = UserStats.objects.filter(following=user_follower_object)
-            distances = {}
 
-            # Calculate harvinsine distance between every follower that user follows and the user
-            for index, follower in enumerate(followers):
-                distance_between_users = haversine_distance(lat1=user_stats.last_recorded_latitude, lat2=follower.last_recorded_latitude, lon1=user_stats.last_recorded_longitude, lon2=follower.last_recorded_longitude)
-                distances[index] = distance_between_users
-
-            # Sorts them baced on the one that is the closest to the user in distance
-            distances = dict(sorted(distances.items(), key=lambda item: item[0]))
-
-            # Setup
             daily_feed = []
             remaining_feed = []
+            distances_dict = {}
 
-            # Filters the posts into 2 lists, one for the posts that are todays posts and one for the remaining posts
-            todays_posts = Post.objects.filter(created_at__date=date.today())
-            for post, distance in zip(todays_posts, list(distances.values())):
-                if post.user.username == distance:
-                    daily_feed.append(post)
+            # Defining the latitude and longitude of the user acessing the page
+            user_lat = user_stats.last_recorded_latitude
+            user_lon = user_stats.last_recorded_longitude
 
-            remaining_posts = Post.objects.exclude(created_at__date=date.today())
-            for post, distance in zip(remaining_posts, list(distances.values())):
-                if post.user.username == distance:
-                    daily_feed.append(post)
-            
+            # Loop though all follwers, calculate distance, add data to a dictionary
+            for follower in followers:
+                follower_lat = follower.last_recorded_latitude
+                follower_lon = follower.last_recorded_longitude
+
+                distance_between_users = haversine_distance(lat1=user_lat, lat2=follower_lat, lon1=user_lon, lon2=follower_lon)
+                distances_dict[follower] = distance_between_users
+
+            # Sort the dictionary
+            distances_dict = dict(sorted(distances_dict.items(), key=lambda d: d[1]))
+
+            # Put user's posts into their respective post type
+            for distance_key in distances_dict.keys():
+                follower_daily_posts = Post.objects.filter(Q(user=distance_key.user) & (Q(date_created=date.today()) | Q(date_modified=date.today())))
+                print(follower_daily_posts)
+                for daily_post in follower_daily_posts:
+                    daily_feed.append(daily_post)
+
+                follower_remaining_posts = Post.objects.filter(user=distance_key.user).exclude(Q(date_created=date.today()) & Q(date_modified=date.today()))
+                for remaining_post in follower_remaining_posts:
+                    remaining_feed.append(remaining_post)
+
+
             return daily_feed, remaining_feed
 
 

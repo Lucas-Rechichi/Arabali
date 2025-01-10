@@ -79,5 +79,5 @@ class Reaction(models.Model):
     user = models.ForeignKey(UserStats, on_delete=models.CASCADE, null=False, related_name='reactions')
     message = models.ForeignKey(Message, on_delete=models.CASCADE, null=False, related_name='reactions')
     reaction = models.CharField(max_length=10, null=False)
-    created_at = models.DateTimeField(auto_now_add=True, null=False)
+    date_created = models.DateTimeField(auto_now_add=True, null=False)
 

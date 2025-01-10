@@ -47,7 +47,7 @@ class Post(models.Model):
     contents = models.TextField()
     likes = models.IntegerField(null=False)
     liked_by = models.ManyToManyField(LikedBy, related_name='post_liked_by')
-    created_at = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(null=True, default=None)
 
     def __str__(self):
@@ -119,7 +119,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=600)
     likes = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     liked_by = models.ManyToManyField(LikedBy, related_name='comment_liked_by')
 
     def __str__(self):
@@ -130,7 +130,7 @@ class NestedComment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=600)
     likes = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     liked_by = models.ManyToManyField(LikedBy, related_name='reply_liked_by')
 
     def __str__(self):

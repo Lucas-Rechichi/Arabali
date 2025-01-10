@@ -63,7 +63,7 @@ def page(request, category, sub_category, increment):
                     'text':sub_comment.text,
                     'liked__by':sub_comment.liked_by,
                     'likes':sub_comment.likes,
-                    'created_at':sub_comment.created_at
+                    'date_created':sub_comment.date_created
                 }
             post_comments[f'{comment.pk}'] = {
                 'id':comment.pk,
@@ -73,7 +73,7 @@ def page(request, category, sub_category, increment):
                 'text':comment.text,
                 'liked__by':comment.liked_by,
                 'likes':comment.likes,
-                'created_at':comment.created_at               
+                'date_created':comment.date_created               
             }
 
     # Orders posts baced on category
@@ -216,7 +216,7 @@ def catch_up_page(request, increment):
                     'text':sub_comment.text,
                     'liked__by':sub_comment.liked_by,
                     'likes':sub_comment.likes,
-                    'created_at':sub_comment.created_at
+                    'date_created':sub_comment.date_created
                 }
             post_comments[f'{comment.pk}'] = {
                 'id':comment.pk,
@@ -226,7 +226,7 @@ def catch_up_page(request, increment):
                 'text':comment.text,
                 'liked__by':comment.liked_by,
                 'likes':comment.likes,
-                'created_at':comment.created_at               
+                'date_created':comment.date_created               
             }
     post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
 
@@ -347,7 +347,7 @@ def post_view(request, post_id):
                 'text':sub_comment.text,
                 'liked__by':sub_comment.liked_by,
                 'likes':sub_comment.likes,
-                'created_at':sub_comment.created_at
+                'date_created':sub_comment.date_created
             }
         post_comments[f'{comment.pk}'] = {
             'id':comment.pk,
@@ -357,7 +357,7 @@ def post_view(request, post_id):
             'text':comment.text,
             'liked__by':comment.liked_by,
             'likes':comment.likes,
-            'created_at':comment.created_at               
+            'date_created':comment.date_created               
         }
     post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
 

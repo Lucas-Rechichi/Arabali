@@ -262,7 +262,7 @@ def new_comment(request):
                     interest = new_interest
 
                 # Making the comment
-                comment = Comment(post=post, text=text, likes=0, user=request.user, created_at = datetime.now())
+                comment = Comment(post=post, text=text, likes=0, user=request.user, date_created = datetime.now())
                 comment.save()
 
                 # Adding points for the comment and the user's interest.
@@ -283,7 +283,7 @@ def new_comment(request):
                     'post':comment.post.pk,
                     'text':comment.text,
                     'likes':comment.likes,
-                    'created_at':comment.created_at,
+                    'date_created':comment.date_created,
                     'liked__by': list(comment.liked_by.all()),
                     'pfp':user_stats.pfp.url,
                     'comment_id':comment.pk
@@ -322,7 +322,7 @@ def new_reply(request):
 
                 # Making the comment
                 comment = Comment.objects.get(id=comment_id)
-                reply = NestedComment(user=user, comment=comment, likes=0, created_at=datetime.now(), text=request.POST.get('text'))
+                reply = NestedComment(user=user, comment=comment, likes=0, date_created=datetime.now(), text=request.POST.get('text'))
                 reply.save()
 
                 # Value Change
@@ -344,7 +344,7 @@ def new_reply(request):
                     'user':reply.user.username,
                     'comment_id':reply.comment.pk,
                     'pfp':user_pfp,
-                    'created_at':reply.created_at,
+                    'date_created':reply.date_created,
                     'text':reply.text,
                     'likes':reply.likes
                 }
@@ -513,7 +513,7 @@ def load_posts(request):
             'post_media': post_media,
             'post_likes': post.likes,
             'post_media_url': post.media.url,
-            'post_created_at': post.created_at,
+            'post_date_created': post.date_created,
             'post_liked_by': post_liked_by,
             'post_comments': post_comments
         }

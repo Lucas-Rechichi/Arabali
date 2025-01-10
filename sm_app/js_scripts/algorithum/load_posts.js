@@ -348,7 +348,7 @@ $(document).ready(function () {
                                                     </div>
                                                     <div class="row">
                                                         <div class="col text-center">
-                                                            <p class="lead">Date Created: ${postsToAppend[i]['post_created_at']}</p>
+                                                            <p class="lead">Date Created: ${postsToAppend[i]['post_date_created']}</p>
                                                         </div>
                                                     </div>
                                                     <br>
