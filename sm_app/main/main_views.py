@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, HttpResponseRedirect
 from django.utils import timezone
 from validate.forms import User

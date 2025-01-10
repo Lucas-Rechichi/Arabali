@@ -227,7 +227,8 @@ class Algorithum:
                     })
 
                 # If the user has liked the post
-                liked_post = Post.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
+                user_liked_by = LikedBy.objects.get(name=user.username)
+                liked_post = post.liked_by.filter(name=user_liked_by).exists()
 
                 # Packaging data into a dictionary
                 feed.append({
@@ -543,12 +544,12 @@ class Algorithum:
 
             # Put user's posts into their respective post type
             for distance_key in distances_dict.keys():
-                follower_daily_posts = Post.objects.filter(Q(user=distance_key.user) & (Q(date_created=date.today()) | Q(date_modified=date.today())))
+                follower_daily_posts = Post.objects.filter(Q(user=distance_key.user) & (Q(date_created__date=date.today()) | Q(date_modified__date=date.today())))
                 print(follower_daily_posts)
                 for daily_post in follower_daily_posts:
                     daily_feed.append(daily_post)
 
-                follower_remaining_posts = Post.objects.filter(user=distance_key.user).exclude(Q(date_created=date.today()) & Q(date_modified=date.today()))
+                follower_remaining_posts = Post.objects.filter(user=distance_key.user).exclude(Q(date_created__date=date.today()) & Q(date_modified__date=date.today()))
                 for remaining_post in follower_remaining_posts:
                     remaining_feed.append(remaining_post)
 
