@@ -1201,7 +1201,7 @@
 
     function connectNotificationSocket() { // function for connecting to the websocket.
         notificationSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/brordcast-message/'
+            'ws://' + window.location.host + '/ws/brodcast-message/'
         ); // connect to the relevant consumer class: NotificationConsumer
 
         notificationSocket.onopen = function(e) {

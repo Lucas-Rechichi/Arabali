@@ -31,6 +31,9 @@
     <script type="module" src="{% static 'main/add_post_page/add_post.js'%}"></script>
     <script type="module" src="{% static 'main/add_post_page/functions.js'%}"></script>
     <script type="module" src="{% static 'forms/colour-picker.js'%}"></script>
+    <script type="text/javascript" src="{% static 'universal/notifications.js'%}"></script>
+    <script type="text/javascript" src="{% static 'websockets/post_socket.js' %}"></script>
+    <script type="text/javascript" src="{% static 'websockets/notification_socket.js' %}"></script>
 {% endblock %}
 
 <!-- For page specific css styles -->
@@ -180,7 +183,7 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col m-2" id="post-media-preview-container">
+                                        <div id="post-media-preview-container">
                                             <i class="bi bi-card-image d-flex justify-content-center" style="font-size: 15rem; color: #198754;"></i>
                                         </div>
                                     </div>
@@ -271,7 +274,7 @@
                         <button id="make-another-post" type="button" class="btn btn-success">Make Another</button>
                     </div>
                     <div class="col-6 d-flex justify-content-center">
-                        <button type="button" class="btn btn-success" onclick="location.href='/page/popular/all'">Exit</button>
+                        <button type="button" class="btn btn-success" onclick="location.href='/page/popular/all/1'">Exit</button>
                     </div>
                 </div>
             </div>

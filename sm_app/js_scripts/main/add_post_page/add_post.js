@@ -312,7 +312,7 @@ $(document).ready(function () {
 
     // Button for visual modal
     $('#make-another-post').click(function () {
-        creatingPostModal.hide();
+        postCreatedModal.hide();
     })
 
     // Post submission
@@ -382,7 +382,7 @@ $(document).ready(function () {
             }
 
         } else {
-            // getting relevant data
+            // Getting relevant data
             var titleInput = $('#post-title').val();
             var contentsInput = $('#post-contents').val();
 

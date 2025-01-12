@@ -144,15 +144,15 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# crispy forms
+# Crispy forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# url configuration
+# Url configuration
 LOGIN_REDIRECT_URL =  "/page/recommended/all/1"
 LOGOUT_REDIRECT_URL =  "/logout/"
 
-# images
+# Images
 MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
 MEDIA_URL = '/images/'
 

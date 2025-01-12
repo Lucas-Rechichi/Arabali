@@ -1,7 +1,7 @@
 import json
 
 from django.http import JsonResponse
-from main.models import Post, Media, PostTag, Category
+from main.models import Post, Media, PostTag, Category, PCF
 from main.algorithum import Algorithum
 
 
@@ -30,20 +30,21 @@ def add_post(request):
     # Determining the catergory for this post using AI
     post_catergory = Algorithum.PostCreations.predict_catergory_request(post_obj=new_post)
 
-    # getting the average post value.
+    # Getting the average post value.
     tag_values = list(PostTag.objects.all().values_list('value', flat=True))
 
     # Creating the post tag
     ave_tag_value = Algorithum.Core.average(num_list=tag_values, is_abs=True)
-    post_tag = PostTag(post=new_post, name=post_catergory, value=ave_tag_value)
-    post_tag.save()
-    
+    new_post_tag = PostTag(post=new_post, name=post_catergory, value=ave_tag_value)
+    new_post_tag.save()
+
+    new_post_function = PCF(tag=new_post_tag, factor=1, is_active=True)
+    new_post_function.save()
+
     # Creating a new catergory instance if this is a new type of post.
     if not Category.objects.filter(name=post_catergory).exists():
         new_catergory = Category(name=post_catergory)
         new_catergory.save()
-
-    print(post_tag.name)
 
     response = {}
 

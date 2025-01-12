@@ -436,7 +436,7 @@
                                                         </div>
                                                     </div>
                                                     <!-- comments -->
-                                                    <div id="comments-container-{{daily_post.post_id}}">
+                                                    <div id="comments-container-{{daily_post.post_id}}" class="comments-container">
                                                         {% for comment in post.post_comments %}
                                                             <div class="row">
                                                                 <div class="col">
@@ -475,7 +475,7 @@
                                                                                                 <i class="bi bi-hand-thumbs-up" id="comment-like-icon-{{comment.comment_id}}" style="color: #198754;"></i>
                                                                                             </div>
                                                                                             <div class="col mt-4">
-                                                                                                <p class="text-success" id="comment-like-text-{{comment.comment_id}}">{{comment.comment_liked}}</p>
+                                                                                                <p class="text-success" id="comment-like-text-{{comment.comment_id}}">{{comment.comment_likes}}</p>
                                                                                             </div>
                                                                                         </div>
                                                                                     </button>
@@ -575,7 +575,7 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col m-2">
-                                                    <h6 class="display-6">{{remaining_post.post_user}}</h6>
+                                                    <h6 class="display-6">{{remaining_post.post_username}}</h6>
                                                 </div>
                                             </div>
                                             <div class="row">
@@ -593,14 +593,14 @@
                                                         {% for media_obj in remaining_post.post_media %}
                                                             {% if forloop.counter == 1 %}
                                                                 <div class="carousel-item active">
-                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100"  alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}" aria-current="true">
+                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100"  alt="{{remaining_post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}" aria-current="true">
                                                                     <div class="carousel-caption d-block d-md-block">
                                                                         <p class="font-{{media_obj.caption_font}}" style="color: {{media_obj.caption_colour}};">{{media_obj.caption_text}}</p>
                                                                     </div>
                                                                 </div>
                                                             {% else %}
                                                                 <div class="carousel-item">
-                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100" alt="{{post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}">
+                                                                    <img src="{{media_obj.media_url}}" class="d-block w-100" alt="{{remaining_post.post_title|correct_apostrophe}} Media: Slide {{forloop.counter}}">
                                                                     <div class="carousel-caption d-block d-md-block">
                                                                         <p class="font-{{media_obj.caption_font}}" style="color: {{media_obj.caption_colour}};">{{media_obj.caption_text}}</p>
                                                                     </div>
@@ -800,7 +800,7 @@
                                                         </div>
                                                     </div>
                                                     <!-- comments -->
-                                                    <div id="comments-container-{{remaining_post.post_id}}">
+                                                    <div id="comments-container-{{remaining_post.post_id}}" class="comments-container">
                                                         {% for comment in remaining_post.post_comments %}
                                                             <div class="row">
                                                                 <div class="col">
@@ -839,7 +839,7 @@
                                                                                                 <i class="bi bi-hand-thumbs-up" id="comment-like-icon-{{comment.comment_id}}" style="color: #198754;"></i>
                                                                                             </div>
                                                                                             <div class="col mt-4">
-                                                                                                <p class="text-success" id="comment-like-text-{{comment.comment_id}}">{{comment.comment_liked}}</p>
+                                                                                                <p class="text-success" id="comment-like-text-{{comment.comment_id}}">{{comment.comment_likes}}</p>
                                                                                             </div>
                                                                                         </div>
                                                                                     </button>
@@ -924,10 +924,30 @@
                                     </div>
                                 {% endfor %}
                             </div>
-                        </div> 
+                        </div>
+                        <div class="row">
+                            <div class="col d-flex justify-content-center m-1">
+                                {% if increment.current <= 5 %}
+                                    <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.backwards}}'" disabled><i class="bi bi-rewind-fill"></i></button>
+                                {% else %}
+                                    <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.backwards}}'"><i class="bi bi-rewind-fill"></i></button>
+                                {% endif %}
+
+                                {% if increment.current <= 1 %}
+                                    <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.previous}}'" disabled><i class="bi bi-caret-left-fill"></i></i></button>
+                                {% else %}
+                                    <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.previous}}'"><i class="bi bi-caret-left-fill"></i></i></button>
+                                {% endif %}
+
+                                <p class="lead m-1">{{increment.current}}</p>
+                                <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.next}}'"><i class="bi bi-caret-right-fill"></i></button>
+                                <button type="button" class="btn btn-success m-1" onclick="location.href='/page/popular/{{sub_category}}/{{increment.forwards}}'"><i class="bi bi-fast-forward-fill"></i></i></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-6">
-                    <div class="card" style="position: fixed;">
+                    <div class="card p-1" style="position: fixed;">
                         <div class="row">
                             <div class="col">
                                 <h4 class="display-6 text-center">What do you want to look at?</h4>
@@ -956,7 +976,7 @@
                             </div>
                         </div>
                         <div class="row d-flex justify-content-center mb-5">
-                            {% for follower in user_followers %}
+                            {% for follower in following %}
                                 <div class="col-4 d-flex justify-content-center">
                                     <button type="button" class="btn mb-2 p-0" onclick="location.href='/profile/{{follower.user.username}}'" style="height:100px; width:100px;">
                                         <img class="border border-success rounded-circle p-0" src="{{follower.pfp.url}}" alt="{{follower.user.username}}'s Profile Picture" style="height:100px; width:100px;">

@@ -51,11 +51,7 @@ class PostConsumer(WebsocketConsumer):
     def posts_manager(self, event):
         request_type = event['request_type']
 
-        if request_type == 'create_post':
-            pass
-        elif request_type == 'delete_post':
-            pass
-        elif request_type == 'create_comment':
+        if request_type == 'create_comment':
             comment_id = event['object_id']
 
             try:
@@ -68,6 +64,7 @@ class PostConsumer(WebsocketConsumer):
             user_stats = UserStats.objects.get(user=comment.user)
 
             data = {
+                'type': request_type,
                 'text': comment.text,
                 'post_id': comment.post.pk,
                 'comment_id': comment.pk,
@@ -88,6 +85,7 @@ class PostConsumer(WebsocketConsumer):
             user_stats = UserStats.objects.get(user=reply.user)
 
             data = {
+                'type': request_type,
                 'text': reply.text,
                 'comment_id': reply.comment.pk,
                 'reply_id': reply.pk,
@@ -104,24 +102,21 @@ class PostConsumer(WebsocketConsumer):
                 print(f'Post with id: {post_id} does not exist.')
             except Exception as e:
                 print(f'An error occured: {e}')
-            
+
             likes = post.likes
             liked_by = post.liked_by
-            
+
             data = {
+                'type': request_type,
                 'likes': likes,
                 'liked_by': liked_by
             }
 
+        elif request_type == 'update_post_likes':
+            pass
         elif request_type == 'update_comment_likes':
             pass
-        elif request_type == 'update_reply_likes':
+        else: # request_type == 'update_reply_likes'
             pass
-        else:
-            print('Invalid request type.')
-            return None
-        
-        self.send(text_data=json.dumps({
-            'type': request_type,
-            'data': data
-        }))
+
+        self.send(text_data=json.dumps(data))

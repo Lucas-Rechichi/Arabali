@@ -256,13 +256,13 @@ def new_comment(request):
                     new_interest = Interest(user=request.user, name=tag.name, value=0)
                     new_interest.save()
 
-                    new_interest_function = ICF(factor=1)
+                    new_interest_function = ICF(interest=new_interest, factor=1)
                     new_interest_function.save()
-                    new_interest.save()
+
                     interest = new_interest
 
                 # Making the comment
-                comment = Comment(post=post, text=text, likes=0, user=request.user, date_created = datetime.now())
+                comment = Comment(post=post, text=text, likes=0, user=request.user, date_created=datetime.now())
                 comment.save()
 
                 # Adding points for the comment and the user's interest.

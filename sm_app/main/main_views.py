@@ -229,12 +229,24 @@ def catch_up_page(request, increment):
             }
     post_comments = dict(post_comments)  # Convert defaultdict to regular dictionary
 
+    # For the following segment
+    user_following_object = Following.objects.get(name=request.user.username)
+    following_userstats = UserStats.objects.filter(following=user_following_object)
+
     # Variables
     variables = {
-        "username": init['username'], 
-        "daily_posts": daily_feed if daily_feed else None,
-        "remaining_posts": remaining_feed if remaining_feed else None,
-        "all_caught_up": all_caught_up,
+        'username': init['username'], 
+        'daily_posts': daily_feed if daily_feed else None,
+        'remaining_posts': remaining_feed if remaining_feed else None,
+        'increment': {
+            'backwards': increment - 5,
+            'previous': increment - 1,
+            'current': increment,
+            'next': increment + 1,
+            'forwards': increment + 5
+        },
+        'following': following_userstats,
+        'all_caught_up': all_caught_up,
         'user_stats': users_stats, 
         'user': user_stats,
         'liked_by': liked_by,
@@ -266,50 +278,64 @@ def add_post(request):
         'notification_count': init['notification_count']
     }
 
-
     return render(request, 'main/add_post.html', variables)
 
 
 @login_required
 def profile(request, name):
+
+    # Setup
     init = initialize_page(request)
     user = User.objects.get(username=name)
     user_stats = UserStats.objects.get(user=user)
+    followers = user_stats.following.filter(name=name)
+    posts = Post.objects.filter(user=user)
+
     if user_stats.is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
-    
-    follow = Following.objects.all()
-    posts = Post.objects.filter(user=u)
+
+    # For the followers of this user
     followed_userstats = []
-    for x in follow:
-        if user_stats.following.filter(name=x).exists():
-            followed_userstats.append(UserStats.objects.filter(user=User.objects.get(username=follow.get(name=x))))
-    
+    for follower in followers:
+        follower_user_obj = User.objects.get(username=follower)
+        follower_userstats = UserStats.objects.get(user=follower_user_obj)
+        followed_userstats.append(follower_userstats)
 
     is_following = user_stats.following.filter(name=request.user.username).exists()
 
+    # If you are on your own profile
     if request.user.username == name:
         self_profile = True
     else:
         self_profile = False
+
+    # Form logic
     if request.method == 'POST':
         if 'follow' in request.POST:
+            user_following_obj = Following.objects.get(name=request.user.username)
+
+            # Following logic
             if request.POST['follow'] == 'follow':
-                user_stats.following.add(follow.get(name=request.user.username))
+                user_stats.following.add(user_following_obj)
                 user_stats.followers += 1
             elif request.POST['follow'] == 'unfollow':
                 user_stats.followers -= 1
-                user_stats.following.remove(follow.get(name=request.user.username))
+                user_stats.following.remove(user_following_obj)
             user_stats.save()
+
+            # Update is_following boolean
             is_following = user_stats.following.filter(name=request.user.username).exists()
-            return HttpResponseRedirect(f'/profile/{u.username}')
+            return HttpResponseRedirect(f'/profile/{user.username}')
+
+    # Sending over data
     profile_vars = {
+        'username': request.user.username, # for the user acessing this page
         'user': user, 
         'userstats': user_stats, 
         'is_following': is_following, 
         'self_profile': self_profile, 
-        'post': posts,
-        'followed_user': followed_userstats,
+        'posts': posts,
+        'followed_users': followed_userstats,
         'search_bar': init['search_bar'],
         'notifications': init['notification_list'],
         'notification_count': init['notification_count']
@@ -324,7 +350,6 @@ def post_view(request, post_id):
     user = User.objects.get(username=post.user.username)
     user_stats = UserStats.objects.get(user=user)
     user_liked_by = LikedBy.objects.get(name=request.user.username)
-    s = UserStats.objects.all()
 
     if UserStats.objects.get(user=request.user).is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})

@@ -11,7 +11,7 @@ from main.extras import remove_last_character, modified_reciprocal, difference
 
 from main.prompts import Prompts
 from main.models import Category, PostTag, Interest, UserStats, Following
-from main.models import Media, Comment, NestedComment, LikedBy, Post
+from main.models import Media, LikedBy, Post
 
 from django.db.models import Count, Q
 from django.core.files.storage import default_storage
@@ -146,7 +146,7 @@ class Algorithum:
             title = post_obj.title
             contents = post_obj.contents
 
-            # AI desion
+            # AI decision
             current_catergories = Category.objects.all()
             response = chat.send_message(Prompts.dermine_catergory_prompt(title=title, contents=contents, catergories_list=current_catergories))
 
@@ -158,6 +158,7 @@ class Algorithum:
             # Setup
             feed = []
             user = user_obj
+            user_liked_by = LikedBy.objects.get(name=user.username).name # for has_liked
             
             # Loops though all selected posts
             for i, post in enumerate(post_list):
@@ -198,7 +199,7 @@ class Algorithum:
                         reply_user_userstats = UserStats.objects.get(user=reply.user)
 
                         # If the user has liked this reply
-                        liked_reply = NestedComment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
+                        liked_reply = reply.liked_by.filter(name=user_liked_by).exists()
 
                         # Packaging data into a dictionary
                         post_comment_replies.append({ 
@@ -213,7 +214,7 @@ class Algorithum:
                     comment_user_userstats = UserStats.objects.get(user=comment.user)
 
                     # If the user has liked this comment
-                    liked_comment = Comment.objects.filter(liked_by=LikedBy.objects.get(name=user.username)).exists()
+                    liked_comment = comment.liked_by.filter(name=user_liked_by).exists()
 
                     # Packaging data into a dictionary
                     post_comments.append({
@@ -227,7 +228,6 @@ class Algorithum:
                     })
 
                 # If the user has liked the post
-                user_liked_by = LikedBy.objects.get(name=user.username)
                 liked_post = post.liked_by.filter(name=user_liked_by).exists()
 
                 # Packaging data into a dictionary
@@ -255,12 +255,11 @@ class Algorithum:
 
                 # Setup
                 catergories = Category.objects.all()
-                catergory_names_list = []
-                catergory_values_list = []
+                category_dict = {}
 
                 # Loops though all catergories
-                for catergory in catergories:
-                    tags = PostTag.objects.filter(name=catergory.name)
+                for category in catergories:
+                    tags = PostTag.objects.filter(name=category.name)
                     total_value = 0.0
 
                     # Loops though all tags with the same name as the catergories
@@ -268,18 +267,15 @@ class Algorithum:
                         total_value += tag.value # append the individual tag value to the total for this catergory
 
                     # Append the name and the total value of the catergory so that they share the same index order
-                    catergory_names_list.append(catergory.name)
-                    catergory_values_list.append(total_value)
+                    category_dict[category] = total_value
+
+                    category_dict = dict(sorted(category_dict.items(), key=lambda v: v[1]))
 
                 # Loops though all catergories, gets the one with the highest value then appends the name to the catergory list
-                for _ in range(0, len(catergory_names_list) + 1):
-                    highest_value = max(catergory_values_list)
-                    index = catergory_values_list.index(highest_value)
-
-                    selected_name = catergory_names_list[index]
+                for i in range(0, len(category_dict.keys())):
+                    selected_name = list(category_dict.keys())[i]
                     catergory_list.append(selected_name)
 
-                pass
             else:
                 interest_list = Algorithum.Core.basic_sort(object_name='interests', sub_category='all', user_obj=user_obj)
                 catergory_list = interest_list
