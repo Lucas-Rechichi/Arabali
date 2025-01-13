@@ -4,12 +4,15 @@ from datetime import datetime, date
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+
+from sm_app import settings
 from main.extras import approx_display, capitalize_plus, difference, exact_display, modified_reciprocal, remove_last_character
 from main.models import Comment, LikedBy, NestedComment, Post, UserStats, PostTag, Interest, ICF, InterestInteraction, PostInteraction, Notification, Following
 from messaging.models import Message, ChatRoom, PollMessage
 from messaging.extras import emoticons_dict
 from django.core.exceptions import ObjectDoesNotExist
 from main.algorithum import Algorithum
+
 
 
 def ajax_error(request):
@@ -37,6 +40,33 @@ def remove_notification(request):
         notification_id = notification.pk
     notification.delete()
     response = {}
+    return JsonResponse(response)
+
+def check_depreciation_time(request):
+    # Getting relevant data
+    recieved_timestamp = request.POST.get()
+    last_depreciation_timestamp = settings.last_depreciation_timestamp
+
+    # Checking to see if enough time has elapsed (1 day = 86400 seconds)
+    if recieved_timestamp - last_depreciation_timestamp >= 86400:
+
+        # Get tags and interests, iterate and apply PCF and ICF respectfuly to them
+        tags = PostTag.objects.all()
+        interests = Interest.objects.all()
+
+        for tag, interest in tags, interests:
+            Algorithum.Depreciations.calculate_post_consequence_function(post_tag_obj=tag)
+            Algorithum.Depreciations.calculate_interest_consequence_function(interest_obj=interest)
+
+    
+
+    else:
+
+        # Message to say that the depreciations have occured today
+        response = {
+            'message': 'Depreciation already occured today'
+        }
+
     return JsonResponse(response)
 
 def realtime_suggestions_manager(request):

@@ -158,6 +158,9 @@ MEDIA_URL = '/images/'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
+# Time recording of last depreciation
+last_depreciation_timestamp = 1736686800
+
 # # Logging
 # LOGGING = {
 #     'version': 1,
