@@ -12,7 +12,7 @@ $(document).ready(function () {
             'csrfmiddlewaretoken': csrfToken
         },
         success: function (response) {
-            console.log('Depreciation successful.')
+            console.log(response.message)
         }
     })
 });

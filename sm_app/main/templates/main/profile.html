@@ -1,6 +1,7 @@
 {% extends 'main/template.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% load main_filters %}
 
 <!-- Title of the page -->
 {% block title %}
@@ -103,7 +104,7 @@
 {% block body %}
 <div class="container">
   <div class="card">
-    <img src="{{ userstats.banner.url }}" class="card-img-top" alt=""/>
+    <img src="{{ userstats.banner.url }}" class="card-img-top" alt="{{userstats.user.username|correct_apostrophe}} banner image"/>
     <br>
     <div class="card-body">
       <div class="row">
@@ -111,13 +112,13 @@
           <h6 class="display-6 text-center m-2">Posts:</h6>
           <hr>
           <div class="row d-flex justify-content-center">
-            {% for post in posts %}
+            {% for user_post in user_posts_data %}
               <div class="col-5 m-2">
                 <div class="card">
-                  <button class="btn p-0 m-0", onclick='location.href = "/posts/{{post.id}}"'>
-                    <img src="{{post.media.url}}" style="max-width: 100%; max-height: 100%; border-radius: 3%;">
+                  <button class="btn p-0 m-0", onclick='location.href = "/posts/{{user_post.post_id}}"'>
+                    <img src="{{user_post.post_media_url}}" style="max-width: 100%; max-height: 100%; border-radius: 3%;">
                     <div class="card-body">
-                      <h5>{{post.title}}</h5>
+                      <h5>{{user_post.post_title}}</h5>
                     </div>
                   </button>
                 </div>

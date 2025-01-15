@@ -58,7 +58,27 @@ def check_depreciation_time(request):
             Algorithum.Depreciations.calculate_post_consequence_function(post_tag_obj=tag)
             Algorithum.Depreciations.calculate_interest_consequence_function(interest_obj=interest)
 
-    
+        # Change the current and old interactions
+        current_post_interactions = PostInteraction.objects.filter(is_new=True)
+        old_post_interactions = PostInteraction.objects.filter(is_new=False)
+
+        current_interest_interactions = InterestInteraction.objects.filter(is_new=True)
+        old_interest_interations = InterestInteraction.objects.filter(ins_new=False)
+
+        for cpi, opi in current_post_interactions, old_post_interactions:
+            cpi.is_new = False # new interactions become the old interactions
+            cpi.save()
+            opi.delete() # delete old interactions
+
+        for cii, oii in current_interest_interactions, old_interest_interations:
+            cii.is_new = False # new interactions become the old interactions
+            cii.save()
+            oii.delete() # delete old interactions
+
+        # Message to say that the depreciations have been successful
+        response = {
+            'message': 'Depreciation Successful'
+        }
 
     else:
 
@@ -269,7 +289,7 @@ def realtime_suggestions_manager(request):
     elif type == 'recommend':
         user = request.user
         user_stats = UserStats.objects.get(user=user)
-        user_follower_object = Following.objects.get(subscribers=user_stats.user.username)
+        user_follower_object = Following.objects.get(name=user_stats.user.username)
         followers = UserStats.objects.filter(following=user_follower_object)
 
         follower_list = []

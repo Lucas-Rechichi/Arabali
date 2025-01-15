@@ -13,6 +13,8 @@ from main.prompts import Prompts
 from main.models import Category, PostTag, Interest, UserStats, Following
 from main.models import Media, LikedBy, Post
 
+from messaging.models import ChatRoom, Message, PollMessage, emoticons_dict
+
 from django.db.models import Count, Q
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User
@@ -434,16 +436,22 @@ class Algorithum:
             
             new_function_factor = (current_interest_value/new_interest_value)
 
+            # Checking to see if the interest value is too low, deletes outliers that are too low
+            interest_userstats = interest_obj.userstats
+            user_interests = Interest.objects.filter(user=interest_userstats)
+            user_interest_values = user_interests.values_list('value', flat=True)
+            user_average_interest_value = Algorithum.Core.average(num_list=user_interest_values, is_abs=False)
+
+            for interest in user_interests:
+                if interest * 7 < user_average_interest_value:
+                    interest.delete()
+        
             # Recording updates to the database
             interest_obj.value = new_interest_value
             interest_obj.save()
 
             function_obj.factor = new_function_factor
             function_obj.save()
-
-    class Maintenence:
-        def delete_interest():
-            pass
 
     class PostSorting:
 
@@ -555,6 +563,190 @@ class Algorithum:
 
     class Search:
 
+        def result_values_users(results_dict, solutions_data, highest_q_value):
+
+            # Setup
+            user_stats = UserStats.objects.all()
+            solution_type = solutions_data['type']
+
+            # Solution logic
+            if solution_type == 'exact':
+                solutions = solutions_data['solutions']
+
+                # Loops though all users to see if their name relates to the search query (exact)
+                for user_stat in user_stats:
+                    for combination_id, solution in solutions.items():
+                        if str(solution) in str(user_stat.user.username): # if the string is present within this user's name
+                            if user_stat.user.pk not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys(): # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
+
+                        if str(solution.lower()) in str(user_stat.user.username):
+                            if user_stat.user.pk  not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys():
+                                results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
+                
+            else: # solution_type == 'approx'
+                solutions = solutions_data['solutions']
+
+                # Loops though all users to see if their name relates to the search query (approximate)
+                for user_stat in user_stats:
+                    split_result_dict = {}
+                    split_result_list = [x for x in (user_stat.user.username)] 
+                    for a in range(len(user_stat.user.username)):
+                        split_result_dict[split_result_list[a]] =  [a + 1]
+                    for combination_id, solution in solutions.items():
+                        if str(solution) in str(user_stat.user.username):
+                            if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
+                                for char_index, char in solutions.items():
+                                    if char in split_result_list:
+                                        combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
+                                results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
+
+                        if str(solution.lower()) in str(user_stat.user.username):
+                            if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
+                                for char_index, char in solutions.items():
+                                    if char in split_result_list:
+                                        combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
+                                results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
+
+            return results_dict
+
+        def result_values_posts(results_dict, solutions_data, highest_q_value):
+
+            # Setup
+            posts = Post.objects.all()
+            solution_type = solutions_data['type']
+
+            if solution_type == 'exact':
+                solutions = solutions_data['solutions']
+
+                # Loops though all posts to see if the title relates to the search query
+                for post in posts:
+                    for combination_id, solution in solutions.items():
+                        if str(solution) in str(post.title):
+                            if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
+                                results_dict['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
+                                
+                        if str(solution.lower()) in str(post.title):
+                            if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
+                                results_dict['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
+
+            else: # solution_type == 'approx'
+                solutions = solutions_data['solutions']
+
+                # Loops though all posts to see if the title relates to the search query
+                for post in posts:
+                    split_result_dict = {}
+                    split_result_list = [x for x in (post.title)] 
+                    for a in range(len(post.title)):
+                        split_result_dict[split_result_list[a]] =  [a + 1]
+                    for combination_id, solution in solutions.items():
+                        if str(solution) in str(post.title):
+                            if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
+                                for char_index, char in solutions.items():
+                                    if char in split_result_list:
+                                        combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
+                                results_dict['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
+
+                        if str(solution.lower()) in str(post.title):
+                            if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
+                                for char_index, char in solutions.items():
+                                    if char in split_result_list:
+                                        combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
+                                results_dict['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
+
+            return results_dict
+
+
+        def result_values_categories(results_dict, solutions_data, highest_q_value):
+
+            # Setup
+            catergories = Category.objects.all()
+            solution_type = solutions_data['type']
+
+            if solution_type == 'exact':
+                solutions = solutions_data['solutions']
+
+                # Loops though all catergories to see if the name of the catergory relates to the search query
+                for catergory in catergories:
+                    for combination_id, solution in solutions.items():
+                        if str(solution) in str(catergory.name):
+                            if catergory.name not in results_dict['exact']['catergories'].keys() and catergory.name not in results_dict['approx']['catergories'].keys():
+                                results_dict['exact']['catergories'][catergory.name] = {'id': catergory.pk,'name': catergory.name, 'value': exact_display(modified_reciprocal(combination_id))}
+                                
+
+                        if str(solution.lower()) in str(catergory.name):
+                            if catergory.name not in results_dict['exact']['catergories'].keys() and catergory.name not in results_dict['approx']['catergoires'].keys():
+                                results_dict['exact']['catergoires'][catergory.name] = {'id': catergory.pk,'name': catergory.name, 'value': exact_display(modified_reciprocal(combination_id))}
+            
+            else: # solution_type == 'approx'
+                solutions = solutions_data['solutions']
+
+                # TODO: Fix up the functions that split the search algorithum function (up to here: approx solutions for catergories)
+
+        def result_values_emoticons(results_dict, solutions_data, highest_q_value):
+
+            # Setup
+            emoticons = emoticons_dict.keys()
+            solution_type = solutions_data['type']
+
+            if solution_type == 'exact':
+                solutions = solutions_data['solutions']
+            else: # solution_type == 'approx'
+                solutions = solutions_data['solutions']
+
+        def result_values_chatrooms(results_dict, solutions_data, highest_q_value):
+
+            # Setup
+            chatrooms = ChatRoom.objects.all()
+            solution_type = solutions_data['type']
+
+            if solution_type == 'exact':
+                solutions = solutions_data['solutions']
+            else: # solution_type == 'approx'
+                solutions = solutions_data['solutions']
+
+        def result_values_messages(results_dict, solutions_data, highest_q_value):
+
+            # Setup
+            messages = Message.objects.all()
+            solution_type = solutions_data['type']
+
+            if solution_type == 'exact':
+                solutions = solutions_data['solutions']
+            else: # solution_type == 'approx'
+                solutions = solutions_data['solutions']
+
+        def query_solutions(query, abs_cutoff_value):
+
+            # Getting the query, the capitalised query, and th highest value a match can have
+            query = str(query)
+            captialized_query = capitalize_plus(query)
+
+            if len(query) <= abs_cutoff_value:
+                pass
+            elif len(query) == abs_cutoff_value:
+                pass
+            else:
+                pass
+
+            # Gets all possible exact solutions for the inserted query
+            exact_solutions = {}
+            changed_query = captialized_query
+            for b in range(len(changed_query)):
+                exact_solutions[b + 1] = changed_query
+                changed_query = remove_last_character(changed_query)
+
+            # Gets all possible approximate solutions for the inserted query
+            approximate_solutions = {}
+            broken_query = [x for x in captialized_query] 
+            for a in range(len(captialized_query)):
+                approximate_solutions[a + 1] =  broken_query[a]
+
+            return exact_solutions, approximate_solutions
+
+        def query_sorting(query):
+            pass
+
         # Gives results that are related to the query searched.
         def results_order(query):
             query = str(query)
@@ -563,7 +755,7 @@ class Algorithum:
 
             # Setup
             exact_solutions = {}
-            feed = {
+            results_dict = {
                 'exact': {
                     'users': {},
                     'tags': {},
@@ -598,38 +790,38 @@ class Algorithum:
             for user_stat in user_stats:
                 for combination_id, solution in exact_solutions.items():
                     if str(solution) in str(user_stat.user.username): # if the string is present within this user's name
-                        if user_stat.user.pk not in feed['exact']['users'].keys() and user_stat.user.pk not in feed['approx']['users'].keys(): # Removes duplicates for both exact and approx solutions
-                            feed['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
+                        if user_stat.user.pk not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys(): # Removes duplicates for both exact and approx solutions
+                            results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
                             
 
                     if str(solution.lower()) in str(user_stat.user.username):
-                        if user_stat.user.pk  not in feed['exact']['users'].keys() and user_stat.user.pk not in feed['approx']['users'].keys():
-                            feed['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
+                        if user_stat.user.pk  not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys():
+                            results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
                             
 
             # Loops though all tags to see if the name of the tag relates to the search query
             for tag in tags:
                 for combination_id, solution in exact_solutions.items():
                     if str(solution) in str(tag.name):
-                        if tag.name not in feed['exact']['tags'].keys() and tag.name not in feed['approx']['tags'].keys():
-                            feed['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
+                        if tag.name not in results_dict['exact']['tags'].keys() and tag.name not in results_dict['approx']['tags'].keys():
+                            results_dict['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
                             
 
                     if str(solution.lower()) in str(tag.name):
-                        if tag.name not in feed['exact']['tags'].keys() and tag.name not in feed['approx']['tags'].keys():
-                            feed['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
+                        if tag.name not in results_dict['exact']['tags'].keys() and tag.name not in results_dict['approx']['tags'].keys():
+                            results_dict['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
                             
 
             # Loops though all posts to see if the title relates to the search query
             for post in posts:
                 for combination_id, solution in exact_solutions.items():
                     if str(solution) in str(post.title):
-                        if post.pk not in feed['exact']['posts'].keys() and post.pk not in feed['approx']['posts'].keys():
-                            feed['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
+                        if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
+                            results_dict['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
                             
                     if str(solution.lower()) in str(post.title):
-                        if post.pk not in feed['exact']['posts'].keys() and post.pk not in feed['approx']['posts'].keys():
-                            feed['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
+                        if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
+                            results_dict['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
 
             # APPROXIMATE SOLUTIONS
 
@@ -641,18 +833,18 @@ class Algorithum:
                     split_result_dict[split_result_list[a]] =  [a + 1]
                 for combination_id, solution in approximate_solutions.items():
                     if str(solution) in str(user_stat.user.username):
-                        if user_stat.user.pk  not in feed['approx']['users'].keys() and user_stat.user.pk not in feed['exact']['users'].keys():
+                        if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            feed['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
+                            results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
 
                     if str(solution.lower()) in str(user_stat.user.username):
-                        if user_stat.user.pk  not in feed['approx']['users'].keys() and user_stat.user.pk not in feed['exact']['users'].keys():
+                        if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            feed['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
+                            results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
 
             # Loops though all tags to see if the name of the tag relates to the search query
             for tag in tags:
@@ -662,18 +854,18 @@ class Algorithum:
                     split_result_dict[split_result_list[a]] =  [a + 1]
                 for combination_id, solution in approximate_solutions.items():
                     if str(solution) in str(tag.name):
-                        if tag.name not in feed['approx']['tags'].keys() and tag.name not in feed['exact']['tags'].keys():
+                        if tag.name not in results_dict['approx']['tags'].keys() and tag.name not in results_dict['exact']['tags'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            feed['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
+                            results_dict['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
 
                     if str(solution.lower()) in str(tag.name):
-                        if tag.name not in feed['approx']['tags'].keys() and tag.name not in feed['exact']['tags'].keys():
+                        if tag.name not in results_dict['approx']['tags'].keys() and tag.name not in results_dict['exact']['tags'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            feed['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
+                            results_dict['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
             
             # Loops though all posts to see if the title relates to the search query
             for post in posts:
@@ -683,41 +875,41 @@ class Algorithum:
                     split_result_dict[split_result_list[a]] =  [a + 1]
                 for combination_id, solution in approximate_solutions.items():
                     if str(solution) in str(post.title):
-                        if post.pk not in feed['approx']['posts'].keys() and post.pk not in feed['exact']['posts'].keys():
+                        if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            feed['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
+                            results_dict['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
 
                     if str(solution.lower()) in str(post.title):
-                        if post.pk not in feed['approx']['posts'].keys() and post.pk not in feed['exact']['posts'].keys():
+                        if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
                             for char_index, char in approximate_solutions.items():
                                 if char in split_result_list:
                                     combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            feed['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
+                            results_dict['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
 
             # SORTING OF RESULTS
 
             # Sort all  by value
-            sorted_users = sorted(feed['exact']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
-            feed['exact']['users'] = {k: v for k, v in sorted_users}
+            sorted_users = sorted(results_dict['exact']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
+            results_dict['exact']['users'] = {k: v for k, v in sorted_users}
 
-            sorted_tags = sorted(feed['exact']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
-            feed['exact']['tags'] = {k: v for k, v in sorted_tags}
+            sorted_tags = sorted(results_dict['exact']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
+            results_dict['exact']['tags'] = {k: v for k, v in sorted_tags}
 
-            sorted_posts = sorted(feed['exact']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
-            feed['exact']['posts'] = {k: v for k, v in sorted_posts}
+            sorted_posts = sorted(results_dict['exact']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
+            results_dict['exact']['posts'] = {k: v for k, v in sorted_posts}
 
-            sorted_users = sorted(feed['approx']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
-            feed['approx']['users'] = {k: v for k, v in sorted_users}
+            sorted_users = sorted(results_dict['approx']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
+            results_dict['approx']['users'] = {k: v for k, v in sorted_users}
 
-            sorted_tags = sorted(feed['approx']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
-            feed['approx']['tags'] = {k: v for k, v in sorted_tags}
+            sorted_tags = sorted(results_dict['approx']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
+            results_dict['approx']['tags'] = {k: v for k, v in sorted_tags}
 
-            sorted_posts = sorted(feed['approx']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
-            feed['approx']['posts'] = {k: v for k, v in sorted_posts}
+            sorted_posts = sorted(results_dict['approx']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
+            results_dict['approx']['posts'] = {k: v for k, v in sorted_posts}
 
-            return feed
+            return results_dict
 
 
 

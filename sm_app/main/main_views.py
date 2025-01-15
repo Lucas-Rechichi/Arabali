@@ -8,8 +8,7 @@ from main.extras import initialize_page
 from main.algorithum import Algorithum
 from main.forms import EditProfile, EditPost, Search
 from main.models import LikedBy, Following, DateAndOrTimeSave
-from main.models import UserStats, Comment, NestedComment
-from main.models import Category
+from main.models import UserStats, Comment, NestedComment, Media
 from main.configure import Configure
 
 from datetime import date
@@ -301,7 +300,21 @@ def profile(request, name):
         follower_userstats = UserStats.objects.get(user=follower_user_obj)
         followed_userstats.append(follower_userstats)
 
+    # For if the user acessing the page is following this user
     is_following = user_stats.following.filter(name=request.user.username).exists()
+
+    # For the media of the post, to show the first image of the carousel
+    user_posts_data = []
+    for post in posts:
+        media_obj = post.media.first()
+
+        post_data = {
+            'post_id': post.pk,
+            'post_title': post.title,
+            'post_media_url': media_obj.media_obj.url
+        }
+
+        user_posts_data.append(post_data)
 
     # If you are on your own profile
     if request.user.username == name:
@@ -334,7 +347,7 @@ def profile(request, name):
         'userstats': user_stats, 
         'is_following': is_following, 
         'self_profile': self_profile, 
-        'posts': posts,
+        'user_posts_data': user_posts_data,
         'followed_users': followed_userstats,
         'search_bar': init['search_bar'],
         'notifications': init['notification_list'],
