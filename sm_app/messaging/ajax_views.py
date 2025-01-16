@@ -93,24 +93,27 @@ def message_sent_text(request):
         else:
             conversation = message_dataframe
 
-        # add rating
-        rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. Make the keys of the rating the message_id and the values the rating. do not include anything else other than the json data in your response.")
-        processed_rating = rating.text.replace("```json", "").replace("```", "")
-        processed_rating = eval(processed_rating)
+        # Add rating
+        if settings.AI_MESSAGE_RECOMMENDATIONS:
+            rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. Make the keys of the rating the message_id and the values the rating. do not include anything else other than the json data in your response.")
+            processed_rating = rating.text.replace("```json", "").replace("```", "")
+            processed_rating = eval(processed_rating)
 
-        message_dataframe['Current Conversation Relevance'] = None
-        print(processed_rating)
+            message_dataframe['Current Conversation Relevance'] = None
+            print(processed_rating)
 
-        dropped_indexes = []
-        for row_index in range(0, message_dataframe.shape[0]):
-            relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
-            message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
+            dropped_indexes = []
+            for row_index in range(0, message_dataframe.shape[0]):
+                relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
+                message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
 
-            if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
-                print('below requrement')
-                dropped_indexes.append(message_dataframe.index.values[row_index])
+                if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
+                    print('below requrement')
+                    dropped_indexes.append(message_dataframe.index.values[row_index])
 
-        message_dataframe = message_dataframe.drop(index=dropped_indexes)
+            message_dataframe = message_dataframe.drop(index=dropped_indexes)
+
+        # Upload message data to the csv file
         message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
         receivers = chat_room.users.exclude(user=user_stats.user)
@@ -234,23 +237,26 @@ def message_sent_image(request):
     else:
         conversation = message_dataframe
 
-    # add rating
-    rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
-    processed_rating = rating.text.strip('```json')
-    processed_rating = eval(processed_rating)
-    
-    message_dataframe['Current Conversation Relevance'] = None
+    # Add rating
+    if settings.AI_MESSAGE_RECOMMENDATIONS:
+        rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+        processed_rating = rating.text.replace("```json", "").replace("```", "")
+        processed_rating = eval(processed_rating)
+        
+        message_dataframe['Current Conversation Relevance'] = None
 
-    dropped_indexes = []
-    for row_index in range(0, message_dataframe.shape[0]):
-        relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
-        message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
+        dropped_indexes = []
+        for row_index in range(0, message_dataframe.shape[0]):
+            relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
+            message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
 
-        if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
-            print('below requrement')
-            dropped_indexes.append(relevance)
+            if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
+                print('below requrement')
+                dropped_indexes.append(relevance)
 
-    message_dataframe = message_dataframe.drop(index=dropped_indexes)
+        message_dataframe = message_dataframe.drop(index=dropped_indexes)
+
+    # Upload message data to the csv file
     message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
     
@@ -371,23 +377,26 @@ def message_sent_video(request):
     else:
         conversation = message_dataframe
 
-    # add rating
-    rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
-    processed_rating = rating.text.strip('```json')
-    processed_rating = eval(processed_rating)
-    
-    message_dataframe['Current Conversation Relevance'] = None
+    # Add rating
+    if settings.AI_MESSAGE_RECOMMENDATIONS:
+        rating = model.generate_content(contents=f"Here is the relevant conversation: {conversation}. Can you rate all of these messages in terms of relevance to the current conversation being held? have your rating be out of ten. Be more leniant with your ratings. Organise these in json data such that it can be trancefered to a python dictionary. do not include anything else other than the json data in your response.")
+        processed_rating = rating.text.replace("```json", "").replace("```", "")
+        processed_rating = eval(processed_rating)
+        
+        message_dataframe['Current Conversation Relevance'] = None
 
-    dropped_indexes = []
-    for row_index in range(0, message_dataframe.shape[0]):
-        relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
-        message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
+        dropped_indexes = []
+        for row_index in range(0, message_dataframe.shape[0]):
+            relevance =  processed_rating[f'{message_dataframe.index.values[row_index]}']
+            message_dataframe.loc[message_dataframe.index.values[row_index], 'Current Conversation Relevance'] = relevance
 
-        if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
-            print('below requrement')
-            dropped_indexes.append(relevance)
+            if relevance < 5: # if the relevance is less than 5, cut it out of the conversation memory
+                print('below requrement')
+                dropped_indexes.append(relevance)
 
-    message_dataframe = message_dataframe.drop(index=dropped_indexes)
+        message_dataframe = message_dataframe.drop(index=dropped_indexes)
+
+    # Upload message data to the csv file
     message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
     notification_ids = []
@@ -505,7 +514,8 @@ def message_sent_audio(request):
         }, index=[message_dataframe.shape[0]])
         message_dataframe = pd.concat([message_dataframe, new_data], ignore_index=True)
 
-        message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
+    # Upload message data to the csv file
+    message_dataframe.to_csv(os.path.join(csv_path, 'conversation.csv'), sep=',', na_rep='None')
 
     notification_ids = []
     if is_reply == 'true':

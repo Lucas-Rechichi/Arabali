@@ -161,6 +161,11 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 # Time recording of last depreciation
 last_depreciation_timestamp = 1736686800
 
+# Site settings
+CAN_SIGN_UP = True
+AI_MESSAGE_RECOMMENDATIONS = False
+AI_MESSAGE_PREDICTIONS = False
+
 # # Logging
 # LOGGING = {
 #     'version': 1,

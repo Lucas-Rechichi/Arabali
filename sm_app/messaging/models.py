@@ -8,16 +8,16 @@ from main.models import UserStats
 
 # To direct the images from user imput into their respective folders.
 def get_image_upload_path_room(instance, filename):
-    return os.path.join('Rooms/', instance.name, 'room_images/' , filename)
+    return os.path.join('chatrooms/', instance.name, 'room_images/' , filename)
 
 def get_image_upload_path_message(instance, filename):
-    return os.path.join('Rooms/', instance.room.name, 'message_images/' , instance.sender.user.username , filename)
+    return os.path.join('chatrooms/', instance.room.name, 'message_images/' , instance.sender.user.username , filename)
 
 def get_video_upload_path_message(instance, filename):
-    return os.path.join('Rooms/', instance.room.name, 'message_videos/' , instance.sender.user.username , filename)
+    return os.path.join('chatrooms/', instance.room.name, 'message_videos/' , instance.sender.user.username , filename)
 
 def get_audio_upload_path_message(instance, filename):
-    return os.path.join('Rooms/', instance.room.name, 'message_audio/' , instance.sender.user.username , filename)
+    return os.path.join('chatrooms/', instance.room.name, 'message_audio/' , instance.sender.user.username , filename)
 
 class ChatRoom(models.Model):
     name = models.CharField(max_length=150)
