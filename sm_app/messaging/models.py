@@ -1,7 +1,6 @@
 import os
 
 from django.db import models
-from django.db.models import Count
 from django.contrib.auth.models import User
 from main.models import UserStats
 
@@ -27,7 +26,6 @@ class ChatRoom(models.Model):
     users = models.ManyToManyField(UserStats)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
 
-from messaging.extras import emoticons_dict # here due to circular import issues with 'ChatRoom'
 class Message(models.Model):
     sender = models.ForeignKey(UserStats, on_delete=models.CASCADE)
     room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')

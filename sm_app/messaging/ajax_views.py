@@ -47,7 +47,7 @@ def message_sent_text(request):
             new_message.save()
 
         # updating the csv file when a new message is created.
-        csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
+        csv_path = os.path.join(settings.MEDIA_ROOT, 'conversation_storage', chat_room.name)
         
         if os.path.exists(csv_path):
             pass
@@ -191,8 +191,8 @@ def message_sent_image(request):
     receivers = chat_room.users.exclude(user=sender_userstats.user)
 
     # updating the csv file when a new message is created.
-    csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
-    
+    csv_path = os.path.join(settings.MEDIA_ROOT, 'conversation_storage', chat_room.name)
+
     if os.path.exists(csv_path):
         pass
     else:
@@ -328,7 +328,7 @@ def message_sent_video(request):
     receivers = chat_room.users.exclude(user=sender_userstats.user)
 
     # formatting of the csv file
-    csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
+    csv_path = os.path.join(settings.MEDIA_ROOT, 'conversation_storage', chat_room.name)
     
     if os.path.exists(csv_path):
         pass
@@ -476,7 +476,7 @@ def message_sent_audio(request):
     receivers = chat_room.users.exclude(user=sender_userstats.user)
 
     # updating the csv file when a new message is created.
-    csv_path = os.path.join(settings.MEDIA_ROOT, 'Rooms', chat_room.name, 'message_memory')
+    csv_path = os.path.join(settings.MEDIA_ROOT, 'conversation_storage', chat_room.name)
     
     if os.path.exists(csv_path):
         pass
