@@ -516,7 +516,7 @@ class Algorithum:
                 selected_tag = tag_order[tag_iterations[name]]
                 order.append(selected_tag.post) # appends the tag's relevant post to the order
 
-                # increments the tag iterations so that the next post in order is chosen
+                # Increments the tag iterations so that the next post in order is chosen
                 tag_iterations[name] += 1
 
             return order
@@ -1058,21 +1058,17 @@ class Algorithum:
             user_follower_object = Following.objects.get(name=userstats_obj.user.username)
             followers = UserStats.objects.filter(following=user_follower_object)
 
-            follower_list = []
+            user_recommendations = []
             for i, follower in enumerate(followers):
                 if i + 1 <= max_recommendations:
-                    follower_list.append({
+                    user_recommendations.append({
                         'username': follower.user.username,
                         'user_pfp_url': follower.pfp.url,
                     })
                 else:
                     break
 
-            recommendations_dict = {
-                'follower_list': follower_list
-            }
-
-            return recommendations_dict
+            return user_recommendations
 
         def recommend_posts(userstats_obj, max_recommendations):
             # Setup
@@ -1080,7 +1076,7 @@ class Algorithum:
             interest_values_list = []
 
             # Get user's interests
-            interests = userstats_obj.interests.all()
+            interests = Interest.objects.filter(user=userstats_obj.user)
             for interest in interests:
                 interest_names_list.append(interest.name)
                 interest_values_list.append(interest.value)
@@ -1088,12 +1084,56 @@ class Algorithum:
             # Preform a shuffle sort to get the names_list
             name_order = Algorithum.Core.shuffle_sort(names_list=interest_names_list, values_list=interest_values_list, iterations=max_recommendations)
 
-            # Preform a basic sort for every category, limiting the number of posts shown
+            # Gets the relevant tags for the selected name
+            tag_iterations = {}
+            posts = []
+            for name in name_order:
+                # Logic for new tag entries
+                if name not in tag_iterations:
+                    tag_iterations[name] = 0
+                
+                # Orders the tags based on individual value
+                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_category=name, user_obj=userstats_obj.user)
+
+                # Select the tag depending on what iteration that name is on
+                selected_tag = tag_order[tag_iterations[name]]
+                posts.append(selected_tag.post) # appends the tag's relevant post to the order
+
+                # Increments the tag iterations so that the next post in order is chosen
+                tag_iterations[name] += 1
+
+            # Get post data
+            post_recommendations = []
+            for index, post in enumerate(posts):
+                if index < max_recommendations:
+                    media_obj = post.media.first()
+                    post_recommendations.append({
+                        'post_title': post.title,
+                        'post_media_url': media_obj.media_obj.url
+                    })
+                else:
+                    break
+
+            return post_recommendations
+
 
         def recommend_catergories(userstats_obj, max_recommendations):
-            pass
 
             # Preform a basic sort, limiting the number of categories shown
+            tags = Algorithum.Core.basic_sort(object_name='tag', sub_category='all', user_obj=None)
+
+            category_recommendations = []
+            for index, tag in enumerate(tags):
+                if index < max_recommendations:
+                    category_recommendations.append({
+                        'tag_name': tag.name
+                    })
+                else:
+                    break
+
+            return category_recommendations
+        
+
 
 
 

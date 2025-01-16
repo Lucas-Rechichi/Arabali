@@ -39,18 +39,17 @@
                         <a href="/page/recommended/all/1" role="button" class="display-6 link-success link-offset-2 link-underline-opacity-0">Arabali</a>
                     </div>
                     <div class="col-4">
-                        <form action="/search/q/1/1/1" method="post">
+                        <form action="/search/q/1/1/1" method="post" id="search-bar-form">
                             {% csrf_token %}
                             <div class="container">
                                 <div class="row">
                                     <div class="col-3">
-        
                                     </div>
                                     <div class="col-6">
-                                        {{search_bar|crispy}}
+                                        <input type="text" id="search-bar" class="form-control" placeholder="Search...">
                                     </div>
                                     <div class="col-3">
-                                        <button type="submit" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
+                                        <button type="submit" id="search-button" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
                                     </div>
                                 </div>
                             </div>
