@@ -106,4 +106,41 @@ def search_recommendations(request):
 
     return JsonResponse(response)
 
+def search_suggestions(request):
+    query = request.POST.get('query')
+    highest_q_value = len(query) * 2
+
+    solutions_data = Algorithum.Search.query_solutions(query=query, abs_cutoff_value=4)
+
+    results_dict = {
+        'exact': {
+            'users': {},
+            'categories': {},
+            'posts': {}
+        },
+        'approx' : {
+            'users': {},
+            'categories': {},
+            'posts': {}
+        }
+    }
+
+    # Searches for apropriate solutions given the query 
+    results_dict = Algorithum.Search.result_values_posts(results_dict=results_dict, solutions_data=solutions_data, highest_q_value=highest_q_value)
+    results_dict = Algorithum.Search.result_values_users(results_dict=results_dict, solutions_data=solutions_data, highest_q_value=highest_q_value)
+    results_dict = Algorithum.Search.result_values_categories(results_dict=results_dict, solutions_data=solutions_data, highest_q_value=highest_q_value)
+
+    # Solution sorting
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solutions_data['type'], search_object_name='posts')
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solutions_data['type'], search_object_name='users')
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solutions_data['type'], search_object_name='categories')
+
+    # TODO: Extract relevant data from search results so that they can be serialized though JSON to the front-end.
+
+
+
+
+
+
+
 

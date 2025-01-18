@@ -1,386 +1,299 @@
 {% load crispy_forms_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For You | Arabali</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        .heading { display: flex; margin: auto; }
-        ul { list-style-type: none; padding-left: 40px; }
-        .custom-icon { position: relative; padding-left: 30px; }
-        .custom-icon i { position: absolute; left: 0; }
-        .topbar { width: 100%; height: 85px; background-color: rgb(186, 186, 186); }
-        .logo-button { background-color: rgb(186, 186, 186); border: none; padding-left: 30px; padding-top: 15px; }
-        .contents, .post, .profile { padding: 30px; width: 70%; margin: auto; position: absolute; top: 50%; margin-top: 20px; text-align: center; }
-        .add { width: 10%; margin: auto; position: absolute; }
-        .like { width: 10%; height: 10%; margin-left: 90%; }
-        .pfp_image { width: 30px; height: 30px; border-radius: 15px; }
-        .pfp_button { height: 35px; width: 35px; background-color: #fff; border-radius: 17.5px; border-color: green; display: flex; justify-content: center; align-items: center; }
-        .follow { width: 100px; left: 50%; }
-        .profile-row-one { text-align: center; }
-        .profile-pfp { height: 100px; width: 100px; }
-        .sideopener { position: absolute; right: 10px; top: 20px; }
-        .user-profile { position: absolute; height: 54px; width: 54px; right: 80px; top: 15px; }
-        .user-image { position: absolute; right: 0px; bottom: 0px; height: 50px; width: 50px; border-radius: 25px; }
-        .minipost { width: 300px; height: 100px; }
-        .invis { border: none; background-color: #fff; }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <div class="container">
-                <div class="row">
-                    <div class="col-4">
-                        <a href="/page/recommended/all/1" role="button" class="display-6 link-success link-offset-2 link-underline-opacity-0">Arabali</a>
-                    </div>
-                    <div class="col-4">
-                        <form action="/search/q/1/1/1" method="post" id="search-bar-form">
-                            {% csrf_token %}
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-3">
-                                    </div>
-                                    <div class="col-6">
-                                        <input type="text" id="search-bar" class="form-control" placeholder="Search...">
-                                    </div>
-                                    <div class="col-3">
-                                        <button type="submit" id="search-button" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-4 d-flex justify-content-end">
-                        <div class="row">
-                            <div class="col-6">
-                                <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav" style="height: 40px; width: fit-content;">
-                                    <div class="fs-2"><i class="bi bi-list" style="color: #198754;"></i></div>
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnotify" aria-controls="staticBackdrop">
-                                    <div class="fs-2"><i class="bi bi-bell-fill" id="bell-icon" style="color: #198754;"></i></div>
-                                    <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">{{ notification_count }}</span>
-                                    </div>
-                                </button>
-                            </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token }}">
+        <meta name="username" content="{{ username }}">
+        <meta name="notification-count" content="{{ notification_count }}">
+        <title>Feed | Arabali</title>
+        <!-- CDN's -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- SCRIPTS -->
+        <script type="module" src="{% static 'algorithum/depreciations.js'%}"></script>
+        <script type="module" src="{% static 'algorithum/search_bar.js'%}"></script>
+        <script type="module" src="{% static 'universal/notifications.js'%}"></script>
+        <script type="module" src="{% static 'websockets/notification_socket.js' %}"></script>
+        <!-- STYLES -->
+        <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
+        <link rel="stylesheet" href="{% static 'universal/search_icons.css' %}">
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-2">
+                            <a href="/page/recommended/all/1" role="button" class="display-6 link-success link-offset-2 link-underline-opacity-0">Arabali</a>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div> 
-    </nav>
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasnav" aria-labelledby="offcanvasnav">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasExampleLabel"><p class="lead">More</p></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 p-2">
-                        <ul>
-                            <li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
-                            <li class="custom-icon"><div class="fs-4"><i class="bi bi-rss-fill" style="color: #787878;"></i></div> <a href="/page/recommended/all/1" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Feed</p></a></li>
-                            <li class="custom-icon"><div class="fs-4"><i class="bi bi-chat-text" style="color: #787878;"></i></div> <a href="/chat/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Messages</p></a></li>
-                            <li class="custom-icon"><div class="fs-4"><i class="bi bi-gear-wide-connected" style="color: #787878;"></i></div> <a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
-                            <li class="custom-icon"><div class="fs-4"><i class="bi bi-box-arrow-right" style="color: #787878;" ></i></div> <a href="/logout/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Logout</p></a></li>                       
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="offcanvasnotify" aria-labelledby="staticBackdropLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Notifications</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <div id="notification-inbox" style="overflow-y: auto;">
-                <!-- loops though all notifications sent to the document -->
-                {% for notification in notifications.values %}
-                <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-                    <div class="card-header">
-                        <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification-{{notification.notification_object.pk}}">
-                            <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
-                        </button>
-                        <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification-{{notification.notification_object.pk}}">
-                            <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
-                        </button>
-                        <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
-                        <button type="button ms-2" class="btn-close" id="close-notification-{{notification.notification_object.pk}}" aria-label="Close"></button>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <img src="{{notification.sender_pfp_url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
-                                <em>{{notification.notification_object.sender}}</em>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col mt-2">
-                                {% if notification.notification_object.relevant_message.text %}
-                                    <p class="text-truncate">{{notification.notification_object.contents}}</p>
-                                {% elif notification.notification_object.relevant_poll %}
-                                    <p class="text-truncate"><strong>Poll: </strong>{{notification.notification_object.contents}}</p>
-                                {% else %}
-                                    {% if notification.notification_object.relevant_message.reply %}
-                                        {% if notification.notification_object.relevant_message.image %}
-                                            <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Image</strong></p>
-                                        {% elif notification.notification_object.relevent_message.video %}
-                                            <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Video</strong></p>
-                                        {% elif notification.notification_object.relvevant_message.audio %}
-                                            <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Audio</strong></p>
-                                        {% else %}
-                                        {% endif %}
-                                    {% else %}
-                                    <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- script for removing notifications if a user dismisses the notification or chjecks out the notification. -->
-                <script> 
-                    $(document).ready(function () {
-                        $('#close-notification-{{notification.notification_object.pk}}').click(function () {
-                            $.ajax({
-                                type: 'POST',
-                                url: '/universal/remove-notification/',
-                                data: {
-                                    'receiver': '{{username}}',
-                                    'type': 'notification-id',
-                                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                                    'notification_id': '{{notification.notification_object.pk}}'
-                                },
-                                success: function(response) {
-                                    console.log(response.notification_count, response.notification_counter)
-                                    var notification = $("#notification-{{notification.notification_object.pk}}")
-                                    notification.remove();
-                                    $('#notification-counter').text('');
-                                    $('#notification-counter').text(response.notification_count);
-                                        if (response.notification_count == 0) {
-                                            $('#notification-counter').text(response.notification_count).hide();
-                                            $('#notification-counter').remove();
-                                            $('#bell-icon').removeClass('bi-bell-fill');
-                                            $('#bell-icon').addClass('bi-bell');
-                                        }
-                                }
-                            })
-                        })
-                        $('#read-notification-{{notification.notification_object.pk}}').click(function () {
-                            $.ajax({
-                                type: 'POST',
-                                url: '/universal/remove-notification/',
-                                data: {
-                                    'receiver': '{{username}}',
-                                    'type': 'notification-id',
-                                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                                    'notification_id': '{{notification.notification_object.pk}}'
-                                },
-                                success: function(response) {
-                                    console.log(response.message)
-                                }
-                            })
-                        })
-                    })
-                </script>
-            {% endfor %}
-            </div>
-        </div>
-    </div>
-    <br>
-    <br>
-    <div class="container">
-        <div class="row">
-            <div class="col-2">
-                <br><br>
-                <nav id="navbar-settings" class="h-100 flex-column align-items-stretch pe-4 border-end mt-2" style="position: fixed;">
-                    <nav class="nav nav-pills flex-column">
-                        <h6 class="display-6 text-center">Settings</h6>
-                        <a href="#edit-profile" class="btn btn-outline-success d-block mb-2">Edit Profile</a>
-                        <a href="#posts" class="btn btn-outline-success d-block">Posts</a>
-                        <br>
-                    </nav>
-                </nav>
-            </div>
-            <div class="col-10">
-                <div data-bs-spy="scroll" data-bs-target="#navbar-settings" data-bs-smooth-scroll="true" class="scrollspy-example-2" tabindex="0">
-                    <div id="edit-profile">
-                        <div class="card p-3" style="top:50px;">
-                            <h2 class="display-4 text-center">Change Profile</h2>
-                            <br>
-                            <form id="EditProfileForm" method="post" enctype="multipart/form-data">
+                        <div class="col-8">
+                            <form action="/search/q/1/1/1" method="post" id="search-bar-form">
                                 {% csrf_token %}
-                                {{ edit_profile_form|crispy }}
-                                <input type="hidden" id="change" name="change" value="">
-                                <button type="button" class="btn btn-success" id="EditProfile"><i class="bi bi-check-circle-fill"></i> Change</button>
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-3">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="text" id="search-bar" class="form-control" placeholder="Search...">
+                                            <div class="card" id="search-suggestions-card" style="display: none; max-height: 167px; overflow-y: auto;">
+                                                <div class="card-body">
+                                                    <ul id="search-suggestions" class="list-group mt-2"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <button type="submit" id="search-button" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    document.getElementById('EditProfile').addEventListener('click', function() {
-                                        document.getElementById('change').value = 'change';
-                                        document.getElementById('EditProfileForm').submit();
-                                    });
-                                });
-                            </script>
+                        </div>
+                        <div class="col-2 d-flex justify-content-end">
                             <div class="row">
-                                <div class="col text-center">
-                                    <p class="lead">Current Username: {{username}}</p>
+                                <div class="col-6">
+                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnav" aria-controls="offcanvasnav" style="height: 40px; width: fit-content;">
+                                        <div class="fs-2"><i class="bi bi-list" style="color: #198754;"></i></div>
+                                    </button>
                                 </div>
-                            </div>
-                            <br>
-                            <div class="row">
-                                <div class="col">
-                                    <p class="lead">Current Pfp:</p>
-                                    <img src="{{user_stats.pfp.url}}" alt="" style="height: 50px; width: 50px; border-radius: 25px; margin-top: 25px;">
-                                </div>
-                                <div class="col">
-                                    <p class="lead">Current Banner:</p>
-                                    <img src="{{user_stats.banner.url}}" alt="" style="height: 100px; width: 500px; border-radius: 25px;">
+                                <div class="col-6">
+                                    <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasnotify" aria-controls="staticBackdrop">
+                                        <div class="fs-2"><i class="bi bi-bell-fill" id="bell-icon" style="color: #198754;"></i></div>
+                                        <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-counter">{{ notification_count }}</span>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <br><br>
-                    <div id="posts">
-                        <div class="card p-3" style="top:50px;">
-                            <div class="row d-flex justify-content-center">
-                                <div class="col-4">
-                                    <button type="button" class="btn btn-success" onclick="location.href='/add/'"><i class="bi bi-file-earmark-plus" style="font-size: 3rem;"></i></button>
+                </div>
+            </div> 
+        </nav>
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasnav" aria-labelledby="offcanvasnav">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasExampleLabel"><p class="lead">More</p></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 p-2">
+                            <ul>
+                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
+                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-rss-fill" style="color: #787878;"></i></div> <a href="/page/recommended/all/1" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Feed</p></a></li>
+                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-chat-text" style="color: #787878;"></i></div> <a href="/chat/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Messages</p></a></li>
+                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-gear-wide-connected" style="color: #787878;"></i></div> <a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
+                                <li class="custom-icon"><div class="fs-4"><i class="bi bi-box-arrow-right" style="color: #787878;" ></i></div> <a href="/logout/" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Logout</p></a></li>                       
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas offcanvas-end" data-bs-backdrop="static" tabindex="-1" id="offcanvasnotify" aria-labelledby="staticBackdropLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title">Notifications</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div id="notification-inbox" style="overflow-y: auto;">
+                    <!-- loops though all notifications sent to the document -->
+                    {% for notification in notifications.values %}
+                        <div id="notification-{{notification.notification_object.pk}}" class="card mb-2" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                            <div class="card-header">
+                                <button class="btn p-0" onclick='location.href="/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}"' id="read-notification-{{notification.notification_object.pk}}">
+                                    <img src="{{notification.notification_object.source.icon.url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                                </button>
+                                <button class="btn p-0 pe-2" onclick="location.href='/chat/{{notification.notification_object.source.name}}/{{notification.notification_object.source.pk}}'" id="read-notification-{{notification.notification_object.pk}}">
+                                    <strong class="me-auto">{{notification.notification_object.source.name}}</strong>
+                                </button>
+                                <small class="text-muted pe-2">{{notification.notification_object.timestamp}}</small>
+                                <button type="button ms-2" class="btn-close" id="close-notification-{{notification.notification_object.pk}}" aria-label="Close"></button>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <img src="{{notification.sender_pfp_url}}" class="rounded me-2" alt="" style="height: 2.5rem; width: 2.5rem">
+                                        <em>{{notification.notification_object.sender}}</em>
+                                    </div>
                                 </div>
-                                <div class="col-4">
-                                    <h2 class="display-4 text-center">Manage Posts</h2>
-                                </div>
-                                <div class="col-4">
+                                <div class="row">
+                                    <div class="col mt-2">
+                                        {% if notification.notification_object.relevant_message.text %}
+                                            <p class="text-truncate">{{notification.notification_object.contents}}</p>
+                                        {% elif notification.notification_object.relevant_poll %}
+                                            <p class="text-truncate"><strong>Poll: </strong>{{notification.notification_object.contents}}</p>
+                                        {% else %}
+                                            {% if notification.notification_object.relevant_message.reply %}
+                                                {% if notification.notification_object.relevant_message.image %}
+                                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Image</strong></p>
+                                                {% elif notification.notification_object.relevent_message.video %}
+                                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Video</strong></p>
+                                                {% elif notification.notification_object.relvevant_message.audio %}
+                                                    <p class="text-truncate">({{notification.notification_object.relevant_message.sender.user.username}} Replied to You): <strong>Audio</strong></p>
+                                                {% else %}
+                                                {% endif %}
+                                            {% else %}
+                                            <p class="text-truncate"><strong>{{notification.notification_object.contents}}</strong></p>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="container">
+            <div class="row">
+                <div class="col-2">
+                    <br>
+                    <br>
+                    <nav id="navbar-settings" class="h-100 flex-column align-items-stretch pe-4 border-end mt-2" style="position: fixed;">
+                        <nav class="nav nav-pills flex-column">
+                            <h6 class="display-6 text-center">Settings</h6>
+                            <a href="#edit-profile" class="btn btn-outline-success d-block mb-2">Edit Profile</a>
+                            <a href="#posts" class="btn btn-outline-success d-block">Posts</a>
                             <br>
-                            <br>
-                            <br>
-                            <div class="row">
-                                {% for post in posts %}
+                        </nav>
+                    </nav>
+                </div>
+                <div class="col-10">
+                    <div data-bs-spy="scroll" data-bs-target="#navbar-settings" data-bs-smooth-scroll="true" class="scrollspy-example-2" tabindex="0">
+                        <div id="edit-profile">
+                            <div class="card p-3" style="top:50px;">
+                                <h2 class="display-4 text-center">Change Profile</h2>
+                                <br>
+                                <form id="EditProfileForm" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    {{ edit_profile_form|crispy }}
+                                    <input type="hidden" id="change" name="change" value="">
+                                    <button type="button" class="btn btn-success" id="EditProfile"><i class="bi bi-check-circle-fill"></i> Change</button>
+                                </form>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        document.getElementById('EditProfile').addEventListener('click', function() {
+                                            document.getElementById('change').value = 'change';
+                                            document.getElementById('EditProfileForm').submit();
+                                        });
+                                    });
+                                </script>
+                                <div class="row">
+                                    <div class="col text-center">
+                                        <p class="lead">Current Username: {{username}}</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="lead">Current Pfp:</p>
+                                        <img src="{{user_stats.pfp.url}}" alt="" style="height: 50px; width: 50px; border-radius: 25px; margin-top: 25px;">
+                                    </div>
+                                    <div class="col">
+                                        <p class="lead">Current Banner:</p>
+                                        <img src="{{user_stats.banner.url}}" alt="" style="height: 100px; width: 500px; border-radius: 25px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <div id="posts">
+                            <div class="card p-3" style="top:50px;">
+                                <div class="row d-flex justify-content-center">
                                     <div class="col-4">
-                                        <div class="card mb-4">
-                                            <img src="{{ post.media.url }}" class="card-img-top" alt="{{ post.title }}">
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col">
-                                                        <h5 class="card-title">{{ post.title }}</h5>
+                                        <button type="button" class="btn btn-success" onclick="location.href='/add/'"><i class="bi bi-file-earmark-plus" style="font-size: 3rem;"></i></button>
+                                    </div>
+                                    <div class="col-4">
+                                        <h2 class="display-4 text-center">Manage Posts</h2>
+                                    </div>
+                                    <div class="col-4">
+                                    </div>
+                                </div>
+                                <br>
+                                <br>
+                                <br>
+                                <div class="row">
+                                    {% for post in posts %}
+                                        <div class="col-4">
+                                            <div class="card mb-4">
+                                                <img src="{{ post.media.url }}" class="card-img-top" alt="{{ post.title }}">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col">
+                                                            <h5 class="card-title">{{ post.title }}</h5>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col d-flex justify-content-center mb-2">
-                                                        <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#morePostModal{{ post.id }}" style="width: 100%; "><i class="bi bi-card-text"></i> More</button>
-                                                        <div class="modal fade" id="morePostModal{{ post.id }}" tabindex="-1" aria-labelledby="morePostModalLabel{{ post.id }}" aria-hidden="true">
-                                                            <div class="modal-dialog modal-lg">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="morePostModalLabel{{ post.id }}">{{post.title}}</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="container">
-                                                                            <div class="row">
-                                                                                <div class="col">
-                                                                                    <img src="{{post.media.url}}" alt="{{post.title}}'s Media" style="max-width: 100%; max-height: 100%; border-radius: 5%;">
+                                                    <div class="row">
+                                                        <div class="col d-flex justify-content-center mb-2">
+                                                            <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#morePostModal{{ post.id }}" style="width: 100%; "><i class="bi bi-card-text"></i> More</button>
+                                                            <div class="modal fade" id="morePostModal{{ post.id }}" tabindex="-1" aria-labelledby="morePostModalLabel{{ post.id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="morePostModalLabel{{ post.id }}">{{post.title}}</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="container">
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <img src="{{post.media.url}}" alt="{{post.title}}'s Media" style="max-width: 100%; max-height: 100%; border-radius: 5%;">
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col">
-                                                                                    <p class="lead text-center">Content:</p>
-                                                                                    <p class="text-center text-truncate">{{post.contents}}</p>
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <p class="lead text-center">Content:</p>
+                                                                                        <p class="text-center text-truncate">{{post.contents}}</p>
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                <div class="col">
-                                                                                    <p class="lead">Preformance</p>
-                                                                                    <hr>
-                                                                                    <p class="lead">Likes: {{post.likes}}</p>
-                                                                                    <p class="lead">Algorithum Score: {{post.posttag.value}}</p>
-                                                                                    <button class="btn btn-outline-success mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                                                                        Liked By
-                                                                                    </button>
-                                                                                    <div class="collapse" id="collapseExample">
-                                                                                        <div class="card card-body">
-                                                                                            {% for likedby in post.liked_by.all %}
-                                                                                                {% for liked_by_user in liked_by_users %}
-                                                                                                    {% if liked_by_user.user.username|stringformat:"%s%s" == likedby.name|stringformat:"%s%s" %}
-                                                                                                        <div class="row">
-                                                                                                            <div class="col-5 d-flex justify-content-end">
-                                                                                                                <button class="invis" style="width: 50px;" onclick='location.href = "/profile/{{liked_by_user.user.username}}"'>
-                                                                                                                    <img src="{{liked_by_user.pfp.url}}" alt="{{liked_by}}'s pfp" style="height: 50px; width: 50px;" class="border border-success rounded-circle border-2">
-                                                                                                                </button>
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <p class="lead">Preformance</p>
+                                                                                        <hr>
+                                                                                        <p class="lead">Likes: {{post.likes}}</p>
+                                                                                        <p class="lead">Algorithum Score: {{post.posttag.value}}</p>
+                                                                                        <button class="btn btn-outline-success mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                                                            Liked By
+                                                                                        </button>
+                                                                                        <div class="collapse" id="collapseExample">
+                                                                                            <div class="card card-body">
+                                                                                                {% for likedby in post.liked_by.all %}
+                                                                                                    {% for liked_by_user in liked_by_users %}
+                                                                                                        {% if liked_by_user.user.username|stringformat:"%s%s" == likedby.name|stringformat:"%s%s" %}
+                                                                                                            <div class="row">
+                                                                                                                <div class="col-5 d-flex justify-content-end">
+                                                                                                                    <button class="invis" style="width: 50px;" onclick='location.href = "/profile/{{liked_by_user.user.username}}"'>
+                                                                                                                        <img src="{{liked_by_user.pfp.url}}" alt="{{liked_by}}'s pfp" style="height: 50px; width: 50px;" class="border border-success rounded-circle border-2">
+                                                                                                                    </button>
+                                                                                                                </div>
+                                                                                                                <div class="col-7 d-flex justify-content-start">
+                                                                                                                    <button class="invis" style="width: fit-content;" onclick='location.href = "/profile/{{liked_by_user.user.username}}"'>
+                                                                                                                        <p class="lead text-center mt-2">{{liked_by_user.user}}</p>
+                                                                                                                    </button>
+                                                                                                                </div>
                                                                                                             </div>
-                                                                                                            <div class="col-7 d-flex justify-content-start">
-                                                                                                                <button class="invis" style="width: fit-content;" onclick='location.href = "/profile/{{liked_by_user.user.username}}"'>
-                                                                                                                    <p class="lead text-center mt-2">{{liked_by_user.user}}</p>
-                                                                                                                </button>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    {% endif %}
+                                                                                                        {% endif %}
+                                                                                                    {% endfor %}
                                                                                                 {% endfor %}
-                                                                                            {% endfor %}
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
-                                                                                </div>
-                                                                                <div class="col">
-                                                                                    <p class="lead">Info</p>
-                                                                                    <hr>
-                                                                                    <p class="lead">Date Created:</p>
-                                                                                    <p class="lead">{{post.date_created}}</p>
-                                                                                    <p class="lead">Date Modified:</p>
-                                                                                    <p class="lead">{{post.date_modified}}</p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#editPostModal{{ post.id }}" style="width:100%; "><i class="bi bi-pencil-fill"></i> Edit</button>
-                                                        <div class="modal fade" id="editPostModal{{ post.id }}" tabindex="-1" aria-labelledby="editPostModalLabel{{ post.id }}" aria-hidden="true">
-                                                            <div class="modal-dialog modal-lg">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="editPostModalLabel{{ post.id }}">Edit Post</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="container">
-                                                                            <div class="row">
-                                                                                <div class="col-7">
-                                                                                    <form id="EditPostForm{{ post.id }}" method="post" enctype="multipart/form-data">
-                                                                                        {% csrf_token %}
-                                                                                        {{ edit_post_form|crispy }}
-                                                                                        <input type="hidden" name="edit" value="true">
-                                                                                        <input type="hidden" name="post-id" value="{{ post.id }}">
-                                                                                        <button type="submit" class="btn btn-success" id="EditPostButton{{ post.id }}">Save changes</button>
-                                                                                    </form>
-                                                                                    <br>
-                                                                                    <div class="alert alert-danger" role="alert">
-                                                                                        Note: Changing The Post Will Account for a Penalty Within The Algorithum.
+                                                                                    <div class="col">
+                                                                                        <p class="lead">Info</p>
+                                                                                        <hr>
+                                                                                        <p class="lead">Date Created:</p>
+                                                                                        <p class="lead">{{post.date_created}}</p>
+                                                                                        <p class="lead">Date Modified:</p>
+                                                                                        <p class="lead">{{post.date_modified}}</p>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="col-5">
-                                                                                    <p class="text-center">Current Post Title:</p>
-                                                                                    <p class="text-center"><strong>{{post.title}}</strong></p>
-                                                                                    <p class="text-center">Current Post Content:</p>
-                                                                                    <p class="text-center text-truncate">{{post.contents}}</p>
-                                                                                    <p class="text-center">Current Media Used:</p>
-                                                                                    <img src="{{post.media.url}}" alt="{{post.title}}'s Media" style="max-width: 100%; max-height: 100%; border-radius: 5%;">
-                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -388,34 +301,76 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-6">
-                                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}" style="width:100%; "><i class="bi bi-trash3-fill"></i> Delete</button>
-                                                        <div class="modal fade" id="deletePostModal{{ post.id }}">
-                                                            <div class="modal-dialog">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <strong>WARNING</strong>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <div class="container">
-                                                                            <div class="row">
-                                                                                <div class="col">
-                                                                                    <p class="lead text-center">Are You Sure That You Want to Delete This Post?</p>
-                                                                                    <br>
-                                                                                    <p class="lead text-center">This Action is Irreversable. </p>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#editPostModal{{ post.id }}" style="width:100%; "><i class="bi bi-pencil-fill"></i> Edit</button>
+                                                            <div class="modal fade" id="editPostModal{{ post.id }}" tabindex="-1" aria-labelledby="editPostModalLabel{{ post.id }}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-lg">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="editPostModalLabel{{ post.id }}">Edit Post</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="container">
+                                                                                <div class="row">
+                                                                                    <div class="col-7">
+                                                                                        <form id="EditPostForm{{ post.id }}" method="post" enctype="multipart/form-data">
+                                                                                            {% csrf_token %}
+                                                                                            {{ edit_post_form|crispy }}
+                                                                                            <input type="hidden" name="edit" value="true">
+                                                                                            <input type="hidden" name="post-id" value="{{ post.id }}">
+                                                                                            <button type="submit" class="btn btn-success" id="EditPostButton{{ post.id }}">Save changes</button>
+                                                                                        </form>
+                                                                                        <br>
+                                                                                        <div class="alert alert-danger" role="alert">
+                                                                                            Note: Changing The Post Will Account for a Penalty Within The Algorithum.
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-5">
+                                                                                        <p class="text-center">Current Post Title:</p>
+                                                                                        <p class="text-center"><strong>{{post.title}}</strong></p>
+                                                                                        <p class="text-center">Current Post Content:</p>
+                                                                                        <p class="text-center text-truncate">{{post.contents}}</p>
+                                                                                        <p class="text-center">Current Media Used:</p>
+                                                                                        <img src="{{post.media.url}}" alt="{{post.title}}'s Media" style="max-width: 100%; max-height: 100%; border-radius: 5%;">
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="row">
-                                                                                <div class="col-6 d-flex justify-content-center">
-                                                                                    <form method="post">
-                                                                                        {% csrf_token%}
-                                                                                        <input type="hidden" name="delete" value="true">
-                                                                                        <input type="hidden" name="post-id" value="{{post.id}}">
-                                                                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                                                                    </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}" style="width:100%; "><i class="bi bi-trash3-fill"></i> Delete</button>
+                                                            <div class="modal fade" id="deletePostModal{{ post.id }}">
+                                                                <div class="modal-dialog">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <strong>WARNING</strong>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="container">
+                                                                                <div class="row">
+                                                                                    <div class="col">
+                                                                                        <p class="lead text-center">Are You Sure That You Want to Delete This Post?</p>
+                                                                                        <br>
+                                                                                        <p class="lead text-center">This Action is Irreversable. </p>
+                                                                                    </div>
                                                                                 </div>
-                                                                                <div class="col-6 d-flex justify-content-center">
-                                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                                <div class="row">
+                                                                                    <div class="col-6 d-flex justify-content-center">
+                                                                                        <form method="post">
+                                                                                            {% csrf_token%}
+                                                                                            <input type="hidden" name="delete" value="true">
+                                                                                            <input type="hidden" name="post-id" value="{{post.id}}">
+                                                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                    <div class="col-6 d-flex justify-content-center">
+                                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -427,141 +382,140 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                {% endfor %}
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-    <!-- Websockets for recieving notifications -->
-    <script type="module">
-        let notificationSocket;
-        let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        
+        <!-- Websockets for recieving notifications -->
+        <script type="module">
+            let notificationSocket;
+            let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
 
-        function connectNotificationSocket() { // function for connecting to the websocket.
-            notificationSocket = new WebSocket(
-                'ws://' + window.location.host + '/ws/brodcast-message/'
-            ); // connect to the relevant consumer class: NotificationConsumer
+            function connectNotificationSocket() { // function for connecting to the websocket.
+                notificationSocket = new WebSocket(
+                    'ws://' + window.location.host + '/ws/brodcast-message/'
+                ); // connect to the relevant consumer class: NotificationConsumer
 
-            notificationSocket.onopen = function(e) {
-                console.log('connected', e);
-            };
+                notificationSocket.onopen = function(e) {
+                    console.log('connected', e);
+                };
 
-            notificationSocket.onmessage = function(e) { // when the consumer class sends a message through
-                console.log('Message coming through!');
-                const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
+                notificationSocket.onmessage = function(e) { // when the consumer class sends a message through
+                    console.log('Message coming through!');
+                    const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
 
-                if (data.receiver === '{{username}}') { // if the data belongs to this specific user
-                    $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
-                    $('#notification-inbox').prepend(data.stored_html_notification); // adds HTML to the notification div that houses the notifications in the off-canvas
-                    
-                    // Update notification count
-                    var notificationCounter = $('#notification-counter');
-                    var newCount = parseInt(notificationCounter.text()) || 0;
-                    notificationCounter.text(newCount + 1).show();
-                    
-                    if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
-                        $('#bell-icon').removeClass('bi-bell');
-                        $('#bell-icon').addClass('bi-bell-fill');
-                    }
-
-                    var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
-
-                    if (notificationElement) {
-                        var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
-                        // Show the toast
-                        notification.show();
-                    } else {
-                        console.error('Notification element not found:', 'notification-' + data.notification_id);
-                    }
-
-                    // Attach event handlers to the newly added notification
-                    attachNotificationEventHandlers(data.notification_id, data.receiver);
-                } else {
-                    console.log('incorrect user');
-                }
-            };
-
-            notificationSocket.onerror = function(e) {
-                console.error('WebSocket encountered an error:', e);
-            };
-
-            notificationSocket.onclose = function(e) {
-                console.error('WebSocket closed unexpectedly:', e);
-                setTimeout(connectNotificationSocket, reconnectionTime); // attempt a reconnection to this websocket
-            };
-        }
-
-        function attachNotificationEventHandlers(notificationId, receiver) {
-            $(`#close-notification-${notificationId}`).click(function() {
-                $.ajax({
-                    type: 'POST',
-                    url: '/universal/remove-notification/',
-                    data: {
-                        'receiver': receiver,
-                        'type': 'notification-id',
-                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                        'notification_id': notificationId,
-                    },
-                    success: function(response) {
-                        console.log(response.message);
-                        var notification = $(`#stored-notification-${notificationId}`);
-                        notification.remove();
+                    if (data.receiver === '{{username}}') { // if the data belongs to this specific user
+                        $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
+                        $('#notification-inbox').prepend(data.stored_html_notification); // adds HTML to the notification div that houses the notifications in the off-canvas
+                        
+                        // Update notification count
                         var notificationCounter = $('#notification-counter');
-                        var newCount = parseInt(notificationCounter.text()) - 1;
-
-                        if (newCount <= 0) {
-                            notificationCounter.text('').hide();
-                            $('#bell-icon').removeClass('bi-bell-fill').addClass('bi-bell');
-                        } else {
-                            notificationCounter.text(newCount);
+                        var newCount = parseInt(notificationCounter.text()) || 0;
+                        notificationCounter.text(newCount + 1).show();
+                        
+                        if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
+                            $('#bell-icon').removeClass('bi-bell');
+                            $('#bell-icon').addClass('bi-bell-fill');
                         }
-                    }
-                });
-            });
 
-            $(`#read-notification-${notificationId}`).click(function() {
-                $.ajax({
-                    type: 'POST',
-                    url: '/universal/remove-notification/',
-                    data: {
-                        'receiver': receiver,
-                        'type': 'notification-id',
-                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                        'notification_id': notificationId,
-                    },
-                    success: function(response) {
-                        console.log(response.message);
-                    }
-                });
-            });
-        }
+                        var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
 
-        $(document).ready(function() {
-            if ('{{ notification_count }}' == '0') {
-                var notification_counter = $('#notification-counter');
-                notification_counter.text('').hide();
-                var notification_bell = $('#bell-icon');
-                notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
-            } else {
-                var notificationCounter = $('#notification-counter');
-                notificationCounter.text('{{ notification_count }}').show();
-                $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
+                        if (notificationElement) {
+                            var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
+                            // Show the toast
+                            notification.show();
+                        } else {
+                            console.error('Notification element not found:', 'notification-' + data.notification_id);
+                        }
+
+                        // Attach event handlers to the newly added notification
+                        attachNotificationEventHandlers(data.notification_id, data.receiver);
+                    } else {
+                        console.log('incorrect user');
+                    }
+                };
+
+                notificationSocket.onerror = function(e) {
+                    console.error('WebSocket encountered an error:', e);
+                };
+
+                notificationSocket.onclose = function(e) {
+                    console.error('WebSocket closed unexpectedly:', e);
+                    setTimeout(connectNotificationSocket, reconnectionTime); // attempt a reconnection to this websocket
+                };
             }
-        });
 
-        connectNotificationSocket(); // connect to the relevant websocket
-    </script>
-    <!-- To store notifications -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+            function attachNotificationEventHandlers(notificationId, receiver) {
+                $(`#close-notification-${notificationId}`).click(function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'receiver': receiver,
+                            'type': 'notification-id',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'notification_id': notificationId,
+                        },
+                        success: function(response) {
+                            console.log(response.message);
+                            var notification = $(`#stored-notification-${notificationId}`);
+                            notification.remove();
+                            var notificationCounter = $('#notification-counter');
+                            var newCount = parseInt(notificationCounter.text()) - 1;
 
-    </div>
+                            if (newCount <= 0) {
+                                notificationCounter.text('').hide();
+                                $('#bell-icon').removeClass('bi-bell-fill').addClass('bi-bell');
+                            } else {
+                                notificationCounter.text(newCount);
+                            }
+                        }
+                    });
+                });
 
-</body>
+                $(`#read-notification-${notificationId}`).click(function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/universal/remove-notification/',
+                        data: {
+                            'receiver': receiver,
+                            'type': 'notification-id',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'notification_id': notificationId,
+                        },
+                        success: function(response) {
+                            console.log(response.message);
+                        }
+                    });
+                });
+            }
+
+            $(document).ready(function() {
+                if ('{{ notification_count }}' == '0') {
+                    var notification_counter = $('#notification-counter');
+                    notification_counter.text('').hide();
+                    var notification_bell = $('#bell-icon');
+                    notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
+                } else {
+                    var notificationCounter = $('#notification-counter');
+                    notificationCounter.text('{{ notification_count }}').show();
+                    $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
+                }
+            });
+
+            connectNotificationSocket(); // connect to the relevant websocket
+        </script>
+        <!-- To store notifications -->
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
+
+        </div>
+
+    </body>
 </html>

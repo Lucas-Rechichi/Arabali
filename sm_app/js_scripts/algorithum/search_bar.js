@@ -66,7 +66,8 @@ $(document).ready(function () {
                         categoryRecommendationHtml = `
                             <div class="container d-flex flex-wrap justify-content-center">
                                 <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/page/recommended/${categoryRecommendationSet['category_name']}/1'">
-                                    <p class="m-0 p-0">Category: ${categoryRecommendationSet['category_name']}</p>
+                                    <i class="bi bi-filter-circle" style="font-size: 2vw; color: #198754;"></i>
+                                    <p class="ms-3" style="margin-top: 12px;">Category: ${categoryRecommendationSet['category_name']}</p>
                                 </button>
                             </div>
                         `;
@@ -110,12 +111,25 @@ $(document).ready(function () {
     });
 
     $('#search-bar').on('blur', function () {
-        // TODO: Add functionality for if the user clicks on a recomendation presented so that the popup doesn't close before the event lisener is triggered
         suggestedCard.fadeOut(300)
     });
 
     // Event listener for realtime typing suggestions
     $('#search-bar').on('input', function () {
+        var queryInput = $(this).val()
+
+        $.ajax({
+            type: 'POST',
+            url: '/universal/search-suggestions/',
+            data: {
+                'query': queryInput,
+                'csrfmiddlewaretoken': csrfToken
+            },
+
+            success: function(response) {
+
+            }
+        });
 
     });
 
