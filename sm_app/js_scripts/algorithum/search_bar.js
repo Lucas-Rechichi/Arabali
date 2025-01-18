@@ -1,4 +1,4 @@
-import { correctApostrphe } from "../universal/extras.js"
+import { correctApostrophe } from "../universal/extras.js"
 
 $(document).ready(function () {
 
@@ -46,32 +46,28 @@ $(document).ready(function () {
 
                         // Creating HTML
                         postRecomemndationHtml = `
-                            <div class="row d-flex justify-content-evenly">
-                                <div class="col">
-                                    <img class="post-icon" src="${postRecommendationSet['post_media_url']}" alt="${correctApostrphe(postRecommendationSet['post_title'])} Cover Slide Image">
-                                </div>
-                                <div class="col">
-                                    <p class="m-0 p-0">Post: ${postRecommendationSet['post_title']}</p>
-                                </div>
+                            <div class="container d-flex flex-wrap justify-content-center">
+                                <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/posts/${postRecommendationSet['post_id']}'">
+                                    <img class="post-icon" src="${postRecommendationSet['post_media_url']}" alt="${correctApostrophe(postRecommendationSet['post_title'])} Cover Slide Image">
+                                    <p class="mt-2 ms-3 p-0">Post: ${postRecommendationSet['post_title']}</p>
+                                </button>
                             </div>
                         `;
 
                         userRecommendationHtml = `
-                            <div class="row d-flex justify-content-evenly">
-                                <div class="col">
-                                    <img class="user-icon" src="${userRecommendationSet['user_pfp_url']}" alt="${correctApostrphe(userRecommendationSet['username'])} Profile Picture">
-                                </div>
-                                <div class="col">
-                                    <p class="m-0 p-0">User: ${userRecommendationSet['username']}</p>
-                                </div>
+                            <div class="container d-flex flex-wrap justify-content-center" onclick="location.href='/profile/${userRecommendationSet['username']}'">
+                                <button type="button" class="btn d-flex flex-wrap">
+                                    <img class="user-icon align-self-start" src="${userRecommendationSet['user_pfp_url']}" alt="${correctApostrophe(userRecommendationSet['username'])} Profile Picture">
+                                    <p class="mt-1 ms-3 p-0 align-self-start">User: ${userRecommendationSet['username']}</p>
+                                </button>
                             </div>
                         `;
 
                         categoryRecommendationHtml = `
-                            <div class="row d-flex justify-content-evenly">
-                                <div class="col">
+                            <div class="container d-flex flex-wrap justify-content-center">
+                                <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/page/recommended/${categoryRecommendationSet['category_name']}/1'">
                                     <p class="m-0 p-0">Category: ${categoryRecommendationSet['category_name']}</p>
-                                </div>
+                                </button>
                             </div>
                         `;
 
@@ -119,7 +115,7 @@ $(document).ready(function () {
     });
 
     // Event listener for realtime typing suggestions
-    $('#search-bar').input(function () {
+    $('#search-bar').on('input', function () {
 
     });
 

@@ -1108,6 +1108,7 @@ class Algorithum:
                 if index < max_recommendations:
                     media_obj = post.media.first()
                     post_recommendations.append({
+                        'post_id': post.pk,
                         'post_title': post.title,
                         'post_media_url': media_obj.media_obj.url
                     })
