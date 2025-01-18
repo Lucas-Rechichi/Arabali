@@ -1,0 +1,12 @@
+/* For the icons used in the search bar */
+.post-icon {
+    width: 70px; 
+    height: 40px;
+    border-radius: 3px;
+}
+
+.user-icon {
+    width: 40px; 
+    height: 40px;
+    border-radius: 20px;
+}

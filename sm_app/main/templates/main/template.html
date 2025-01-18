@@ -20,11 +20,11 @@
         {% block cdns %}{% endblock %}
         <!-- SCRIPTS -->
         {% block scripts %}{% endblock %}
-        <script type="text/javascript" src="{% static 'universal/notifications.js'%}"></script>
-        <script type="text/javascript" src="{% static 'algorithum/depreciations.js'%}"></script>
-        <script type="text/javascript" src="{% static 'algorithum/search_bar.js'%}"></script>
-        <script type="text/javascript" src="{% static 'websockets/post_socket.js' %}"></script>
-        <script type="text/javascript" src="{% static 'websockets/notification_socket.js' %}"></script>
+        <script type="module" src="{% static 'universal/notifications.js'%}"></script>
+        <script type="module" src="{% static 'algorithum/depreciations.js'%}"></script>
+        <script type="module" src="{% static 'algorithum/search_bar.js'%}"></script>
+        <script type="module" src="{% static 'websockets/post_socket.js' %}"></script>
+        <script type="module" src="{% static 'websockets/notification_socket.js' %}"></script>
         <!-- STYLES -->
         {% block styles %}{% endblock %}
         <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
@@ -116,3 +116,4 @@
         {% endblock %}
     </body>
 </html>
+

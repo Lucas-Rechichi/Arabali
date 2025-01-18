@@ -560,7 +560,7 @@
     </div>
 </div>
 {% endif %}
-<script type="text/javascript">
+<script type="module">
     $(document).ready(function () {
         $('#settings-view').on('click', '.change', function () {
             var applyFor = $(this).data('button-type');
@@ -1193,7 +1193,7 @@
 </script>
 
 <!-- Websockets for recieving notifications -->
-<script type="text/javascript">
+<script type="module">
     let notificationSocket;
     reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
 

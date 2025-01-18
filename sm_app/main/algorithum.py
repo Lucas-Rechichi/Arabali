@@ -1120,13 +1120,13 @@ class Algorithum:
         def recommend_catergories(userstats_obj, max_recommendations):
 
             # Preform a basic sort, limiting the number of categories shown
-            tags = Algorithum.Core.basic_sort(object_name='tag', sub_category='all', user_obj=None)
+            interests = Algorithum.Core.basic_sort(object_name='interest', sub_category='all', user_obj=None)
 
             category_recommendations = []
-            for index, tag in enumerate(tags):
+            for index, interest in enumerate(interests):
                 if index < max_recommendations:
                     category_recommendations.append({
-                        'tag_name': tag.name
+                        'category_name': interest.name
                     })
                 else:
                     break

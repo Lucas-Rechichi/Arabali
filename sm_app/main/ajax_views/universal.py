@@ -40,7 +40,7 @@ def remove_notification(request):
 
 def check_depreciation_time(request):
     # Getting relevant data
-    recieved_timestamp = request.POST.get()
+    recieved_timestamp = int(request.POST.get('timestamp'))
     last_depreciation_timestamp = settings.last_depreciation_timestamp
 
     # Checking to see if enough time has elapsed (1 day = 86400 seconds)
@@ -50,7 +50,7 @@ def check_depreciation_time(request):
         tags = PostTag.objects.all()
         interests = Interest.objects.all()
 
-        for tag, interest in tags, interests:
+        for tag, interest in zip(tags, interests):
             Algorithum.Depreciations.calculate_post_consequence_function(post_tag_obj=tag)
             Algorithum.Depreciations.calculate_interest_consequence_function(interest_obj=interest)
 
@@ -61,12 +61,12 @@ def check_depreciation_time(request):
         current_interest_interactions = InterestInteraction.objects.filter(is_new=True)
         old_interest_interations = InterestInteraction.objects.filter(ins_new=False)
 
-        for cpi, opi in current_post_interactions, old_post_interactions:
+        for cpi, opi in zip(current_post_interactions, old_post_interactions):
             cpi.is_new = False # new interactions become the old interactions
             cpi.save()
             opi.delete() # delete old interactions
 
-        for cii, oii in current_interest_interactions, old_interest_interations:
+        for cii, oii in zip(current_interest_interactions, old_interest_interations):
             cii.is_new = False # new interactions become the old interactions
             cii.save()
             oii.delete() # delete old interactions
