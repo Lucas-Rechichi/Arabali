@@ -111,6 +111,7 @@ def search_suggestions(request):
     highest_q_value = len(query) * 2
 
     solutions_data = Algorithum.Search.query_solutions(query=query, abs_cutoff_value=4)
+    solution_type = solutions_data['type']
 
     results_dict = {
         'exact': {
@@ -131,11 +132,53 @@ def search_suggestions(request):
     results_dict = Algorithum.Search.result_values_categories(results_dict=results_dict, solutions_data=solutions_data, highest_q_value=highest_q_value)
 
     # Solution sorting
-    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solutions_data['type'], search_object_name='posts')
-    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solutions_data['type'], search_object_name='users')
-    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solutions_data['type'], search_object_name='categories')
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='posts')
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='users')
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='categories')
 
-    # TODO: Extract relevant data from search results so that they can be serialized though JSON to the front-end.
+    # Extract relevant data from search results so that they can be serialized though JSON to the front-end.
+
+    results_data = {
+        'posts': [],
+        'users': [],
+        'categories': []
+    }
+
+    for index, post_solution in enumerate(results_dict[solution_type]['posts']):
+        if index < 3:
+            media_obj = post_solution['object'].media.first()
+
+            results_data['posts'].append({
+                'post_id': post_solution['id'],
+                'post_title': post_solution['object'].title,
+                'post_media_url': media_obj.media_obj.url
+            })
+
+        else:
+            break
+
+    for index, user_solution in enumerate(results_dict[solution_type]['users']):
+        if index < 3:
+            results_data['users'].append({
+                'username': user_solution['object'].name,
+                'user_pfp_url': user_solution['object'].pfp.url
+            })
+        else:
+            break
+
+    for index, category_solution in enumerate(results_dict[solution_type]['categories']):
+        if index < 3:
+            results_data['categories'].append({
+                'category_name': category_solution['object'].name
+            })
+        else:
+            break
+
+    response = {
+        'results_data': results_data
+    }
+
+    return JsonResponse(response)
 
 
 

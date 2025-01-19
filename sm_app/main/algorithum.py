@@ -846,6 +846,8 @@ class Algorithum:
 
             # Query solutions logic
             if len(query) < abs_cutoff_value:
+                solution_type = 'approx'
+
                 # Gets all possible approximate solutions for the inserted query
                 broken_query = [x for x in captialized_query] 
                 for a in range(len(captialized_query)):

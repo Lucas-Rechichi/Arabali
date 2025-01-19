@@ -25,11 +25,11 @@ $(document).ready(function () {
                     // Response setup
                     var recommendationsLength = response.post_recommendations.length
 
-                    var postRecomemndationsHtml = '';
+                    var postRecommendationsHtml = '';
                     var userRecommendationsHtml = '';
                     var categoryRecommendationsHtml = '';
 
-                    var postRecomemndationHtml;
+                    var postRecommendationHtml;
                     var userRecommendationHtml;
                     var categoryRecommendationHtml;
 
@@ -45,7 +45,7 @@ $(document).ready(function () {
                         categoryRecommendationSet = response.category_recommendations[i];
 
                         // Creating HTML
-                        postRecomemndationHtml = `
+                        postRecommendationHtml = `
                             <div class="container d-flex flex-wrap justify-content-center">
                                 <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/posts/${postRecommendationSet['post_id']}'">
                                     <img class="post-icon" src="${postRecommendationSet['post_media_url']}" alt="${correctApostrophe(postRecommendationSet['post_title'])} Cover Slide Image">
@@ -73,19 +73,19 @@ $(document).ready(function () {
                         `;
 
                         // Appending HTML
-                        postRecomemndationsHtml += postRecomemndationHtml;
+                        postRecommendationsHtml += postRecommendationHtml;
                         userRecommendationsHtml += userRecommendationHtml;
                         categoryRecommendationsHtml += categoryRecommendationHtml;
                     };
 
-                    var suggestionsHtml = `
+                    var recommendationsHtml = `
                         <div class="container">
                             <div class="row">
                                 <div class="col">
                                     <p class="lead text-center">Posts</p>
                                 </div>
                             </div>
-                            ${postRecomemndationsHtml}
+                            ${postRecommendationsHtml}
                             <div class="row">
                                 <div class="col">
                                     <p class="lead text-center">Users</p>
@@ -101,7 +101,7 @@ $(document).ready(function () {
                         </div>
                     `;
 
-                    searchSuggestions.html(suggestionsHtml);
+                    searchSuggestions.html(recommendationsHtml);
 
                 }
             })
@@ -127,6 +127,84 @@ $(document).ready(function () {
             },
 
             success: function(response) {
+                // Setup
+                var suggestionsLength = response.results_data['posts'].length
+
+                var postSuggestionsHtml = '';
+                var userSuggestionsHtml = '';
+                var categorySuggestionsHtml = '';
+
+                var postSuggestionHtml;
+                var userSuggestionHtml;
+                var categorySuggestionHtml;
+
+                var postSuggestionSet;
+                var userSuggestionSet;
+                var categorySuggestionSet;
+
+                // Loops though all suggestions, processes it into HTML
+                for (let i=0; i < suggestionsLength; i++) {
+                    postSuggestionSet = response.results_data['posts'][i];
+                    userSuggestionSet = response.results_data['users'][i];
+                    categorySuggestionSet = response.results_data['categories'][i];
+
+                    // Creating HTML
+                    postSuggestionHtml = `
+                        <div class="container d-flex flex-wrap justify-content-center">
+                            <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/posts/${postSuggestionSet['post_id']}'">
+                                <img class="post-icon" src="${postSuggestionSet['post_media_url']}" alt="${correctApostrophe(postSuggestionSet['post_title'])} Cover Slide Image">
+                                <p class="mt-2 ms-3 p-0">Post: ${postSuggestionSet['post_title']}</p>
+                            </button>
+                        </div>
+                    `;
+
+                    userSuggestionHtml = `
+                        <div class="container d-flex flex-wrap justify-content-center" onclick="location.href='/profile/${userSuggestionSet['username']}'">
+                            <button type="button" class="btn d-flex flex-wrap">
+                                <img class="user-icon align-self-start" src="${userSuggestionSet['user_pfp_url']}" alt="${correctApostrophe(userSuggestionSet['username'])} Profile Picture">
+                                <p class="mt-1 ms-3 p-0 align-self-start">User: ${userSuggestionSet['username']}</p>
+                            </button>
+                        </div>
+                    `;
+
+                    categorySuggestionHtml = `
+                        <div class="container d-flex flex-wrap justify-content-center">
+                            <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/page/recommended/${categorySuggestionSet['category_name']}/1'">
+                                <i class="bi bi-filter-circle" style="font-size: 2vw; color: #198754;"></i>
+                                <p class="ms-3" style="margin-top: 12px;">Category: ${categorySuggestionSet['category_name']}</p>
+                            </button>
+                        </div>
+                    `;
+
+                    postSuggestionsHtml += postSuggestionHtml;
+                    userSuggestionsHtml += userSuggestionHtml;
+                    categorySuggestionsHtml += categorySuggestionHtml;
+                }
+
+                var suggestionsHtml = `
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <p class="lead text-center">Posts</p>
+                            </div>
+                        </div>
+                        ${postSuggestionsHtml}
+                        <div class="row">
+                            <div class="col">
+                                <p class="lead text-center">Users</p>
+                            </div>
+                        </div>
+                        ${userSuggestionsHtml}
+                        <div class="row">
+                            <div class="col">
+                                <p class="lead text-center">Categories</p>
+                            </div>
+                        </div>
+                        ${categorySuggestionsHtml}
+                    </div>
+                `;
+
+                searchSuggestions.html(suggestionsHtml);
 
             }
         });
