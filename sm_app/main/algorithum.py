@@ -564,9 +564,10 @@ class Algorithum:
 
     class Search:
 
-        def result_values_users(results_dict, solutions_data, highest_q_value):
+        def result_values_users(results_dict, solutions_data, id_dict, highest_q_value):
 
             # Setup
+            id_dict['users'] = []
             user_stats = UserStats.objects.all()
             solution_type = solutions_data['type']
 
@@ -578,12 +579,14 @@ class Algorithum:
                 for user_stat in user_stats:
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(user_stat.user.username): # if the string is present within this user's name
-                            if user_stat.user.pk not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys(): # Removes duplicates for both exact and approx solutions
-                                results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk, 'object': user_stat, 'value': exact_display(modified_reciprocal(combination_id))}
+                            if user_stat.user.pk not in id_dict['users']: # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['users'].append({'object': user_stat, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['users'].append(user_stat.user.pk)
 
                         if str(solution.lower()) in str(user_stat.user.username):
-                            if user_stat.user.pk  not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys():
-                                results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk, 'object': user_stat, 'value': exact_display(modified_reciprocal(combination_id))}
+                            if user_stat.user.pk not in id_dict['users']:
+                                results_dict['exact']['users'].append({'object': user_stat, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['users'].append(user_stat.user.pk)
                 
             else: # solution_type == 'approx'
                 solutions = solutions_data['solutions']
@@ -596,24 +599,27 @@ class Algorithum:
                         split_result_dict[split_result_list[a]] =  [a + 1]
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(user_stat.user.username):
-                            if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
+                            if user_stat.user.pk not in id_dict['users']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk, 'object': user_stat, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['users'].append({'object': user_stat, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['users'].append(user_stat.user.pk)
 
                         if str(solution.lower()) in str(user_stat.user.username):
-                            if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
+                            if user_stat.user.pk not in id_dict['users']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk, 'object': user_stat, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['users'].append({'object': user_stat, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['users'].append(user_stat.user.pk)
 
             return results_dict
 
-        def result_values_posts(results_dict, solutions_data, highest_q_value):
+        def result_values_posts(results_dict, solutions_data, id_dict, highest_q_value):
 
             # Setup
+            id_dict['posts'] = []
             posts = Post.objects.all()
             solution_type = solutions_data['type']
 
@@ -624,12 +630,14 @@ class Algorithum:
                 for post in posts:
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(post.title):
-                            if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
-                                results_dict['exact']['posts'][post.pk] = {'id': post.pk, 'object': post, 'value': exact_display(modified_reciprocal(combination_id))}
-                                
+                            if post.pk not in id_dict['posts']:
+                                results_dict['exact']['posts'].append({'object': post, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['posts'].append(post.pk)
+
                         if str(solution.lower()) in str(post.title):
-                            if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
-                                results_dict['exact']['posts'][post.pk] = {'id': post.pk, 'object': post, 'value': exact_display(modified_reciprocal(combination_id))}
+                            if post.pk not in id_dict['posts']:
+                                results_dict['exact']['posts'].append({'object': post, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['posts'].append(post.pk)
 
             else: # solution_type == 'approx'
                 solutions = solutions_data['solutions']
@@ -642,24 +650,27 @@ class Algorithum:
                         split_result_dict[split_result_list[a]] =  [a + 1]
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(post.title):
-                            if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
+                            if post.pk not in id_dict['posts']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['posts'][post.pk] = {'id': post.pk, 'object': post, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['posts'].append({'object': post, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['posts'].append(post.pk)
 
                         if str(solution.lower()) in str(post.title):
-                            if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
+                            if post.pk not in id_dict['posts']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['posts'][post.pk] = {'id': post.pk, 'object': post, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['posts'].append({'object': post, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['posts'].append(post.pk)
 
             return results_dict
 
-        def result_values_categories(results_dict, solutions_data, highest_q_value):
+        def result_values_categories(results_dict, solutions_data, id_dict, highest_q_value):
 
             # Setup
+            id_dict['categories'] = []
             categories = Category.objects.all()
             solution_type = solutions_data['type']
 
@@ -670,14 +681,15 @@ class Algorithum:
                 for category in categories:
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(category.name):
-                            if category.name not in results_dict['exact']['catergories'].keys() and category.name not in results_dict['approx']['catergories'].keys():
-                                results_dict['exact']['catergories'][category.name] = {'id': category.pk, 'object': category, 'value': exact_display(modified_reciprocal(combination_id))}
-                                
+                            if category.name not in id_dict['categories']:
+                                results_dict['exact']['catergories'].append({'object': category, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['categories'].append(category.name)
 
                         if str(solution.lower()) in str(category.name):
-                            if category.name not in results_dict['exact']['catergories'].keys() and category.name not in results_dict['approx']['catergoires'].keys():
-                                results_dict['exact']['catergoires'][category.name] = {'id': category.pk, 'object': category, 'value': exact_display(modified_reciprocal(combination_id))}
-            
+                            if category.name not in id_dict['categories']:
+                                results_dict['exact']['catergories'].append({'object': category, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['categories'].append(category.name)
+
             else: # solution_type == 'approx'
                 solutions = solutions_data['solutions']
 
@@ -689,24 +701,27 @@ class Algorithum:
                         split_result_dict[split_result_list[a]] =  [a + 1]
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(category.name):
-                            if category.name not in results_dict['approx']['categories'].keys() and category.name not in results_dict['exact']['categories'].keys():
+                            if category.name not in id_dict['categories']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['categories'][category.name] = {'id': category.pk, 'object': category, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['catergories'].append({'object': category, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['categories'].append(category.name)
 
                         if str(solution.lower()) in str(category.name):
-                            if category.name not in results_dict['approx']['categories'].keys() and category.name not in results_dict['exact']['categories'].keys():
+                            if category.name not in id_dict['categories']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['categories'][category.name] = {'id': category.pk, 'object': category, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['catergories'].append({'object': category, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['categories'].append(category.name)
 
             return results_dict
 
-        def result_values_emoticons(results_dict, solutions_data, highest_q_value):
+        def result_values_emoticons(results_dict, solutions_data, id_dict, highest_q_value):
 
             # Setup
+            id_dict['emoticons'] = []
             emoticons = emoticons_dict.keys()
             solution_type = solutions_data['type']
 
@@ -716,12 +731,14 @@ class Algorithum:
                 for emoticon in emoticons:
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(emoticon): # if the string is present within this user's name
-                            if emoticon not in results_dict['exact'].keys(): # Removes duplicates for both exact and approx solutions
-                                results_dict['exact']['emoticons'][emoticon] = {'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)}
+                            if emoticon not in id_dict['emoticons']: # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['emoticons'].append(emoticon)
 
                         if str(solution.lower()) in str(emoticon):
-                            if emoticon not in results_dict['exact'].keys():
-                                results_dict['exact']['emoticons'][emoticon] = {'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)}
+                            if emoticon not in id_dict['emoticons']: # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['emoticons'].append(emoticon)
 
             else: # solution_type == 'approx'
                 solutions = solutions_data['solutions']
@@ -733,24 +750,27 @@ class Algorithum:
                         split_result_dict[split_result_list[a]] =  [a + 1]
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(emoticon):
-                            if emoticon  not in results_dict['approx'].keys():
+                            if emoticon not in id_dict['emoticons']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['emoticons'][emoticon] = {'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['emoticons'].append(emoticon)
 
                         if str(solution.lower()) in str(emoticon):
-                            if emoticon not in results_dict['approx'].keys():
+                            if emoticon not in id_dict['emoticons']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['emoticons'][emoticon] = {'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['emoticons'].append(emoticon)
 
             return results_dict
 
-        def result_values_chatrooms(results_dict, solutions_data, highest_q_value):
+        def result_values_chatrooms(results_dict, solutions_data, id_dict, highest_q_value):
 
             # Setup
+            id_dict['chatrooms'] = []
             chatrooms = ChatRoom.objects.all()
             solution_type = solutions_data['type']
 
@@ -760,14 +780,15 @@ class Algorithum:
                 for chatroom in chatrooms:
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(chatroom.name): # if the string is present within this user's name
-                            if chatroom.name not in results_dict['exact'].keys(): # Removes duplicates for both exact and approx solutions
-                                results_dict['exact']['chatrooms'][chatroom.name] = {'id': chatroom.pk, 'object': chatroom, 'value': approx_display(combination_id, highest_q_value)}
+                            if chatroom.pk not in id_dict['chatrooms']: # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['chatrooms'].append({'object': chatroom, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['chatrooms'].append(chatroom.pk)
 
                         if str(solution.lower()) in str(chatroom.name):
-                            if chatroom.name not in results_dict['exact'].keys():
-                                results_dict['exact']['chatrooms'][chatroom.name] = {'id': chatroom.pk, 'object': chatroom, 'value': approx_display(combination_id, highest_q_value)}
+                            if chatroom.pk not in id_dict['chatrooms']: # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['chatrooms'].append({'object': chatroom, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['chatrooms'].append(chatroom.pk)
 
-                    
             else: # solution_type == 'approx'
                 solutions = solutions_data['solutions']
 
@@ -778,24 +799,27 @@ class Algorithum:
                         split_result_dict[split_result_list[a]] =  [a + 1]
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(chatroom.name):
-                            if chatroom.name not in results_dict['approx'].keys():
+                            if chatroom.pk not in id_dict['chatrooms']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['chatrooms'][chatroom.name] = {'id': chatroom.pk, 'object': chatroom, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['chatrooms'].append({'object': chatroom, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['chatrooms'].append(chatroom.pk)
 
                         if str(solution.lower()) in str(chatroom.name):
-                            if chatroom.name not in results_dict['approx'].keys():
+                            if chatroom.pk not in id_dict['chatrooms']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['chatrooms'][chatroom.name] = {'id': chatroom.pk, 'object': chatroom, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['chatrooms'].append({'object': chatroom, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['chatrooms'].append(chatroom.pk)
 
             return results_dict
 
-        def result_values_messages(results_dict, solutions_data, highest_q_value):
+        def result_values_messages(results_dict, solutions_data, id_dict, highest_q_value):
 
             # Setup
+            id_dict['messages'] = []
             messages = Message.objects.exclude(text=None)
             solution_type = solutions_data['type']
 
@@ -805,12 +829,14 @@ class Algorithum:
                 for message in messages:
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(message.text): # if the string is present within this message's text
-                            if message.text not in results_dict['exact'].keys(): # Removes duplicates for both exact and approx solutions
-                                results_dict['exact']['chatrooms'][message.text] = {'id': message.pk, 'object': message, 'value': approx_display(combination_id, highest_q_value)}
+                            if message.pk not in id_dict['messages']: # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['messages'].appned({'object': message, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['messages'].append(message.pk)
 
                         if str(solution.lower()) in str(message.text):
-                            if message.text not in results_dict['exact'].keys():
-                                results_dict['exact']['chatrooms'][message.text] = {'id': message.pk, 'object': message, 'value': approx_display(combination_id, highest_q_value)}
+                            if message.pk not in id_dict['messages']: # Removes duplicates for both exact and approx solutions
+                                results_dict['exact']['messages'].appned({'object': message, 'value': exact_display(modified_reciprocal(combination_id))})
+                                id_dict['messages'].append(message.pk)
 
             else: # solution_type == 'approx'
                 solutions = solutions_data['solutions']
@@ -822,18 +848,20 @@ class Algorithum:
                         split_result_dict[split_result_list[a]] =  [a + 1]
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(message.text):
-                            if message.text not in results_dict['approx'].keys():
+                            if message.pk not in id_dict['messages']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['chatrooms'][message.text] = {'id': message.pk, 'object': message, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['messages'].appned({'object': message, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['messages'].append(message.pk)
 
                         if str(solution.lower()) in str(message.text):
-                            if message.text not in results_dict['approx'].keys():
+                            if message.pk not in id_dict['messages']:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['approx']['chatrooms'][message.text] = {'id': message.pk, 'object': message, 'value': approx_display(combination_id, highest_q_value)}
+                                results_dict['exact']['messages'].appned({'object': message, 'value': approx_display(combination_id, highest_q_value)})
+                                id_dict['messages'].append(message.pk)
 
             return results_dict
 
@@ -884,6 +912,8 @@ class Algorithum:
             return solution_data
 
         def query_sorting(results_dict, search_type, search_object_name):
+            # TODO: Fix the sorting ofr the new design of sorting solutions data (we use lists now for the solutions)
+
             sorted_objects = sorted(results_dict[search_type][search_object_name].items(), key=lambda item: item[1]['value'], reverse=True)
             results_dict[search_type][search_object_name] = {k: v for k, v in sorted_objects}
 

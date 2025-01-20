@@ -102,8 +102,6 @@ def search_recommendations(request):
         'category_recommendations': category_recommendations,
     }
 
-    print(response)
-
     return JsonResponse(response)
 
 def search_suggestions(request):
@@ -115,21 +113,23 @@ def search_suggestions(request):
 
     results_dict = {
         'exact': {
-            'users': {},
-            'categories': {},
-            'posts': {}
+            'users': [],
+            'categories': [],
+            'posts': []
         },
         'approx' : {
-            'users': {},
-            'categories': {},
-            'posts': {}
+            'users': [],
+            'categories': [],
+            'posts': []
         }
     }
 
+    id_dict = {}
+
     # Searches for apropriate solutions given the query 
-    results_dict = Algorithum.Search.result_values_posts(results_dict=results_dict, solutions_data=solutions_data, highest_q_value=highest_q_value)
-    results_dict = Algorithum.Search.result_values_users(results_dict=results_dict, solutions_data=solutions_data, highest_q_value=highest_q_value)
-    results_dict = Algorithum.Search.result_values_categories(results_dict=results_dict, solutions_data=solutions_data, highest_q_value=highest_q_value)
+    results_dict = Algorithum.Search.result_values_posts(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
+    results_dict = Algorithum.Search.result_values_users(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
+    results_dict = Algorithum.Search.result_values_categories(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
 
     # Solution sorting
     results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='posts')
@@ -137,6 +137,8 @@ def search_suggestions(request):
     results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='categories')
 
     # Extract relevant data from search results so that they can be serialized though JSON to the front-end.
+
+    print(results_dict)
 
     results_data = {
         'posts': [],
