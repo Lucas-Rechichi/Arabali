@@ -438,15 +438,14 @@ class Algorithum:
             new_function_factor = (current_interest_value/new_interest_value)
 
             # Checking to see if the interest value is too low, deletes outliers that are too low
-            interest_userstats = interest_obj.userstats
-            user_interests = Interest.objects.filter(user=interest_userstats)
+            user_interests = Interest.objects.filter(user=interest_obj.user)
             user_interest_values = user_interests.values_list('value', flat=True)
             user_average_interest_value = Algorithum.Core.average(num_list=user_interest_values, is_abs=False)
 
             for interest in user_interests:
-                if interest * 7 < user_average_interest_value:
+                if interest.value * 7 < user_average_interest_value:
                     interest.delete()
-        
+
             # Recording updates to the database
             interest_obj.value = new_interest_value
             interest_obj.save()
@@ -603,7 +602,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['users'].append({'object': user_stat, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['users'].append({'object': user_stat, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['users'].append(user_stat.user.pk)
 
                         if str(solution.lower()) in str(user_stat.user.username):
@@ -611,7 +610,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['users'].append({'object': user_stat, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['users'].append({'object': user_stat, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['users'].append(user_stat.user.pk)
 
             return results_dict
@@ -654,7 +653,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['posts'].append({'object': post, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['posts'].append({'object': post, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['posts'].append(post.pk)
 
                         if str(solution.lower()) in str(post.title):
@@ -662,7 +661,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['posts'].append({'object': post, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['posts'].append({'object': post, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['posts'].append(post.pk)
 
             return results_dict
@@ -682,12 +681,12 @@ class Algorithum:
                     for combination_id, solution in solutions.items():
                         if str(solution) in str(category.name):
                             if category.name not in id_dict['categories']:
-                                results_dict['exact']['catergories'].append({'object': category, 'value': exact_display(modified_reciprocal(combination_id))})
+                                results_dict['exact']['categories'].append({'object': category, 'value': exact_display(modified_reciprocal(combination_id))})
                                 id_dict['categories'].append(category.name)
 
                         if str(solution.lower()) in str(category.name):
                             if category.name not in id_dict['categories']:
-                                results_dict['exact']['catergories'].append({'object': category, 'value': exact_display(modified_reciprocal(combination_id))})
+                                results_dict['exact']['categories'].append({'object': category, 'value': exact_display(modified_reciprocal(combination_id))})
                                 id_dict['categories'].append(category.name)
 
             else: # solution_type == 'approx'
@@ -705,7 +704,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['catergories'].append({'object': category, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['categories'].append({'object': category, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['categories'].append(category.name)
 
                         if str(solution.lower()) in str(category.name):
@@ -713,7 +712,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['catergories'].append({'object': category, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['categories'].append({'object': category, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['categories'].append(category.name)
 
             return results_dict
@@ -754,7 +753,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['emoticons'].append(emoticon)
 
                         if str(solution.lower()) in str(emoticon):
@@ -762,7 +761,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['emoticons'].append({'name': emoticon, 'unicode': emoticons_dict[emoticon], 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['emoticons'].append(emoticon)
 
             return results_dict
@@ -803,7 +802,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['chatrooms'].append({'object': chatroom, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['chatrooms'].append({'object': chatroom, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['chatrooms'].append(chatroom.pk)
 
                         if str(solution.lower()) in str(chatroom.name):
@@ -811,7 +810,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['chatrooms'].append({'object': chatroom, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['chatrooms'].append({'object': chatroom, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['chatrooms'].append(chatroom.pk)
 
             return results_dict
@@ -852,7 +851,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['messages'].appned({'object': message, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['messages'].appned({'object': message, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['messages'].append(message.pk)
 
                         if str(solution.lower()) in str(message.text):
@@ -860,7 +859,7 @@ class Algorithum:
                                 for char_index, char in solutions.items():
                                     if char in split_result_list:
                                         combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                                results_dict['exact']['messages'].appned({'object': message, 'value': approx_display(combination_id, highest_q_value)})
+                                results_dict['approx']['messages'].appned({'object': message, 'value': approx_display(combination_id, highest_q_value)})
                                 id_dict['messages'].append(message.pk)
 
             return results_dict
@@ -911,14 +910,27 @@ class Algorithum:
 
             return solution_data
 
-        def query_sorting(results_dict, search_type, search_object_name):
+        def query_sorting(results_dict, search_type):
             # TODO: Fix the sorting ofr the new design of sorting solutions data (we use lists now for the solutions)
 
-            sorted_objects = sorted(results_dict[search_type][search_object_name].items(), key=lambda item: item[1]['value'], reverse=True)
-            results_dict[search_type][search_object_name] = {k: v for k, v in sorted_objects}
+            for category, suggestions_dict in results_dict[search_type].items():
+
+                suggestion_objects = [suggestion_dict['object'] for suggestion_dict in suggestions_dict]
+                suggestion_ratings = [suggestion_dict['value'] for suggestion_dict in suggestions_dict]
+
+                index_list = [i for i in range(len(suggestion_ratings))]
+                sorted_indices = sorted(index_list, key=lambda i: suggestion_ratings[i], reverse=True) 
+
+                sorted_suggestions = []
+                for index in sorted_indices:
+                    sorted_suggestions.append({
+                        'object': suggestion_objects[index],
+                        'value': suggestion_ratings[index]
+                    })
+
+                results_dict[search_type][category] = sorted_suggestions
 
             return results_dict
-
         # Gives results that are related to the query searched.
         def results_order(query):
             query = str(query)

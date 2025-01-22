@@ -1,6 +1,6 @@
-<!DOCTYPE html>
 {% load crispy_forms_tags %}
 {% load static %}
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -39,7 +39,7 @@
                             <a href="/page/recommended/all/1" role="button" class="display-6 link-success link-offset-2 link-underline-opacity-0">Arabali</a>
                         </div>
                         <div class="col-8">
-                            <form action="/search/q/1/1/1" method="post" id="search-bar-form">
+                            <form method="post" id="search-bar-form">
                                 {% csrf_token %}
                                 <div class="container">
                                     <div class="row">
@@ -54,7 +54,7 @@
                                             </div>
                                         </div>
                                         <div class="col-3">
-                                            <button type="submit" id="search-button" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
+                                            <button type="button" id="search-button" class="btn btn-outline-success"><i class="bi bi-search"></i></button>
                                         </div>
                                     </div>
                                 </div>

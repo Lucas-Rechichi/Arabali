@@ -1,3 +1,6 @@
+import importlib
+from datetime import datetime
+
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -59,7 +62,7 @@ def check_depreciation_time(request):
         old_post_interactions = PostInteraction.objects.filter(is_new=False)
 
         current_interest_interactions = InterestInteraction.objects.filter(is_new=True)
-        old_interest_interations = InterestInteraction.objects.filter(ins_new=False)
+        old_interest_interations = InterestInteraction.objects.filter(is_new=False)
 
         for cpi, opi in zip(current_post_interactions, old_post_interactions):
             cpi.is_new = False # new interactions become the old interactions
@@ -70,6 +73,10 @@ def check_depreciation_time(request):
             cii.is_new = False # new interactions become the old interactions
             cii.save()
             oii.delete() # delete old interactions
+
+        # Change the time set for the depreciation timestamp to the current timestamp
+        current_timestamp = datetime.now().timestamp()
+        
 
         # Message to say that the depreciations have been successful
         response = {
@@ -92,12 +99,10 @@ def search_recommendations(request):
     userstats_obj = UserStats.objects.get(user=user_obj)
 
     # Getting recommendations
-    post_recommendations = Algorithum.Recommend.recommend_posts(userstats_obj=userstats_obj, max_recommendations=3)
     user_recommendations = Algorithum.Recommend.recommend_users(userstats_obj=userstats_obj, max_recommendations=3)
     category_recommendations = Algorithum.Recommend.recommend_catergories(userstats_obj=userstats_obj, max_recommendations=3)
 
     response = {
-        'post_recommendations': post_recommendations,
         'user_recommendations': user_recommendations,
         'category_recommendations': category_recommendations,
     }
@@ -115,54 +120,32 @@ def search_suggestions(request):
         'exact': {
             'users': [],
             'categories': [],
-            'posts': []
         },
         'approx' : {
             'users': [],
             'categories': [],
-            'posts': []
         }
     }
 
     id_dict = {}
 
     # Searches for apropriate solutions given the query 
-    results_dict = Algorithum.Search.result_values_posts(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
     results_dict = Algorithum.Search.result_values_users(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
     results_dict = Algorithum.Search.result_values_categories(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
 
     # Solution sorting
-    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='posts')
-    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='users')
-    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type, search_object_name='categories')
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type)
 
     # Extract relevant data from search results so that they can be serialized though JSON to the front-end.
-
-    print(results_dict)
-
     results_data = {
-        'posts': [],
         'users': [],
         'categories': []
     }
 
-    for index, post_solution in enumerate(results_dict[solution_type]['posts']):
-        if index < 3:
-            media_obj = post_solution['object'].media.first()
-
-            results_data['posts'].append({
-                'post_id': post_solution['id'],
-                'post_title': post_solution['object'].title,
-                'post_media_url': media_obj.media_obj.url
-            })
-
-        else:
-            break
-
     for index, user_solution in enumerate(results_dict[solution_type]['users']):
         if index < 3:
             results_data['users'].append({
-                'username': user_solution['object'].name,
+                'username': user_solution['object'].user.username,
                 'user_pfp_url': user_solution['object'].pfp.url
             })
         else:
@@ -175,6 +158,8 @@ def search_suggestions(request):
             })
         else:
             break
+
+    print(results_data)
 
     response = {
         'results_data': results_data
