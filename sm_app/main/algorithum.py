@@ -911,16 +911,19 @@ class Algorithum:
             return solution_data
 
         def query_sorting(results_dict, search_type):
-            # TODO: Fix the sorting ofr the new design of sorting solutions data (we use lists now for the solutions)
 
+            # Loops though all types of items being searched
             for category, suggestions_dict in results_dict[search_type].items():
 
+                # Extracts the object and value form this result type
                 suggestion_objects = [suggestion_dict['object'] for suggestion_dict in suggestions_dict]
                 suggestion_ratings = [suggestion_dict['value'] for suggestion_dict in suggestions_dict]
 
+                # Creates a list representing the position of the current suggestion results, orders them based on the value, to create instructions as to sort the objects
                 index_list = [i for i in range(len(suggestion_ratings))]
                 sorted_indices = sorted(index_list, key=lambda i: suggestion_ratings[i], reverse=True) 
 
+                # Uses the index instructions to sort the objects
                 sorted_suggestions = []
                 for index in sorted_indices:
                     sorted_suggestions.append({
@@ -931,180 +934,18 @@ class Algorithum:
                 results_dict[search_type][category] = sorted_suggestions
 
             return results_dict
-        # Gives results that are related to the query searched.
-        def results_order(query):
-            query = str(query)
-            captialized_query = capitalize_plus(query)
-            highest_q_value = len(query) * 2
-
-            # Setup
-            exact_solutions = {}
-            results_dict = {
-                'exact': {
-                    'users': {},
-                    'tags': {},
-                    'posts': {}
-                },
-                'approx' : {
-                    'users': {},
-                    'tags': {},
-                    'posts': {}
-                }
-            }
-
-            user_stats = UserStats.objects.all()
-            tags = PostTag.objects.all()
-            posts = Post.objects.all()
-
-            # Gets all possible exact solutions for the inserted query
-            changed_query = captialized_query
-            for b in range(len(changed_query)):
-                exact_solutions[b + 1] = changed_query
-                changed_query = remove_last_character(changed_query)
-
-            # Gets all possible approximate solutions for the inserted query
-            approximate_solutions = {}
-            broken_query = [x for x in captialized_query] 
-            for a in range(len(captialized_query)):
-                approximate_solutions[a + 1] =  broken_query[a] 
-
-            # EXACT SOLUTIONS
-
-            # Loops though all users to see if their name relates to the search query
-            for user_stat in user_stats:
-                for combination_id, solution in exact_solutions.items():
-                    if str(solution) in str(user_stat.user.username): # if the string is present within this user's name
-                        if user_stat.user.pk not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys(): # Removes duplicates for both exact and approx solutions
-                            results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
-                            
-
-                    if str(solution.lower()) in str(user_stat.user.username):
-                        if user_stat.user.pk  not in results_dict['exact']['users'].keys() and user_stat.user.pk not in results_dict['approx']['users'].keys():
-                            results_dict['exact']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': exact_display(modified_reciprocal(combination_id))}
-                            
-
-            # Loops though all tags to see if the name of the tag relates to the search query
-            for tag in tags:
-                for combination_id, solution in exact_solutions.items():
-                    if str(solution) in str(tag.name):
-                        if tag.name not in results_dict['exact']['tags'].keys() and tag.name not in results_dict['approx']['tags'].keys():
-                            results_dict['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
-                            
-
-                    if str(solution.lower()) in str(tag.name):
-                        if tag.name not in results_dict['exact']['tags'].keys() and tag.name not in results_dict['approx']['tags'].keys():
-                            results_dict['exact']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': exact_display(modified_reciprocal(combination_id))}
-                            
-
-            # Loops though all posts to see if the title relates to the search query
-            for post in posts:
-                for combination_id, solution in exact_solutions.items():
-                    if str(solution) in str(post.title):
-                        if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
-                            results_dict['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
-                            
-                    if str(solution.lower()) in str(post.title):
-                        if post.pk not in results_dict['exact']['posts'].keys() and post.pk not in results_dict['approx']['posts'].keys():
-                            results_dict['exact']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': exact_display(modified_reciprocal(combination_id))}
-
-            # APPROXIMATE SOLUTIONS
-
-            # Loops though all users to see if their name relates to the search query
-            for user_stat in user_stats:
-                split_result_dict = {}
-                split_result_list = [x for x in (user_stat.user.username)] 
-                for a in range(len(user_stat.user.username)):
-                    split_result_dict[split_result_list[a]] =  [a + 1]
-                for combination_id, solution in approximate_solutions.items():
-                    if str(solution) in str(user_stat.user.username):
-                        if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
-
-                    if str(solution.lower()) in str(user_stat.user.username):
-                        if user_stat.user.pk  not in results_dict['approx']['users'].keys() and user_stat.user.pk not in results_dict['exact']['users'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            results_dict['approx']['users'][user_stat.user.pk] = {'id': user_stat.user.pk,'name': user_stat.user.username, 'value': approx_display(combination_id, highest_q_value)}
-
-            # Loops though all tags to see if the name of the tag relates to the search query
-            for tag in tags:
-                split_result_dict = {}
-                split_result_list = [x for x in (tag.name)] 
-                for a in range(len(tag.name)):
-                    split_result_dict[split_result_list[a]] =  [a + 1]
-                for combination_id, solution in approximate_solutions.items():
-                    if str(solution) in str(tag.name):
-                        if tag.name not in results_dict['approx']['tags'].keys() and tag.name not in results_dict['exact']['tags'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            results_dict['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
-
-                    if str(solution.lower()) in str(tag.name):
-                        if tag.name not in results_dict['approx']['tags'].keys() and tag.name not in results_dict['exact']['tags'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            results_dict['approx']['tags'][tag.name] = {'id': tag.pk,'name': tag.name, 'value': approx_display(combination_id, highest_q_value)}
-            
-            # Loops though all posts to see if the title relates to the search query
-            for post in posts:
-                split_result_dict = {}
-                split_result_list = [x for x in (post.title)] 
-                for a in range(len(post.title)):
-                    split_result_dict[split_result_list[a]] =  [a + 1]
-                for combination_id, solution in approximate_solutions.items():
-                    if str(solution) in str(post.title):
-                        if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            results_dict['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
-
-                    if str(solution.lower()) in str(post.title):
-                        if post.pk not in results_dict['approx']['posts'].keys() and post.pk not in results_dict['exact']['posts'].keys():
-                            for char_index, char in approximate_solutions.items():
-                                if char in split_result_list:
-                                    combination_id += modified_reciprocal(difference(char_index, split_result_dict[char][0]))
-                            results_dict['approx']['posts'][post.pk] = {'id': post.pk,'name': post.title, 'value': approx_display(combination_id, highest_q_value)}
-
-            # SORTING OF RESULTS
-
-            # Sort all by value
-            sorted_users = sorted(results_dict['exact']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
-            results_dict['exact']['users'] = {k: v for k, v in sorted_users}
-
-            sorted_tags = sorted(results_dict['exact']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
-            results_dict['exact']['tags'] = {k: v for k, v in sorted_tags}
-
-            sorted_posts = sorted(results_dict['exact']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
-            results_dict['exact']['posts'] = {k: v for k, v in sorted_posts}
-
-            sorted_users = sorted(results_dict['approx']['users'].items(), key=lambda item: item[1]['value'], reverse=True)
-            results_dict['approx']['users'] = {k: v for k, v in sorted_users}
-
-            sorted_tags = sorted(results_dict['approx']['tags'].items(), key=lambda item: item[1]['value'], reverse=True)
-            results_dict['approx']['tags'] = {k: v for k, v in sorted_tags}
-
-            sorted_posts = sorted(results_dict['approx']['posts'].items(), key=lambda item: item[1]['value'], reverse=True)
-            results_dict['approx']['posts'] = {k: v for k, v in sorted_posts}
-
-            return results_dict
-
 
     class Recommend:
 
         def recommend_users(userstats_obj, max_recommendations):
+            # Setup
             user_follower_object = Following.objects.get(name=userstats_obj.user.username)
             followers = UserStats.objects.filter(following=user_follower_object)
-
             user_recommendations = []
-            for i, follower in enumerate(followers):
-                if i + 1 <= max_recommendations:
+
+            # Loops though all followers, appends their name and profile picture file path to the recommendations list
+            for index, follower in enumerate(followers):
+                if index < max_recommendations:
                     user_recommendations.append({
                         'username': follower.user.username,
                         'user_pfp_url': follower.pfp.url,
@@ -1167,6 +1008,7 @@ class Algorithum:
             # Preform a basic sort, limiting the number of categories shown
             interests = Algorithum.Core.basic_sort(object_name='interest', user_obj=userstats_obj.user)
 
+            # Loops though all categories, appends their name to the recommendations list
             category_recommendations = []
             for index, interest in enumerate(interests):
                 if index < max_recommendations:

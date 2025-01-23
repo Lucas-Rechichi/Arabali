@@ -504,97 +504,78 @@ def error(request, error):
     return render(request, 'main/error.html', {'issue':error, 'notifications': init['notification_list'], 'notification_count': init['notification_count']})
 
 @login_required
-def search_results(request, q, post_increment, user_increment, catergory_increment):
+def search_results(request, query, increment):
     init = initialize_page(request=request) # initialize for topbar
 
     if UserStats.objects.get(user=request.user).is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
     
-    try:
-        query = request.POST.get('query') # getting query
-        if not query:
-            query = q
-    except:
-        query = q
-    results = Algorithum.Search.results_order(query=query)
-    filtered_results = {
-        'exact' : {
-            'users' : {},
-            'posts' : {},
-            'tags' : {},
+    # Getting search results
+    highest_q_value = len(query) * 2
+
+    solutions_data = Algorithum.Search.query_solutions(query=query, abs_cutoff_value=4)
+    solution_type = solutions_data['type']
+
+    results_dict = {
+        'exact': {
+            'users': [],
+            'categories': [],
         },
         'approx' : {
-            'users' : {},
-            'posts' : {},
-            'tags' : {},
+            'users': [],
+            'categories': [],
         }
     }
-    p = 0
-    for key, value in results['exact']['posts'].items():
-        p += 1
-        if (10 * (post_increment - 1)) < p < ((8 * post_increment) + (2 * (post_increment - 1))):
-            filtered_results['exact']['posts'][key] = value
-        if p > ((8 * post_increment) + (2 * (post_increment - 1))):
+
+    id_dict = {}
+
+    # Searches for apropriate solutions given the query 
+    results_dict = Algorithum.Search.result_values_users(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
+    results_dict = Algorithum.Search.result_values_categories(results_dict=results_dict, solutions_data=solutions_data, id_dict=id_dict, highest_q_value=highest_q_value)
+
+    # Solution sorting
+    results_dict = Algorithum.Search.query_sorting(results_dict=results_dict, search_type=solution_type)
+
+    # Extract relevant data from search results so that they can be serialized though JSON to the front-end.
+    results_data = {
+        'users': [],
+        'categories': []
+    }
+
+    # Limits the results of the suggestions to 10 per type, per page
+    for index, user_solution in enumerate(results_dict[solution_type]['users']):
+        index += 1
+        if (10 * (increment - 1)) < index < ((10 * increment) + 1):
+            results_data['users'].append({
+                'username': user_solution['object'].user.username,
+                'user_pfp_url': user_solution['object'].pfp.url
+            })
+        else:
             break
 
-    for key, value in results['approx']['posts'].items():
-        if ((8 * post_increment) + (2 * post_increment)) < p < ((10 * post_increment) + 1):
-            filtered_results['approx']['posts'][key] = value
-        p += 1
-        if p > ((10 * post_increment) + 1):
-            break
-    
-    u = 0
-    for key, value in results['exact']['users'].items():
-        u += 1
-        if (10 * (user_increment - 1)) < u < ((8 * user_increment) + (2 * user_increment - 1)):
-            filtered_results['exact']['users'][key] = value
-        if u > ((8 * user_increment) + (2 * (user_increment - 1))):
+    for index, category_solution in enumerate(results_dict[solution_type]['categories']):
+        index += 1
+        if (10 * (increment - 1)) < index < ((10 * increment) + 1):
+            results_data['categories'].append({
+                'category_name': category_solution['object'].name
+            })
+        else:
             break
 
-    for key, value in results['approx']['users'].items():
-        if ((8 * user_increment) + (2 * user_increment)) < u < ((10 * user_increment) + 1):
-            filtered_results['approx']['users'][key] = value
-        u += 1
-        if u > ((10 * user_increment) + 1):
-            break
+    print(results_dict)
 
-    c = 0
-    for key, value in results['exact']['tags'].items():
-        c += 1
-        if (10 * (catergory_increment - 1)) < c < ((8 * catergory_increment) + (2 * catergory_increment - 1)):
-            filtered_results['exact']['tags'][key] = value
-        if c > ((8 * catergory_increment) + (2 * (catergory_increment - 1))):
-            break
-
-    for key, value in results['approx']['tags'].items():
-        if ((8 * catergory_increment) + (2 * catergory_increment)) < c < ((10 * catergory_increment) + 1):
-            filtered_results['approx']['tags'][key] = value
-        c += 1
-        if c > ((10 * catergory_increment) + 1):
-            break
-    print(init['username'])
     variables = {
-        'feed':filtered_results, 
-        'search_bar': init['search_bar'], 
-        'username': init['username'],
+        'results_data': results_data,
         'query': query,
-        "post_increment" : {
-            "previous" : post_increment - 1,
-            "current": post_increment,
-            "next": post_increment + 1
+        'results_type': solution_type,
+        'increment': {
+            'previous': increment - 1,
+            'current': increment,
+            'next': increment + 1
         },
-        "user_increment" : {
-            "previous" : user_increment - 1,
-            "current": user_increment,
-            "next": user_increment + 1
-        },
-        "category_increment" : {
-            "previous" : catergory_increment - 1,
-            "current": catergory_increment,
-            "next": catergory_increment + 1
-        },
+        'username': init['username'],
         'notifications': init['notification_list'],
         'notification_count': init['notification_count']
-        }
+    }
+
     return render(request, 'main/search.html', variables)

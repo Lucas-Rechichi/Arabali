@@ -121,7 +121,7 @@ $(document).ready(function () {
         if (queryInput.length === 0) {
             // Throw an error?
         } else {
-            searchForm.attr('action', `/search/${queryInput}/1/1/1`); // For a get request to the search page
+            searchForm.attr('action', `/search/${queryInput}/1`); // For a get request to the search page
 
             searchForm[0].submit();
         }

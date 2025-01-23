@@ -1,12 +1,30 @@
 {% extends 'main/template.html' %}
 {% load crispy_forms_tags %}
-{% block title %}Search Results for: {{query}}{% endblock %}
+{% load main_filters %}
+{% load static %}
+
+<!-- Title of the page -->
+{% block title %}
+    Search Results For: {{query}} | Arabali
+{% endblock %}
+
+<!-- For the sidebar -->
 {% block topsidebar %}
-<li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
+    <li class="custom-icon"><div class="fs-4"><i class="bi bi-person" style="color: #787878;"></i></div> <a href="/profile/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Profile</p></a></li>
 {% endblock %}
+
 {% block middlesidebar %}
-<li class="custom-icon"><div class="fs-4"><i class="bi bi-gear-wide-connected" style="color: #787878;"></i></div> <a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
+    <li class="custom-icon"><div class="fs-4"><i class="bi bi-gear-wide-connected" style="color: #787878;"></i></div> <a href="/settings/{{username}}" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"><p class="lead">Settings</p></a></li>
 {% endblock %}
+
+<!-- For page specific scripts -->
+{% block scripts %}
+    <script type="module" src="{% static 'universal/notifications.js'%}"></script>
+    <script type="module" src="{% static 'websockets/post_socket.js' %}"></script>
+    <script type="module" src="{% static 'websockets/notification_socket.js' %}"></script>
+{% endblock %}
+
+<!-- Notifications -->
 {% block notifications %}
     <!-- loops though all notifications sent to the document -->
     {% for notification in notifications.values %}
@@ -52,57 +70,15 @@
                 </div>
             </div>
         </div>
-        <!-- script for removing notifications if a user dismisses the notification or chjecks out the notification. -->
-        <script> 
-            $(document).ready(function () {
-                $('#close-notification-{{notification.notification_object.pk}}').click(function () {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/universal/remove-notification/',
-                        data: {
-                            'receiver': '{{user.username}}',
-                            'type': 'notification-id',
-                            'csrfmiddlewaretoken': '{{ csrf_token }}',
-                            'notification_id': '{{notification.notification_object.pk}}'
-                        },
-                        success: function(response) {
-                            console.log(response.notification_count, response.notification_counter)
-                            var notification = $("#notification-{{notification.notification_object.pk}}")
-                            notification.remove();
-                            $('#notification-counter').text('');
-                            $('#notification-counter').text(response.notification_count);
-                                if (response.notification_count == 0) {
-                                    $('#notification-counter').text(response.notification_count).hide();
-                                    $('#notification-counter').remove();
-                                    $('#bell-icon').removeClass('bi-bell-fill');
-                                    $('#bell-icon').addClass('bi-bell');
-                                }
-                        }
-                    })
-                })
-                $('#read-notification-{{notification.notification_object.pk}}').click(function () {
-                    $.ajax({
-                        type: 'POST',
-                        url: '/universal/remove-notification/',
-                        data: {
-                            'receiver': '{{user.username}}',
-                            'type': 'notification-id',
-                            'csrfmiddlewaretoken': '{{ csrf_token }}',
-                            'notification_id': '{{notification.notification_object.pk}}'
-                        },
-                        success: function(response) {
-                            console.log(response.message)
-                        }
-                    })
-                })
-            })
-        </script>
     {% endfor %}
 {% endblock %}
-<!-- for the notification counter -->
+
+<!-- For the notification counter -->
 {% block notification_count %} 
     {{ notification_count }}
 {% endblock %}
+
+<!-- Main segment of HTML document -->
 {% block body %}
 <div class="container">
     <div class="row">
@@ -110,102 +86,60 @@
             <br>
             <div class="card">
                 <div class="container">
+                    <!-- Heading -->
                     <div class="row">
                         <div class="col">
                             <em><p class="lead text-center">You searched for: '{{query}}'</p></em>
                         </div>
                     </div>
+                    <!-- The suggestions -->
                     <div class="row">
-                        <div class="col-4">
-                            <h6 class="display-6 text-center">Posts</h6>
-                            <hr>
-                            <!-- loops though all Exact post solutions -->
-                            {% for id, result in feed.exact.posts.items %}
-                                <div class="row">
-                                    <div class="col">
-                                        <!-- redirects users to that specific post -->
-                                        <a href="/posts/{{result.id}}" role="button" class="link-success link-offset-2 link-underline-opacity-0"><p class="lead text-center">{{result.name}}</p></a>    
-                                    </div>
-                                </div>
-                                <hr>
-                            {% endfor %}
-                            <!-- same for approx solutions -->
-                            {% for id, result in feed.approx.posts.items %}
-                                <div class="row">
-                                    <div class="col">
-                                        <a href="/posts/{{result.id}}" role="button" class="link-success link-offset-2 link-underline-opacity-0"><p class="lead text-center">{{result.name}}</p></a>
-                                    </div>
-                                </div>
-                                <hr>
-                            {% endfor %}
-                            <!-- Pageination -->
-                            <div class="col d-flex justify-content-center">
-                                {% if post_increment.previous == 0 %}
-                                    <button class="btn btn-outline-success" disabled><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% else %}
-                                    <button class="btn btn-outline-success" onclick='location.href = "/search/{{query}}/{{post_increment.previous}}/{{user_increment.current}}/{{category_increment.current}}"'><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% endif %}
-                                <p class="lead ps-2 pe-2 mt-2">Page No. {{post_increment.current}} </p>
-                                <button class="btn btn-outline-success" onclick='location.href = "/search/{{query}}/{{post_increment.next}}/{{user_increment.current}}/{{category_increment.current}}"'>Next <i class="bi bi-arrow-right-circle"></i></button>
-                            </div>
-                        </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <h6 class="display-6 text-center">Users</h6>
                             <hr>
-                            {% for id, result in feed.exact.users.items %}
+                            <!-- Loops though all user suggestions -->
+                            {% for user_suggestion in results_data.users %}
                                 <div class="row">
                                     <div class="col">
-                                        <a href="/profile/{{result.name}}" role="button" class="link-success link-offset-2 link-underline-opacity-0"><p class="lead text-center">{{result.name}}</p></a>      
+                                        <div class="container d-flex flex-wrap justify-content-center">
+                                            <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/profile/{{user_suggestion.username}}'">
+                                                <img class="user-icon align-self-start" src="{{user_suggestion.user_pfp_url}}" alt="{{user_suggestion.username|correct_apostrophe}} Profile Picture">
+                                                <p class="mt-1 ms-3 p-0 align-self-start">User: {{user_suggestion.username}}</p>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <hr>
                             {% endfor %}
-                            {% for id, result in feed.approx.users.items %}
-                                <div class="row">
-                                    <div class="col">
-                                        <a href="/profile/{{result.name}}" role="button" class="link-success link-offset-2 link-underline-opacity-0"><p class="lead text-center">{{result.name}}</p></a>      
-                                    </div>
-                                </div>
-                                <hr>
-                            {% endfor %}
-                            <div class="col d-flex justify-content-center">
-                                {% if user_increment.previous == 0 %}
-                                    <button class="btn btn-outline-success" disabled><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% else %}
-                                    <button class="btn btn-outline-success" onclick='location.href = "/search/{{query}}/{{post_increment.current}}/{{user_increment.previous}}/{{category_increment.current}}"'><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% endif %}
-                                <p class="lead ps-2 pe-2 mt-2">Page No. {{user_increment.current}} </p>
-                                <button class="btn btn-outline-success" onclick='location.href = "/search/{{query}}/{{post_increment.current}}/{{user_increment.next}}/{{category_increment.current}}"'>Next <i class="bi bi-arrow-right-circle"></i></button>
-                            </div>
                         </div>
-                        <div class="col-4">
-                            <h6 class="display-6 text-center">Catergories</h6>
+                        <div class="col-6">
+                            <h6 class="display-6 text-center">Categories</h6>
                             <hr>
-                            {% for id, result in feed.exact.tags.items %}
+                            <!-- Loops though all category suggestions -->
+                            {% for category_suggestion in results_data.categories %}
                                 <div class="row">
                                     <div class="col">
-                                        <a href="/page/popular|{{result.name}}/1" role="button" class="link-success link-offset-2 link-underline-opacity-0"><p class="lead text-center">{{result.name}}</p></a>      
+                                        <div class="container d-flex flex-wrap justify-content-center">
+                                            <button type="button" class="btn d-flex flex-wrap" onclick="location.href='/page/recommended/{{category_suggestion.category_name}}/1'">
+                                                <i class="bi bi-filter-circle" style="font-size: 2vw; color: #198754;"></i>
+                                                <p class="ms-3" style="margin-top: 12px;">Category: {{category_suggestion.category_name}}</p>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                <hr>
                             {% endfor %}
-                            {% for id, result in feed.approx.tags.items %}
-                                <div class="row">
-                                    <div class="col">
-                                        <a href="/page/popular|{{result.name}}/1" role="button" class="link-success link-offset-2 link-underline-opacity-0"><p class="lead text-center">{{result.name}}</p></a>  
-                                    </div>
-                                </div>
-                                <hr>
-                            {% endfor %}
-                            <div class="col d-flex justify-content-center">
-                                {% if category_increment.previous == 0 %}
-                                    <button class="btn btn-outline-success" disabled><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% else %}
-                                    <button class="btn btn-outline-success" onclick='location.href = "/search/{{query}}/{{post_increment.current}}/{{user_increment.current}}/{{category_increment.previous}}"'><i class="bi bi-arrow-left-circle"></i> Previous</button>
-                                {% endif %}
-                                <p class="lead ps-2 pe-2 mt-2">Page No. {{category_increment.current}} </p>
-                                <button class="btn btn-outline-success" onclick='location.href = "/search/{{query}}/{{post_increment.current}}/{{user_increment.current}}/{{category_increment.next}}"'>Next <i class="bi bi-arrow-right-circle"></i></button>
-                            </div>
+                        </div>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="row">
+                        <div class="col d-flex justify-content-center m-1">
+                            {% if increment.current <= 1 %}
+                                <button type="button" class="btn btn-success m-1" onclick="location.href='/search/{{query}}/{{increment.previous}}'" disabled><i class="bi bi-caret-left-fill"></i></i></button>
+                            {% else %}
+                                <button type="button" class="btn btn-success m-1" onclick="location.href='/search/{{query}}/{{increment.previous}}'"><i class="bi bi-caret-left-fill"></i></i></button>
+                            {% endif %}
+
+                            <p class="lead m-1">{{increment.current}}</p>
+                            <button type="button" class="btn btn-success m-1" onclick="location.href='/search/{{query}}/{{increment.next}}'"><i class="bi bi-caret-right-fill"></i></button>
                         </div>
                     </div>
                 </div>
@@ -213,125 +147,6 @@
         </div>
     </div>
 </div>
-<!-- Websockets for recieving notifications -->
-<script type="module">
-    let notificationSocket;
-    let reconnectionTime = 5000; // time between disconnection and an attempt to reconnect to the websocket
-
-    function connectNotificationSocket() { // function for connecting to the websocket.
-        notificationSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/brodcast-message/'
-        ); // connect to the relevant consumer class: NotificationConsumer
-
-        notificationSocket.onopen = function(e) {
-            console.log('connected', e);
-        };
-
-        notificationSocket.onmessage = function(e) { // when the consumer class sends a message through
-            console.log('Message coming through!');
-            const data = JSON.parse(e.data); // reconfigures the data so that it can be used within our function.
-
-            if (data.receiver === '{{username}}') { // if the data belongs to this specific user
-                $('#inbox').append(data.html_notification_popup); // adds HTML to the inbox div, which stores notification toasts
-                $('#notification-inbox').prepend(data.stored_html_notification); // adds HTML to the notification div that houses the notifications in the off-canvas
-                
-                // Update notification count
-                var notificationCounter = $('#notification-counter');
-                var newCount = parseInt(notificationCounter.text()) || 0;
-                notificationCounter.text(newCount + 1).show();
-                
-                if ($('#bell-icon').hasClass('bi-bell')) { // if the bell looks like it has 0 notifications
-                    $('#bell-icon').removeClass('bi-bell');
-                    $('#bell-icon').addClass('bi-bell-fill');
-                }
-
-                var notificationElement = document.getElementById('popup-notification-' + data.notification_id); // gets the newly created popup notification toast
-
-                if (notificationElement) {
-                    var notification = new bootstrap.Toast(notificationElement); // creates a bootstrap toast
-                    // Show the toast
-                    notification.show();
-                } else {
-                    console.error('Notification element not found:', 'notification-' + data.notification_id);
-                }
-
-                // Attach event handlers to the newly added notification
-                attachNotificationEventHandlers(data.notification_id, data.receiver);
-            } else {
-                console.log('incorrect user');
-            }
-        };
-
-        notificationSocket.onerror = function(e) {
-            console.error('WebSocket encountered an error:', e);
-        };
-
-        notificationSocket.onclose = function(e) {
-            console.error('WebSocket closed unexpectedly:', e);
-            setTimeout(connectNotificationSocket, reconnectionTime); // attempt a reconnection to this websocket
-        };
-    }
-
-    function attachNotificationEventHandlers(notificationId, receiver) {
-        $(`#close-notification-${notificationId}`).click(function() {
-            $.ajax({
-                type: 'POST',
-                url: '/universal/remove-notification/',
-                data: {
-                    'receiver': receiver,
-                    'type': 'notification-id',
-                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                    'notification_id': notificationId,
-                },
-                success: function(response) {
-                    console.log(response.message);
-                    var notification = $(`#stored-notification-${notificationId}`);
-                    notification.remove();
-                    var notificationCounter = $('#notification-counter');
-                    var newCount = parseInt(notificationCounter.text()) - 1;
-
-                    if (newCount <= 0) {
-                        notificationCounter.text('').hide();
-                        $('#bell-icon').removeClass('bi-bell-fill').addClass('bi-bell');
-                    } else {
-                        notificationCounter.text(newCount);
-                    }
-                }
-            });
-        });
-
-        $(`#read-notification-${notificationId}`).click(function() {
-            $.ajax({
-                type: 'POST',
-                url: '/universal/remove-notification/',
-                data: {
-                    'receiver': receiver,
-                    'type': 'notification-id',
-                    'csrfmiddlewaretoken': '{{ csrf_token }}',
-                    'notification_id': notificationId,
-                },
-                success: function(response) {
-                    console.log(response.message);
-                }
-            });
-        });
-    }
-
-    $(document).ready(function() {
-        if ('{{ notification_count }}' == '0') {
-            var notification_counter = $('#notification-counter');
-            notification_counter.text('').hide();
-            var notification_bell = $('#bell-icon');
-            notification_bell.removeClass('bi-bell-fill').addClass('bi-bell');
-        } else {
-            var notificationCounter = $('#notification-counter');
-            notificationCounter.text('{{ notification_count }}').show();
-            $('#bell-icon').removeClass('bi-bell').addClass('bi-bell-fill');
-        }
-    });
-
-    connectNotificationSocket(); // connect to the relevant websocket
-</script>
 <!-- To store notifications -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" id="inbox">
 
