@@ -1,0 +1,40 @@
+/* For the icons used in the search bar */
+.post-icon {
+    width: 5vw; 
+    height: 5vh;
+    border-radius: 3px;
+}
+
+.user-icon {
+    width: 2vw; 
+    height: 2vw;
+    border-radius: 20px;
+}
+
+/* For the searching popup */
+#search-suggestions-card {
+    display: none; 
+    position: absolute; 
+    max-height: 550px;
+    max-width: 94.39%;
+    z-index: 500; 
+    overflow-y: auto;
+}
+
+@media (min-width:992px) and (max-width:1200px) {
+    #search-suggestions-card {
+        max-width: 93.47%;
+    }
+}
+
+@media (min-width:768) and (max-width:992px) {
+    #search-suggestions-card {
+        max-width: 89.47%;
+    }
+}
+
+@media (max-width:768px) {
+    #search-suggestions-card {
+        max-width: 85.71%;
+    }
+}

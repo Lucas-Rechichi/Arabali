@@ -51,7 +51,7 @@ class Algorithum:
                 return num_final - num_initial
         
         # Function for sorting objects baced on the value
-        def basic_sort(object_name, sub_category, user_obj=None):
+        def basic_sort(object_name, sub_category=None, user_obj=None):
 
             # Setup
             order = []
@@ -64,11 +64,11 @@ class Algorithum:
                     filtered_objects = PostTag.objects.filter(name=sub_category)
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
-            else:
+            else: # object_name == 'interest':
                 if sub_category == 'all':
                     sorted_objects = Interest.objects.all().annotate(Count('value')).order_by('-value')
                 else:
-                    filtered_objects = Interest.objects.filter(name=sub_category, user=user_obj)
+                    filtered_objects = Interest.objects.filter(user=user_obj)
                     sorted_objects = filtered_objects.annotate(Count('value')).order_by('-value')
 
             # Appends the sorted queryset to a list
@@ -1165,7 +1165,7 @@ class Algorithum:
         def recommend_catergories(userstats_obj, max_recommendations):
 
             # Preform a basic sort, limiting the number of categories shown
-            interests = Algorithum.Core.basic_sort(object_name='interest', sub_category='all', user_obj=None)
+            interests = Algorithum.Core.basic_sort(object_name='interest', user_obj=userstats_obj.user)
 
             category_recommendations = []
             for index, interest in enumerate(interests):

@@ -1,4 +1,4 @@
-import importlib
+import re
 from datetime import datetime
 
 from django.http import JsonResponse
@@ -74,9 +74,19 @@ def check_depreciation_time(request):
             cii.save()
             oii.delete() # delete old interactions
 
-        # Change the time set for the depreciation timestamp to the current timestamp
-        current_timestamp = datetime.now().timestamp()
+        # Change the time set in settings for the depreciation timestamp to the current timestamp
+        current_timestamp = round(datetime.now().timestamp())
+        timestamp_syntax = f'last_depreciation_timestamp = {current_timestamp}'
+        settings_file_path = 'sm_app/settings.py'
+
+        with open(settings_file_path, 'r') as settings_file: # read file, get data
+            file_content = settings_file.read()
+
+        variable_syntax_pattern = r'(last_depreciation_timestamp\s*=\s*)\d+' # syntax pattern
+        updated_file_content = re.sub(variable_syntax_pattern, rf'{timestamp_syntax}', file_content) # replace with new timestamp
         
+        with open(settings_file_path, 'w') as settings_file: # write the file again
+            settings_file.write(updated_file_content)
 
         # Message to say that the depreciations have been successful
         response = {

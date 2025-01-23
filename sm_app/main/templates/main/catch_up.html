@@ -26,7 +26,7 @@
         <script type="module" src="{% static 'websockets/notification_socket.js' %}"></script>
         <!-- STYLES -->
         <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
-        <link rel="stylesheet" href="{% static 'universal/search_icons.css' %}">
+        <link rel="stylesheet" href="{% static 'universal/search_bar.css' %}">
         <link rel="stylesheet" href="{% static 'main/posts.css' %}">
     </head>
     <body>
@@ -45,7 +45,7 @@
                                         <div class="col-3">
                                         </div>
                                         <div class="col-6">
-                                            <input type="text" id="search-bar" class="form-control" placeholder="Search...">
+                                            <input type="text" id="search-bar" class="form-control" placeholder="Search..." autocomplete="off">
                                             <div class="card" id="search-suggestions-card" style="display: none; max-height: 167px; overflow-y: auto;">
                                                 <div class="card-body">
                                                     <ul id="search-suggestions" class="list-group mt-2"></ul>

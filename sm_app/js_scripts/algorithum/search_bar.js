@@ -84,7 +84,8 @@ $(document).ready(function () {
     
                         categorySuggestionsHtml += categorySuggestionHtml;
                     };
-    
+
+                    // Constructing the suggestions
                     var suggestionsHtml = `
                         <div class="container">
                             <div class="row">
@@ -138,7 +139,8 @@ $(document).ready(function () {
 
             success: function(response) {
                 // Response setup
-                var recommendationsLength = 3
+                var userRecommendationsLength = response.user_recommendations.length;
+                var categoryRecommendationsLength = response.category_recommendations.length;
 
                 var userRecommendationsHtml = '';
                 var categoryRecommendationsHtml = '';
@@ -149,11 +151,11 @@ $(document).ready(function () {
                 var userRecommendationSet;
                 var categoryRecommendationSet;
 
-                // Loops though all recommendations, appending the HTML to it's respective variable above
-                for (let i=0; i < recommendationsLength; i++) {
+                // Loops though all user recommendations, appending the HTML to it's respective variable above
+                for (let i=0; i < userRecommendationsLength; i++) {
+
                     // Getting recommendation
                     userRecommendationSet = response.user_recommendations[i];
-                    categoryRecommendationSet = response.category_recommendations[i];
 
                     userRecommendationHtml = `
                         <div class="container d-flex flex-wrap justify-content-center">
@@ -164,6 +166,15 @@ $(document).ready(function () {
                         </div>
                     `;
 
+                    userRecommendationsHtml += userRecommendationHtml;
+                };
+
+                // Loops though all category recommendations, appending the HTML to it's respective variable above
+                for (let i=0; i < categoryRecommendationsLength; i++) {
+
+                    // Getting recommendation
+                    categoryRecommendationSet = response.category_recommendations[i];
+
                     categoryRecommendationHtml = `
                         <div class="container d-flex flex-wrap justify-content-center">
                             <button type="button" class="btn d-flex flex-wrap" onclick="location.href=\'/page/recommended/${categoryRecommendationSet['category_name']}/1\'">
@@ -173,10 +184,10 @@ $(document).ready(function () {
                         </div>
                     `;
 
-                    userRecommendationsHtml += userRecommendationHtml;
                     categoryRecommendationsHtml += categoryRecommendationHtml;
                 };
 
+                // Constructing the recommentations
                 var recommendationsHtml = `
                     <div class="container">
                         <div class="row">
