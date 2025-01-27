@@ -56,7 +56,7 @@ class Algorithum:
             # Setup
             order = []
 
-            # Logic for what to sort
+            # Logic for what to sort for
             if object_name == 'tag':
                 if sub_category == 'all':
                     sorted_objects = PostTag.objects.all().annotate(Count('value')).order_by('-value')
@@ -327,7 +327,7 @@ class Algorithum:
 
             return appending_posts
 
-    class Depreciations:
+    class Modulations:
         def calculate_post_consequence_function(post_tag_obj):
 
             # Getting tag value
@@ -355,7 +355,7 @@ class Algorithum:
 
             # Getting the average of the post_tags
             post_tag_values_list = list(PostTag.objects.all().values_list('value', flat=True))
-            average_post_tag_value = Algorithum.Core.average(num_list=post_tag_values_list, is_abs=False) # ABS dosen't mattter here due to all tag values always being positive
+            average_post_tag_value = Algorithum.Core.average(num_list=post_tag_values_list, is_abs=False)
 
             # Getting the sum of the difference_list
             sum_of_difference = 0.0
@@ -507,9 +507,9 @@ class Algorithum:
                 # Logic for new tag entries
                 if name not in tag_iterations:
                     tag_iterations[name] = 0
-                
+
                 # Orders the tags based on individual value
-                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_category=name, user_obj=user)
+                tag_order = Algorithum.Core.basic_sort(object_name='tag', sub_category=name)
 
                 # Select the tag depending on what iteration that name is on
                 selected_tag = tag_order[tag_iterations[name]]

@@ -33,7 +33,7 @@ urlpatterns = [
     # for universal functions
     path('universal/error/', universal.ajax_error, name="ajax_error"),
     path('universal/remove-notification/', universal.remove_notification, name='remove_notification'),
-    path('universal/check-depreciation-time/', universal.check_depreciation_time, name='check_depreciation_time'),
+    path('universal/check-modulation-time/', universal.check_modulation_time, name='check_modulation_time'),
     path('universal/search-recommendations/', universal.search_recommendations, name='search_recommendations'),
     path('universal/search-suggestions/', universal.search_suggestions, name='search_suggestions'),
 

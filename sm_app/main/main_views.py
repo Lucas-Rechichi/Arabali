@@ -95,9 +95,6 @@ def page(request, category, sub_category, increment):
 
     else:
         return render(request, 'main/error.html', {'issue': 'Category Dose Not Exist'})
-    
-    # Conditional for if the subcategory exists
-
 
     # Only allows the top 10 posts to be displayed first
     posts_to_append = Algorithum.PostRendering.posts_per_page(post_list=posts, incrementing_factor=increment, limit_index=None)

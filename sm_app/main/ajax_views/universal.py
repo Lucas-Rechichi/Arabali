@@ -41,21 +41,21 @@ def remove_notification(request):
     response = {}
     return JsonResponse(response)
 
-def check_depreciation_time(request):
+def check_modulation_time(request):
     # Getting relevant data
     recieved_timestamp = int(request.POST.get('timestamp'))
-    last_depreciation_timestamp = settings.last_depreciation_timestamp
+    last_modulation_timestamp = settings.last_modulation_timestamp
 
     # Checking to see if enough time has elapsed (1 day = 86400 seconds)
-    if recieved_timestamp - last_depreciation_timestamp >= 86400:
+    if recieved_timestamp - last_modulation_timestamp >= 86400:
 
         # Get tags and interests, iterate and apply PCF and ICF respectfuly to them
         tags = PostTag.objects.all()
         interests = Interest.objects.all()
 
         for tag, interest in zip(tags, interests):
-            Algorithum.Depreciations.calculate_post_consequence_function(post_tag_obj=tag)
-            Algorithum.Depreciations.calculate_interest_consequence_function(interest_obj=interest)
+            Algorithum.Modulations.calculate_post_consequence_function(post_tag_obj=tag)
+            Algorithum.Modulations.calculate_interest_consequence_function(interest_obj=interest)
 
         # Change the current and old interactions
         current_post_interactions = PostInteraction.objects.filter(is_new=True)
@@ -74,28 +74,28 @@ def check_depreciation_time(request):
             cii.save()
             oii.delete() # delete old interactions
 
-        # Change the time set in settings for the depreciation timestamp to the current timestamp
+        # Change the time set in settings for the modulation timestamp to the current timestamp
         current_timestamp = round(datetime.now().timestamp())
-        timestamp_syntax = f'last_depreciation_timestamp = {current_timestamp}'
+        timestamp_syntax = f'last_modulation_timestamp = {current_timestamp}'
         settings_file_path = 'sm_app/settings.py'
 
         with open(settings_file_path, 'r') as settings_file: # read file, get data
             file_content = settings_file.read()
 
-        variable_syntax_pattern = r'(last_depreciation_timestamp\s*=\s*)\d+' # syntax pattern
+        variable_syntax_pattern = r'(last_modulation_timestamp\s*=\s*)\d+' # syntax pattern
         updated_file_content = re.sub(variable_syntax_pattern, rf'{timestamp_syntax}', file_content) # replace with new timestamp
         
         with open(settings_file_path, 'w') as settings_file: # write the file again
             settings_file.write(updated_file_content)
 
-        # Message to say that the depreciations have been successful
+        # Message to say that the modulations have been successful
         response = {
             'message': 'Depreciation Successful'
         }
 
     else:
 
-        # Message to say that the depreciations have occured today
+        # Message to say that the modulations have occured today
         response = {
             'message': 'Depreciation already occured today'
         }
