@@ -412,88 +412,31 @@ def post_view(request, post_id):
 
 @login_required
 def config(request, name):
+
     init = initialize_page(request)
-    
+
     if UserStats.objects.get(user=request.user).is_banned:
         return render(request, 'main/error.html', {'issue': 'You are banned from Arabali.'})
+
     # Checking that the right user is acessing this page.
-    username = request.user.username
-    if name != username:
+    if name != request.user.username:
         return render(request, 'main/error.html', {'issue': 'Cannot access this users profile'})
     
     # Getting needed databace values
-    user = User.objects.get(username=username)
-    user_stats = UserStats.objects.get(user=user)
-    liked_bys = LikedBy.objects.all()
-    
+    user_stats = UserStats.objects.get(user=request.user)
+    user_posts = Post.objects.all()
 
-    # LikedBy Preperation
-    liked_by_users = []
-    liked_by_user_set = set()
-    user_posts = Post.objects.filter(user=user)
-    post_list = user_posts
-    for user_liked_by_obj in liked_bys:
-        for post in post_list:
-            if user_liked_by_obj in post.liked_by.all():
-                if user_liked_by_obj not in liked_by_user_set:
-                    try:
-                        liked_by_users.append(UserStats.objects.get(user=User.objects.get(username=user_liked_by_obj.name)))
-                        liked_by_user_set.add(user_liked_by_obj)
-                    except User.DoesNotExist:
-                        break
-    print(post.liked_by.all(), liked_by_users)
+    user_posts_data = Algorithum.PostRendering.get_post_data(post_list=user_posts, user_obj=request.user)
 
-    # Form init
-    if request.method == 'POST':
-        # Forms
-        edit_profile_form = EditProfile(request.POST, request.FILES)
-        edit_post_form = EditPost(request.POST, request.FILES)
-
-        if request.POST.get('change'):
-            if edit_profile_form.is_valid():
-                # Form function
-                edit_profile = Configure.edit_profile(request=request, current_username=username)
-            
-                # Editing Error Management
-                if edit_profile in ['Cannot be named Images due to the default image directory being called Images.', 'Username Cannot Contain Spaces', 'Username Taken.']:
-                    return render(request, 'main/error.html', {'issue': edit_profile})
-            
-                if edit_profile:
-                    return HttpResponseRedirect(f'/edit/{edit_profile.username}')
-        
-        elif request.POST.get('delete'):
-            for p in post_list:
-                if int(request.POST.get('post-id')) == int(p.pk):
-                    Configure.delete_post(request=request, post=p)
-                
-        elif request.POST.get('edit'):
-            for p in post_list:
-                if int(request.POST.get('post-id')) == int(p.pk):
-                    Configure.edit_post(request=request, post=p)
-
-        else:
-            print('Other button pressed')
-            print(request.POST)
-
-    else:
-
-        # Forms
-        edit_profile_form = EditProfile()
-        edit_post_form = EditPost()
-        
-    user_posts = Post.objects.filter(user=user)
-    post_list = list(user_posts)
     variables = {
-        'edit_profile_form': edit_profile_form,
-        'edit_post_form': edit_post_form, 
         'user_stats': user_stats, 
-        'username': username,
-        'posts': post_list,
+        'posts': user_posts_data,
+        'username' : init['username'],
         'search_bar': init['search_bar'],
-        'liked_by_users': liked_by_users,
         'notifications': init['notification_list'],
         'notification_count': init['notification_count']
-    }        
+    }
+
     return render(request, 'main/config.html', variables)
 
 def error(request, error):

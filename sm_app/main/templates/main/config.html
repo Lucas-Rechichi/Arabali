@@ -1,4 +1,5 @@
 {% load crispy_forms_tags %}
+{% load main_filters %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -20,6 +21,7 @@
         <script type="module" src="{% static 'universal/notifications.js'%}"></script>
         <script type="module" src="{% static 'websockets/notification_socket.js' %}"></script>
         <!-- STYLES -->
+        <link rel="stylesheet" href="{% static 'forms/drag_and_drop.css' %}">
         <link rel="stylesheet" href="{% static 'universal/sidebar.css' %}">
         <link rel="stylesheet" href="{% static 'universal/search_bar.css' %}">
     </head>
@@ -38,9 +40,9 @@
                                     <div class="row">
                                         <div class="col-3">
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-6 position-relative">
                                             <input type="text" id="search-bar" class="form-control" placeholder="Search..." autocomplete="off">
-                                            <div class="card" id="search-suggestions-card" style="display: none; max-height: 167px; overflow-y: auto;">
+                                            <div class="card w-100" id="search-suggestions-card">
                                                 <div class="card-body">
                                                     <ul id="search-suggestions" class="list-group mt-2"></ul>
                                                 </div>
@@ -151,6 +153,7 @@
         </div>
         <br>
         <br>
+        <!-- Main section of HTML document -->
         <div class="container">
             <div class="row">
                 <div class="col-2">
@@ -165,26 +168,67 @@
                         </nav>
                     </nav>
                 </div>
+                <!-- Changing profile -->
                 <div class="col-10">
                     <div data-bs-spy="scroll" data-bs-target="#navbar-settings" data-bs-smooth-scroll="true" class="scrollspy-example-2" tabindex="0">
                         <div id="edit-profile">
                             <div class="card p-3" style="top:50px;">
                                 <h2 class="display-4 text-center">Change Profile</h2>
                                 <br>
-                                <form id="EditProfileForm" method="post" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    {{ edit_profile_form|crispy }}
-                                    <input type="hidden" id="change" name="change" value="">
-                                    <button type="button" class="btn btn-success" id="EditProfile"><i class="bi bi-check-circle-fill"></i> Change</button>
-                                </form>
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        document.getElementById('EditProfile').addEventListener('click', function() {
-                                            document.getElementById('change').value = 'change';
-                                            document.getElementById('EditProfileForm').submit();
-                                        });
-                                    });
-                                </script>
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="username-input">New Username:</label>
+                                        <input type="text" id="username-input" class="form-control" placeholder="Current: {{username}}">
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label for="pfp-media-card" class="form-label">Profile Picture:</label>
+                                        <div class="file-drop-input p-5" id="pfp-media-card">
+                                            <button type="button" class="btn" id="upload-pfp-media-button" onclick="document.getElementById('pfp-media-input').click();">
+                                                <i class="bi bi-upload" style="font-size: 3rem;"></i>
+                                                <p class="text-center">Drag and drop files or click onto the icon</p>
+                                                <input type="file" id="pfp-media-input" hidden>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <br>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col">
+                                                <p class="lead text-center m-0">Current:</p>
+                                            </div>
+                                            <div class="col">
+
+                                            </div>
+                                            <div class="col">
+                                                <p class="lead text-center m-0">New:</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <img class="ms-5" src="{{user_stats.pfp.url}}" alt="{{username|correct_apostrophe}} Profile Picture" style="width: 2rem; height: 2rem; border-radius: 1rem;">
+                                            </div>
+                                            <div class="col">
+                                                <i class="bi bi-arrow-right-square ms-5" style="font-size: 1.5rem;"></i>
+                                            </div>
+                                            
+                                            <div class="col">
+                                                <img id="pfp-media-preview" src="" alt="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+
+                                    </div>
+                                    <div class="col-6">
+                                        
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col text-center">
                                         <p class="lead">Current Username: {{username}}</p>

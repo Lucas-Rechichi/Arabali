@@ -90,14 +90,14 @@ def check_modulation_time(request):
 
         # Message to say that the modulations have been successful
         response = {
-            'message': 'Depreciation Successful'
+            'message': 'Modulations Successful'
         }
 
     else:
 
         # Message to say that the modulations have occured today
         response = {
-            'message': 'Depreciation already occured today'
+            'message': 'Modulations already occured today'
         }
 
     return JsonResponse(response)
