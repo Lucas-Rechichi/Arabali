@@ -38,7 +38,7 @@ def add_post(request):
     new_post_tag = PostTag(post=new_post, name=post_catergory, value=ave_tag_value)
     new_post_tag.save()
 
-    new_post_function = PCF(tag=new_post_tag, factor=1, is_active=True)
+    new_post_function = PCF(tag=new_post_tag, factor=1)
     new_post_function.save()
 
     # Creating a new catergory instance if this is a new type of post.

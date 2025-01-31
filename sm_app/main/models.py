@@ -176,7 +176,6 @@ class ICF(models.Model):
 class PCF(models.Model):
     tag = models.OneToOneField(PostTag, on_delete=models.CASCADE, null=False, related_name='PCF')
     factor = models.FloatField()
-    is_active = models.BooleanField()
 
     def __str__(self):
         return f'Function for {self.tag.name} for post {self.tag.post.title}'

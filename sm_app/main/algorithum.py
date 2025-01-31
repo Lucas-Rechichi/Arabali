@@ -365,32 +365,29 @@ class Algorithum:
             # Getting the function parameters
             function_obj = post_tag_obj.PCF
             current_factor = function_obj.factor
-            is_active = function_obj.is_active
-            if is_active:
 
-                # Computing the function
-                function_result = (current_factor) * ( (sum_of_difference) ** (1/3) )
+            # Computing the function
+            function_result = (current_factor) * ( (sum_of_difference) ** (1/3) )
 
-                # Updating tag value and function factor
-                if function_result == 0:
-                    new_post_tag_value = current_tag_value - average_post_tag_value
+            # Updating tag value and function factor
+            if function_result == 0:
+                new_post_tag_value = current_tag_value - average_post_tag_value
 
-                else:
-                    new_post_tag_value = current_tag_value + (average_post_tag_value * function_result)
+            else:
+                new_post_tag_value = current_tag_value + (average_post_tag_value * function_result)
 
-                new_function_factor = (current_tag_value/new_post_tag_value)
+            new_function_factor = (current_tag_value/new_post_tag_value)
 
-                # Checking to see if the tag value has become too low to be modualted
-                if new_post_tag_value * 3 < average_post_tag_value:
-                    function_obj.is_active = False
-                    function_obj.save()
+            # Checking to see if the tag value has become too low to be modualted
+            if new_post_tag_value * 3 < average_post_tag_value:
+                function_obj.delete()
 
-                # Recording updates to the database
-                post_tag_obj.value = new_post_tag_value
-                post_tag_obj.save()
+            # Recording updates to the database
+            post_tag_obj.value = new_post_tag_value
+            post_tag_obj.save()
 
-                function_obj.factor = new_function_factor
-                function_obj.save()
+            function_obj.factor = new_function_factor
+            function_obj.save()
 
         def calculate_interest_consequence_function(interest_obj):
 

@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 
 from sm_app import settings
 from main.extras import approx_display, capitalize_plus, difference, exact_display, modified_reciprocal, remove_last_character
-from main.models import UserStats, PostTag, Interest, InterestInteraction, PostInteraction, Notification, Following
+from main.models import UserStats, PostTag, Interest, InterestInteraction
+from main.models import PostInteraction, Notification, PCF
 from main.algorithum import Algorithum
 
 from messaging.models import Message, PollMessage
@@ -54,7 +55,18 @@ def check_modulation_time(request):
         interests = Interest.objects.all()
 
         for tag, interest in zip(tags, interests):
-            Algorithum.Modulations.calculate_post_consequence_function(post_tag_obj=tag)
+            # Logic for tags
+            if tag.PCF:
+                Algorithum.Modulations.calculate_post_consequence_function(post_tag_obj=tag)
+            else:
+                # Check to see if the tag can be 'redeemed' for it's PCF
+                new_interactions_count = PostInteraction.objects.filter(tag=tag, is_new=True)
+
+                if new_interactions_count >= 5:
+                    redeemed_post_consequence_function = PCF(tag=tag, factor=1)
+                    redeemed_post_consequence_function.save()
+
+            # Compute ICF regardless
             Algorithum.Modulations.calculate_interest_consequence_function(interest_obj=interest)
 
         # Change the current and old interactions
