@@ -367,7 +367,7 @@ class Algorithum:
             current_factor = function_obj.factor
             is_active = function_obj.is_active
             if is_active:
-                
+
                 # Computing the function
                 function_result = (current_factor) * ( (sum_of_difference) ** (1/3) )
 
@@ -377,8 +377,13 @@ class Algorithum:
 
                 else:
                     new_post_tag_value = current_tag_value + (average_post_tag_value * function_result)
-                
+
                 new_function_factor = (current_tag_value/new_post_tag_value)
+
+                # Checking to see if the tag value has become too low to be modualted
+                if new_post_tag_value * 3 < average_post_tag_value:
+                    function_obj.is_active = False
+                    function_obj.save()
 
                 # Recording updates to the database
                 post_tag_obj.value = new_post_tag_value
