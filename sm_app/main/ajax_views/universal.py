@@ -63,8 +63,8 @@ def check_modulation_time(request):
                 new_interactions_count = PostInteraction.objects.filter(tag=tag, is_new=True)
 
                 if new_interactions_count >= 5:
-                    redeemed_post_consequence_function = PCF(tag=tag, factor=1)
-                    redeemed_post_consequence_function.save()
+                    redeemed_consequence_function = PCF(tag=tag, factor=1)
+                    redeemed_consequence_function.save()
 
             # Compute ICF regardless
             Algorithum.Modulations.calculate_interest_consequence_function(interest_obj=interest)
